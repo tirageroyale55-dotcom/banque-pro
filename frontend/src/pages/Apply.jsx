@@ -90,7 +90,7 @@ export default function Apply() {
       return;
     }
 
-    const res = await fetch("http://localhost:5000/api/auth/check-user", {
+    const res = await fetch("/api/auth/check-user", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -171,7 +171,7 @@ export default function Apply() {
     // 👉 AJOUT SIGNATURE
     data.append("signature", signatureData);
 
-    const res = await fetch("http://localhost:5000/api/auth/apply", {
+    const res = await fetch("/api/auth/apply", {
       method: "POST",
       body: data,
     });
