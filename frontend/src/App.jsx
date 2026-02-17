@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
+
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
@@ -19,7 +20,7 @@ import AdminUserDetails from "./pages/admin/AdminUserDetails";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    
       <Routes>
 
         {/* PUBLIC */}
@@ -79,6 +80,6 @@ export default function App() {
         />
 
       </Routes>
-    </BrowserRouter>
+    
   );
 }
