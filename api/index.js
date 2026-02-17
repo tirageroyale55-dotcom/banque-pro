@@ -1,2 +1,9 @@
-const app = require("../backend/server");
-module.exports = app;
+import express from "express";
+
+const app = express();
+
+app.get("/hello", (req, res) => {
+  res.json({ message: "Hello" });
+});
+
+export default app;
