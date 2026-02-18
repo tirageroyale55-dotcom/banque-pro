@@ -1,11 +1,11 @@
-import { defineConfig } from "vite"; 
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "./", // <-- important pour que le build pointe vers les bons fichiers
+  base: "/",   // <-- IMPORTANT
   build: {
-    outDir: "dist", // normalement déjà par défaut
+    outDir: "dist",
   },
   server: {
     proxy: {
