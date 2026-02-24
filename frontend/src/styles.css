@@ -2059,6 +2059,8 @@ a{text-decoration:none;color:inherit}
 /* Champ Pays (react-select) */
 .apply-card .react-select__control {
   border-radius: 6px !important; /* un peu plus rond */
+  
+
 }
 
 /* Champ Téléphone */
@@ -2067,8 +2069,6 @@ a{text-decoration:none;color:inherit}
 }
 
 
-border-radius: 16px; /* subtil */
-border-radius: 20px; /* très arrondi */
 
 
 
