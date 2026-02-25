@@ -1,13 +1,12 @@
 const multer = require("multer");
 
-// ✅ stockage mémoire compatible Vercel
-const storage = multer.memoryStorage();
-
-const upload = multer({
-  storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB max par fichier
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
   }
 });
 
-module.exports = upload;
+module.exports = multer({ storage });
