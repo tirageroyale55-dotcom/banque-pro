@@ -16,6 +16,10 @@ const normalizePhone = phone => {
 exports.applyForAccount = async (req, res) => {
   try {
 
+console.log("=== Apply Request Received ===");
+console.log("BODY:", req.body);
+console.log("FILES:", req.files);
+
     if (!req.body.email || !req.body.telephone) {
       return res.status(400).json({
         message: "Email et téléphone obligatoires"

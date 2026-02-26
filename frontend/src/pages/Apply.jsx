@@ -19,6 +19,7 @@ export default function Apply() {
   const [countryError, setCountryError] = useState(false);
   const [phoneError, setPhoneError] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
+  const [signatureData, setSignatureData] = useState(null);
   const [phoneExists, setPhoneExists] = useState(false);
   const [emailMessage, setEmailMessage] = useState("");
 
@@ -157,11 +158,10 @@ export default function Apply() {
   e.preventDefault();
 
   try {
-    const canvas = document.getElementById("signature");
-
-    // 🔥 récupère signature
-    const signatureData = canvas.toDataURL("image/png");
-
+    if (!signatureData) {
+  alert("Signature manquante");
+  return;
+}
     const data = new FormData();
 
     Object.entries(formData).forEach(([k, v]) => {
@@ -240,12 +240,15 @@ export default function Apply() {
     };
 
     const stop = () => {
-      drawing = false;
-      if (hasDrawn) {
-        setHasSignature(true);
-        setSignatureError(false);
-      }
-    };
+  drawing = false;
+  if (hasDrawn) {
+    setHasSignature(true);
+    setSignatureError(false);
+
+    const data = canvas.toDataURL("image/png");
+    setSignatureData(data);   // ✅ sauvegarde signature
+  }
+};
 
     canvas.addEventListener("mousedown", start);
     canvas.addEventListener("mousemove", draw);

@@ -47,5 +47,13 @@ router.post("/check-user", async (req, res) => {
 
 
 
+// --------------------
+// ROUTE TEST SIMPLE (GET)
+// --------------------
+router.get("/check-user", (req, res) => {
+  res.json({ ok: true, message: "Route check-user OK" });
+});
+
+
 
 module.exports = router;

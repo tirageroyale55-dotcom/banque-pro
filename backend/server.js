@@ -1,4 +1,4 @@
-require("dotenv").config(); // DOIT être la toute première ligne
+require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
@@ -20,13 +20,12 @@ app.use("/api/admin", require("./routes/admin.routes"));
 app.use("/api/client", require("./routes/client.routes"));
 app.use("/api/transactions", require("./routes/transaction.routes"));
 
-
 const PORT = process.env.PORT || 5000;
 
 app.get("/", (req, res) => {
   res.send("🚀 Backend Banque-Pro opérationnel");
 });
 
-
-const serverless = require("serverless-http");
-module.exports = serverless(app);
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT);
+});
