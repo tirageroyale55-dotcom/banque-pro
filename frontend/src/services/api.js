@@ -1,9 +1,9 @@
-const API_URL = "http://localhost:5000/api";
+const API_URL = "/api"; // correspond à ton vercel.json
 
 export const api = async (endpoint, method = "GET", data = null) => {
   const token = localStorage.getItem("token");
 
-  const res = await fetch(API_URL + endpoint, {
+  const res = await fetch(`${API_URL}${endpoint}`, {
     method,
     headers: {
       "Content-Type": "application/json",

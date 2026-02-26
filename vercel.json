@@ -5,7 +5,10 @@
     { "src": "backend/server.js", "use": "@vercel/node" }
   ],
   "routes": [
+    // Toutes les requêtes vers /api/... vont vers ton backend
     { "src": "/api/(.*)", "dest": "backend/server.js" },
-    { "src": "/(.*)", "dest": "frontend/$1" }
+
+    // Rediriger toutes les autres requêtes frontend vers index.html pour React Router
+    { "src": "/(.*)", "dest": "/frontend/dist/index.html" }
   ]
 }
