@@ -1,14 +1,15 @@
 {
   "version": 2,
   "builds": [
-    { "src": "frontend/package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } },
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    },
     { "src": "backend/server.js", "use": "@vercel/node" }
   ],
   "routes": [
-    // Toutes les requêtes vers /api/... vont vers ton backend
     { "src": "/api/(.*)", "dest": "backend/server.js" },
-
-    // Rediriger toutes les autres requêtes frontend vers index.html pour React Router
     { "src": "/(.*)", "dest": "/frontend/dist/index.html" }
   ]
 }
