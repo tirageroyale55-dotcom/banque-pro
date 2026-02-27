@@ -26,6 +26,5 @@ app.get("/", (req, res) => {
   res.send("🚀 Backend Banque-Pro opérationnel");
 });
 
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
-});
+// ✅ AJOUTE ÇA :
+module.exports = app;
