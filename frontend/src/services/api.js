@@ -1,4 +1,4 @@
-const API_URL = "/api"; // correspond à ton vercel.json
+const API_URL = "/api"; 
 
 export const api = async (endpoint, method = "GET", data = null) => {
   const token = localStorage.getItem("token");
