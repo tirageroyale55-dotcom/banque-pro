@@ -1,15 +1,20 @@
-const API_URL = "/api"; 
+const API_URL = "/api";
 
 export const api = async (endpoint, method = "GET", data = null) => {
-   console.log("TOKEN =", token);
+  const token = localStorage.getItem("token");
+
+  const headers = {
+    "Content-Type": "application/json",
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
 
   const res = await fetch(`${API_URL}${endpoint}`, {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` })
-    },
-    body: data ? JSON.stringify(data) : undefined
+    headers,
+    body: data ? JSON.stringify(data) : undefined,
   });
 
   const json = await res.json();
