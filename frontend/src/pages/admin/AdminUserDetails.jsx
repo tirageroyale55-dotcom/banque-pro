@@ -89,13 +89,13 @@ export default function AdminUserDetails() {
       <section>
         <h3>Documents</h3>
         {user.pieceIdentiteRecto && (
-          <a href={`http://localhost:5000/${user.pieceIdentiteRecto}`} target="_blank">
+          <a href={user.pieceIdentiteRecto} target="_blank">
             📄 Pièce identité recto
           </a>
         )}
         <br />
         {user.pieceIdentiteVerso && (
-          <a href={`http://localhost:5000/${user.pieceIdentiteVerso}`} target="_blank">
+          <a href={user.pieceIdentiteVerso} target="_blank">
             📄 Pièce identité verso
           </a>
         )}
