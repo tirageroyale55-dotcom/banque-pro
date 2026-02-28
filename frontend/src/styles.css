@@ -2307,163 +2307,69 @@ a{text-decoration:none;color:inherit}
 
 
 
-/* ===== LOGIN ===== */
-
-.login-card {
-  max-width: 420px;
+/* ILLUSTRATION */
+.login-illustration {
   text-align: center;
+  margin-bottom: 20px;
 }
 
-.login-subtitle {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 25px;
-}
-
-/* INPUT AVEC ICONE */
-
-.input-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #f7f9fc;
-  border: 1px solid #e3e8ef;
-  border-radius: 10px;
-  padding: 10px 12px;
-  margin-bottom: 15px;
-}
-
-.input-group svg {
-  color: #1a4fd8;
-}
-
-.input-group input {
-  border: none;
-  outline: none;
-  background: transparent;
-  flex: 1;
-  font-size: 0.95rem;
-}
-
-/* ERREUR */
-
-.form-error {
-  color: #d32f2f;
-  font-size: 0.85rem;
-  margin-bottom: 10px;
-}
-
-/* FOOTER */
-
-.login-footer {
-  margin-top: 20px;
-  font-size: 0.85rem;
-}
-
-.login-link {
-  color: #1a4fd8;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.login-link:hover {
-  text-decoration: underline;
-}
-
-
-/* ===== MOBILE ===== */
-
-@media (max-width: 768px) {
-
-  .login-card {
-    padding: 25px 18px;
-  }
-
-  .login-subtitle {
-    font-size: 0.85rem;
-  }
-
-}
-
-
-
-
-
-
-
-
-/* CONTAINER */
-.login-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* IMAGE HAUT */
-.login-hero {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.login-hero img {
-  width: 280px;
-  max-width: 90%;
-  opacity: 0.95;
-}
-
-/* CARTE */
-.login-card {
-  width: 100%;
-  max-width: 400px;
-}
-
-/* ICON */
-.login-icon {
-  font-size: 28px;
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-/* ACTIONS */
-.login-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-}
-
-/* LIENS */
-.link {
-  font-size: 13px;
-  text-decoration: none;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
-
-.link.danger {
-  color: red;
+.login-illustration img {
+  width: 140px;
 }
 
 /* PIN DISPLAY */
 .pin-display {
-  text-align: center;
-  font-size: 22px;
-  letter-spacing: 6px;
-  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
 }
 
-/* ERREUR */
-.error-msg {
-  color: red;
-  margin-top: 10px;
-  font-size: 14px;
+.pin-display span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
 }
 
-/* 📱 MOBILE FIX (ANTI ZOOM) */
-input {
+.pin-display .filled {
+  background: #1a4fd8;
+}
+
+/* CLAVIER */
+.pin-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.pin-pad button {
+  padding: 15px;
+  border-radius: 10px;
+  border: none;
+  background: #f1f4f8;
   font-size: 16px;
+  cursor: pointer;
+}
+
+.pin-pad button:hover {
+  background: #e3e8ef;
+}
+
+/* HELP */
+.login-help {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.login-help button {
+  margin-top: 10px;
+  width: 100%;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .login-illustration img {
+    width: 100px;
+  }
 }

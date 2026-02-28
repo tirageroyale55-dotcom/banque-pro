@@ -1,145 +1,142 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const [step, setStep] = useState(1);
   const [personalId, setPersonalId] = useState("");
   const [pin, setPin] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
 
-  // 👉 ETAPE 1 : Vérification identifiant
-  const handleIdSubmit = async (e) => {
+  /* ===== STEP 1 ===== */
+  const handleId = e => {
     e.preventDefault();
-    setError(null);
-
-    try {
-      const res = await api("/auth/check-id", "POST", { personalId });
-
-      if (res.exists) {
-        setStep(2);
-      } else {
-        setError("Identifiant introuvable");
-      }
-    } catch (err) {
-      setError("Erreur serveur");
-    }
+    if (!personalId) return;
+    setStep(2);
   };
 
-  // 👉 ETAPE 2 : Connexion PIN
-  const handlePinSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
+  /* ===== PIN CLICK ===== */
+  const handlePinClick = val => {
+    if (pin.length >= 6) return;
+    setPin(prev => prev + val);
+  };
+
+  const removePin = () => {
+    setPin(prev => prev.slice(0, -1));
+  };
+
+  /* ===== LOGIN ===== */
+  const submitPin = async () => {
+    if (pin.length < 4) return;
 
     try {
       const res = await api("/auth/login", "POST", {
         personalId,
-        pin,
+        pin
       });
 
       localStorage.setItem("token", res.token);
 
       if (res.user.role === "ADMIN") {
-        window.location.href = "/admin";
+        navigate("/admin");
       } else {
-        window.location.href = "/dashboard";
+        navigate("/dashboard");
       }
 
     } catch (err) {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
+      setError("Code PIN incorrect");
+
+      setPin("");
 
       if (newAttempts >= 3) {
-        setError("3 tentatives échouées. Réinitialisation requise.");
-      } else {
-        setError("Code PIN incorrect");
+        setError("Compte temporairement bloqué");
       }
     }
   };
 
   return (
-    <div className="login-container">
+    <div className="apply-bg">
 
-      {/* ✅ IMAGE HAUT (hors carte) */}
-      <div className="login-hero">
-        <img
-          src="/banking-illustration.png"
-          alt="Bank illustration"
-        />
-      </div>
+      <div className="apply-card login-card">
 
-      {/* ✅ CARTE LOGIN */}
-      <form
-        className="card login-card"
-        onSubmit={step === 1 ? handleIdSubmit : handlePinSubmit}
-      >
-        {/* 🔒 Icône bancaire */}
-        <div className="login-icon">🏦</div>
-
-        <h2>Connexion sécurisée</h2>
-
-        {/* ✅ ETAPE 1 */}
+        {/* ===== STEP 1 IDENTIFIANT ===== */}
         {step === 1 && (
           <>
-            <input
-              name="personalId"
-              placeholder="Identifiant personnel"
-              required
-              value={personalId}
-              onChange={(e) => setPersonalId(e.target.value)}
-            />
-
-            <div className="login-actions">
-              <a href="/forgot-id" className="link">
-                Identifiant oublié ?
-              </a>
-
-              <button type="submit">Continuer →</button>
+            <div className="login-illustration">
+              <img src="/img/login-illu.png" alt="illustration" />
             </div>
+
+            <h2 className="apply-title">Connexion</h2>
+
+            <form onSubmit={handleId}>
+              <input
+                placeholder="Identifiant personnel"
+                value={personalId}
+                onChange={e => setPersonalId(e.target.value)}
+                required
+              />
+
+              <button className="btn-solid">
+                Continuer
+              </button>
+            </form>
+
+            <p className="login-link">
+              Identifiant oublié ?
+            </p>
           </>
         )}
 
-        {/* ✅ ETAPE 2 */}
+        {/* ===== STEP 2 PIN ===== */}
         {step === 2 && (
           <>
+            <h2 className="apply-title">Saisissez votre code PIN</h2>
+
+            {/* PIN DISPLAY */}
             <div className="pin-display">
-              {pin.padEnd(5, "•")}
+              {Array.from({ length: 6 }).map((_, i) => (
+                <span key={i} className={pin[i] ? "filled" : ""}></span>
+              ))}
             </div>
 
-            <input
-              type="password"
-              maxLength="5"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              placeholder="•••••"
-              value={pin}
-              onChange={(e) => setPin(e.target.value)}
-              required
-            />
+            {/* ERROR */}
+            {error && <p className="form-error">{error}</p>}
 
-            <div className="login-actions">
-              {attempts < 3 ? (
-                <a href="/forgot-pin" className="link">
-                  Code PIN oublié ?
-                </a>
-              ) : (
-                <a href="/reset-password" className="link danger">
-                  Réinitialiser mot de passe
-                </a>
-              )}
+            {/* CLAVIER */}
+            <div className="pin-pad">
+              {[1,2,3,4,5,6,7,8,9].map(n => (
+                <button key={n} onClick={() => handlePinClick(n)}>
+                  {n}
+                </button>
+              ))}
 
-              <button type="submit">Se connecter →</button>
+              <button onClick={removePin}>⌫</button>
+              <button onClick={() => handlePinClick(0)}>0</button>
+              <button onClick={submitPin}>✔</button>
             </div>
+
+            {/* RESET */}
+            {attempts >= 3 && (
+              <div className="login-help">
+                <p>Code PIN oublié ?</p>
+                <button className="btn-outline">
+                  Réinitialiser le PIN
+                </button>
+
+                <button className="btn-outline">
+                  Réinitialiser le mot de passe
+                </button>
+              </div>
+            )}
           </>
         )}
 
-        {/* ❌ ERREUR */}
-        {error && (
-          <p className="error-msg">
-            {error}
-          </p>
-        )}
-      </form>
+      </div>
     </div>
   );
 }
