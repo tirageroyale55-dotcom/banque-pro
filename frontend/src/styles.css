@@ -2452,7 +2452,8 @@ a{text-decoration:none;color:inherit}
 
 
 
-.login-container {
+/* 🔥 PAGE */
+.login-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -2460,87 +2461,86 @@ a{text-decoration:none;color:inherit}
   justify-content: center;
 }
 
-/* IMAGE HAUT */
-.login-hero {
-  width: 100%;
-  display: flex;
-  justify-content: center;
+/* 🔥 IMAGE TOP */
+.login-hero img {
+  width: 140px;
   margin-bottom: 20px;
 }
 
-.login-hero img {
+/* 🔥 CARD */
+.login-card {
   width: 100%;
   max-width: 420px;
 }
 
-/* CARTE */
-.login-card {
-  width: 100%;
-  max-width: 400px;
-}
-
-/* HEADER */
-.bank-header {
+/* 🔥 HEADER */
+.login-header {
   text-align: center;
   margin-bottom: 20px;
 }
 
 .bank-icon {
   font-size: 28px;
-  display: block;
 }
 
-/* LIENS */
-.login-links {
+/* 🔥 ACTIONS */
+.login-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-top: 10px;
-  font-size: 13px;
 }
 
-.login-links a {
-  color: #0055aa;
+.login-actions a {
+  font-size: 13px;
+  color: #555;
   text-decoration: none;
 }
 
-.login-links a:hover {
-  text-decoration: underline;
+.login-actions button {
+  margin-left: auto;
 }
 
-/* BOUTON ALIGNÉ DROITE */
-.btn-row {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 15px;
-}
-
-/* ERREUR */
-.error {
-  color: red;
-  font-size: 13px;
-  margin-top: 10px;
-}
-
-/* TELEPHONE MOCK */
-.phone-mock {
-  background: #111;
-  border-radius: 20px;
-  padding: 20px;
-  margin-bottom: 15px;
+/* 🔥 PIN */
+.pin-label {
   text-align: center;
+  margin-bottom: 10px;
 }
 
 .pin-display {
-  color: #0f0;
-  font-size: 22px;
-  letter-spacing: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  font-size: 24px;
+  margin-bottom: 20px;
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
+/* 🔥 CLAVIER */
+.pin-keyboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.pin-keyboard button {
+  padding: 15px;
+  font-size: 18px;
+}
+
+/* ❌ ERROR */
+.error-msg {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* 📱 MOBILE */
+@media (max-width: 480px) {
   .login-hero img {
-    max-width: 300px;
+    width: 110px;
   }
 
   .login-card {
-    margin: 0 15px;
+    padding: 20px;
   }
 }
