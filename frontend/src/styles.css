@@ -2302,6 +2302,87 @@ a{text-decoration:none;color:inherit}
 
 
 
+/* ===== LOGIN ===== */
+
+.login-card {
+  max-width: 420px;
+  text-align: center;
+}
+
+.login-subtitle {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+/* INPUT AVEC ICONE */
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f7f9fc;
+  border: 1px solid #e3e8ef;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 15px;
+}
+
+.input-group svg {
+  color: #1a4fd8;
+}
+
+.input-group input {
+  border: none;
+  outline: none;
+  background: transparent;
+  flex: 1;
+  font-size: 0.95rem;
+}
+
+/* ERREUR */
+
+.form-error {
+  color: #d32f2f;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+}
+
+/* FOOTER */
+
+.login-footer {
+  margin-top: 20px;
+  font-size: 0.85rem;
+}
+
+.login-link {
+  color: #1a4fd8;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
+
+
+/* ===== MOBILE ===== */
+
+@media (max-width: 768px) {
+
+  .login-card {
+    padding: 25px 18px;
+  }
+
+  .login-subtitle {
+    font-size: 0.85rem;
+  }
+
+}
+
+
+
+
 /* ILLUSTRATION */
 .login-illustration {
   text-align: center;
