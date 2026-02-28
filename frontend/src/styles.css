@@ -2449,3 +2449,98 @@ a{text-decoration:none;color:inherit}
     width: 100px;
   }
 }
+
+
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* IMAGE HAUT */
+.login-hero {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.login-hero img {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* CARTE */
+.login-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* HEADER */
+.bank-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.bank-icon {
+  font-size: 28px;
+  display: block;
+}
+
+/* LIENS */
+.login-links {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.login-links a {
+  color: #0055aa;
+  text-decoration: none;
+}
+
+.login-links a:hover {
+  text-decoration: underline;
+}
+
+/* BOUTON ALIGNÉ DROITE */
+.btn-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+/* ERREUR */
+.error {
+  color: red;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+/* TELEPHONE MOCK */
+.phone-mock {
+  background: #111;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.pin-display {
+  color: #0f0;
+  font-size: 22px;
+  letter-spacing: 8px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .login-hero img {
+    max-width: 300px;
+  }
+
+  .login-card {
+    margin: 0 15px;
+  }
+}
