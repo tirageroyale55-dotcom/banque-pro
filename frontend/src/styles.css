@@ -2414,6 +2414,11 @@ a{text-decoration:none;color:inherit}
   justify-content: flex-end;
 }
 
+.apply-card input {
+  width: 100%;
+  max-width: 100%;
+}
+
 /* MOBILE */
 @media (max-width: 768px) {
   .login-top-illustration img {
