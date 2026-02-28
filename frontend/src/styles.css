@@ -2419,6 +2419,10 @@ a{text-decoration:none;color:inherit}
   max-width: 100%;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 /* MOBILE */
 @media (max-width: 768px) {
   .login-top-illustration img {
