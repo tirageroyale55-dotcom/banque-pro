@@ -2451,3 +2451,42 @@ a{text-decoration:none;color:inherit}
 }
 
 
+/* empêche zoom iPhone sans casser ton design */
+input, button {
+  font-size: 16px;
+}
+
+/* image au dessus sans toucher ta card */
+.login-hero {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.login-hero img {
+  width: 220px;
+  max-width: 90%;
+}
+
+/* alignement bouton droite uniquement */
+.login-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* clavier PIN sans casser ton style */
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  gap: 10px;
+  justify-content: center;
+}
+
+.pin-display {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 15px 0;
+  font-size: 22px;
+}
