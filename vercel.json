@@ -11,12 +11,14 @@
       "use": "@vercel/node"
     }
   ],
+  {
   "routes": [
     { "src": "/api/(.*)", "dest": "backend/server.js" },
 
-    { "handle": "filesystem" },
+    { "src": "^/$", "dest": "frontend/index.html" },
 
-    
+    { "src": "^/(admin|dashboard|profile|login|apply|pending|activation)(.*)", "dest": "frontend/index.html" },
+
     { "src": "/(.*)", "dest": "frontend/$1" }
   ]
 }
