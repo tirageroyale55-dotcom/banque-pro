@@ -2373,3 +2373,44 @@ a{text-decoration:none;color:inherit}
     width: 100px;
   }
 }
+
+
+
+
+
+
+
+
+
+/* IMAGE HORS CARTE */
+.login-top-image {
+  text-align: center;
+  margin-bottom: -40px;
+}
+
+.login-top-image img {
+  width: 200px;
+  opacity: 0.9;
+}
+
+/* ICONE BANQUE */
+.bank-icon {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+/* BOUTON ALIGNÉ À DROITE */
+.align-right {
+  display: block;
+  margin-left: auto;
+}
+
+/* BLOQUER ZOOM MOBILE */
+html, body {
+  touch-action: manipulation;
+}
+
+input, button {
+  font-size: 16px;
+}

@@ -10,32 +10,41 @@ export default function Login() {
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
+  const [idError, setIdError] = useState(false);
 
   /* ===== STEP 1 ===== */
-  const handleId = e => {
+  const handleId = async (e) => {
     e.preventDefault();
     if (!personalId) return;
-    setStep(2);
+
+    try {
+      // Vérifie si l'identifiant existe
+      await api("/auth/check-id", "POST", { personalId });
+      setIdError(false);
+      setStep(2);
+    } catch (err) {
+      setIdError(true);
+    }
   };
 
   /* ===== PIN CLICK ===== */
-  const handlePinClick = val => {
-    if (pin.length >= 6) return;
-    setPin(prev => prev + val);
+  const handlePinClick = (val) => {
+    if (pin.length >= 5) return;
+    setPin((prev) => prev + val);
   };
 
   const removePin = () => {
-    setPin(prev => prev.slice(0, -1));
+    setPin((prev) => prev.slice(0, -1));
   };
 
   /* ===== LOGIN ===== */
   const submitPin = async () => {
-    if (pin.length < 4) return;
+    if (pin.length !== 5) return;
 
     try {
       const res = await api("/auth/login", "POST", {
         personalId,
-        pin
+        pin,
       });
 
       localStorage.setItem("token", res.token);
@@ -45,12 +54,10 @@ export default function Login() {
       } else {
         navigate("/dashboard");
       }
-
     } catch (err) {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
       setError("Code PIN incorrect");
-
       setPin("");
 
       if (newAttempts >= 3) {
@@ -62,33 +69,46 @@ export default function Login() {
   return (
     <div className="apply-bg">
 
+      {/* IMAGE HORS CARTE */}
+      <div className="login-top-image">
+        <img src="/img/login-illu.png" alt="illustration" />
+      </div>
+
       <div className="apply-card login-card">
+
+        {/* ICONE BANCAIRE */}
+        <div className="bank-icon">🏦</div>
 
         {/* ===== STEP 1 IDENTIFIANT ===== */}
         {step === 1 && (
           <>
-            <div className="login-illustration">
-              <img src="/img/login-illu.png" alt="illustration" />
-            </div>
-
             <h2 className="apply-title">Connexion</h2>
 
             <form onSubmit={handleId}>
               <input
                 placeholder="Identifiant personnel"
                 value={personalId}
-                onChange={e => setPersonalId(e.target.value)}
+                onChange={(e) => {
+                  setPersonalId(e.target.value);
+                  setIdError(false);
+                }}
                 required
               />
 
-              <button className="btn-solid">
+              {idError && (
+                <p className="form-error">Identifiant incorrect</p>
+              )}
+
+              {idError && (
+                <p className="login-link">
+                  Identifiant oublié ?
+                </p>
+              )}
+
+              <button className="btn-solid align-right">
                 Continuer
               </button>
             </form>
-
-            <p className="login-link">
-              Identifiant oublié ?
-            </p>
           </>
         )}
 
@@ -99,7 +119,7 @@ export default function Login() {
 
             {/* PIN DISPLAY */}
             <div className="pin-display">
-              {Array.from({ length: 6 }).map((_, i) => (
+              {Array.from({ length: 5 }).map((_, i) => (
                 <span key={i} className={pin[i] ? "filled" : ""}></span>
               ))}
             </div>
@@ -124,6 +144,7 @@ export default function Login() {
             {attempts >= 3 && (
               <div className="login-help">
                 <p>Code PIN oublié ?</p>
+
                 <button className="btn-outline">
                   Réinitialiser le PIN
                 </button>
@@ -135,7 +156,6 @@ export default function Login() {
             )}
           </>
         )}
-
       </div>
     </div>
   );
