@@ -2452,95 +2452,94 @@ a{text-decoration:none;color:inherit}
 
 
 
-/* 🔥 PAGE */
-.login-page {
-  min-height: 100vh;
+/* 🔥 Empêche zoom mobile */
+input, button {
+  font-size: 16px;
+}
+
+/* Container */
+.login-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* Image haute */
+.login-hero {
+  width: 100%;
+  display: flex;
   justify-content: center;
+  margin-bottom: -40px;
+  z-index: 1;
 }
 
-/* 🔥 IMAGE TOP */
-.login-hero img {
-  width: 140px;
-  margin-bottom: 20px;
+.login-image {
+  width: 220px;
+  max-width: 90%;
 }
 
-/* 🔥 CARD */
+/* Card */
 .login-card {
+  position: relative;
+  z-index: 2;
   width: 100%;
   max-width: 420px;
 }
 
-/* 🔥 HEADER */
-.login-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
+/* Icône banque */
 .bank-icon {
-  font-size: 28px;
+  font-size: 40px;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
-/* 🔥 ACTIONS */
+/* Actions */
 .login-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
-.login-actions a {
-  font-size: 13px;
-  color: #555;
-  text-decoration: none;
-}
-
-.login-actions button {
-  margin-left: auto;
-}
-
-/* 🔥 PIN */
-.pin-label {
+/* PIN */
+.pin-container {
   text-align: center;
-  margin-bottom: 10px;
 }
 
 .pin-display {
   display: flex;
   justify-content: center;
   gap: 10px;
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 28px;
+  margin: 20px 0;
 }
 
-/* 🔥 CLAVIER */
-.pin-keyboard {
+/* Clavier */
+.keypad {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 70px);
   gap: 10px;
+  justify-content: center;
 }
 
-.pin-keyboard button {
-  padding: 15px;
+.keypad button {
+  height: 55px;
+  border-radius: 10px;
   font-size: 18px;
 }
 
-/* ❌ ERROR */
-.error-msg {
-  color: red;
-  text-align: center;
-  margin-top: 10px;
+/* Liens */
+.login-links {
+  margin-top: 15px;
 }
 
-/* 📱 MOBILE */
+/* Responsive */
 @media (max-width: 480px) {
-  .login-hero img {
-    width: 110px;
+  .login-image {
+    width: 180px;
   }
 
-  .login-card {
-    padding: 20px;
+  .keypad {
+    grid-template-columns: repeat(3, 60px);
   }
 }

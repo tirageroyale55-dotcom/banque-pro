@@ -8,7 +8,7 @@ export default function Login() {
   const [error, setError] = useState(null);
   const [attempts, setAttempts] = useState(0);
 
-  // ✅ Vérification identifiant
+  // 🔹 Vérifier identifiant
   const handleIdSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -22,14 +22,14 @@ export default function Login() {
       }
 
       setStep(2);
-    } catch {
-      setError("Erreur serveur");
+    } catch (err) {
+      setError("Erreur de vérification");
     }
   };
 
-  // ✅ Connexion PIN
+  // 🔹 Connexion PIN
   const handleLogin = async () => {
-    if (pin.length !== 5) return;
+    setError(null);
 
     try {
       const res = await api("/auth/login", "POST", {
@@ -51,15 +51,15 @@ export default function Login() {
       setError("Code PIN incorrect");
 
       if (newAttempts >= 3) {
-        setError("3 tentatives échouées. Réinitialisation requise.");
+        setError("3 tentatives échouées. Veuillez réinitialiser votre accès.");
       }
     }
   };
 
-  // ✅ Clavier PIN
-  const addDigit = (digit) => {
+  // 🔹 Clavier PIN
+  const addDigit = (num) => {
     if (pin.length < 5) {
-      setPin(pin + digit);
+      setPin(pin + num);
     }
   };
 
@@ -68,86 +68,95 @@ export default function Login() {
   };
 
   return (
-    <div className="login-page">
+    <div className="login-container">
 
-      {/* 🔥 IMAGE PREMIUM */}
+      {/* 🔥 IMAGE HAUT (hors card) */}
       <div className="login-hero">
         <img
-          src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+          src="/bank-woman.png"
           alt="bank"
+          className="login-image"
         />
       </div>
 
       {/* 🔥 CARD */}
       <div className="card login-card">
 
-        <div className="login-header">
-          <span className="bank-icon">🏦</span>
-          <h2>Connexion sécurisée</h2>
-        </div>
-
-        {/* ================= STEP 1 ================= */}
+        {/* 🔹 STEP 1 */}
         {step === 1 && (
           <form onSubmit={handleIdSubmit}>
+            <div className="bank-icon">🏦</div>
+
+            <h2>Connexion sécurisée</h2>
 
             <input
+              name="personalId"
+              placeholder="Identifiant personnel"
               value={personalId}
               onChange={(e) => setPersonalId(e.target.value)}
-              placeholder="Identifiant personnel"
               required
             />
+
+            {error && <p className="error">{error}</p>}
 
             <div className="login-actions">
               <a href="/forgot-id">Identifiant oublié ?</a>
 
-              <button type="submit">
-                Continuer →
-              </button>
+              <button type="submit">Continuer →</button>
             </div>
           </form>
         )}
 
-        {/* ================= STEP 2 ================= */}
+        {/* 🔹 STEP 2 */}
         {step === 2 && (
-          <div>
+          <div className="pin-container">
 
-            <p className="pin-label">
-              Entrez votre code PIN
-            </p>
+            <div className="bank-icon">🏦</div>
 
-            {/* 🔒 PIN DISPLAY */}
+            <h2>Saisir votre code PIN</h2>
+
+            {/* 🔢 AFFICHAGE PIN */}
             <div className="pin-display">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <span key={i}>
+              {[...Array(5)].map((_, i) => (
+                <span key={i} className="dot">
                   {pin[i] ? "●" : "○"}
                 </span>
               ))}
             </div>
 
-            {/* 📱 CLAVIER */}
-            <div className="pin-keyboard">
+            {error && <p className="error">{error}</p>}
+
+            {/* 🔢 CLAVIER */}
+            <div className="keypad">
               {[1,2,3,4,5,6,7,8,9].map(n => (
                 <button key={n} onClick={() => addDigit(n)}>
                   {n}
                 </button>
               ))}
 
-              <button onClick={removeDigit}>←</button>
+              <button onClick={removeDigit}>⌫</button>
               <button onClick={() => addDigit(0)}>0</button>
-              <button onClick={handleLogin}>✔</button>
+              <button
+                onClick={handleLogin}
+                disabled={pin.length !== 5}
+              >
+                ✔
+              </button>
             </div>
 
-            <div className="login-actions">
-              <a href="/forgot-pin">Code PIN oublié ?</a>
+            {/* 🔗 LIENS */}
+            <div className="login-links">
+              {attempts < 3 ? (
+                <a href="/forgot-pin">Code PIN oublié ?</a>
+              ) : (
+                <a href="/reset-access">
+                  Réinitialiser mon accès
+                </a>
+              )}
             </div>
-
           </div>
         )}
 
-        {/* ❌ ERREUR */}
-        {error && (
-          <p className="error-msg">{error}</p>
-        )}
       </div>
     </div>
   );
