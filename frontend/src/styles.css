@@ -2302,6 +2302,11 @@ a{text-decoration:none;color:inherit}
 
 
 
+
+
+
+
+
 /* ===== LOGIN ===== */
 
 .login-card {
@@ -2380,113 +2385,3 @@ a{text-decoration:none;color:inherit}
 
 }
 
-
-
-
-/* ILLUSTRATION */
-.login-illustration {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.login-illustration img {
-  width: 140px;
-}
-
-/* PIN DISPLAY */
-.pin-display {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 20px 0;
-}
-
-.pin-display span {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid #ccc;
-}
-
-.pin-display .filled {
-  background: #1a4fd8;
-}
-
-/* CLAVIER */
-.pin-pad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.pin-pad button {
-  padding: 15px;
-  border-radius: 10px;
-  border: none;
-  background: #f1f4f8;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.pin-pad button:hover {
-  background: #e3e8ef;
-}
-
-/* HELP */
-.login-help {
-  margin-top: 20px;
-  text-align: center;
-}
-
-.login-help button {
-  margin-top: 10px;
-  width: 100%;
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
-  .login-illustration img {
-    width: 100px;
-  }
-}
-
-
-/* empêche zoom iPhone sans casser ton design */
-input, button {
-  font-size: 16px;
-}
-
-/* image au dessus sans toucher ta card */
-.login-hero {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.login-hero img {
-  width: 220px;
-  max-width: 90%;
-}
-
-/* alignement bouton droite uniquement */
-.login-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* clavier PIN sans casser ton style */
-.keypad {
-  display: grid;
-  grid-template-columns: repeat(3, 60px);
-  gap: 10px;
-  justify-content: center;
-}
-
-.pin-display {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin: 15px 0;
-  font-size: 22px;
-}
