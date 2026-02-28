@@ -10,7 +10,6 @@ export default function Login() {
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
-  const [idError, setIdError] = useState(false);
 
   /* ===== STEP 1 ===== */
   const handleId = async (e) => {
@@ -18,12 +17,12 @@ export default function Login() {
     if (!personalId) return;
 
     try {
-      // Vérifie si l'identifiant existe
+      // Vérification côté backend
       await api("/auth/check-id", "POST", { personalId });
-      setIdError(false);
+      setError("");
       setStep(2);
-    } catch (err) {
-      setIdError(true);
+    } catch {
+      setError("Identifiant incorrect");
     }
   };
 
@@ -67,10 +66,10 @@ export default function Login() {
   };
 
   return (
-    <div className="apply-bg">
+    <div className="apply-bg login-page">
 
-      {/* IMAGE HORS CARTE */}
-      <div className="login-top-image">
+      {/* IMAGE AU DESSUS (TOUJOURS VISIBLE) */}
+      <div className="login-top-illustration">
         <img src="/img/login-illu.png" alt="illustration" />
       </div>
 
@@ -88,27 +87,24 @@ export default function Login() {
               <input
                 placeholder="Identifiant personnel"
                 value={personalId}
-                onChange={(e) => {
-                  setPersonalId(e.target.value);
-                  setIdError(false);
-                }}
+                onChange={(e) => setPersonalId(e.target.value)}
                 required
               />
 
-              {idError && (
-                <p className="form-error">Identifiant incorrect</p>
-              )}
+              {error && <p className="form-error">{error}</p>}
 
-              {idError && (
-                <p className="login-link">
-                  Identifiant oublié ?
-                </p>
-              )}
-
-              <button className="btn-solid align-right">
-                Continuer
-              </button>
+              <div className="btn-right">
+                <button className="btn-solid">
+                  Continuer
+                </button>
+              </div>
             </form>
+
+            {error && (
+              <p className="login-link">
+                Identifiant oublié ?
+              </p>
+            )}
           </>
         )}
 
@@ -124,7 +120,6 @@ export default function Login() {
               ))}
             </div>
 
-            {/* ERROR */}
             {error && <p className="form-error">{error}</p>}
 
             {/* CLAVIER */}
@@ -140,11 +135,9 @@ export default function Login() {
               <button onClick={submitPin}>✔</button>
             </div>
 
-            {/* RESET */}
             {attempts >= 3 && (
               <div className="login-help">
                 <p>Code PIN oublié ?</p>
-
                 <button className="btn-outline">
                   Réinitialiser le PIN
                 </button>
@@ -156,6 +149,7 @@ export default function Login() {
             )}
           </>
         )}
+
       </div>
     </div>
   );

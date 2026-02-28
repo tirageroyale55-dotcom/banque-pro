@@ -2382,35 +2382,43 @@ a{text-decoration:none;color:inherit}
 
 
 
-/* IMAGE HORS CARTE */
-.login-top-image {
+/* IMAGE AU DESSUS DE LA CARD */
+.login-top-illustration {
   text-align: center;
   margin-bottom: -40px;
+  z-index: 2;
+  position: relative;
 }
 
-.login-top-image img {
-  width: 200px;
-  opacity: 0.9;
+.login-top-illustration img {
+  width: 220px;
 }
 
-/* ICONE BANQUE */
+/* ICONE BANCAIRE */
 .bank-icon {
+  font-size: 40px;
   text-align: center;
-  font-size: 32px;
   margin-bottom: 10px;
 }
 
-/* BOUTON ALIGNÉ À DROITE */
-.align-right {
-  display: block;
-  margin-left: auto;
+/* ALIGNER BOUTON A DROITE */
+.btn-right {
+  display: flex;
+  justify-content: flex-end;
 }
 
-/* BLOQUER ZOOM MOBILE */
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .login-top-illustration img {
+    width: 160px;
+  }
+}
+
+/* DESACTIVER ZOOM MOBILE */
 html, body {
   touch-action: manipulation;
 }
 
 input, button {
-  font-size: 16px;
+  touch-action: manipulation;
 }
