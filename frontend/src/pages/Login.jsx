@@ -49,34 +49,36 @@ const handleId = async (e) => {
   };
 
   /* ===== LOGIN ===== */
-  const submitPin = async () => {
-    if (pin.length !== 5) return;
+  const submitPin = async () => { 
+  if (pin.length !== 5) return;
 
-    try {
-      const res = await api("/auth/login", "POST", {
-        personalId,
-        pin,
-      });
+  try {
+    const res = await api("/auth/login", "POST", {
+      personalId,
+      pin,
+    });
 
-      localStorage.setItem("token", res.token);
+    localStorage.setItem("token", res.token);
 
+    if (res.user.role === "ADMIN") {
+      navigate("/admin"); // 🔥 admin direct
+    } else {
       navigate("/welcome", {
-  state: {
-    user: res.user
-  }
-});
-    } catch (err) {
-      const newAttempts = attempts + 1;
-      setAttempts(newAttempts);
-      setError("Code PIN incorrect");
-      setPin("");
-
-      if (newAttempts >= 3) {
-        setError("Compte temporairement bloqué");
-      }
+        state: { user: res.user }
+      });
     }
-  };
 
+  } catch (err) {
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
+    setError("Code PIN incorrect");
+    setPin("");
+
+    if (newAttempts >= 3) {
+      setError("Compte temporairement bloqué");
+    }
+  }
+};
   return (
   <div className="apply-bg login-page">
 
