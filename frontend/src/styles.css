@@ -2437,3 +2437,31 @@ input, select, textarea {
 html, body {
   overflow-x: hidden;
 }
+
+
+
+
+
+/* PAGE WELCOME */
+.welcome-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* CARD */
+.welcome-card {
+  text-align: center;
+}
+
+/* TITRE */
+.welcome-title {
+  margin-bottom: 30px;
+}
+
+/* BOUTON */
+.welcome-btn {
+  display: block;
+  margin: 0 auto;
+  width: 60%;
+}

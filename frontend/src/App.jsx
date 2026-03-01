@@ -9,6 +9,7 @@ import Apply from "./pages/Apply";
 import Pending from "./pages/Pending";
 import Activate from "./pages/Activate";
 import Login from "./pages/Login";
+import Welcome from "./pages/Welcome";
 
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/pending" element={<Pending />} />
         <Route path="/activation" element={<Activate />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/welcome" element={<Welcome />} />
         
         {/* CLIENT */}
         <Route

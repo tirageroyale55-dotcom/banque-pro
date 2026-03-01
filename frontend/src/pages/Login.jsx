@@ -60,11 +60,11 @@ const handleId = async (e) => {
 
       localStorage.setItem("token", res.token);
 
-      if (res.user.role === "ADMIN") {
-        navigate("/admin");
-      } else {
-        navigate("/dashboard");
-      }
+      navigate("/welcome", {
+  state: {
+    user: res.user
+  }
+});
     } catch (err) {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
