@@ -172,12 +172,14 @@ exports.login = async (req, res) => {
     );
 
     res.json({
-      token,
-      user: {
-        personalId: user.personalId,
-        role: user.role
-      }
-    });
+  token,
+  user: {
+    personalId: user.personalId,
+    role: user.role,
+    prenom: user.prenom,
+    nom: user.nom
+  }
+});
 
   } catch (err) {
     res.status(500).json({ error: err.message });
