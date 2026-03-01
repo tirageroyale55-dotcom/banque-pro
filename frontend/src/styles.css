@@ -2426,7 +2426,7 @@ a{text-decoration:none;color:inherit}
 /* MOBILE */
 @media (max-width: 768px) {
   .login-top-illustration img {
-    width: 160px;
+    width: 400px;
   }
 }
 
