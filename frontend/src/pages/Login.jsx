@@ -12,20 +12,32 @@ export default function Login() {
   const [attempts, setAttempts] = useState(0);
 
   /* ===== STEP 1 ===== */
-  const handleId = async (e) => {
-    e.preventDefault();
-    if (!personalId) return;
+  /* ===== STEP 1 ===== */
+const handleId = async (e) => {
+  e.preventDefault();
 
-    try {
-      // Vérification côté backend
-      await api("/auth/check-id", "POST", { personalId });
-      setError("");
-      setStep(2);
-    } catch {
+  const cleanId = personalId.trim();
+
+  if (!cleanId) return;
+
+  try {
+    const res = await api("/auth/check-id", "POST", {
+      personalId: cleanId
+    });
+
+    if (!res.exists) {
       setError("Identifiant incorrect");
+      return;
     }
-  };
 
+    setError("");
+    setStep(2);
+
+  } catch (err) {
+    console.error(err);
+    setError("Erreur serveur");
+  }
+};
   /* ===== PIN CLICK ===== */
   const handlePinClick = (val) => {
     if (pin.length >= 5) return;

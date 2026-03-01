@@ -44,7 +44,26 @@ router.post("/check-user", async (req, res) => {
   });
 });
 
+router.post("/check-id", async (req, res) => {
+  const personalId = req.body.personalId?.trim();
 
+  if (!personalId) {
+    return res.status(400).json({ exists: false });
+  }
+
+  const user = await User.findOne({
+    personalId: personalId
+  });
+
+  if (!user) {
+    return res.json({ exists: false });
+  }
+
+  res.json({
+    exists: true,
+    status: user.status
+  });
+});
 
 
 // --------------------
