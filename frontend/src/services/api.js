@@ -1,7 +1,7 @@
-export async function api(path, method = "GET", body) {
+export default async function api(path, method = "GET", body) {
   const token = localStorage.getItem("token");
 
-  const res = await fetch("https://banque-pro.vercel.app/api" + path, {
+  const res = await fetch("/api" + path, {
     method,
     headers: {
       "Content-Type": "application/json",
