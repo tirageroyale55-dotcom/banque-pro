@@ -11,6 +11,10 @@ export default function Login() {
   const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
 
+  const handleForgotId = () => {
+  navigate("/forgot-id");
+};
+
   /* ===== STEP 1 ===== */
   /* ===== STEP 1 ===== */
 const handleId = async (e) => {
@@ -71,12 +75,11 @@ const handleId = async (e) => {
   } catch (err) {
     const newAttempts = attempts + 1;
     setAttempts(newAttempts);
-    setError("Code PIN incorrect");
-    setPin("");
-
-    if (newAttempts >= 3) {
-      setError("Compte temporairement bloqué");
-    }
+    if (err.response?.status === 403) {
+  setError("Compte temporairement bloqué");
+} else {
+  setError("Code PIN incorrect");
+}
   }
 };
   return (
@@ -113,7 +116,9 @@ const handleId = async (e) => {
           </form>
 
           {error && (
-            <p className="login-link">Identifiant oublié ?</p>
+           <p className="login-link" onClick={handleForgotId}>
+             Identifiant oublié ?
+           </p>
           )}
         </>
       )}
@@ -131,6 +136,14 @@ const handleId = async (e) => {
 
           {error && <p className="form-error">{error}</p>}
 
+          {error && (
+            <p
+              className="login-link"
+              onClick={() => navigate("/forgot-pin")}
+            >
+              Code PIN oublié ?
+           </p>
+           )}
           <div className="pin-pad">
             {[1,2,3,4,5,6,7,8,9].map(n => (
               <button key={n} onClick={() => handlePinClick(n)}>

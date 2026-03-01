@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-
+const nodemailer = require("nodemailer");
 // ======================
 // Normalisation téléphone
 // ======================
@@ -134,13 +134,14 @@ exports.login = async (req, res) => {
   try {
     const { personalId, pin } = req.body;
 
+    // 1️⃣ Vérification champs
     if (!personalId || !pin) {
       return res.status(400).json({
         message: "Champs requis manquants"
       });
     }
 
-    // Cherche l'utilisateur par personalId
+    // 2️⃣ Recherche utilisateur
     const user = await User.findOne({ personalId });
 
     if (!user) {
@@ -149,39 +150,139 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Vérifie que le compte est actif et email vérifié
+    // 3️⃣ Vérifier blocage
+    if (user.lockedUntil && user.lockedUntil > Date.now()) {
+      return res.status(403).json({
+        message: "Compte temporairement bloqué. Veuillez contacter l'administrateur."
+      });
+    }
+
+    // 4️⃣ Vérifie statut
     if (user.status !== "ACTIVE" || !user.emailVerified) {
       return res.status(403).json({
         message: "Compte non activé"
       });
     }
 
-    // Vérifie le PIN
+    // 5️⃣ Vérification PIN
     const pinValid = await bcrypt.compare(pin, user.pinHash);
+
     if (!pinValid) {
+      user.loginAttempts = (user.loginAttempts || 0) + 1;
+
+      // 🔴 Blocage après 5 tentatives
+      if (user.loginAttempts >= 5) {
+        user.lockedUntil = Date.now() + 30 * 60 * 1000; // 30 minutes
+        await user.save();
+
+        return res.status(403).json({
+          message:
+            "Compte temporairement bloqué. Contactez l'administrateur."
+        });
+      }
+
+      await user.save();
+
       return res.status(401).json({
         message: "Code PIN incorrect"
       });
     }
 
-    // Génère token JWT
+    // 6️⃣ Si succès → reset tentatives
+    user.loginAttempts = 0;
+    user.lockedUntil = null;
+    await user.save();
+
+    // 7️⃣ Génération JWT
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
+    // 8️⃣ Réponse avec vrai nom
     res.json({
-  token,
-  user: {
-    personalId: user.personalId,
-    role: user.role,
-    prenom: user.prenom,
-    nom: user.nom
-  }
-});
+      token,
+      user: {
+        personalId: user.personalId,
+        role: user.role,
+        prenom: user.prenom,
+        nom: user.nom
+      }
+    });
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      error: err.message
+    });
+  }
+};
+
+
+
+// ======================
+// Envoi identifiant
+// ======================
+exports.sendPersonalId = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user) return res.status(404).json({ ok: false, message: "Email incorrect" });
+
+    // Config nodemailer
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    const info = await transporter.sendMail({
+      from: `"Banque" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: "Votre identifiant personnel",
+      html: `<p>Bonjour ${user.prenom},</p>
+             <p>Votre identifiant personnel est : <b>${user.personalId}</b></p>`,
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
+
+
+
+
+
+exports.verifyPassword = async (req, res) => {
+  try {
+    const { personalId, password } = req.body;
+    const user = await User.findOne({ personalId });
+    if (!user) return res.json({ ok: false });
+
+    const valid = await bcrypt.compare(password, user.passwordHash);
+    res.json({ ok: valid });
+  } catch (err) {
+    res.status(500).json({ ok: false });
+  }
+};
+
+
+
+exports.changePin = async (req, res) => {
+  try {
+    const { personalId, pin } = req.body;
+    const user = await User.findOne({ personalId });
+    if (!user) return res.json({ ok: false });
+
+    user.pinHash = await bcrypt.hash(pin, 10);
+    user.loginAttempts = 0; // reset tentative après succès
+    await user.save();
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false });
   }
 };

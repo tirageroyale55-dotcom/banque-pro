@@ -18,6 +18,9 @@ import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUserDetails from "./pages/admin/AdminUserDetails";
 
+import ForgotId from "./pages/ForgotId";
+import ForgotPin from "./pages/ForgotPin";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -32,7 +35,8 @@ export default function App() {
         <Route path="/activation" element={<Activate />} />
         <Route path="/login" element={<Login />} />
         <Route path="/welcome" element={<Welcome />} />
-        
+        <Route path="/forgot-id" element={<ForgotId />} />
+        <Route path="/forgot-pin" element={<ForgotPin />} />
         {/* CLIENT */}
         <Route
           path="/dashboard"

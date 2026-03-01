@@ -5,7 +5,7 @@ const { activateAccount } = require("../controllers/auth.controller");
 const { login } = require("../controllers/auth.controller");
 const upload = require("../middleware/upload.middleware");
 const User = require("../models/User");
-
+const { sendPersonalId, verifyPassword, changePin } = require("../controllers/auth.controller");
 
 router.post("/login", login);
 
@@ -65,6 +65,16 @@ router.post("/check-id", async (req, res) => {
   });
 });
 
+
+
+// Envoi identifiant
+router.post("/send-personal-id", sendPersonalId);
+
+// Vérifier mot de passe pour PIN
+router.post("/verify-password", verifyPassword);
+
+// Changer PIN
+router.post("/change-pin", changePin);
 
 // --------------------
 // ROUTE TEST SIMPLE (GET)

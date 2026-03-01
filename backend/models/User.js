@@ -113,9 +113,13 @@ const UserSchema = new mongoose.Schema(
     type: String,
     enum: ["ADMIN", "CLIENT"],
     default: "CLIENT"
-  }
+  },
+  
+  loginAttempts: { type: Number, default: 0 }, // compteur de tentatives
+  lockedUntil: { type: Date }                // date jusqu'à laquelle le compte est bloqué
 },
 { timestamps: true }
 );
+
 
 module.exports = mongoose.model("User", UserSchema);
