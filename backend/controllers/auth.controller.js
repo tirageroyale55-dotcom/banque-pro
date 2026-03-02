@@ -240,7 +240,7 @@ exports.sendPersonalId = async (req, res) => {
    });
 
     const info = await transporter.sendMail({
-      from: `"Banque" <${process.env.SMTP_USER}>`,
+      from: `"Banque" <${process.env.MAIL_USER}>`,
       to: email,
       subject: "Votre identifiant personnel",
       html: `<p>Bonjour ${user.prenom},</p>
