@@ -35,8 +35,8 @@ export default function App() {
         <Route path="/activation" element={<Activate />} />
         <Route path="/login" element={<Login />} />
         <Route path="/welcome" element={<Welcome />} />
-        <Route path="/forgot-id" element={<forgotId />} />
-        <Route path="/forgot-pin" element={<forgotPin />} />
+        <Route path="/forgot-id" element={<ForgotId />} />
+        <Route path="/forgot-pin" element={<ForgotPin />} />
         {/* CLIENT */}
         <Route
           path="/dashboard"
