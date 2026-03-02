@@ -243,8 +243,78 @@ exports.sendPersonalId = async (req, res) => {
       from: `"BPER Banque" <${process.env.MAIL_USER}>`, // ✅ ici
       to: email,
       subject: "Votre identifiant personnel",
-      html: `<p>Bonjour ${user.prenom},</p>
-             <p>Votre identifiant personnel est : <b>${user.personalId}</b></p>`,
+      html: `
+<div style="margin:0;padding:0;background:#f4f6f9;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:20px 0;">
+    <tr>
+      <td align="center">
+        
+        <!-- CARD -->
+        <table width="100%" style="max-width:480px;background:#ffffff;border-radius:12px;padding:30px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+          
+          <!-- LOGO / TITRE -->
+          <tr>
+            <td style="font-size:22px;font-weight:bold;color:#1a4fd8;padding-bottom:10px;">
+              BPER Banque
+            </td>
+          </tr>
+
+          <!-- TITRE -->
+          <tr>
+            <td style="font-size:18px;font-weight:600;color:#333;padding-bottom:20px;">
+              Récupération de votre identifiant
+            </td>
+          </tr>
+
+          <!-- MESSAGE -->
+          <tr>
+            <td style="font-size:14px;color:#555;padding-bottom:20px;">
+              Bonjour <b>${user.prenom}</b>,<br><br>
+              Suite à votre demande, nous vous communiquons votre identifiant personnel.
+            </td>
+          </tr>
+
+          <!-- IDENTIFIANT -->
+          <tr>
+            <td style="background:#f1f4f8;border-radius:10px;padding:15px;font-size:20px;font-weight:bold;color:#1a4fd8;letter-spacing:2px;">
+              ${user.personalId}
+            </td>
+          </tr>
+
+          <!-- INFO -->
+          <tr>
+            <td style="font-size:13px;color:#777;padding-top:20px;">
+              Pour votre sécurité, ne partagez jamais cet identifiant.<br>
+              Si vous n'êtes pas à l'origine de cette demande, contactez immédiatement votre conseiller.
+            </td>
+          </tr>
+
+          <!-- BOUTON -->
+          <tr>
+            <td style="padding-top:25px;">
+              <a href="${process.env.APP_URL}" 
+                 style="display:inline-block;padding:12px 20px;background:#1a4fd8;color:#ffffff;text-decoration:none;border-radius:8px;font-size:14px;">
+                Accéder à mon espace
+              </a>
+            </td>
+          </tr>
+
+        </table>
+
+        <!-- FOOTER -->
+        <table width="100%" style="max-width:480px;text-align:center;margin-top:15px;">
+          <tr>
+            <td style="font-size:12px;color:#999;">
+              © ${new Date().getFullYear()} BPER Banque - Tous droits réservés
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</div>
+`
     });
 
     res.json({ ok: true });
