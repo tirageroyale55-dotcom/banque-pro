@@ -12,71 +12,83 @@ const transporter = nodemailer.createTransport({
 
 exports.sendActivationEmail = async (user, link) => {
   const html = `
-  <div style="font-family:Arial,Helvetica,sans-serif;background:#f4f6f8;padding:40px">
-    <div style="max-width:620px;margin:auto;background:#ffffff;padding:35px;border-radius:12px">
+  <div style="margin:0;padding:0;background:#f4f6f9;font-family:Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="padding:20px 0;">
+      <tr>
+        <td align="center">
+          
+          <table width="100%" style="max-width:480px;background:#ffffff;border-radius:12px;padding:30px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+            
+            <tr>
+              <td style="font-size:22px;font-weight:bold;color:#1a4fd8;padding-bottom:10px;">
+                BPER Banque
+              </td>
+            </tr>
 
-      <h2 style="color:#003A8F;margin-bottom:5px">
-        BPER Banque  – Activation de votre accès
-      </h2>
+            <tr>
+              <td style="font-size:18px;font-weight:600;color:#333;padding-bottom:20px;">
+                Activation de votre accès bancaire
+              </td>
+            </tr>
 
-      <p>Madame, Monsieur <strong>${user.nom}</strong>,</p>
+            <tr>
+              <td style="font-size:14px;color:#555;padding-bottom:20px;">
+                Bonjour <b>${user.prenom}</b>,<br><br>
+                Votre demande d’ouverture de compte a été validée.
+              </td>
+            </tr>
 
-      <p>
-        Votre demande d’ouverture de compte a été <strong>validée</strong>.
-      </p>
+            <tr>
+              <td style="font-size:14px;color:#555;padding-bottom:10px;">
+                Votre identifiant personnel :
+              </td>
+            </tr>
 
-      <p>
-        <strong>Identifiant personnel de connexion :</strong>
-      </p>
+            <tr>
+              <td style="background:#f1f4f8;border-radius:10px;padding:15px;font-size:20px;font-weight:bold;color:#1a4fd8;letter-spacing:2px;">
+                ${user.personalId}
+              </td>
+            </tr>
 
-      <div style="
-        background:#eef3fb;
-        padding:15px;
-        border-radius:8px;
-        font-size:20px;
-        letter-spacing:2px;
-        text-align:center;
-        margin-bottom:25px
-      ">
-        ${user.personalId}
-      </div>
+            <tr>
+              <td style="font-size:13px;color:#777;padding-top:20px;">
+                Cliquez sur le bouton ci-dessous pour activer votre accès et définir votre code PIN.
+              </td>
+            </tr>
 
-      <p>
-        Afin d’activer votre accès bancaire et définir votre code PIN personnel,
-        veuillez cliquer sur le bouton ci-dessous :
-      </p>
+            <tr>
+              <td style="padding-top:25px;">
+                <a href="${link}" 
+                   style="display:inline-block;padding:12px 20px;background:#1a4fd8;color:#ffffff;text-decoration:none;border-radius:8px;font-size:14px;">
+                  Activer mon accès
+                </a>
+              </td>
+            </tr>
 
-      <div style="text-align:center;margin:30px 0">
-        <a href="${link}" style="
-          background:#003A8F;
-          color:#ffffff;
-          padding:14px 26px;
-          border-radius:8px;
-          text-decoration:none;
-          font-weight:bold;
-        ">
-          Activer mon accès bancaire
-        </a>
-      </div>
+            <tr>
+              <td style="font-size:12px;color:#999;padding-top:20px;">
+                Ce lien est valable pendant 1 heure.
+              </td>
+            </tr>
 
-      <p style="font-size:14px;color:#444">
-        Ce lien est valable pendant <strong>1 heure</strong>.
-      </p>
+          </table>
 
-      <hr style="margin:30px 0">
+          <table width="100%" style="max-width:480px;text-align:center;margin-top:15px;">
+            <tr>
+              <td style="font-size:12px;color:#999;">
+                © ${new Date().getFullYear()} BPER Banque - Tous droits réservés
+              </td>
+            </tr>
+          </table>
 
-      <p style="font-size:12px;color:#777">
-        Si vous n’êtes pas à l’origine de cette demande, veuillez ignorer cet email.
-        <br><br>
-        © BPER Banque  – Service client sécurisé
-      </p>
-
-    </div>
+        </td>
+      </tr>
+    </table>
   </div>
   `;
 
   await transporter.sendMail({
-    from: `"BPER Banque" <contact@tirageroyale.com>`,
+    from: `"BPER Banque" <${process.env.MAIL_USER}>`,
     to: user.email,
     subject: "Activation de votre accès bancaire",
     html
@@ -85,49 +97,64 @@ exports.sendActivationEmail = async (user, link) => {
 
 exports.sendRejectionEmail = async (user) => {
   const html = `
-  <div style="font-family:Arial,Helvetica,sans-serif;background:#f4f6f8;padding:40px">
-    <div style="max-width:620px;margin:auto;background:#ffffff;padding:35px;border-radius:12px">
+  <div style="margin:0;padding:0;background:#f4f6f9;font-family:Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="padding:20px 0;">
+      <tr>
+        <td align="center">
+          
+          <table width="100%" style="max-width:480px;background:#ffffff;border-radius:12px;padding:30px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+            
+            <tr>
+              <td style="font-size:22px;font-weight:bold;color:#8B0000;padding-bottom:10px;">
+                BPER Banque
+              </td>
+            </tr>
 
-      <h2 style="color:#8B0000;margin-bottom:10px">
-        Banque Pro – Information concernant votre demande
-      </h2>
+            <tr>
+              <td style="font-size:18px;font-weight:600;color:#333;padding-bottom:20px;">
+                Information concernant votre demande
+              </td>
+            </tr>
 
-      <p>Madame, Monsieur <strong>${user.nom}</strong>,</p>
+            <tr>
+              <td style="font-size:14px;color:#555;padding-bottom:20px;">
+                Bonjour <b>${user.prenom}</b>,<br><br>
+                Après analyse de votre dossier, nous regrettons de vous informer que votre demande d’ouverture de compte n’a pas pu être acceptée.
+              </td>
+            </tr>
 
-      <p>
-        Nous vous remercions de l’intérêt que vous avez porté à Banque Pro.
-      </p>
+            <tr>
+              <td style="font-size:13px;color:#777;">
+                Conformément à nos obligations réglementaires, aucun détail supplémentaire ne peut être communiqué.
+              </td>
+            </tr>
 
-      <p>
-        Après analyse de votre dossier, nous regrettons de vous informer
-        que votre demande d’ouverture de compte n’a pas pu être acceptée
-        à ce stade.
-      </p>
+            <tr>
+              <td style="font-size:13px;color:#777;padding-top:15px;">
+                Vous pouvez soumettre une nouvelle demande ultérieurement.
+              </td>
+            </tr>
 
-      <p style="font-size:14px;color:#444">
-        Conformément à nos obligations réglementaires, aucune information
-        complémentaire ne peut être communiquée concernant cette décision.
-      </p>
+          </table>
 
-      <p>
-        Vous avez la possibilité de soumettre une nouvelle demande ultérieurement.
-      </p>
+          <table width="100%" style="max-width:480px;text-align:center;margin-top:15px;">
+            <tr>
+              <td style="font-size:12px;color:#999;">
+                © ${new Date().getFullYear()} BPER Banque - Tous droits réservés
+              </td>
+            </tr>
+          </table>
 
-      <hr style="margin:30px 0">
-
-      <p style="font-size:12px;color:#777">
-        © BPER Banque – Service client<br>
-        contact@tirageroyale.com
-      </p>
-
-    </div>
+        </td>
+      </tr>
+    </table>
   </div>
   `;
 
   await transporter.sendMail({
-    from: `"BPER Banque " <contact@tirageroyale.com>`,
+    from: `"BPER Banque" <${process.env.MAIL_USER}>`,
     to: user.email,
-    subject: "Information concernant votre demande d’ouverture de compte",
+    subject: "Information concernant votre demande",
     html
   });
 };
