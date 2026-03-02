@@ -17,8 +17,16 @@ export default function AdminUserDetails() {
     const fetchUser = async () => {
       try {
         const data = await api(`/admin/user/${id}`, "GET");
-        setUser(data);
+
+        // Vérifie que data est un objet
+        if (data && typeof data === "object") {
+          setUser(data);
+        } else {
+          setUser(null);
+          setError("Aucun utilisateur trouvé");
+        }
       } catch (err) {
+        setUser(null);
         setError(err.message || "Erreur lors du chargement du dossier");
       } finally {
         setLoading(false);
@@ -52,53 +60,55 @@ export default function AdminUserDetails() {
       {/* STATUS */}
       <section>
         <h3>Statut</h3>
-        <p><strong>{user.status}</strong></p>
+        <p><strong>{user.status || "Non renseigné"}</strong></p>
       </section>
 
       {/* IDENTITE */}
       <section>
         <h3>Identité</h3>
-        <p>Civilité : {user.civilite}</p>
-        <p>Nom : {user.nom}</p>
-        <p>Prénom : {user.prenom}</p>
-        <p>Date naissance : {user.dateNaissance}</p>
-        <p>Lieu naissance : {user.lieuNaissance}</p>
-        <p>Nationalité : {user.nationalite}</p>
+        <p>Civilité : {user.civilite || "Non renseigné"}</p>
+        <p>Nom : {user.nom || "Non renseigné"}</p>
+        <p>Prénom : {user.prenom || "Non renseigné"}</p>
+        <p>Date naissance : {user.dateNaissance || "Non renseigné"}</p>
+        <p>Lieu naissance : {user.lieuNaissance || "Non renseigné"}</p>
+        <p>Nationalité : {user.nationalite || "Non renseigné"}</p>
         <p>Résidence fiscale : {user.residenceFiscale || "Non renseigné"}</p>
       </section>
 
       {/* CONTACT */}
       <section>
         <h3>Coordonnées</h3>
-        <p>Email : {user.email}</p>
-        <p>Téléphone : {user.telephone}</p>
-        <p>Adresse : {user.adresse}</p>
-        <p>{user.codePostal} {user.ville}</p>
-        <p>Pays : {user.pays}</p>
+        <p>Email : {user.email || "Non renseigné"}</p>
+        <p>Téléphone : {user.telephone || "Non renseigné"}</p>
+        <p>Adresse : {user.adresse || "Non renseigné"}</p>
+        <p>{user.codePostal || ""} {user.ville || ""}</p>
+        <p>Pays : {user.pays || "Non renseigné"}</p>
       </section>
 
       {/* FINANCIER */}
       <section>
         <h3>Situation financière</h3>
-        <p>Profession : {user.situationProfessionnelle}</p>
-        <p>Source revenus : {user.sourceRevenus}</p>
-        <p>Revenus mensuels : {user.revenusMensuels} €</p>
+        <p>Profession : {user.situationProfessionnelle || "Non renseigné"}</p>
+        <p>Source revenus : {user.sourceRevenus || "Non renseigné"}</p>
+        <p>Revenus mensuels : {user.revenusMensuels ? `${user.revenusMensuels} €` : "Non renseigné"}</p>
       </section>
 
       {/* DOCUMENTS */}
       <section>
         <h3>Documents</h3>
-        {user.pieceIdentiteRecto && (
-          <a href={user.pieceIdentiteRecto} target="_blank">
+        {user.pieceIdentiteRecto ? (
+          <a href={user.pieceIdentiteRecto} target="_blank" rel="noreferrer">
             📄 Pièce identité recto
           </a>
-        )}
+        ) : <p>Pièce identité recto non fournie</p>}
+
         <br />
-        {user.pieceIdentiteVerso && (
-          <a href={user.pieceIdentiteVerso} target="_blank">
+
+        {user.pieceIdentiteVerso ? (
+          <a href={user.pieceIdentiteVerso} target="_blank" rel="noreferrer">
             📄 Pièce identité verso
           </a>
-        )}
+        ) : <p>Pièce identité verso non fournie</p>}
       </section>
 
       {/* SIGNATURE */}
