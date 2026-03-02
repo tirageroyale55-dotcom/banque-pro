@@ -277,7 +277,7 @@ exports.sendPersonalId = async (req, res) => {
           <!-- IDENTIFIANT -->
           <tr>
             <td style="background:#f1f4f8;border-radius:10px;padding:15px;font-size:20px;font-weight:bold;color:#1a4fd8;letter-spacing:2px;">
-              ${user.personalId}
+              ${user.personalId.slice(0, 2)}****${user.personalId.slice(-2)}
             </td>
           </tr>
 
@@ -298,7 +298,9 @@ exports.sendPersonalId = async (req, res) => {
               </a>
             </td>
           </tr>
-
+                 <p style="font-size:12px;color:#999;margin-top:20px;">
+                   Cet email est automatique, merci de ne pas y répondre.
+                </p>
         </table>
 
         <!-- FOOTER -->
