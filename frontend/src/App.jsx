@@ -18,8 +18,8 @@ import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUserDetails from "./pages/admin/AdminUserDetails";
 
-import ForgotId from "./pages/ForgotId";
-import ForgotPin from "./pages/ForgotPin";
+import ForgotId from "./pages/forgotId";
+import ForgotPin from "./pages/forgotPin";
 
 export default function App() {
   return (
@@ -35,8 +35,8 @@ export default function App() {
         <Route path="/activation" element={<Activate />} />
         <Route path="/login" element={<Login />} />
         <Route path="/welcome" element={<Welcome />} />
-        <Route path="/forgot-id" element={<ForgotId />} />
-        <Route path="/forgot-pin" element={<ForgotPin />} />
+        <Route path="/forgot-id" element={<forgotId />} />
+        <Route path="/forgot-pin" element={<forgotPin />} />
         {/* CLIENT */}
         <Route
           path="/dashboard"
