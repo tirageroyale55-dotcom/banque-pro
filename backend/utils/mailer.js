@@ -16,7 +16,7 @@ exports.sendActivationEmail = async (user, link) => {
     <div style="max-width:620px;margin:auto;background:#ffffff;padding:35px;border-radius:12px">
 
       <h2 style="color:#003A8F;margin-bottom:5px">
-        Banque Pro – Activation de votre accès
+        BPER Banque  – Activation de votre accès
       </h2>
 
       <p>Madame, Monsieur <strong>${user.nom}</strong>,</p>

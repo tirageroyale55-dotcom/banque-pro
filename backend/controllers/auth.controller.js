@@ -226,7 +226,7 @@ exports.sendPersonalId = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email: email.toLowerCase().trim() });
-    if (!user) return res.status(404).json({ ok: false, message: "Email incorrect" });
+    if (!user) return res.status(404).json({ ok: false, message: "Email introuvable" });
 
     // Config nodemailer
     const transporter = nodemailer.createTransport({
@@ -240,7 +240,7 @@ exports.sendPersonalId = async (req, res) => {
     });
 
     const info = await transporter.sendMail({
-      from: `"Banque" <${process.env.MAIL_USER}>`, // ✅ ici
+      from: `"BPER Banque" <${process.env.MAIL_USER}>`, // ✅ ici
       to: email,
       subject: "Votre identifiant personnel",
       html: `<p>Bonjour ${user.prenom},</p>

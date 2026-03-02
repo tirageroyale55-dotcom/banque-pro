@@ -19,7 +19,7 @@ export default function ForgotId() {
       if (!res.ok) {
         const newAttempts = attempts + 1;
         setAttempts(newAttempts);
-        setError(res.message || "Email incorrect");
+        setError(res.message || "Email introuvable");
 
         if (newAttempts >= 3) {
           // après 3 tentatives, retour à home
