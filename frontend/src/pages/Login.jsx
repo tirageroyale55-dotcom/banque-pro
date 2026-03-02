@@ -145,7 +145,7 @@ const handleId = async (e) => {
            </p>
            )}
           <div className="pin-pad">
-            {[1,2,3,4,5,6,7,8,9].map(n => (
+            {[1,2,3,4,5,6,7,8,9,0].map(n => (
               <button key={n} onClick={() => handlePinClick(n)}>
                 {n}
               </button>
