@@ -165,8 +165,7 @@ exports.login = async (req, res) => {
     }
 
     // 5️⃣ Vérification PIN
-    const pinValid = await bcrypt.compare(pin, user.pinHash);
-
+    const pinValid = await bcrypt.compare(pin.trim(), user.pinHash);
     if (!pinValid) {
       user.loginAttempts = (user.loginAttempts || 0) + 1;
 
@@ -279,7 +278,8 @@ exports.changePin = async (req, res) => {
     if (!user) return res.json({ ok: false });
 
     user.pinHash = await bcrypt.hash(pin, 10);
-    user.loginAttempts = 0; // reset tentative après succès
+    user.loginAttempts = 0;
+    user.lockedUntil = null; // 🔥 IMPORTANT
     await user.save();
     res.json({ ok: true });
   } catch (err) {
