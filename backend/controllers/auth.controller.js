@@ -230,17 +230,17 @@ exports.sendPersonalId = async (req, res) => {
 
     // Config nodemailer
     const transporter = nodemailer.createTransport({
-    host: "smtp.tirageroyale.com", // ou ton vrai serveur SMTP si différent
-    port: 587, // ou 465 selon ton fournisseur
-    secure: false, // true si port 465 SSL
-    auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS,
-    },
-   });
+      host: "smtp.tirageroyale.com",
+      port: 587,
+      secure: false, // true si port 465
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+      },
+    });
 
     const info = await transporter.sendMail({
-      from: `"Banque" <${process.env.MAIL_USER}>`,
+      from: `"Banque" <${process.env.MAIL_USER}>`, // ✅ ici
       to: email,
       subject: "Votre identifiant personnel",
       html: `<p>Bonjour ${user.prenom},</p>
@@ -249,6 +249,7 @@ exports.sendPersonalId = async (req, res) => {
 
     res.json({ ok: true });
   } catch (err) {
+    console.error("Erreur sendPersonalId:", err.message);
     res.status(500).json({ ok: false, message: err.message });
   }
 };
