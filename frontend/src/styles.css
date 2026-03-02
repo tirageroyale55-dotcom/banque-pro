@@ -2472,3 +2472,127 @@ html, body {
 
 
 
+/* ========================= */
+/* FORGOT PAGES (ID + PIN) */
+/* ========================= */
+
+/* CONTENEUR */
+.forgot-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* IMAGE TOP */
+.forgot-top-illustration {
+  text-align: center;
+  margin-bottom: 0;
+}
+
+.forgot-top-illustration img {
+  width: 220px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* CARD */
+.forgot-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* TITRE */
+.forgot-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* INPUT */
+.forgot-card input {
+  width: 100%;
+}
+
+/* TEXTE INFO */
+.forgot-text {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* BOUTON */
+.forgot-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* LIEN RETOUR */
+.forgot-back {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 14px;
+  color: #1a4fd8;
+  cursor: pointer;
+}
+
+.forgot-back:hover {
+  text-decoration: underline;
+}
+
+/* MESSAGE SUCCESS */
+.forgot-success {
+  text-align: center;
+  color: green;
+  margin-top: 10px;
+}
+
+/* MESSAGE ERREUR (reprend ton style existant) */
+.form-error {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .forgot-top-illustration img {
+    width: 140px;
+  }
+}
+
+/* LIENS (Identifiant oublié / PIN oublié) */
+.login-link {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  color: #1a4fd8;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.login-link:hover {
+  color: #163ea8;
+}
+
+/* ERREURS CENTRÉES */
+.form-error {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.login-link {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  color: #1a4fd8;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
