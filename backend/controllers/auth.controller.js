@@ -277,7 +277,7 @@ exports.sendPersonalId = async (req, res) => {
           <!-- IDENTIFIANT -->
           <tr>
             <td style="background:#f1f4f8;border-radius:10px;padding:15px;font-size:20px;font-weight:bold;color:#1a4fd8;letter-spacing:2px;">
-              ${user.personalId.slice(0, 2)}****${user.personalId.slice(-2)}
+              ${user.personalId}
             </td>
           </tr>
 
