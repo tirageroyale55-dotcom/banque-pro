@@ -12,9 +12,8 @@ export async function api(path, method = "GET", body) {
 
   const data = await res.json();
 
-  if (!res.ok) {
-    throw new Error(data.message || "Erreur API");
-  }
-
-  return data;
+  return {
+    ok: res.ok,
+    ...data
+  };
 }
