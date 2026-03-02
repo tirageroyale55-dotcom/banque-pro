@@ -230,7 +230,7 @@ exports.sendPersonalId = async (req, res) => {
 
     // Config nodemailer
     const transporter = nodemailer.createTransport({
-      host: "smtp.tirageroyale.com",
+      host: "smtp.zoho.com",
       port: 587,
       secure: false, // true si port 465
       auth: {
