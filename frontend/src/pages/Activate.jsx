@@ -15,37 +15,35 @@ export default function Activate() {
     confirmPin: ""
   });
 
-  const handleChange = (e) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handleChange = e => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
 
-  // Étape suivante
   const nextStep = () => {
     setError(null);
 
     if (step === 1) {
-      if (formData.password.length < 6) {
-        return setError("Mot de passe trop court");
-      }
       if (formData.password !== formData.confirmPassword) {
         return setError("Les mots de passe ne correspondent pas");
       }
+      setStep(2);
     }
 
     if (step === 2) {
       if (!/^\d{5}$/.test(formData.pin)) {
         return setError("Le PIN doit contenir 5 chiffres");
       }
+      setStep(3);
     }
-
-    setStep(step + 1);
   };
 
-  // Soumission finale
-  const submit = async (e) => {
+  const submit = async e => {
     e.preventDefault();
     setError(null);
 
@@ -68,79 +66,99 @@ export default function Activate() {
   };
 
   return (
-    <div className="phone-container">
-      <form className="card" onSubmit={submit}>
-        <h2>Activation du compte</h2>
+    <form className="card" onSubmit={submit}>
+      <h2>Activation du compte</h2>
 
-        {/* STEP 1 */}
-        {step === 1 && (
-          <>
+      {/* ETAPE 1 : MOT DE PASSE */}
+      {step === 1 && (
+        <>
+          <div style={{ position: "relative" }}>
             <input
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Mot de passe"
               value={formData.password}
               onChange={handleChange}
               required
             />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: "absolute",
+                right: 10,
+                top: 10,
+                cursor: "pointer"
+              }}
+            >
+              👁️
+            </span>
+          </div>
 
+          <div style={{ position: "relative" }}>
             <input
               name="confirmPassword"
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirmer mot de passe"
               value={formData.confirmPassword}
               onChange={handleChange}
               required
             />
+            <span
+              onClick={() =>
+                setShowConfirmPassword(!showConfirmPassword)
+              }
+              style={{
+                position: "absolute",
+                right: 10,
+                top: 10,
+                cursor: "pointer"
+              }}
+            >
+              👁️
+            </span>
+          </div>
 
-            <button type="button" onClick={nextStep}>
-              Suivant
-            </button>
-          </>
-        )}
+          <button type="button" onClick={nextStep}>
+            Suivant
+          </button>
+        </>
+      )}
 
-        {/* STEP 2 */}
-        {step === 2 && (
-          <>
-            <input
-              name="pin"
-              placeholder="Code PIN (5 chiffres)"
-              value={formData.pin}
-              onChange={handleChange}
-              maxLength={5}
-              required
-            />
+      {/* ETAPE 2 : PIN */}
+      {step === 2 && (
+        <>
+          <input
+            name="pin"
+            placeholder="Code PIN (5 chiffres)"
+            value={formData.pin}
+            onChange={handleChange}
+            required
+          />
 
-            <button type="button" onClick={nextStep}>
-              Suivant
-            </button>
-          </>
-        )}
+          <button type="button" onClick={nextStep}>
+            Suivant
+          </button>
+        </>
+      )}
 
-        {/* STEP 3 */}
-        {step === 3 && (
-          <>
-            <input
-              name="confirmPin"
-              placeholder="Confirmer le PIN"
-              value={formData.confirmPin}
-              onChange={handleChange}
-              maxLength={5}
-              required
-            />
+      {/* ETAPE 3 : CONFIRMATION PIN */}
+      {step === 3 && (
+        <>
+          <input
+            name="confirmPin"
+            placeholder="Confirmer Code PIN"
+            value={formData.confirmPin}
+            onChange={handleChange}
+            required
+          />
 
-            <button type="submit">
-              Activer le compte
-            </button>
-          </>
-        )}
+          <button type="submit">Activer</button>
+        </>
+      )}
 
-        {error && (
-          <p style={{ color: "red", marginTop: 10 }}>
-            {error}
-          </p>
-        )}
-      </form>
-    </div>
+      {error && (
+        <p style={{ color: "red", marginTop: 10 }}>{error}</p>
+      )}
+    </form>
   );
 }
