@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../services/api";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 export default function Activate() {
   const params = new URLSearchParams(window.location.search);
@@ -8,6 +9,9 @@ export default function Activate() {
   const [step, setStep] = useState(1);
   const [error, setError] = useState(null);
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [formData, setFormData] = useState({
     password: "",
     confirmPassword: "",
@@ -15,17 +19,12 @@ export default function Activate() {
     confirmPin: ""
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const handleChange = e => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const nextStep = () => {
+  const nextStep = e => {
+    e.preventDefault();
     setError(null);
 
     if (step === 1) {
@@ -66,10 +65,10 @@ export default function Activate() {
   };
 
   return (
-    <form className="card" onSubmit={submit}>
+    <form className="card" onSubmit={step === 3 ? submit : nextStep}>
       <h2>Activation du compte</h2>
 
-      {/* ETAPE 1 : MOT DE PASSE */}
+      {/* STEP 1 : PASSWORD */}
       {step === 1 && (
         <>
           <div style={{ position: "relative" }}>
@@ -83,14 +82,9 @@ export default function Activate() {
             />
             <span
               onClick={() => setShowPassword(!showPassword)}
-              style={{
-                position: "absolute",
-                right: 10,
-                top: 10,
-                cursor: "pointer"
-              }}
+              style={iconStyle}
             >
-              👁️
+              {showPassword ? <EyeSlashIcon /> : <EyeIcon />}
             </span>
           </div>
 
@@ -107,58 +101,56 @@ export default function Activate() {
               onClick={() =>
                 setShowConfirmPassword(!showConfirmPassword)
               }
-              style={{
-                position: "absolute",
-                right: 10,
-                top: 10,
-                cursor: "pointer"
-              }}
+              style={iconStyle}
             >
-              👁️
+              {showConfirmPassword ? <EyeSlashIcon /> : <EyeIcon />}
             </span>
           </div>
-
-          <button type="button" onClick={nextStep}>
-            Suivant
-          </button>
         </>
       )}
 
-      {/* ETAPE 2 : PIN */}
+      {/* STEP 2 : PIN */}
       {step === 2 && (
-        <>
-          <input
-            name="pin"
-            placeholder="Code PIN (5 chiffres)"
-            value={formData.pin}
-            onChange={handleChange}
-            required
-          />
-
-          <button type="button" onClick={nextStep}>
-            Suivant
-          </button>
-        </>
+        <input
+          name="pin"
+          placeholder="Code PIN (5 chiffres)"
+          value={formData.pin}
+          onChange={handleChange}
+          maxLength={5}
+          required
+        />
       )}
 
-      {/* ETAPE 3 : CONFIRMATION PIN */}
+      {/* STEP 3 : CONFIRM PIN */}
       {step === 3 && (
-        <>
-          <input
-            name="confirmPin"
-            placeholder="Confirmer Code PIN"
-            value={formData.confirmPin}
-            onChange={handleChange}
-            required
-          />
-
-          <button type="submit">Activer</button>
-        </>
+        <input
+          name="confirmPin"
+          placeholder="Confirmer Code PIN"
+          value={formData.confirmPin}
+          onChange={handleChange}
+          maxLength={5}
+          required
+        />
       )}
 
       {error && (
         <p style={{ color: "red", marginTop: 10 }}>{error}</p>
       )}
+
+      <button>
+        {step === 3 ? "Activer" : "Suivant"}
+      </button>
     </form>
   );
 }
+
+const iconStyle = {
+  position: "absolute",
+  right: 10,
+  top: "50%",
+  transform: "translateY(-50%)",
+  width: 20,
+  height: 20,
+  cursor: "pointer",
+  color: "#555"
+};
