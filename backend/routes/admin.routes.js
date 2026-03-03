@@ -27,7 +27,7 @@ router.get("/pending", auth, role("ADMIN"), getPendingUsers);
 router.post("/validate/:id", auth, role("ADMIN"), validateUser);
 router.post("/reject/:id", auth, role("ADMIN"), rejectUser);
 
-router.post("/admin-send-reset", adminAuthMiddleware, sendResetLink);
+router.post("/admin-send-reset", auth, role("ADMIN"), sendResetLink);
 
 module.exports = router;
 

@@ -41,7 +41,17 @@ export default function App() {
         <Route path="/forgot-id" element={<ForgotId />} />
         <Route path="/forgot-pin" element={<ForgotPin />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/admin/reset" element={<AdminReset />} />
+        
+
+        <Route
+          path="/admin/reset"
+          element={
+            <AdminRoute>
+             <AdminReset />
+            </AdminRoute>
+          }
+        />
+
         {/* CLIENT */}
         <Route
           path="/dashboard"
