@@ -10,30 +10,25 @@ export default function ForgotId() {
   const [attempts, setAttempts] = useState(0);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email) return;
+  e.preventDefault();
+  if (!email) return;
 
-    try {
-      const res = await api("/auth/send-personal-id", "POST", { email });
+  try {
+    await api("/auth/send-personal-id", "POST", { email });
 
-      if (!res.ok) {
-        const newAttempts = attempts + 1;
-        setAttempts(newAttempts);
-        setError(res.message || "Email introuvable");
+    setSuccess(true);
+    setError("");
+  } catch (err) {
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
 
-        if (newAttempts >= 3) {
-          // après 3 tentatives, retour à home
-          navigate("/");
-        }
-        return;
-      }
+    setError(err.message || "Email introuvable");
 
-      setSuccess(true);
-      setError("");
-    } catch (err) {
-      setError("Erreur serveur");
+    if (newAttempts >= 3) {
+      navigate("/");
     }
-  };
+  }
+};
 
   return (
     <div className="apply-bg forgot-page">
