@@ -68,7 +68,7 @@ export default function Activate() {
     <form className="card" onSubmit={step === 3 ? submit : nextStep}>
       <h2>Activation du compte</h2>
 
-      {/* STEP 1 : PASSWORD */}
+      {/* STEP 1 */}
       {step === 1 && (
         <>
           <div style={{ position: "relative" }}>
@@ -79,11 +79,9 @@ export default function Activate() {
               value={formData.password}
               onChange={handleChange}
               required
+              style={{ paddingRight: 35 }}
             />
-            <span
-              onClick={() => setShowPassword(!showPassword)}
-              style={iconStyle}
-            >
+            <span onClick={() => setShowPassword(!showPassword)} style={iconStyle}>
               {showPassword ? <EyeSlashIcon /> : <EyeIcon />}
             </span>
           </div>
@@ -96,11 +94,10 @@ export default function Activate() {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
+              style={{ paddingRight: 35 }}
             />
             <span
-              onClick={() =>
-                setShowConfirmPassword(!showConfirmPassword)
-              }
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               style={iconStyle}
             >
               {showConfirmPassword ? <EyeSlashIcon /> : <EyeIcon />}
@@ -109,7 +106,7 @@ export default function Activate() {
         </>
       )}
 
-      {/* STEP 2 : PIN */}
+      {/* STEP 2 */}
       {step === 2 && (
         <input
           name="pin"
@@ -121,7 +118,7 @@ export default function Activate() {
         />
       )}
 
-      {/* STEP 3 : CONFIRM PIN */}
+      {/* STEP 3 */}
       {step === 3 && (
         <input
           name="confirmPin"
@@ -149,8 +146,8 @@ const iconStyle = {
   right: 10,
   top: "50%",
   transform: "translateY(-50%)",
-  width: 20,
-  height: 20,
+  width: 18,
+  height: 18,
   cursor: "pointer",
-  color: "#555"
+  color: "#777"
 };
