@@ -10,15 +10,24 @@ export async function api(path, method = "GET", body) {
     body: body ? JSON.stringify(body) : undefined
   });
 
-  // Toujours parser la réponse
-  const data = await res.json().catch(() => ({}));
+  let data;
 
-  // Si erreur HTTP, throw
-  if (!res.ok) {
-    // Si backend renvoie message, on l'utilise
-    throw new Error(data.message || "Erreur API");
+  try {
+    data = await res.json();
+  } catch {
+    data = {};
   }
 
-  // Si data n’est pas un tableau, on renvoie un tableau vide
-  return Array.isArray(data) ? data : data;
+  if (!res.ok) {
+    // 🔥 on récupère TOUS les formats possibles
+    const message =
+      data.message ||
+      data.error ||
+      data.msg ||
+      "Erreur serveur";
+
+    throw new Error(message);
+  }
+
+  return data;
 }
