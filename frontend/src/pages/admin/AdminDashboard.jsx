@@ -8,20 +8,30 @@ export default function AdminDashboard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchPending = async () => {
-      try {
-        const data = await api("/admin/pending");
-        setUsers(data || []);
-      } catch (err) {
-        console.error(err);
-        setError("Impossible de charger les demandes");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchPending = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await api("/admin/pending");
 
-    fetchPending();
-  }, []);
+      // On s'assure que c'est bien un tableau
+      if (!Array.isArray(data)) {
+        setUsers([]);
+      } else {
+        setUsers(data);
+      }
+
+    } catch (err) {
+      console.error(err);
+      setError("Impossible de charger les demandes");
+      setUsers([]); // <- important pour éviter le crash
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchPending();
+}, []);
 
   if (loading) {
     return <div className="card">Chargement...</div>;
