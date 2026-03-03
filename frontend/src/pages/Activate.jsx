@@ -6,164 +6,136 @@ export default function Activate() {
   const token = params.get("token");
 
   const [step, setStep] = useState(1);
-  const [pin, setPin] = useState("");
-  const [confirmPin, setConfirmPin] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
 
-  /* ===== PIN PAD ===== */
-  const handlePinClick = (val) => {
-    if (step === 1 && pin.length < 5) {
-      setPin((prev) => prev + val);
-    }
-    if (step === 3 && confirmPin.length < 5) {
-      setConfirmPin((prev) => prev + val);
-    }
+  const [form, setForm] = useState({
+    password: "",
+    confirmPassword: "",
+    pin: "",
+    confirmPin: ""
+  });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const removePin = () => {
-    if (step === 1) setPin((prev) => prev.slice(0, -1));
-    if (step === 3) setConfirmPin((prev) => prev.slice(0, -1));
-  };
-
-  /* ===== STEP VALIDATION ===== */
+  // 👉 Étape suivante
   const nextStep = () => {
-    setError("");
+    setError(null);
 
     if (step === 1) {
-      if (pin.length !== 5) {
-        return setError("Le PIN doit contenir 5 chiffres");
-      }
-      setStep(2);
-    }
-
-    else if (step === 2) {
-      if (!password || password.length < 6) {
-        return setError("Mot de passe trop court");
-      }
-      if (password !== confirmPassword) {
+      if (form.password !== form.confirmPassword) {
         return setError("Les mots de passe ne correspondent pas");
       }
-      setStep(3);
+      if (form.password.length < 6) {
+        return setError("Mot de passe trop court");
+      }
     }
+
+    if (step === 2) {
+      if (!/^\d{5}$/.test(form.pin)) {
+        return setError("Le PIN doit contenir 5 chiffres");
+      }
+    }
+
+    setStep(step + 1);
   };
 
-  /* ===== FINAL SUBMIT ===== */
+  // 👉 Soumission finale
   const submit = async () => {
-    setError("");
+    setError(null);
 
-    if (confirmPin !== pin) {
-      return setError("Les codes PIN ne correspondent pas");
+    if (form.pin !== form.confirmPin) {
+      return setError("Les PIN ne correspondent pas");
     }
 
     try {
       await api("/auth/activate", "POST", {
         token,
-        password,
-        confirmPassword,
-        pin
+        password: form.password,
+        confirmPassword: form.confirmPassword,
+        pin: form.pin
       });
 
-      alert("Compte activé avec succès !");
       window.location = "/login";
-
     } catch (err) {
       setError(err.message || "Erreur activation");
     }
   };
 
   return (
-    <div className="apply-bg login-page">
+    <div className="card">
+      <h2>Activation du compte</h2>
 
-      <div className="apply-card login-card">
+      {/* ✅ ÉTAPE 1 */}
+      {step === 1 && (
+        <>
+          <p>Étape 1 : Créer votre mot de passe</p>
 
-        <div className="bank-icon">🔐</div>
+          <input
+            name="password"
+            type="password"
+            placeholder="Mot de passe"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
 
-        {/* ================= STEP 1 PIN ================= */}
-        {step === 1 && (
-          <>
-            <h2 className="apply-title">Créer votre code PIN</h2>
+          <input
+            name="confirmPassword"
+            type="password"
+            placeholder="Confirmer mot de passe"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            required
+          />
 
-            <div className="pin-display">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <span key={i} className={pin[i] ? "filled" : ""}></span>
-              ))}
-            </div>
+          <button onClick={nextStep}>Suivant</button>
+        </>
+      )}
 
-            {error && <p className="form-error">{error}</p>}
+      {/* ✅ ÉTAPE 2 */}
+      {step === 2 && (
+        <>
+          <p>Étape 2 : Choisir votre code PIN</p>
 
-            <div className="pin-pad">
-              {[1,2,3,4,5,6,7,8,9].map(n => (
-                <button key={n} onClick={() => handlePinClick(n)}>
-                  {n}
-                </button>
-              ))}
+          <input
+            name="pin"
+            type="password"
+            maxLength="5"
+            placeholder="Code PIN (5 chiffres)"
+            value={form.pin}
+            onChange={handleChange}
+            required
+          />
 
-              <button onClick={removePin}>⌫</button>
-              <button onClick={() => handlePinClick(0)}>0</button>
-              <button onClick={nextStep}>✔</button>
-            </div>
-          </>
-        )}
+          <button onClick={nextStep}>Suivant</button>
+        </>
+      )}
 
-        {/* ================= STEP 2 PASSWORD ================= */}
-        {step === 2 && (
-          <>
-            <h2 className="apply-title">Créer votre mot de passe</h2>
+      {/* ✅ ÉTAPE 3 */}
+      {step === 3 && (
+        <>
+          <p>Étape 3 : Confirmer votre code PIN</p>
 
-            <input
-              type="password"
-              placeholder="Mot de passe"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+          <input
+            name="confirmPin"
+            type="password"
+            maxLength="5"
+            placeholder="Confirmer PIN"
+            value={form.confirmPin}
+            onChange={handleChange}
+            required
+          />
 
-            <input
-              type="password"
-              placeholder="Confirmer mot de passe"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
+          <button onClick={submit}>Activer</button>
+        </>
+      )}
 
-            {error && <p className="form-error">{error}</p>}
-
-            <div className="btn-right">
-              <button className="btn-solid" onClick={nextStep}>
-                Continuer
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* ================= STEP 3 CONFIRM PIN ================= */}
-        {step === 3 && (
-          <>
-            <h2 className="apply-title">Confirmer votre code PIN</h2>
-
-            <div className="pin-display">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <span key={i} className={confirmPin[i] ? "filled" : ""}></span>
-              ))}
-            </div>
-
-            {error && <p className="form-error">{error}</p>}
-
-            <div className="pin-pad">
-              {[1,2,3,4,5,6,7,8,9].map(n => (
-                <button key={n} onClick={() => handlePinClick(n)}>
-                  {n}
-                </button>
-              ))}
-
-              <button onClick={removePin}>⌫</button>
-              <button onClick={() => handlePinClick(0)}>0</button>
-              <button onClick={submit}>✔</button>
-            </div>
-          </>
-        )}
-
-      </div>
+      {/* ❌ ERREUR */}
+      {error && (
+        <p style={{ color: "red", marginTop: 10 }}>{error}</p>
+      )}
     </div>
   );
 }
