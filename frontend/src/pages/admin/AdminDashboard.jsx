@@ -8,46 +8,35 @@ export default function AdminDashboard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-  const fetchPending = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await api("/admin/pending");
+    const fetchPending = async () => {
+      setLoading(true);
+      setError(null);
 
-      // On s'assure que c'est bien un tableau
-      if (!Array.isArray(data)) {
-        setUsers([]);
-      } else {
-        setUsers(data);
+      try {
+        const data = await api("/admin/pending");
+
+        // Sécurise si la réponse n’est pas un tableau
+        setUsers(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error(err);
+        setError("Impossible de charger les demandes");
+        setUsers([]); // on vide le tableau si erreur
+      } finally {
+        setLoading(false);
       }
+    };
 
-    } catch (err) {
-      console.error(err);
-      setError("Impossible de charger les demandes");
-      setUsers([]); // <- important pour éviter le crash
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchPending();
+  }, []);
 
-  fetchPending();
-}, []);
-
-  if (loading) {
-    return <div className="card">Chargement...</div>;
-  }
-
-  if (error) {
-    return <div className="card error">{error}</div>;
-  }
+  if (loading) return <div className="card">Chargement...</div>;
+  if (error) return <div className="card error">{error}</div>;
 
   return (
     <div className="card">
       <h2>Demandes KYC en attente</h2>
 
-      {users.length === 0 && (
-        <p>Aucune demande en attente</p>
-      )}
+      {users.length === 0 && <p>Aucune demande en attente</p>}
 
       {users.map(user => (
         <div key={user._id} className="kyc-row">

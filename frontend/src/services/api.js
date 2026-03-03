@@ -10,10 +10,15 @@ export async function api(path, method = "GET", body) {
     body: body ? JSON.stringify(body) : undefined
   });
 
-  const data = await res.json();
+  // Toujours parser la réponse
+  const data = await res.json().catch(() => ({}));
 
-  return {
-    ok: res.ok,
-    ...data
-  };
+  // Si erreur HTTP, throw
+  if (!res.ok) {
+    // Si backend renvoie message, on l'utilise
+    throw new Error(data.message || "Erreur API");
+  }
+
+  // Si data n’est pas un tableau, on renvoie un tableau vide
+  return Array.isArray(data) ? data : data;
 }
