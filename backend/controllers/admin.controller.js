@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 const User = require("../models/User");
 const Account = require("../models/Account");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+
 const {
   generatePersonalId,
   generateIBAN,
@@ -100,4 +103,52 @@ exports.getPendingUsers = async (req, res) => {
     .select("-pinHash -activationToken");
 
   res.json(users);
+};
+
+
+
+
+
+
+
+
+exports.sendResetLink = async (req, res) => {
+  try {
+    const { personalId } = req.body;
+
+    const user = await User.findOne({ personalId });
+    if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
+
+    const token = crypto.randomBytes(32).toString("hex");
+    user.resetToken = token;
+    user.resetExpires = Date.now() + 60 * 60 * 1000; // 1h
+    await user.save();
+
+    const resetLink = `https://tonapp.com/reset-password?token=${token}`;
+
+    // Envoyer mail (Nodemailer)
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
+
+    await transporter.sendMail({
+      from: `"Support Banque" <${process.env.SMTP_USER}>`,
+      to: user.email,
+      subject: "Réinitialisation de votre compte",
+      html: `<p>Bonjour ${user.prenom},</p>
+             <p>Pour réinitialiser votre mot de passe et votre PIN, cliquez sur le lien ci-dessous :</p>
+             <a href="${resetLink}">Réinitialiser mon compte</a>
+             <p>Ce lien expirera dans 1 heure.</p>`
+    });
+
+    res.json({ message: "Lien de réinitialisation envoyé avec succès" });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };

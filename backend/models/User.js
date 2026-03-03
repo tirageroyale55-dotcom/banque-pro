@@ -114,7 +114,10 @@ const UserSchema = new mongoose.Schema(
     enum: ["ADMIN", "CLIENT"],
     default: "CLIENT"
   },
-  
+
+  resetToken: String,
+  resetExpires: Date,
+
   loginAttempts: { type: Number, default: 0 }, // compteur de tentatives
   lockedUntil: { type: Date }                // date jusqu'à laquelle le compte est bloqué
 },

@@ -377,3 +377,53 @@ exports.changePin = async (req, res) => {
     res.status(500).json({ ok: false });
   }
 };
+
+
+
+
+
+
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, personalId, password, confirmPassword, pin } = req.body;
+
+    if (!token || !personalId || !password || !confirmPassword || !pin) {
+      return res.status(400).json({ message: "Champs requis manquants" });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Les mots de passe ne correspondent pas" });
+    }
+
+    if (!/^\d{5}$/.test(pin)) {
+      return res.status(400).json({ message: "Le PIN doit contenir 5 chiffres" });
+    }
+
+    // Cherche l'utilisateur par token et identifiant
+    const user = await User.findOne({
+      personalId,
+      resetToken: token,
+      resetExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Lien invalide ou expiré" });
+    }
+
+    // Hash du mot de passe et du PIN
+    user.passwordHash = await bcrypt.hash(password, 10);
+    user.pinHash = await bcrypt.hash(pin, 10);
+
+    // Supprime le token et expiration
+    user.resetToken = undefined;
+    user.resetExpires = undefined;
+
+    await user.save();
+
+    res.json({ message: "Mot de passe et PIN mis à jour avec succès" });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
