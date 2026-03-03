@@ -225,22 +225,34 @@ exports.login = async (req, res) => {
 exports.sendPersonalId = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ email: email.toLowerCase().trim() });
-    if (!user) return res.status(404).json({ ok: false, message: "Email introuvable" });
 
-    // Config nodemailer
+    if (!email) {
+      return res.status(400).json({ message: "Email requis" });
+    }
+
+    const user = await User.findOne({
+      email: email.toLowerCase().trim()
+    });
+
+    // ✅ email pas trouvé → message clair
+    if (!user) {
+      return res.status(404).json({
+        message: "Email introuvable"
+      });
+    }
+
     const transporter = nodemailer.createTransport({
       host: "smtp.zoho.com",
       port: 587,
-      secure: false, // true si port 465
+      secure: false,
       auth: {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS,
       },
     });
 
-    const info = await transporter.sendMail({
-      from: `"BPER Banque" <${process.env.MAIL_USER}>`, // ✅ ici
+    await transporter.sendMail({
+      from: `"BPER Banque" <${process.env.MAIL_USER}>`,
       to: email,
       subject: "Votre identifiant personnel",
       html: `
@@ -319,10 +331,15 @@ exports.sendPersonalId = async (req, res) => {
 `
     });
 
-    res.json({ ok: true });
+    return res.json({ ok: true });
+
   } catch (err) {
-    console.error("Erreur sendPersonalId:", err.message);
-    res.status(500).json({ ok: false, message: err.message });
+    console.error("Erreur sendPersonalId:", err);
+
+    // ✅ TOUJOURS renvoyer message propre
+    return res.status(500).json({
+      message: "Erreur serveur"
+    });
   }
 };
 
