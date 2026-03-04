@@ -6,6 +6,7 @@ const { login } = require("../controllers/auth.controller");
 const upload = require("../middleware/upload.middleware");
 const User = require("../models/User");
 const { sendPersonalId, verifyPassword, changePin } = require("../controllers/auth.controller");
+const { resetPassword } = require("../controllers/auth.controller");
 
 router.post("/login", login);
 
@@ -77,6 +78,7 @@ router.post("/verify-password", verifyPassword);
 router.post("/change-pin", changePin);
 
 router.post("/auth/reset-password", resetPassword);
+
 
 // --------------------
 // ROUTE TEST SIMPLE (GET)
