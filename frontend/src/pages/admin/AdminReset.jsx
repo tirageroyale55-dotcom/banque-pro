@@ -12,7 +12,7 @@ export default function AdminReset() {
     setSuccess("");
 
     try {
-      const res = await api("/auth/admin-send-reset", "POST", { personalId });
+      const res = await api("/admin-send-reset", "POST", { personalId });
       setSuccess(res.message);
     } catch (err) {
       setError(err.message || "Erreur serveur");
