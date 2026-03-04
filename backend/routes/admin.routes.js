@@ -6,7 +6,8 @@ const User = require("../models/User");
 
 const {
   validateUser,
-  getPendingUsers
+  getPendingUsers,
+  sendResetLink
 } = require("../controllers/admin.controller");
 
 router.get("/user/:id", auth, role("ADMIN"), async (req, res) => {
