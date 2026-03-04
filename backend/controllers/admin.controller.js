@@ -117,39 +117,46 @@ exports.sendResetLink = async (req, res) => {
     const { personalId } = req.body;
 
     const user = await User.findOne({ personalId });
-    if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
 
     const token = crypto.randomBytes(32).toString("hex");
     user.resetToken = token;
-    user.resetExpires = Date.now() + 60 * 60 * 1000; // 1h
+    user.resetExpires = Date.now() + 60 * 60 * 1000;
     await user.save();
 
-    const resetLink = `https://tonapp.com/reset-password?token=${token}`;
+    const resetLink = `${process.env.APP_URL}/reset-password?token=${token}`;
 
-    // Envoyer mail (Nodemailer)
     const transporter = nodemailer.createTransport({
       host: "smtp.zoho.com",
       port: 587,
       secure: false,
+      requireTLS: true,
       auth: {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS,
       },
     });
 
+    await transporter.verify(); // 🔥 vérifie connexion SMTP
+
     await transporter.sendMail({
       from: `"Support Banque" <${process.env.MAIL_USER}>`,
       to: user.email,
       subject: "Réinitialisation de votre compte",
-      html: `<p>Bonjour ${user.prenom},</p>
-             <p>Pour réinitialiser votre mot de passe et votre PIN, cliquez sur le lien ci-dessous :</p>
-             <a href="${resetLink}">Réinitialiser mon compte</a>
-             <p>Ce lien expirera dans 1 heure.</p>`
+      html: `
+        <p>Bonjour ${user.prenom},</p>
+        <p>Pour réinitialiser votre mot de passe et votre PIN :</p>
+        <a href="${resetLink}">Réinitialiser mon compte</a>
+        <p>Ce lien expire dans 1 heure.</p>
+      `
     });
 
     res.json({ message: "Lien de réinitialisation envoyé avec succès" });
 
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("RESET ERROR:", err);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
