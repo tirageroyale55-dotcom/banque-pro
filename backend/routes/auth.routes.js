@@ -77,7 +77,7 @@ router.post("/verify-password", verifyPassword);
 // Changer PIN
 router.post("/change-pin", changePin);
 
-router.post("/auth/reset-password", resetPassword);
+router.post("/reset-password", resetPassword);
 
 
 // --------------------
