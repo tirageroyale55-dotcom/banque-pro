@@ -6,7 +6,7 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 export default function ResetPassword() {
   const navigate = useNavigate();
   const params = new URLSearchParams(window.location.search);
-  const token = params.get("token"); // token envoyé par mail
+  const token = params.get("token");
 
   const [step, setStep] = useState(1);
   const [error, setError] = useState("");
@@ -29,19 +29,16 @@ export default function ResetPassword() {
   const handleCheckId = async (e) => {
     e.preventDefault();
     setError("");
-
     try {
       const res = await api("/auth/check-id", "POST", { personalId });
-
       if (!res.exists) {
         const newAttempts = attempts + 1;
         setAttempts(newAttempts);
         setError("Identifiant non trouvé");
-        if (newAttempts >= 3) return navigate("/"); // retour page login
+        if (newAttempts >= 3) return navigate("/");
         return;
       }
-
-      setStep(2); // Identifiant correct
+      setStep(2);
     } catch (err) {
       setError("Erreur serveur");
     }
@@ -55,7 +52,7 @@ export default function ResetPassword() {
       return;
     }
     setError("");
-    setStep(3); // passer à PIN
+    setStep(3); // passer à la saisie du PIN
   };
 
   // ================= STEP 3 & 4 : PIN =================
@@ -74,31 +71,23 @@ export default function ResetPassword() {
     else setConfirmPin((prev) => prev.slice(0, -1));
   };
 
-  const handlePinNext = (e) => {
-    e.preventDefault();
-    if (pin.length !== 5) {
-      setError("Le PIN doit contenir 5 chiffres");
-      return;
+  // Auto-validation : passer à confirmation PIN dès que 5 chiffres saisis
+  useEffect(() => {
+    if (step === 3 && pin.length === 5) {
+      setStep(4);
     }
-    setError("");
-    setStep(4); // confirmation PIN
-  };
+  }, [pin, step]);
 
-  const handlePinConfirm = (e) => {
-    e.preventDefault();
-    if (pin !== confirmPin) {
-      setError("Les PIN ne correspondent pas");
-      return;
-    }
-    handleSubmit(); // appel final
-  };
-
-  // Validation automatique dès que 5 chiffres dans confirm PIN
+  // Auto-validation finale : soumettre dès que confirmation PIN complète
   useEffect(() => {
     if (step === 4 && confirmPin.length === 5) {
-      handlePinConfirm(new Event("submit"));
+      if (pin !== confirmPin) {
+        setError("Les PIN ne correspondent pas");
+        return;
+      }
+      handleSubmit();
     }
-  }, [confirmPin, step]);
+  }, [confirmPin, pin, step]);
 
   // ================= SUBMIT FINAL =================
   const handleSubmit = async () => {
@@ -110,7 +99,6 @@ export default function ResetPassword() {
         confirmPassword,
         pin,
       });
-
       alert("Mot de passe et PIN mis à jour avec succès !");
       navigate("/login");
     } catch (err) {
@@ -144,7 +132,6 @@ export default function ResetPassword() {
         {step === 2 && (
           <form onSubmit={handlePasswordNext}>
             <h2 className="apply-title">Nouveau mot de passe</h2>
-
             <div style={{ position: "relative" }}>
               <input
                 type={showPassword ? "text" : "password"}
@@ -158,7 +145,6 @@ export default function ResetPassword() {
                 {showPassword ? <EyeSlashIcon /> : <EyeIcon />}
               </span>
             </div>
-
             <div style={{ position: "relative" }}>
               <input
                 type={showConfirmPassword ? "text" : "password"}
@@ -168,64 +154,53 @@ export default function ResetPassword() {
                 required
                 style={{ paddingRight: 40 }}
               />
-              <span onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={iconStyle}>
+              <span
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                style={iconStyle}
+              >
                 {showConfirmPassword ? <EyeSlashIcon /> : <EyeIcon />}
               </span>
             </div>
-
             {error && <p className="form-error">{error}</p>}
-            <div className="btn-right">
-              <button className="btn-solid">Continuer</button>
-            </div>
           </form>
         )}
 
         {/* STEP 3 : Nouveau PIN */}
         {step === 3 && (
-          <form onSubmit={handlePinNext}>
+          <>
             <h2 className="apply-title">Choisissez votre code PIN</h2>
             <div className="pin-display">
               {Array.from({ length: 5 }).map((_, i) => (
                 <span key={i} className={pin[i] ? "filled" : ""}></span>
               ))}
             </div>
-
             {error && <p className="form-error">{error}</p>}
-
             <div className="pin-pad">
-              {[1,2,3,4,5,6,7,8,9].map(n => (
+              {[1,2,3,4,5,6,7,8,9,0].map((n) => (
                 <button key={n} type="button" onClick={() => handlePinClick(n, "pin")}>{n}</button>
               ))}
               <button type="button" onClick={() => removePin("pin")}>⌫</button>
-              <button type="button" onClick={() => handlePinClick(0, "pin")}>0</button>
             </div>
-
-            <div className="btn-right">
-              <button className="btn-solid">Continuer</button>
-            </div>
-          </form>
+          </>
         )}
 
         {/* STEP 4 : Confirmer PIN */}
         {step === 4 && (
-          <form onSubmit={handlePinConfirm}>
+          <>
             <h2 className="apply-title">Confirmez votre code PIN</h2>
             <div className="pin-display">
               {Array.from({ length: 5 }).map((_, i) => (
                 <span key={i} className={confirmPin[i] ? "filled" : ""}></span>
               ))}
             </div>
-
             {error && <p className="form-error">{error}</p>}
-
             <div className="pin-pad">
-              {[1,2,3,4,5,6,7,8,9].map(n => (
+              {[1,2,3,4,5,6,7,8,9,0].map((n) => (
                 <button key={n} type="button" onClick={() => handlePinClick(n, "confirm")}>{n}</button>
               ))}
               <button type="button" onClick={() => removePin("confirm")}>⌫</button>
-              <button type="button" onClick={() => handlePinClick(0, "confirm")}>0</button>
             </div>
-          </form>
+          </>
         )}
       </div>
     </div>
@@ -240,5 +215,5 @@ const iconStyle = {
   width: 20,
   height: 20,
   cursor: "pointer",
-  color: "#888"
+  color: "#888",
 };
