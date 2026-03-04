@@ -128,16 +128,17 @@ exports.sendResetLink = async (req, res) => {
 
     // Envoyer mail (Nodemailer)
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
+      host: "smtp.zoho.com",
+      port: 587,
+      secure: false,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+      },
     });
 
     await transporter.sendMail({
-      from: `"Support Banque" <${process.env.SMTP_USER}>`,
+      from: `"Support Banque" <${process.env.MAIL_USER}>`,
       to: user.email,
       subject: "Réinitialisation de votre compte",
       html: `<p>Bonjour ${user.prenom},</p>
