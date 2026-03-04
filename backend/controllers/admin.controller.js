@@ -142,7 +142,7 @@ exports.sendResetLink = async (req, res) => {
     await transporter.verify(); // 🔥 vérifie connexion SMTP
 
     await transporter.sendMail({
-      from: `"Support Banque" <${process.env.MAIL_USER}>`,
+      from: `"Support BPER BANQUE" <${process.env.MAIL_USER}>`,
       to: user.email,
       subject: "Réinitialisation de votre compte",
       html: `
