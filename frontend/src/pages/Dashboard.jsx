@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { api } from "../services/api";
-import "./Dashboard.css";
+import Navbar from "../components/Navbar";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
