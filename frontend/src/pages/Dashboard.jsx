@@ -1,176 +1,264 @@
-import { useEffect, useState } from "react";
-import { Bell, HelpCircle, User, Home, CreditCard, Grid, Heart } from "lucide-react";
+import { useState, useEffect } from "react";
+import { api } from "../services/api";
+import { useNavigate } from "react-router-dom";
+
+import { motion, AnimatePresence } from "framer-motion";
+
+import {
+  Bell,
+  HelpCircle,
+  Landmark,
+  CreditCard,
+  Wallet,
+  Send,
+  Smartphone,
+  Receipt,
+  Home,
+  ArrowRightLeft,
+  Grid,
+  Gem,
+  Headphones
+} from "lucide-react";
+
+import "./dashboard.css";
 
 export default function Dashboard() {
 
-  const [scrolled, setScrolled] = useState(false);
+  const [data, setData] = useState(null);
+  const [activeTab, setActiveTab] = useState("accounts");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
 
-    const handleScroll = () => {
-      if (window.scrollY > 80) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => window.removeEventListener("scroll", handleScroll);
+    api("/client/dashboard")
+      .then(setData)
+      .catch(() => {
+        localStorage.removeItem("token");
+        navigate("/login");
+      });
 
   }, []);
 
-  const balance = "5 421,76 €";
+  if (!data) return null;
+
+  const renderContent = () => {
+
+    switch (activeTab) {
+
+      case "accounts":
+        return (
+
+          <motion.div
+            key="accounts"
+            initial={{opacity:0, x:40}}
+            animate={{opacity:1, x:0}}
+            exit={{opacity:0, x:-40}}
+          >
+
+            <div className="account-card">
+
+              <div className="account-header">
+                Compte principal
+              </div>
+
+              <motion.div
+                className="balance"
+                initial={{opacity:0}}
+                animate={{opacity:1}}
+                transition={{duration:1}}
+              >
+                {data.balance} €
+              </motion.div>
+
+              <div className="balance-date">
+                Solde disponible
+              </div>
+
+              <div className="owner">
+                {data.firstname} {data.lastname}
+              </div>
+
+              <div className="iban">
+                {data.iban}
+              </div>
+
+            </div>
+
+            <div className="quick-actions">
+
+              <div className="action">
+                <Send size={26}/>
+                <p>Virement</p>
+              </div>
+
+              <div className="action">
+                <Smartphone size={26}/>
+                <p>Recharge</p>
+              </div>
+
+              <div className="action">
+                <Receipt size={26}/>
+                <p>Paiement</p>
+              </div>
+
+            </div>
+
+          </motion.div>
+        );
+
+      case "cards":
+        return (
+
+          <motion.div
+            key="cards"
+            initial={{opacity:0, x:40}}
+            animate={{opacity:1, x:0}}
+            exit={{opacity:0, x:-40}}
+          >
+
+            <div className="account-card">
+              <h3>Mes cartes</h3>
+              <p>Aucune carte active</p>
+            </div>
+
+          </motion.div>
+
+        );
+
+      case "financing":
+        return (
+
+          <motion.div
+            key="financing"
+            initial={{opacity:0, x:40}}
+            animate={{opacity:1, x:0}}
+            exit={{opacity:0, x:-40}}
+          >
+
+            <div className="account-card">
+              <h3>Financements</h3>
+              <p>Aucun financement disponible</p>
+            </div>
+
+          </motion.div>
+
+        );
+
+    }
+
+  };
 
   return (
 
-    <div className="bg-[#f5f6fa] min-h-screen pb-24">
+    <div className="bank-app">
 
       {/* HEADER */}
 
-      <header
-        className={`
-        sticky top-0 z-50
-        backdrop-blur-md
-        transition-all duration-300
-        ${scrolled ? "bg-white/70 shadow-sm" : "bg-white/40"}
-        `}
-      >
-
-        {/* TOP BAR */}
-
-        <div className="flex justify-between items-center px-4 pt-4">
-
-          <button>
-            <User size={22} />
-          </button>
-
-          <div className="flex gap-3">
-
-            <button>
-              <Bell size={22}/>
-            </button>
-
-            <button>
-              <HelpCircle size={22}/>
-            </button>
-
-          </div>
-
-        </div>
-
-        {/* GROS SOLDE */}
+      <div className="header">
 
         <div
-          className={`
-          text-center transition-all duration-300
-          ${scrolled ? "opacity-0 h-0 overflow-hidden" : "opacity-100 py-4"}
-          `}
+          className="profile"
+          onClick={() => navigate("/profile")}
         >
+          <div className="avatar">
+            {data.firstname?.charAt(0)}
+            {data.lastname?.charAt(0)}
+          </div>
+        </div>
 
-          <p className="text-xs text-gray-500">
-            Solde disponible
-          </p>
+        <div className="header-icons">
 
-          <h1 className="text-3xl font-bold">
-            {balance}
-          </h1>
+          <Bell
+            size={22}
+            onClick={() => navigate("/notifications")}
+          />
+
+          <HelpCircle
+            size={22}
+            onClick={() => navigate("/help")}
+          />
 
         </div>
 
-      </header>
+      </div>
 
       {/* TABS */}
 
-      <div className="sticky top-[60px] z-40 bg-white">
+      <div className="tabs">
 
-        <div className="flex justify-between items-center px-4 pt-2">
+        <button
+          className={activeTab === "accounts" ? "tab active" : "tab"}
+          onClick={() => setActiveTab("accounts")}
+        >
+          <Landmark size={18}/> Comptes
+        </button>
 
-          <div className="flex gap-6 text-sm font-medium">
+        <button
+          className={activeTab === "cards" ? "tab active" : "tab"}
+          onClick={() => setActiveTab("cards")}
+        >
+          <CreditCard size={18}/> Cartes
+        </button>
 
-            <button className="border-b-2 border-black pb-2">
-              Comptes
-            </button>
-
-            <button className="pb-2 text-gray-500">
-              Cartes
-            </button>
-
-            <button className="pb-2 text-gray-500">
-              Financement
-            </button>
-
-          </div>
-
-          {/* SOLDE QUI ENTRE DANS LES TABS */}
-
-          <div
-            className={`
-            transition-all duration-300
-            ${scrolled ? "opacity-100" : "opacity-0"}
-            `}
-          >
-            <span className="font-semibold">
-              {balance}
-            </span>
-          </div>
-
-        </div>
+        <button
+          className={activeTab === "financing" ? "tab active" : "tab"}
+          onClick={() => setActiveTab("financing")}
+        >
+          <Wallet size={18}/> Financement
+        </button>
 
       </div>
 
-      {/* CONTENU */}
+      {/* CONTENT */}
 
-      <div className="p-4 space-y-4">
+      <div className="content">
 
-        {[1,2,3,4,5,6,7,8].map((item)=>(
-          <div
-            key={item}
-            className="bg-white p-4 rounded-xl shadow-sm"
-          >
-            Transaction exemple
-          </div>
-        ))}
+        <AnimatePresence mode="wait">
+          {renderContent()}
+        </AnimatePresence>
 
       </div>
 
-      {/* BOTTOM NAVIGATION */}
+      {/* BOTTOM NAV */}
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t z-50">
+      <div className="bottom-nav">
 
-        <div className="flex justify-around py-2 text-xs">
-
-          <button className="flex flex-col items-center">
-            <Home size={20}/>
-            Accueil
-          </button>
-
-          <button className="flex flex-col items-center">
-            <CreditCard size={20}/>
-            Payer
-          </button>
-
-          <button className="flex flex-col items-center">
-            <Grid size={20}/>
-            Produits
-          </button>
-
-          <button className="flex flex-col items-center">
-            <Heart size={20}/>
-            Lifestyle
-          </button>
-
-          <button className="flex flex-col items-center">
-            <HelpCircle size={20}/>
-            Aide
-          </button>
-
+        <div
+          className="nav-item active"
+          onClick={() => navigate("/dashboard")}
+        >
+          <Home size={24}/>
+          <span>Accueil</span>
         </div>
 
-      </nav>
+        <div className="nav-item">
+          <ArrowRightLeft size={24}/>
+          <span>Payer</span>
+        </div>
+
+        <div className="nav-item">
+          <Grid size={24}/>
+          <span>Produits</span>
+        </div>
+
+        <div className="nav-item">
+          <Gem size={24}/>
+          <span>Lifestyle</span>
+        </div>
+
+        <div
+          className="nav-item"
+          onClick={() => navigate("/help")}
+        >
+          <Headphones size={24}/>
+          <span>Aide</span>
+        </div>
+
+      </div>
 
     </div>
 
   );
+
 }
