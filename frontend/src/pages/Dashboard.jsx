@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { api } from "../services/api";
+import { useNavigate } from "react-router-dom";
+
 import {
   Bell,
   HelpCircle,
@@ -19,33 +21,65 @@ import {
 import "./dashboard.css";
 
 export default function Dashboard() {
+
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("comptes");
 
+  const navigate = useNavigate();
+
   useEffect(() => {
+
     api("/client/dashboard")
       .then(setData)
       .catch(() => {
         localStorage.removeItem("token");
         window.location = "/login";
       });
+
   }, []);
 
   if (!data) return null;
 
   return (
+
     <div className="bank-app">
 
       {/* HEADER */}
+
       <div className="header">
 
-        <div className="profile">
-          <div className="avatar">GD</div>
+        {/* PROFIL */}
+
+        <div
+          className="profile"
+          onClick={() => navigate("/profile")}
+        >
+
+          <div className="avatar">
+
+            {data.firstname?.charAt(0)}
+            {data.lastname?.charAt(0)}
+
+          </div>
+
         </div>
 
+        {/* ICONES */}
+
         <div className="header-icons">
-          <Bell size={22}/>
-          <HelpCircle size={22}/>
+
+          <Bell
+            size={22}
+            onClick={() => navigate("/notifications")}
+            style={{cursor:"pointer"}}
+          />
+
+          <HelpCircle
+            size={22}
+            onClick={() => navigate("/help")}
+            style={{cursor:"pointer"}}
+          />
+
         </div>
 
       </div>
@@ -56,33 +90,42 @@ export default function Dashboard() {
 
         <button
           className={activeTab === "comptes" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("comptes")}
+          onClick={()=>{
+            setActiveTab("comptes");
+            navigate("/accounts");
+          }}
         >
           <Landmark size={18}/> Comptes
         </button>
 
         <button
           className={activeTab === "cartes" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("cartes")}
+          onClick={()=>{
+            setActiveTab("cartes");
+            navigate("/cards");
+          }}
         >
           <CreditCard size={18}/> Cartes
         </button>
 
         <button
           className={activeTab === "financement" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("financement")}
+          onClick={()=>{
+            setActiveTab("financement");
+            navigate("/financing");
+          }}
         >
           <Wallet size={18}/> Financement
         </button>
 
       </div>
 
-      {/* COMPTE */}
+      {/* CARTE COMPTE */}
 
       <div className="account-card">
 
         <div className="account-header">
-          <span>Compte 3735584</span>
+          Compte principal
         </div>
 
         <div className="balance">
@@ -94,7 +137,7 @@ export default function Dashboard() {
         </div>
 
         <div className="owner">
-          {data.name}
+          {data.firstname} {data.lastname}
         </div>
 
         <div className="iban">
@@ -103,7 +146,7 @@ export default function Dashboard() {
 
       </div>
 
-      {/* ACTIONS RAPIDES */}
+      {/* ACTIONS */}
 
       <div className="quick-actions">
 
@@ -124,8 +167,7 @@ export default function Dashboard() {
 
       </div>
 
-
-      {/* DERNIERS MOUVEMENTS */}
+      {/* MOUVEMENTS */}
 
       <div className="transactions">
 
@@ -139,7 +181,7 @@ export default function Dashboard() {
           </div>
 
           <div className="desc">
-            Frais bancaires autorisés
+            Frais bancaires
           </div>
 
           <div className="amount negative">
@@ -150,12 +192,14 @@ export default function Dashboard() {
 
       </div>
 
-
-      {/* BOTTOM NAV */}
+      {/* NAVIGATION BAS */}
 
       <div className="bottom-nav">
 
-        <div className="nav-item active">
+        <div
+          className="nav-item active"
+          onClick={()=>navigate("/dashboard")}
+        >
           <Home size={24}/>
           <span>Accueil</span>
         </div>
@@ -175,7 +219,10 @@ export default function Dashboard() {
           <span>Lifestyle</span>
         </div>
 
-        <div className="nav-item">
+        <div
+          className="nav-item"
+          onClick={()=>navigate("/help")}
+        >
           <Headphones size={24}/>
           <span>Aide</span>
         </div>

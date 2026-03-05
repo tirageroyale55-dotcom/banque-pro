@@ -1,18 +1,38 @@
-import Navbar from "../components/Navbar";
+import { useState } from "react";
 
-export default function Profile() {
-  return (
-    <>
-      <Navbar />
-      <div className="card">
-        <h2>Profil</h2>
-        <p>Données personnelles sécurisées</p>
-        <p><strong>Nom :</strong> Client Test</p>
-        <p><strong>Email :</strong> client@test.com</p>
-        <p><strong>Rôle :</strong> Client</p>
-      </div>
-    </>
-  );
+export default function Profile(){
+
+const [photo,setPhoto] = useState(null)
+
+function upload(e){
+
+const file = e.target.files[0]
+setPhoto(URL.createObjectURL(file))
+
+}
+
+return(
+
+<div style={{padding:"30px"}}>
+
+<h2>Profil utilisateur</h2>
+
+<div>
+
+<img
+src={photo || "/default-avatar.png"}
+alt="profil"
+style={{width:120,borderRadius:"50%"}}
+/>
+
+<input type="file" onChange={upload}/>
+
+</div>
+
+</div>
+
+)
+
 }
 
 

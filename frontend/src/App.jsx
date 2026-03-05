@@ -14,6 +14,11 @@ import Welcome from "./pages/Welcome";
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 import Profile from "./pages/Profile";
+import Notifications from "./pages/Notifications";
+import Help from "./pages/Help";
+import Accounts from "./pages/Accounts";
+import Cards from "./pages/Cards";
+import Financing from "./pages/Financing";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUserDetails from "./pages/admin/AdminUserDetails";
@@ -77,6 +82,51 @@ export default function App() {
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Notifications />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/help"
+          element={
+            <ProtectedRoute>
+              <Help />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/accounts"
+          element={
+            <ProtectedRoute>
+              <Accounts />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/cards"
+          element={
+            <ProtectedRoute>
+              <Cards />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/financing"
+          element={
+            <ProtectedRoute>
+              <Financing />
+           </ProtectedRoute>
           }
         />
 
