@@ -1,32 +1,31 @@
-.bank-app{
+.bank-container{
 background:#0b5c5b;
 height:100vh;
+overflow:hidden;
+display:flex;
+flex-direction:column;
 font-family:"Inter",sans-serif;
 color:white;
-overflow:hidden;
 }
 
 /* HEADER */
 
 .header{
-position:fixed;
+position:sticky;
 top:0;
-left:0;
-right:0;
-height:70px;
+z-index:100;
+background:#0b5c5b;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:0 20px;
-background:#0b5c5b;
-z-index:1000;
+padding:20px;
 }
 
 .avatar{
-width:50px;
-height:50px;
+width:48px;
+height:48px;
 background:#cfd8dc;
-border-radius:16px;
+border-radius:14px;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -36,21 +35,19 @@ color:#0b5c5b;
 
 .header-icons{
 display:flex;
-gap:15px;
+gap:16px;
 }
 
 /* TABS */
 
 .tabs{
-position:fixed;
-top:70px;
-left:0;
-right:0;
+position:sticky;
+top:80px;
+z-index:90;
+background:#0b5c5b;
 display:flex;
 gap:10px;
-padding:10px 20px;
-background:#0b5c5b;
-z-index:999;
+padding:10px 20px 20px 20px;
 }
 
 .tab{
@@ -71,16 +68,13 @@ color:#0b5c5b;
 font-weight:600;
 }
 
-/* CONTENT SCROLL */
+/* SCROLL CONTENT */
 
 .content{
-position:absolute;
-top:130px;
-bottom:90px;
-left:0;
-right:0;
+flex:1;
 overflow-y:auto;
 padding:20px;
+padding-bottom:120px;
 }
 
 /* ACCOUNT CARD */
@@ -93,13 +87,25 @@ padding:20px;
 margin-bottom:20px;
 }
 
+.account-header{
+font-weight:600;
+margin-bottom:10px;
+}
+
 .balance{
 font-size:36px;
 font-weight:700;
 }
 
+.balance-date{
+font-size:14px;
+opacity:0.7;
+margin-top:5px;
+}
+
 .owner{
 margin-top:5px;
+font-weight:500;
 }
 
 .iban{
@@ -112,7 +118,7 @@ font-size:14px;
 .quick-actions{
 display:flex;
 justify-content:space-between;
-margin-bottom:25px;
+margin-bottom:30px;
 }
 
 .action{
@@ -120,9 +126,14 @@ text-align:center;
 flex:1;
 }
 
-/* TRANSACTIONS */
+.action p{
+margin-top:6px;
+font-size:13px;
+}
 
-.transactions{
+/* SECTIONS */
+
+.section-card{
 background:white;
 color:#0b5c5b;
 border-radius:20px;
@@ -139,9 +150,10 @@ right:0;
 background:white;
 display:flex;
 justify-content:space-around;
-padding:12px;
-border-top:1px solid #eee;
+padding:14px 10px;
+box-shadow:0 -3px 20px rgba(0,0,0,0.2);
 color:#0b5c5b;
+z-index:200;
 }
 
 .nav-item{
@@ -153,4 +165,18 @@ font-size:11px;
 
 .nav-item.active{
 color:#10a37f;
+}
+
+/* DESKTOP BPER STYLE */
+
+@media (min-width:900px){
+
+.bank-container{
+max-width:420px;
+margin:auto;
+border-radius:20px;
+overflow:hidden;
+box-shadow:0 20px 50px rgba(0,0,0,0.3);
+}
+
 }

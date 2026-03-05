@@ -36,8 +36,7 @@ export default function Dashboard() {
   if (!data) return null;
 
   return (
-
-    <div className="bank-app">
+    <div className="bank-container">
 
       {/* HEADER FIXE */}
 
@@ -57,7 +56,7 @@ export default function Dashboard() {
 
       </div>
 
-      {/* TABS FIXES */}
+      {/* TABS FIXE */}
 
       <div className="tabs">
 
@@ -84,11 +83,12 @@ export default function Dashboard() {
 
       </div>
 
-      {/* CONTENU SCROLL */}
+      {/* CONTENU SCROLLABLE */}
 
       <div className="content">
 
         {activeTab === "accounts" && (
+
           <>
             <div className="account-card">
 
@@ -133,46 +133,26 @@ export default function Dashboard() {
 
             </div>
 
-            <div className="transactions">
-
-              <h3>DERNIÈRES OPÉRATIONS</h3>
-
-              <div className="transaction">
-                <div>
-                  <span className="date">02</span>
-                  <span className="month">mar</span>
-                </div>
-
-                <div className="desc">
-                  Frais bancaires
-                </div>
-
-                <div className="amount">
-                  -26,69 €
-                </div>
-              </div>
-
-            </div>
           </>
         )}
 
         {activeTab === "cards" && (
-          <div className="account-card">
+          <div className="section-card">
             <h3>Mes cartes</h3>
-            <p>Aucune carte active</p>
+            <p>Aucune carte disponible</p>
           </div>
         )}
 
         {activeTab === "financing" && (
-          <div className="account-card">
-            <h3>Financement</h3>
-            <p>Aucun financement disponible</p>
+          <div className="section-card">
+            <h3>Financements</h3>
+            <p>Aucun financement actif</p>
           </div>
         )}
 
       </div>
 
-      {/* BOTTOM NAV FIXE */}
+      {/* BOTTOM NAVIGATION */}
 
       <div className="bottom-nav">
 
