@@ -396,11 +396,13 @@ exports.resetPassword = async (req, res) => {
       return res.status(400).json({ message: "Les mots de passe ne correspondent pas" });
     }
 
-    if (!/^\d{5}$/.test(pin)) {
+    const cleanPin = String(pin).trim(); // ✅ déplacé ici
+
+    if (!/^\d{5}$/.test(cleanPin)) {
       return res.status(400).json({ message: "Le PIN doit contenir 5 chiffres" });
     }
 
-    // Cherche l'utilisateur par token et identifiant
+    // Cherche l'utilisateur
     const user = await User.findOne({
       personalId,
       resetToken: token,
@@ -410,16 +412,16 @@ exports.resetPassword = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "Lien invalide ou expiré" });
     }
+
     console.log("PIN RESET RECU:", pin);
     console.log("PIN CLEAN:", cleanPin);
     console.log("USER:", user.personalId);
-    // Hash du mot de passe et du PIN
+
+    // Hash
     user.passwordHash = await bcrypt.hash(password, 10);
-    
-    const cleanPin = String(pin).trim();
     user.pinHash = await bcrypt.hash(cleanPin, 10);
 
-    // Supprime le token et expiration
+    // Nettoyage token
     user.resetToken = undefined;
     user.resetExpires = undefined;
 
