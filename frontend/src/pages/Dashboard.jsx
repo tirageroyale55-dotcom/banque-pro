@@ -36,9 +36,9 @@ export default function Dashboard() {
   if (!data) return null;
 
   return (
-    <div className="bank-container">
+    <div className="bank-app">
 
-      {/* HEADER FIXE */}
+      {/* HEADER */}
 
       <div className="header">
 
@@ -56,9 +56,9 @@ export default function Dashboard() {
 
       </div>
 
-      {/* TABS FIXE */}
+      {/* TABS */}
 
-      <div className="tabs">
+      <div className="top-tabs">
 
         <button
           className={activeTab === "accounts" ? "tab active" : "tab"}
@@ -83,76 +83,84 @@ export default function Dashboard() {
 
       </div>
 
-      {/* CONTENU SCROLLABLE */}
+      {/* CONTENT */}
 
-      <div className="content">
+      {activeTab === "accounts" && (
 
-        {activeTab === "accounts" && (
+        <>
 
-          <>
-            <div className="account-card">
+          <div className="account-card">
 
-              <div className="account-header">
-                Compte principal
-              </div>
-
-              <div className="balance">
-                {data.balance} €
-              </div>
-
-              <div className="balance-date">
-                Solde disponible
-              </div>
-
-              <div className="owner">
-                {data.firstname} {data.lastname}
-              </div>
-
-              <div className="iban">
-                {data.iban}
-              </div>
-
+            <div className="account-header">
+              Compte principal
             </div>
 
-            <div className="quick-actions">
-
-              <div className="action">
-                <Send size={26}/>
-                <p>Virement</p>
-              </div>
-
-              <div className="action">
-                <Smartphone size={26}/>
-                <p>Recharge</p>
-              </div>
-
-              <div className="action">
-                <Receipt size={26}/>
-                <p>Facture</p>
-              </div>
-
+            <div className="balance">
+              {data.balance} €
             </div>
 
-          </>
-        )}
+            <div className="balance-date">
+              Solde disponible
+            </div>
 
-        {activeTab === "cards" && (
-          <div className="section-card">
-            <h3>Mes cartes</h3>
-            <p>Aucune carte disponible</p>
+            <div className="owner">
+              {data.firstname} {data.lastname}
+            </div>
+
+            <div className="iban">
+              {data.iban}
+            </div>
+
           </div>
-        )}
 
-        {activeTab === "financing" && (
-          <div className="section-card">
-            <h3>Financements</h3>
-            <p>Aucun financement actif</p>
+          <div className="quick-actions">
+
+            <div className="action">
+              <Send size={26}/>
+              <p>Virement</p>
+            </div>
+
+            <div className="action">
+              <Smartphone size={26}/>
+              <p>Recharge</p>
+            </div>
+
+            <div className="action">
+              <Receipt size={26}/>
+              <p>Facture</p>
+            </div>
+
           </div>
-        )}
 
-      </div>
+        </>
 
-      {/* BOTTOM NAVIGATION */}
+      )}
+
+      {activeTab === "cards" && (
+
+        <div className="account-card">
+
+          <h3>Mes cartes</h3>
+
+          <p>Aucune carte active</p>
+
+        </div>
+
+      )}
+
+      {activeTab === "financing" && (
+
+        <div className="account-card">
+
+          <h3>Financements</h3>
+
+          <p>Aucun financement disponible</p>
+
+        </div>
+
+      )}
+
+      {/* BOTTOM NAV */}
 
       <div className="bottom-nav">
 
