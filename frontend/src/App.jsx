@@ -15,8 +15,8 @@ import Activate from "./pages/Activate";
 import Login from "./pages/Login";
 import Welcome from "./pages/Welcome";
 
-import ForgotId from "./pages/ForgotId";
-import ForgotPin from "./pages/ForgotPin";
+import ForgotId from "./pages/forgotId";
+import ForgotPin from "./pages/forgotPin";
 import ResetPassword from "./pages/ResetPassword";
 
 /* CLIENT PAGES */
