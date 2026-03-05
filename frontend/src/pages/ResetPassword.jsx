@@ -85,26 +85,28 @@ export default function ResetPassword() {
 
   // 👉 STEP 4 → validation automatique finale
   useEffect(() => {
-    if (step === 4 && confirmPin.length === 5) {
-      if (pin !== confirmPin) {
-        setError("Les PIN ne correspondent pas");
-        setConfirmPin(""); // reset confirmation
-        return;
-      }
+  if (step === 4 && pin.length === 5 && confirmPin.length === 5) {
 
-      handleSubmit();
+    if (pin !== confirmPin) {
+      setError("Les PIN ne correspondent pas");
+      return;
     }
-  }, [confirmPin, step]);
+
+    handleSubmit();
+  }
+}, [pin, confirmPin, step]);
 
   // ===== SUBMIT =====
   const handleSubmit = async () => {
     try {
+      const cleanPin = String(pin).trim();
+
       await api("/auth/reset-password", "POST", {
-        token,
-        personalId,
-        password,
-        confirmPassword,
-        pin,
+       token,
+       personalId,
+       password,
+       confirmPassword,
+       pin: cleanPin,
       });
 
       alert("Mot de passe et PIN mis à jour avec succès !");

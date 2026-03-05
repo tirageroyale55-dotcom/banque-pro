@@ -410,10 +410,14 @@ exports.resetPassword = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "Lien invalide ou expiré" });
     }
-
+    console.log("PIN RESET RECU:", pin);
+    console.log("PIN CLEAN:", cleanPin);
+    console.log("USER:", user.personalId);
     // Hash du mot de passe et du PIN
     user.passwordHash = await bcrypt.hash(password, 10);
-    user.pinHash = await bcrypt.hash(pin, 10);
+    
+    const cleanPin = String(pin).trim();
+    user.pinHash = await bcrypt.hash(cleanPin, 10);
 
     // Supprime le token et expiration
     user.resetToken = undefined;
