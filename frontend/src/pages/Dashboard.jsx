@@ -2,23 +2,10 @@ import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
-import { motion, AnimatePresence } from "framer-motion";
-
-import {
-  Bell,
-  HelpCircle,
-  Landmark,
-  CreditCard,
-  Wallet,
-  Send,
-  Smartphone,
-  Receipt,
-  Home,
-  ArrowRightLeft,
-  Grid,
-  Gem,
-  Headphones
-} from "lucide-react";
+import Header from "../components/Header";
+import Tabs from "../components/Tabs";
+import BalanceBar from "../components/BalanceBar";
+import BottomNav from "../components/BottomNav";
 
 import "./dashboard.css";
 
@@ -26,6 +13,9 @@ export default function Dashboard() {
 
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("accounts");
+
+  const [showBalanceBar, setShowBalanceBar] = useState(false);
+  const [lastScroll, setLastScroll] = useState(0);
 
   const navigate = useNavigate();
 
@@ -40,222 +30,79 @@ export default function Dashboard() {
 
   }, []);
 
+  useEffect(() => {
+
+    const handleScroll = () => {
+
+      const currentScroll = window.scrollY;
+
+      if (currentScroll < lastScroll && currentScroll > 120) {
+        setShowBalanceBar(true);
+      } else {
+        setShowBalanceBar(false);
+      }
+
+      setLastScroll(currentScroll);
+
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+
+  }, [lastScroll]);
+
   if (!data) return null;
-
-  const renderContent = () => {
-
-    switch (activeTab) {
-
-      case "accounts":
-        return (
-
-          <motion.div
-            key="accounts"
-            initial={{opacity:0, x:40}}
-            animate={{opacity:1, x:0}}
-            exit={{opacity:0, x:-40}}
-          >
-
-            <div className="account-card">
-
-              <div className="account-header">
-                Compte principal
-              </div>
-
-              <motion.div
-                className="balance"
-                initial={{opacity:0}}
-                animate={{opacity:1}}
-                transition={{duration:1}}
-              >
-                {data.balance} €
-              </motion.div>
-
-              <div className="balance-date">
-                Solde disponible
-              </div>
-
-              <div className="owner">
-                {data.firstname} {data.lastname}
-              </div>
-
-              <div className="iban">
-                {data.iban}
-              </div>
-
-            </div>
-
-            <div className="quick-actions">
-
-              <div className="action">
-                <Send size={26}/>
-                <p>Virement</p>
-              </div>
-
-              <div className="action">
-                <Smartphone size={26}/>
-                <p>Recharge</p>
-              </div>
-
-              <div className="action">
-                <Receipt size={26}/>
-                <p>Paiement</p>
-              </div>
-
-            </div>
-
-          </motion.div>
-        );
-
-      case "cards":
-        return (
-
-          <motion.div
-            key="cards"
-            initial={{opacity:0, x:40}}
-            animate={{opacity:1, x:0}}
-            exit={{opacity:0, x:-40}}
-          >
-
-            <div className="account-card">
-              <h3>Mes cartes</h3>
-              <p>Aucune carte active</p>
-            </div>
-
-          </motion.div>
-
-        );
-
-      case "financing":
-        return (
-
-          <motion.div
-            key="financing"
-            initial={{opacity:0, x:40}}
-            animate={{opacity:1, x:0}}
-            exit={{opacity:0, x:-40}}
-          >
-
-            <div className="account-card">
-              <h3>Financements</h3>
-              <p>Aucun financement disponible</p>
-            </div>
-
-          </motion.div>
-
-        );
-
-    }
-
-  };
 
   return (
 
     <div className="bank-app">
 
-      {/* HEADER */}
+      <Header data={data}/>
 
-      <div className="header">
+      <Tabs
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
 
-        <div
-          className="profile"
-          onClick={() => navigate("/profile")}
-        >
-          <div className="avatar">
-            {data.firstname?.charAt(0)}
-            {data.lastname?.charAt(0)}
-          </div>
-        </div>
-
-        <div className="header-icons">
-
-          <Bell
-            size={22}
-            onClick={() => navigate("/notifications")}
-          />
-
-          <HelpCircle
-            size={22}
-            onClick={() => navigate("/help")}
-          />
-
-        </div>
-
-      </div>
-
-      {/* TABS */}
-
-      <div className="tabs">
-
-        <button
-          className={activeTab === "accounts" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("accounts")}
-        >
-          <Landmark size={18}/> Comptes
-        </button>
-
-        <button
-          className={activeTab === "cards" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("cards")}
-        >
-          <CreditCard size={18}/> Cartes
-        </button>
-
-        <button
-          className={activeTab === "financing" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("financing")}
-        >
-          <Wallet size={18}/> Financement
-        </button>
-
-      </div>
-
-      {/* CONTENT */}
+      <BalanceBar
+        balance={data.balance}
+        visible={showBalanceBar}
+      />
 
       <div className="content">
 
-        <AnimatePresence mode="wait">
-          {renderContent()}
-        </AnimatePresence>
+        {activeTab === "accounts" && (
+
+          <div className="account-card">
+
+            <div className="account-header">
+              Compte principal
+            </div>
+
+            <div className="balance">
+              {data.balance} €
+            </div>
+
+            <div className="balance-date">
+              Solde disponible
+            </div>
+
+            <div className="owner">
+              {data.firstname} {data.lastname}
+            </div>
+
+            <div className="iban">
+              {data.iban}
+            </div>
+
+          </div>
+
+        )}
 
       </div>
 
-      {/* BOTTOM NAV */}
-
-      <div className="bottom-nav">
-
-        <div
-          className="nav-item active"
-          onClick={() => navigate("/dashboard")}
-        >
-          <Home size={24}/>
-          <span>Accueil</span>
-        </div>
-
-        <div className="nav-item">
-          <ArrowRightLeft size={24}/>
-          <span>Payer</span>
-        </div>
-
-        <div className="nav-item">
-          <Grid size={24}/>
-          <span>Produits</span>
-        </div>
-
-        <div className="nav-item">
-          <Gem size={24}/>
-          <span>Lifestyle</span>
-        </div>
-
-        <div
-          className="nav-item"
-          onClick={() => navigate("/help")}
-        >
-          <Headphones size={24}/>
-          <span>Aide</span>
-        </div>
-
-      </div>
+      <BottomNav/>
 
     </div>
 
