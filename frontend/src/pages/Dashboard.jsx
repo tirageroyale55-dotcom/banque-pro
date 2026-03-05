@@ -63,9 +63,11 @@ export default function Dashboard() {
       <Header data={data}/>
 
       <Tabs
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+  activeTab={activeTab}
+  setActiveTab={setActiveTab}
+  balance={data.balance}
+  showBalance={showBalanceBar}
+/>
 
       <BalanceBar
         balance={data.balance}
