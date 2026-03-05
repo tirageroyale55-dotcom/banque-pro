@@ -77,7 +77,7 @@ export default function Dashboard() {
           <div className="account-card">
 
             <div className="account-header">
-              Compte principal
+              Compte 
             </div>
 
             <div className="balance">
