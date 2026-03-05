@@ -1,264 +1,113 @@
 import { useState, useEffect } from "react";
-import { api } from "../services/api";
-import { useNavigate } from "react-router-dom";
-
-import { motion, AnimatePresence } from "framer-motion";
-
-import {
-  Bell,
-  HelpCircle,
-  Landmark,
-  CreditCard,
-  Wallet,
-  Send,
-  Smartphone,
-  Receipt,
-  Home,
-  ArrowRightLeft,
-  Grid,
-  Gem,
-  Headphones
-} from "lucide-react";
-
-import "./dashboard.css";
+import axios from "axios";
 
 export default function Dashboard() {
 
-  const [data, setData] = useState(null);
-  const [activeTab, setActiveTab] = useState("accounts");
-
-  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("comptes");
+  const [balance, setBalance] = useState(null);
 
   useEffect(() => {
-
-    api("/client/dashboard")
-      .then(setData)
-      .catch(() => {
-        localStorage.removeItem("token");
-        navigate("/login");
-      });
-
+    fetchBalance();
   }, []);
 
-  if (!data) return null;
+  const fetchBalance = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-  const renderContent = () => {
+      const res = await axios.get(
+        "https://ton-backend.com/api/account/balance",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
 
-    switch (activeTab) {
+      setBalance(res.data.balance);
 
-      case "accounts":
-        return (
-
-          <motion.div
-            key="accounts"
-            initial={{opacity:0, x:40}}
-            animate={{opacity:1, x:0}}
-            exit={{opacity:0, x:-40}}
-          >
-
-            <div className="account-card">
-
-              <div className="account-header">
-                Compte principal
-              </div>
-
-              <motion.div
-                className="balance"
-                initial={{opacity:0}}
-                animate={{opacity:1}}
-                transition={{duration:1}}
-              >
-                {data.balance} €
-              </motion.div>
-
-              <div className="balance-date">
-                Solde disponible
-              </div>
-
-              <div className="owner">
-                {data.firstname} {data.lastname}
-              </div>
-
-              <div className="iban">
-                {data.iban}
-              </div>
-
-            </div>
-
-            <div className="quick-actions">
-
-              <div className="action">
-                <Send size={26}/>
-                <p>Virement</p>
-              </div>
-
-              <div className="action">
-                <Smartphone size={26}/>
-                <p>Recharge</p>
-              </div>
-
-              <div className="action">
-                <Receipt size={26}/>
-                <p>Paiement</p>
-              </div>
-
-            </div>
-
-          </motion.div>
-        );
-
-      case "cards":
-        return (
-
-          <motion.div
-            key="cards"
-            initial={{opacity:0, x:40}}
-            animate={{opacity:1, x:0}}
-            exit={{opacity:0, x:-40}}
-          >
-
-            <div className="account-card">
-              <h3>Mes cartes</h3>
-              <p>Aucune carte active</p>
-            </div>
-
-          </motion.div>
-
-        );
-
-      case "financing":
-        return (
-
-          <motion.div
-            key="financing"
-            initial={{opacity:0, x:40}}
-            animate={{opacity:1, x:0}}
-            exit={{opacity:0, x:-40}}
-          >
-
-            <div className="account-card">
-              <h3>Financements</h3>
-              <p>Aucun financement disponible</p>
-            </div>
-
-          </motion.div>
-
-        );
-
+    } catch (err) {
+      console.log(err);
     }
-
   };
 
   return (
+    <div className="dashboard">
 
-    <div className="bank-app">
-
-      {/* HEADER */}
-
+      {/* HEADER FIXE */}
       <div className="header">
-
-        <div
-          className="profile"
-          onClick={() => navigate("/profile")}
-        >
-          <div className="avatar">
-            {data.firstname?.charAt(0)}
-            {data.lastname?.charAt(0)}
-          </div>
-        </div>
-
         <div className="header-icons">
-
-          <Bell
-            size={22}
-            onClick={() => navigate("/notifications")}
-          />
-
-          <HelpCircle
-            size={22}
-            onClick={() => navigate("/help")}
-          />
-
+          <button>👤</button>
+          <button>🔔</button>
+          <button>❓</button>
         </div>
 
+        {/* TABS */}
+        <div className="tabs">
+          <button
+            className={activeTab === "comptes" ? "active" : ""}
+            onClick={() => setActiveTab("comptes")}
+          >
+            Comptes
+          </button>
+
+          <button
+            className={activeTab === "cartes" ? "active" : ""}
+            onClick={() => setActiveTab("cartes")}
+          >
+            Cartes
+          </button>
+
+          <button
+            className={activeTab === "financement" ? "active" : ""}
+            onClick={() => setActiveTab("financement")}
+          >
+            Financement
+          </button>
+        </div>
       </div>
 
-      {/* TABS */}
 
-      <div className="tabs">
-
-        <button
-          className={activeTab === "accounts" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("accounts")}
-        >
-          <Landmark size={18}/> Comptes
-        </button>
-
-        <button
-          className={activeTab === "cards" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("cards")}
-        >
-          <CreditCard size={18}/> Cartes
-        </button>
-
-        <button
-          className={activeTab === "financing" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("financing")}
-        >
-          <Wallet size={18}/> Financement
-        </button>
-
-      </div>
-
-      {/* CONTENT */}
-
+      {/* CONTENU */}
       <div className="content">
 
-        <AnimatePresence mode="wait">
-          {renderContent()}
-        </AnimatePresence>
+        {activeTab === "comptes" && (
+
+          <div className="account-section">
+
+            {/* SOLDE DISPONIBLE */}
+            <div className="balance-card">
+
+              <h3>Solde disponible</h3>
+
+              <h1>
+                {balance !== null
+                  ? balance.toLocaleString("fr-FR", {
+                      style: "currency",
+                      currency: "EUR",
+                    })
+                  : "..."}
+              </h1>
+
+            </div>
+
+          </div>
+
+        )}
 
       </div>
 
-      {/* BOTTOM NAV */}
 
+      {/* BOTTOM NAVIGATION */}
       <div className="bottom-nav">
 
-        <div
-          className="nav-item active"
-          onClick={() => navigate("/dashboard")}
-        >
-          <Home size={24}/>
-          <span>Accueil</span>
-        </div>
-
-        <div className="nav-item">
-          <ArrowRightLeft size={24}/>
-          <span>Payer</span>
-        </div>
-
-        <div className="nav-item">
-          <Grid size={24}/>
-          <span>Produits</span>
-        </div>
-
-        <div className="nav-item">
-          <Gem size={24}/>
-          <span>Lifestyle</span>
-        </div>
-
-        <div
-          className="nav-item"
-          onClick={() => navigate("/help")}
-        >
-          <Headphones size={24}/>
-          <span>Aide</span>
-        </div>
+        <button>Accueil</button>
+        <button>Payer</button>
+        <button>Produits</button>
+        <button>Lifestyle</button>
+        <button>Aide</button>
 
       </div>
 
     </div>
-
   );
-
 }
