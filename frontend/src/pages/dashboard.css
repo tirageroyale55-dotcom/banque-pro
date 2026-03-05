@@ -1,18 +1,25 @@
 .bank-app{
 background:#0b5c5b;
-min-height:100vh;
-font-family: "Inter", sans-serif;
+height:100vh;
+font-family:"Inter",sans-serif;
 color:white;
-padding:20px;
+overflow:hidden;
 }
 
 /* HEADER */
 
 .header{
+position:fixed;
+top:0;
+left:0;
+right:0;
+height:70px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-bottom:20px;
+padding:0 20px;
+background:#0b5c5b;
+z-index:1000;
 }
 
 .avatar{
@@ -32,12 +39,18 @@ display:flex;
 gap:15px;
 }
 
-/* TOP TABS */
+/* TABS */
 
-.top-tabs{
+.tabs{
+position:fixed;
+top:70px;
+left:0;
+right:0;
 display:flex;
 gap:10px;
-margin-bottom:20px;
+padding:10px 20px;
+background:#0b5c5b;
+z-index:999;
 }
 
 .tab{
@@ -58,6 +71,18 @@ color:#0b5c5b;
 font-weight:600;
 }
 
+/* CONTENT SCROLL */
+
+.content{
+position:absolute;
+top:130px;
+bottom:90px;
+left:0;
+right:0;
+overflow-y:auto;
+padding:20px;
+}
+
 /* ACCOUNT CARD */
 
 .account-card{
@@ -68,25 +93,13 @@ padding:20px;
 margin-bottom:20px;
 }
 
-.account-header{
-font-weight:600;
-margin-bottom:10px;
-}
-
 .balance{
 font-size:36px;
 font-weight:700;
 }
 
-.balance-date{
-font-size:14px;
-opacity:0.7;
-margin-top:5px;
-}
-
 .owner{
 margin-top:5px;
-font-weight:500;
 }
 
 .iban{
@@ -105,12 +118,6 @@ margin-bottom:25px;
 .action{
 text-align:center;
 flex:1;
-color:white;
-}
-
-.action p{
-margin-top:6px;
-font-size:13px;
 }
 
 /* TRANSACTIONS */
@@ -122,58 +129,18 @@ border-radius:20px;
 padding:20px;
 }
 
-.transactions h3{
-margin-bottom:15px;
-font-size:16px;
-}
-
-.transaction{
-display:flex;
-align-items:center;
-justify-content:space-between;
-border-top:1px solid #eee;
-padding-top:10px;
-}
-
-.date{
-font-size:22px;
-font-weight:700;
-margin-right:5px;
-}
-
-.month{
-font-size:12px;
-}
-
-.desc{
-flex:1;
-margin-left:10px;
-font-weight:500;
-}
-
-.amount{
-font-weight:700;
-}
-
-.negative{
-color:#0b5c5b;
-}
-
 /* BOTTOM NAV */
 
 .bottom-nav{
 position:fixed;
-bottom:15px;
-left:50%;
-transform:translateX(-50%);
+bottom:0;
+left:0;
+right:0;
 background:white;
-width:90%;
-max-width:500px;
-border-radius:40px;
 display:flex;
 justify-content:space-around;
 padding:12px;
-box-shadow:0 5px 20px rgba(0,0,0,0.2);
+border-top:1px solid #eee;
 color:#0b5c5b;
 }
 
