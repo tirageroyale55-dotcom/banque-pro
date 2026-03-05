@@ -7,6 +7,8 @@ import Tabs from "../components/Tabs";
 import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 
+import Accounts from "./Accounts";
+
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
@@ -70,37 +72,27 @@ export default function Dashboard() {
         visible={showBalanceBar}
       />
 
-      <div className="content">
+      {/* CONTENU DES TABS */}
 
-        {activeTab === "accounts" && (
+      {activeTab === "accounts" && <Accounts />}
 
+      {activeTab === "cards" && (
+        <div className="content">
           <div className="account-card">
-
-            <div className="account-header">
-              Compte 
-            </div>
-
-            <div className="balance">
-              {data.balance} €
-            </div>
-
-            <div className="balance-date">
-              Solde disponible
-            </div>
-
-            <div className="owner">
-              {data.firstname} {data.lastname}
-            </div>
-
-            <div className="iban">
-              {data.iban}
-            </div>
-
+            <h3>Mes cartes</h3>
+            <p>Aucune carte active</p>
           </div>
+        </div>
+      )}
 
-        )}
-
-      </div>
+      {activeTab === "financing" && (
+        <div className="content">
+          <div className="account-card">
+            <h3>Financements</h3>
+            <p>Aucun financement disponible</p>
+          </div>
+        </div>
+      )}
 
       <BottomNav/>
 

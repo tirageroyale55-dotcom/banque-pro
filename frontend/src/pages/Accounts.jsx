@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../services/api";
 
 export default function Accounts() {
+
   const [data, setData] = useState(null);
 
   useEffect(() => {
@@ -11,15 +12,35 @@ export default function Accounts() {
   if (!data) return null;
 
   return (
-    <div className="bank-app">
-      <h2>Mes Comptes</h2>
+
+    <div className="content">
+
       <div className="account-card">
-        <div className="account-header">Compte principal</div>
-        <div className="balance">{data.balance} €</div>
-        <div className="balance-date">Solde disponible</div>
-        <div className="owner">{data.firstname} {data.lastname}</div>
-        <div className="iban">{data.iban}</div>
+
+        <div className="account-header">
+          Compte principal
+        </div>
+
+        <div className="balance">
+          {data.balance} €
+        </div>
+
+        <div className="balance-date">
+          Solde disponible
+        </div>
+
+        <div className="owner">
+          {data.firstname} {data.lastname}
+        </div>
+
+        <div className="iban">
+          {data.iban}
+        </div>
+
       </div>
+
     </div>
+
   );
+
 }
