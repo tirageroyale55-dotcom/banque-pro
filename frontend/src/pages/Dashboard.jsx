@@ -36,9 +36,10 @@ export default function Dashboard() {
   if (!data) return null;
 
   return (
+
     <div className="bank-app">
 
-      {/* HEADER */}
+      {/* HEADER FIXE */}
 
       <div className="header">
 
@@ -56,9 +57,9 @@ export default function Dashboard() {
 
       </div>
 
-      {/* TABS */}
+      {/* TABS FIXES */}
 
-      <div className="top-tabs">
+      <div className="tabs">
 
         <button
           className={activeTab === "accounts" ? "tab active" : "tab"}
@@ -83,84 +84,95 @@ export default function Dashboard() {
 
       </div>
 
-      {/* CONTENT */}
+      {/* CONTENU SCROLL */}
 
-      {activeTab === "accounts" && (
+      <div className="content">
 
-        <>
+        {activeTab === "accounts" && (
+          <>
+            <div className="account-card">
 
+              <div className="account-header">
+                Compte principal
+              </div>
+
+              <div className="balance">
+                {data.balance} €
+              </div>
+
+              <div className="balance-date">
+                Solde disponible
+              </div>
+
+              <div className="owner">
+                {data.firstname} {data.lastname}
+              </div>
+
+              <div className="iban">
+                {data.iban}
+              </div>
+
+            </div>
+
+            <div className="quick-actions">
+
+              <div className="action">
+                <Send size={26}/>
+                <p>Virement</p>
+              </div>
+
+              <div className="action">
+                <Smartphone size={26}/>
+                <p>Recharge</p>
+              </div>
+
+              <div className="action">
+                <Receipt size={26}/>
+                <p>Facture</p>
+              </div>
+
+            </div>
+
+            <div className="transactions">
+
+              <h3>DERNIÈRES OPÉRATIONS</h3>
+
+              <div className="transaction">
+                <div>
+                  <span className="date">02</span>
+                  <span className="month">mar</span>
+                </div>
+
+                <div className="desc">
+                  Frais bancaires
+                </div>
+
+                <div className="amount">
+                  -26,69 €
+                </div>
+              </div>
+
+            </div>
+          </>
+        )}
+
+        {activeTab === "cards" && (
           <div className="account-card">
-
-            <div className="account-header">
-              Compte principal
-            </div>
-
-            <div className="balance">
-              {data.balance} €
-            </div>
-
-            <div className="balance-date">
-              Solde disponible
-            </div>
-
-            <div className="owner">
-              {data.firstname} {data.lastname}
-            </div>
-
-            <div className="iban">
-              {data.iban}
-            </div>
-
+            <h3>Mes cartes</h3>
+            <p>Aucune carte active</p>
           </div>
+        )}
 
-          <div className="quick-actions">
-
-            <div className="action">
-              <Send size={26}/>
-              <p>Virement</p>
-            </div>
-
-            <div className="action">
-              <Smartphone size={26}/>
-              <p>Recharge</p>
-            </div>
-
-            <div className="action">
-              <Receipt size={26}/>
-              <p>Facture</p>
-            </div>
-
+        {activeTab === "financing" && (
+          <div className="account-card">
+            <h3>Financement</h3>
+            <p>Aucun financement disponible</p>
           </div>
+        )}
 
-        </>
+      </div>
 
-      )}
-
-      {activeTab === "cards" && (
-
-        <div className="account-card">
-
-          <h3>Mes cartes</h3>
-
-          <p>Aucune carte active</p>
-
-        </div>
-
-      )}
-
-      {activeTab === "financing" && (
-
-        <div className="account-card">
-
-          <h3>Financements</h3>
-
-          <p>Aucun financement disponible</p>
-
-        </div>
-
-      )}
-
-      {/* BOTTOM NAV */}
+      {/* BOTTOM NAV FIXE */}
 
       <div className="bottom-nav">
 
