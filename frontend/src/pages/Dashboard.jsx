@@ -1,10 +1,26 @@
 import { useState, useEffect } from "react";
 import { api } from "../services/api";
-import Navbar from "../components/Navbar";
+import {
+  Bell,
+  HelpCircle,
+  Landmark,
+  CreditCard,
+  Wallet,
+  Send,
+  Smartphone,
+  Receipt,
+  Home,
+  ArrowRightLeft,
+  Grid,
+  Gem,
+  Headphones
+} from "lucide-react";
+
+import "./dashboard.css";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
-  const [activeTopTab, setActiveTopTab] = useState("carte");
+  const [activeTab, setActiveTab] = useState("comptes");
 
   useEffect(() => {
     api("/client/dashboard")
@@ -20,90 +36,150 @@ export default function Dashboard() {
   return (
     <div className="bank-app">
 
-      {/* TOP HEADER */}
-      <div className="top-header">
-        <div className="menu-icon">☰</div>
-        <div className="icons-right">🔔 ❔</div>
+      {/* HEADER */}
+      <div className="header">
+
+        <div className="profile">
+          <div className="avatar">GD</div>
+        </div>
+
+        <div className="header-icons">
+          <Bell size={22}/>
+          <HelpCircle size={22}/>
+        </div>
+
       </div>
 
-      {/* TOP NAVIGATION */}
+      {/* TOP TABS */}
+
       <div className="top-tabs">
-        <span
-          className={activeTopTab === "conti" ? "active" : ""}
-          onClick={() => setActiveTopTab("conti")}
+
+        <button
+          className={activeTab === "comptes" ? "tab active" : "tab"}
+          onClick={() => setActiveTab("comptes")}
         >
-          Conti
-        </span>
-        <span
-          className={activeTopTab === "carte" ? "active" : ""}
-          onClick={() => setActiveTopTab("carte")}
+          <Landmark size={18}/> Comptes
+        </button>
+
+        <button
+          className={activeTab === "cartes" ? "tab active" : "tab"}
+          onClick={() => setActiveTab("cartes")}
         >
-          Carte
-        </span>
-        <span
-          className={activeTopTab === "invest" ? "active" : ""}
-          onClick={() => setActiveTopTab("invest")}
+          <CreditCard size={18}/> Cartes
+        </button>
+
+        <button
+          className={activeTab === "financement" ? "tab active" : "tab"}
+          onClick={() => setActiveTab("financement")}
         >
-          Investimenti
-        </span>
+          <Wallet size={18}/> Financement
+        </button>
+
       </div>
 
-      {/* CARD SECTION */}
-      {activeTopTab === "carte" && (
-        <div className="card-section">
-          <div className="card-bank">
-            <div className="card-title">BPER</div>
-            <div className="card-number">**** {data.iban.slice(-4)}</div>
-            <div className="card-brand">Mastercard</div>
-          </div>
+      {/* COMPTE */}
 
-          <div className="card-actions">
-            <div>PIN</div>
-            <div>KEY6</div>
-            <div>SOSPENDI</div>
-            <div>ALTRO</div>
-          </div>
-        </div>
-      )}
+      <div className="account-card">
 
-      {/* ACCOUNT SECTION */}
-      {activeTopTab === "conti" && (
-        <div className="account-section">
-          <h3>Saldo disponibile</h3>
-          <h1>{data.balance} €</h1>
-          <p>IBAN: {data.iban}</p>
+        <div className="account-header">
+          <span>Compte 3735584</span>
         </div>
-      )}
 
-      {/* INVEST SECTION */}
-      {activeTopTab === "invest" && (
-        <div className="account-section">
-          <h3>Investimenti</h3>
-          <p>Nessun investimento attivo</p>
+        <div className="balance">
+          {data.balance} €
         </div>
-      )}
 
-      {/* MONTHLY BLOCK */}
-      <div className="monthly-box">
-        <h4>PRELIEVI E PAGAMENTI MENSILI</h4>
-        <div className="monthly-row">
-          <div>
-            <p>Speso</p>
-            <strong>200,00 €</strong>
-          </div>
-          <div>
-            <p>Residuo</p>
-            <strong>{data.balance} €</strong>
-          </div>
+        <div className="balance-date">
+          Solde disponible
         </div>
+
+        <div className="owner">
+          {data.name}
+        </div>
+
+        <div className="iban">
+          {data.iban}
+        </div>
+
       </div>
 
-      {/* BOTTOM NAVIGATION */}
+      {/* ACTIONS RAPIDES */}
+
+      <div className="quick-actions">
+
+        <div className="action">
+          <Send size={26}/>
+          <p>Virement</p>
+        </div>
+
+        <div className="action">
+          <Smartphone size={26}/>
+          <p>Recharge mobile</p>
+        </div>
+
+        <div className="action">
+          <Receipt size={26}/>
+          <p>Paiement facture</p>
+        </div>
+
+      </div>
+
+
+      {/* DERNIERS MOUVEMENTS */}
+
+      <div className="transactions">
+
+        <h3>DERNIÈRES OPÉRATIONS</h3>
+
+        <div className="transaction">
+
+          <div>
+            <span className="date">02</span>
+            <span className="month">mar</span>
+          </div>
+
+          <div className="desc">
+            Frais bancaires autorisés
+          </div>
+
+          <div className="amount negative">
+            -26,69 €
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* BOTTOM NAV */}
+
       <div className="bottom-nav">
-        <div className="active">Home</div>
-        <div>Paga</div>
-        <div>Prodotti</div>
-        <div>Aiuto</div>
+
+        <div className="nav-item active">
+          <Home size={24}/>
+          <span>Accueil</span>
+        </div>
+
+        <div className="nav-item">
+          <ArrowRightLeft size={24}/>
+          <span>Payer</span>
+        </div>
+
+        <div className="nav-item">
+          <Grid size={24}/>
+          <span>Produits</span>
+        </div>
+
+        <div className="nav-item">
+          <Gem size={24}/>
+          <span>Lifestyle</span>
+        </div>
+
+        <div className="nav-item">
+          <Headphones size={24}/>
+          <span>Aide</span>
+        </div>
+
       </div>
 
     </div>
