@@ -2,8 +2,8 @@
 background:#0b5c5b;
 height:100vh;
 font-family:"Inter",sans-serif;
-color:white;
 overflow:hidden;
+color:white;
 }
 
 /* HEADER */
@@ -23,20 +23,21 @@ z-index:1000;
 }
 
 .avatar{
-width:50px;
-height:50px;
-background:#cfd8dc;
-border-radius:16px;
+width:48px;
+height:48px;
+background:#e2e8f0;
+border-radius:14px;
 display:flex;
 align-items:center;
 justify-content:center;
-font-weight:bold;
+font-weight:700;
 color:#0b5c5b;
 }
 
 .header-icons{
 display:flex;
-gap:15px;
+gap:16px;
+cursor:pointer;
 }
 
 /* TABS */
@@ -48,7 +49,7 @@ left:0;
 right:0;
 display:flex;
 gap:10px;
-padding:10px 20px;
+padding:12px 20px;
 background:#0b5c5b;
 z-index:999;
 }
@@ -71,25 +72,25 @@ color:#0b5c5b;
 font-weight:600;
 }
 
-/* CONTENT SCROLL */
+/* CONTENT */
 
 .content{
 position:absolute;
 top:130px;
-bottom:90px;
+bottom:85px;
 left:0;
 right:0;
 overflow-y:auto;
 padding:20px;
 }
 
-/* ACCOUNT CARD */
+/* CARD */
 
 .account-card{
 background:white;
 color:#0b5c5b;
-border-radius:20px;
-padding:20px;
+border-radius:22px;
+padding:22px;
 margin-bottom:20px;
 }
 
@@ -98,35 +99,17 @@ font-size:36px;
 font-weight:700;
 }
 
-.owner{
-margin-top:5px;
-}
-
-.iban{
-margin-top:10px;
-font-size:14px;
-}
-
 /* ACTIONS */
 
 .quick-actions{
 display:flex;
 justify-content:space-between;
-margin-bottom:25px;
+margin-top:15px;
 }
 
 .action{
-text-align:center;
 flex:1;
-}
-
-/* TRANSACTIONS */
-
-.transactions{
-background:white;
-color:#0b5c5b;
-border-radius:20px;
-padding:20px;
+text-align:center;
 }
 
 /* BOTTOM NAV */
@@ -136,12 +119,12 @@ position:fixed;
 bottom:0;
 left:0;
 right:0;
+height:80px;
 background:white;
 display:flex;
 justify-content:space-around;
-padding:12px;
+align-items:center;
 border-top:1px solid #eee;
-color:#0b5c5b;
 }
 
 .nav-item{
@@ -149,6 +132,8 @@ display:flex;
 flex-direction:column;
 align-items:center;
 font-size:11px;
+color:#0b5c5b;
+cursor:pointer;
 }
 
 .nav-item.active{

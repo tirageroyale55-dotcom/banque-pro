@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { api } from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 import {
   Bell,
@@ -24,12 +25,14 @@ export default function Dashboard() {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("accounts");
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     api("/client/dashboard")
       .then(setData)
       .catch(() => {
         localStorage.removeItem("token");
-        window.location = "/login";
+        navigate("/login");
       });
   }, []);
 
@@ -39,11 +42,14 @@ export default function Dashboard() {
 
     <div className="bank-app">
 
-      {/* HEADER FIXE */}
+      {/* HEADER */}
 
       <div className="header">
 
-        <div className="profile">
+        <div
+          className="profile"
+          onClick={() => navigate("/profile")}
+        >
           <div className="avatar">
             {data.firstname?.charAt(0)}
             {data.lastname?.charAt(0)}
@@ -51,13 +57,22 @@ export default function Dashboard() {
         </div>
 
         <div className="header-icons">
-          <Bell size={22}/>
-          <HelpCircle size={22}/>
+
+          <Bell
+            size={22}
+            onClick={() => navigate("/notifications")}
+          />
+
+          <HelpCircle
+            size={22}
+            onClick={() => navigate("/help")}
+          />
+
         </div>
 
       </div>
 
-      {/* TABS FIXES */}
+      {/* TABS */}
 
       <div className="tabs">
 
@@ -84,11 +99,12 @@ export default function Dashboard() {
 
       </div>
 
-      {/* CONTENU SCROLL */}
+      {/* CONTENT */}
 
       <div className="content">
 
         {activeTab === "accounts" && (
+
           <>
             <div className="account-card">
 
@@ -128,55 +144,43 @@ export default function Dashboard() {
 
               <div className="action">
                 <Receipt size={26}/>
-                <p>Facture</p>
+                <p>Paiement</p>
               </div>
 
             </div>
 
-            <div className="transactions">
-
-              <h3>DERNIÈRES OPÉRATIONS</h3>
-
-              <div className="transaction">
-                <div>
-                  <span className="date">02</span>
-                  <span className="month">mar</span>
-                </div>
-
-                <div className="desc">
-                  Frais bancaires
-                </div>
-
-                <div className="amount">
-                  -26,69 €
-                </div>
-              </div>
-
-            </div>
           </>
+
         )}
 
         {activeTab === "cards" && (
+
           <div className="account-card">
             <h3>Mes cartes</h3>
             <p>Aucune carte active</p>
           </div>
+
         )}
 
         {activeTab === "financing" && (
+
           <div className="account-card">
-            <h3>Financement</h3>
+            <h3>Financements</h3>
             <p>Aucun financement disponible</p>
           </div>
+
         )}
 
       </div>
 
-      {/* BOTTOM NAV FIXE */}
+      {/* BOTTOM NAV */}
 
       <div className="bottom-nav">
 
-        <div className="nav-item active">
+        <div
+          className="nav-item active"
+          onClick={() => navigate("/dashboard")}
+        >
           <Home size={24}/>
           <span>Accueil</span>
         </div>
@@ -196,7 +200,10 @@ export default function Dashboard() {
           <span>Lifestyle</span>
         </div>
 
-        <div className="nav-item">
+        <div
+          className="nav-item"
+          onClick={() => navigate("/help")}
+        >
           <Headphones size={24}/>
           <span>Aide</span>
         </div>
