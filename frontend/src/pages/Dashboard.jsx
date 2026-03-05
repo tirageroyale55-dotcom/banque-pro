@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "../services/api";
-import Navbar from "../components/Navbar";
+import "./Dashboard.css";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTopTab, setActiveTopTab] = useState("carte");
 
   useEffect(() => {
     api("/client/dashboard")
@@ -18,64 +18,94 @@ export default function Dashboard() {
   if (!data) return null;
 
   return (
-    <div className="dashboard">
-      <Navbar />
+    <div className="bank-app">
 
-      {/* HEADER TABS */}
-      <div className="tabs">
+      {/* TOP HEADER */}
+      <div className="top-header">
+        <div className="menu-icon">☰</div>
+        <div className="icons-right">🔔 ❔</div>
+      </div>
+
+      {/* TOP NAVIGATION */}
+      <div className="top-tabs">
         <span
-          className={activeTab === 0 ? "active" : ""}
-          onClick={() => setActiveTab(0)}
+          className={activeTopTab === "conti" ? "active" : ""}
+          onClick={() => setActiveTopTab("conti")}
         >
-          Comptes
+          Conti
         </span>
         <span
-          className={activeTab === 1 ? "active" : ""}
-          onClick={() => setActiveTab(1)}
+          className={activeTopTab === "carte" ? "active" : ""}
+          onClick={() => setActiveTopTab("carte")}
         >
           Carte
         </span>
         <span
-          className={activeTab === 2 ? "active" : ""}
-          onClick={() => setActiveTab(2)}
+          className={activeTopTab === "invest" ? "active" : ""}
+          onClick={() => setActiveTopTab("invest")}
         >
-          Investissements
+          Investimenti
         </span>
       </div>
 
-      {/* CONTENU SLIDE */}
-      <div
-        className="tab-container"
-        style={{ transform: `translateX(-${activeTab * 100}%)` }}
-      >
-        {/* PAGE 1 : COMPTE */}
-        <div className="tab-page">
-          <h2>Solde</h2>
-          <h1>{data.balance} €</h1>
-          <p>IBAN : {data.iban}</p>
-        </div>
-
-        {/* PAGE 2 : CARTE */}
-        <div className="tab-page">
+      {/* CARD SECTION */}
+      {activeTopTab === "carte" && (
+        <div className="card-section">
           <div className="card-bank">
-            <h3>BPER Banque</h3>
-            <p>Carte **** {data.iban.slice(-4)}</p>
+            <div className="card-title">BPER</div>
+            <div className="card-number">**** {data.iban.slice(-4)}</div>
+            <div className="card-brand">Mastercard</div>
           </div>
 
-          <div className="actions">
-            <button>PIN</button>
-            <button>KEY6</button>
-            <button>Suspendre</button>
-            <button>Autres</button>
+          <div className="card-actions">
+            <div>PIN</div>
+            <div>KEY6</div>
+            <div>SOSPENDI</div>
+            <div>ALTRO</div>
           </div>
         </div>
+      )}
 
-        {/* PAGE 3 : INVESTISSEMENTS */}
-        <div className="tab-page">
-          <h2>Investissements</h2>
-          <p>Aucun investissement actif</p>
+      {/* ACCOUNT SECTION */}
+      {activeTopTab === "conti" && (
+        <div className="account-section">
+          <h3>Saldo disponibile</h3>
+          <h1>{data.balance} €</h1>
+          <p>IBAN: {data.iban}</p>
+        </div>
+      )}
+
+      {/* INVEST SECTION */}
+      {activeTopTab === "invest" && (
+        <div className="account-section">
+          <h3>Investimenti</h3>
+          <p>Nessun investimento attivo</p>
+        </div>
+      )}
+
+      {/* MONTHLY BLOCK */}
+      <div className="monthly-box">
+        <h4>PRELIEVI E PAGAMENTI MENSILI</h4>
+        <div className="monthly-row">
+          <div>
+            <p>Speso</p>
+            <strong>200,00 €</strong>
+          </div>
+          <div>
+            <p>Residuo</p>
+            <strong>{data.balance} €</strong>
+          </div>
         </div>
       </div>
+
+      {/* BOTTOM NAVIGATION */}
+      <div className="bottom-nav">
+        <div className="active">Home</div>
+        <div>Paga</div>
+        <div>Prodotti</div>
+        <div>Aiuto</div>
+      </div>
+
     </div>
   );
 }

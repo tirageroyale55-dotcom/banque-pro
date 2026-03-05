@@ -2607,63 +2607,113 @@ html, body {
 
 
 
-.dashboard {
-  background: #0f3d3e;
+.bank-app {
+  background: linear-gradient(to bottom, #0f3d3e, #0a2c2d);
   min-height: 100vh;
   color: white;
-  overflow: hidden;
+  padding-bottom: 80px;
+  font-family: Arial, sans-serif;
 }
 
-/* TABS */
-.tabs {
+/* HEADER */
+.top-header {
   display: flex;
-  justify-content: space-around;
-  padding: 15px;
+  justify-content: space-between;
+  padding: 15px 20px;
+  font-size: 20px;
+}
+
+/* TOP TABS */
+.top-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 20px;
   font-size: 14px;
 }
 
-.tabs span {
-  opacity: 0.5;
+.top-tabs span {
+  opacity: 0.6;
   cursor: pointer;
 }
 
-.tabs .active {
+.top-tabs .active {
   opacity: 1;
   font-weight: bold;
-  border-bottom: 2px solid #1ec98f;
+  border-bottom: 2px solid #2ee59d;
 }
 
-/* CONTAINER SLIDE */
-.tab-container {
+/* CARD */
+.card-section {
+  padding: 0 20px;
+}
+
+.card-bank {
+  background: #16c784;
+  border-radius: 20px;
+  padding: 25px;
+  margin-bottom: 20px;
+  color: white;
+  position: relative;
+}
+
+.card-title {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.card-number {
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+.card-brand {
+  position: absolute;
+  bottom: 15px;
+  right: 20px;
+}
+
+/* CARD ACTIONS */
+.card-actions {
   display: flex;
-  width: 300%;
-  transition: transform 0.3s ease;
+  justify-content: space-between;
+  text-align: center;
+  font-size: 12px;
 }
 
-.tab-page {
-  width: 100%;
-  flex-shrink: 0;
+/* ACCOUNT */
+.account-section {
   padding: 20px;
 }
 
-/* CARTE */
-.card-bank {
-  background: linear-gradient(135deg, #1ec98f, #0f9b7a);
+/* MONTHLY BOX */
+.monthly-box {
+  background: #f2f2f2;
+  color: black;
+  margin: 30px 20px;
   border-radius: 20px;
   padding: 20px;
-  margin-bottom: 20px;
 }
 
-/* ACTIONS */
-.actions {
+.monthly-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: white;
+  color: black;
   display: flex;
   justify-content: space-around;
+  padding: 15px 0;
+  font-size: 13px;
 }
 
-.actions button {
-  background: #124b4c;
-  border: none;
-  padding: 10px;
-  border-radius: 10px;
-  color: white;
+.bottom-nav .active {
+  color: #16c784;
+  font-weight: bold;
 }
