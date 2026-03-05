@@ -3,6 +3,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 
+import ClientLayout from "./layouts/ClientLayout";
+
+/* PUBLIC PAGES */
+
 import Home from "./pages/Home";
 import ApplyIntro from "./pages/ApplyIntro";
 import Apply from "./pages/Apply";
@@ -10,6 +14,12 @@ import Pending from "./pages/Pending";
 import Activate from "./pages/Activate";
 import Login from "./pages/Login";
 import Welcome from "./pages/Welcome";
+
+import ForgotId from "./pages/ForgotId";
+import ForgotPin from "./pages/ForgotPin";
+import ResetPassword from "./pages/ResetPassword";
+
+/* CLIENT PAGES */
 
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
@@ -20,13 +30,10 @@ import Accounts from "./pages/Accounts";
 import Cards from "./pages/Cards";
 import Financing from "./pages/Financing";
 
+/* ADMIN PAGES */
+
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUserDetails from "./pages/admin/AdminUserDetails";
-
-import ForgotId from "./pages/forgotId";
-import ForgotPin from "./pages/forgotPin";
-
-import ResetPassword from "./pages/ResetPassword";
 import AdminReset from "./pages/admin/AdminReset";
 
 export default function App() {
@@ -34,7 +41,8 @@ export default function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* PUBLIC */}
+        {/* PUBLIC ROUTES */}
+
         <Route path="/" element={<Home />} />
         <Route path="/apply-intro" element={<ApplyIntro />} />
         <Route path="/apply" element={<ApplyIntro />} />
@@ -43,94 +51,22 @@ export default function App() {
         <Route path="/activation" element={<Activate />} />
         <Route path="/login" element={<Login />} />
         <Route path="/welcome" element={<Welcome />} />
+
         <Route path="/forgot-id" element={<ForgotId />} />
         <Route path="/forgot-pin" element={<ForgotPin />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        
+
+        {/* ADMIN ROUTES */}
 
         <Route
           path="/admin/reset"
           element={
             <AdminRoute>
-             <AdminReset />
+              <AdminReset />
             </AdminRoute>
           }
         />
 
-        {/* CLIENT */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/transactions"
-          element={
-            <ProtectedRoute>
-              <Transactions />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/notifications"
-          element={
-            <ProtectedRoute>
-              <Notifications />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/help"
-          element={
-            <ProtectedRoute>
-              <Help />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/accounts"
-          element={
-            <ProtectedRoute>
-              <Accounts />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/cards"
-          element={
-            <ProtectedRoute>
-              <Cards />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/financing"
-          element={
-            <ProtectedRoute>
-              <Financing />
-           </ProtectedRoute>
-          }
-        />
-
-        {/* ADMIN */}
         <Route
           path="/admin"
           element={
@@ -148,6 +84,27 @@ export default function App() {
             </AdminRoute>
           }
         />
+
+        {/* CLIENT SECURE AREA */}
+
+        <Route
+          element={
+            <ProtectedRoute>
+              <ClientLayout />
+            </ProtectedRoute>
+          }
+        >
+
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/accounts" element={<Accounts />} />
+          <Route path="/cards" element={<Cards />} />
+          <Route path="/financing" element={<Financing />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/help" element={<Help />} />
+
+        </Route>
 
       </Routes>
     </BrowserRouter>
