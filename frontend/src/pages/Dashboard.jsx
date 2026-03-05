@@ -7,7 +7,7 @@ import Tabs from "../components/Tabs";
 import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 
-import "./dashboard.css";
+import "../styles/dashboard.css";
 
 export default function Dashboard() {
 
