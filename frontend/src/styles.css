@@ -2607,3 +2607,103 @@ html, body {
 
 
 
+.dashboard {
+  background: #0f3d3e;
+  min-height: 100vh;
+  color: white;
+  padding-bottom: 80px;
+}
+
+/* HEADER */
+.dashboard-header {
+  padding: 20px;
+}
+
+.tabs {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.tabs span {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.tabs .active {
+  opacity: 1;
+  font-weight: bold;
+}
+
+/* CARTE */
+.card-bank {
+  margin: 20px;
+  border-radius: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #1ec98f, #0f9b7a);
+}
+
+.card-number {
+  margin-top: 30px;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.circle {
+  width: 40px;
+  height: 40px;
+  background: red;
+  border-radius: 50%;
+}
+
+/* ACTIONS */
+.actions {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px;
+}
+
+.actions button {
+  background: #124b4c;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+}
+
+/* DEPENSES */
+.spending {
+  background: white;
+  color: black;
+  border-radius: 20px;
+  margin: 20px;
+  padding: 15px;
+}
+
+.spending-card {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* NAV BAS */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 15px 0;
+  border-top: 1px solid #ddd;
+}
+
+.bottom-nav span {
+  font-size: 20px;
+}
