@@ -1,8 +1,4 @@
-import {
-Send,
-Smartphone,
-Receipt
-} from "lucide-react";
+import { Send, PlusCircle, Receipt } from "lucide-react";
 
 export default function Accounts({ data }) {
 
@@ -10,22 +6,22 @@ return (
 
 <div className="content">
 
-<div className="account-label">
-Conto {data.iban.slice(-6)}
-</div>
-
 <div className="account-card">
+
+<div className="account-title">
+Compte principal
+</div>
 
 <div className="balance">
 {data.balance} €
 </div>
 
 <div className="balance-date">
-Saldo disponibile al 06/03/2026
+Solde disponible
 </div>
 
-<div className="bank-name">
-Di Genaro Gervasio
+<div className="owner">
+{data.firstname} {data.lastname}
 </div>
 
 <div className="iban">
@@ -38,53 +34,17 @@ Di Genaro Gervasio
 
 <div className="action">
 <Send size={22}/>
-<span>Bonifico ordinario</span>
+<span>Virement</span>
 </div>
 
 <div className="action">
-<Smartphone size={22}/>
-<span>Ricarica telefonica</span>
+<PlusCircle size={22}/>
+<span>Ajouter</span>
 </div>
 
 <div className="action">
 <Receipt size={22}/>
-<span>CBill e pagoPA</span>
-</div>
-
-</div>
-
-<div className="transactions">
-
-<h3>ULTIMI MOVIMENTI</h3>
-
-<div className="tx">
-<div>
-<strong>02</strong>
-<span>mar</span>
-</div>
-
-<div className="tx-info">
-COMPETENZE DARE AUTORIZZATE
-</div>
-
-<div className="tx-amount">
--26,69 €
-</div>
-</div>
-
-<div className="tx">
-<div>
-<strong>07</strong>
-<span>gen</span>
-</div>
-
-<div className="tx-info">
-COMPETENZE SPESE ED ONERI
-</div>
-
-<div className="tx-amount">
--19,20 €
-</div>
+<span>Paiement</span>
 </div>
 
 </div>

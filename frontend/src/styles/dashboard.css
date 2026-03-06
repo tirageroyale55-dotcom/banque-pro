@@ -1,322 +1,222 @@
 .bank-app{
-
-background:#0f5f61;
+background:#0b5c5b;
 min-height:100vh;
-font-family:Inter, sans-serif;
+font-family:"Inter",sans-serif;
 color:white;
-
 }
 
 /* HEADER */
 
 .header{
-
 position:fixed;
 top:0;
 left:0;
 right:0;
-
 height:70px;
-
 display:flex;
-align-items:center;
 justify-content:space-between;
-
-padding:0 18px;
-
-background:#0f5f61;
-
+align-items:center;
+padding:0 20px;
+background:#0b5c5b;
 z-index:1000;
-
 }
 
 .avatar{
-
-width:42px;
-height:42px;
-
-border-radius:12px;
-
-background:#e6f0ef;
-
+width:48px;
+height:48px;
+background:#e2e8f0;
+border-radius:14px;
 display:flex;
 align-items:center;
 justify-content:center;
-
 font-weight:700;
-color:#0f5f61;
+color:#0b5c5b;
+}
 
+.header-icons{
+display:flex;
+gap:16px;
+cursor:pointer;
 }
 
 /* TABS */
 
 .tabs{
-
 position:fixed;
-
 top:70px;
 left:0;
 right:0;
-
 display:flex;
 gap:10px;
-
-padding:10px 18px;
-
-background:#0f5f61;
-
+padding:12px 20px;
+background:#0b5c5b;
+z-index:999;
 }
 
 .tab{
-
 display:flex;
 align-items:center;
 gap:6px;
-
-background:#1a6d6f;
-
-border:none;
-
-padding:8px 14px;
-
+background:#0f6d6c;
+padding:10px 16px;
 border-radius:20px;
-
+border:none;
 color:white;
-
-font-size:13px;
-
 cursor:pointer;
-
 }
 
 .tab.active{
-
 background:white;
-color:#0f5f61;
+color:#0b5c5b;
+font-weight:600;
+}
 
+/* PAGE CONTENT */
+
+.page-content{
+padding-top:130px;
+padding-bottom:120px;
 }
 
 /* CONTENT */
 
-.page-content{
-
-padding-top:120px;
-padding-bottom:120px;
-
-}
-
 .content{
-
-padding:18px;
-
+padding:20px;
 }
 
-/* ACCOUNT LABEL */
-
-.account-label{
-
-font-size:13px;
-opacity:0.8;
-
-margin-bottom:8px;
-
-}
-
-/* CARD */
+/* CARTE COMPTE */
 
 .account-card{
-
 background:white;
-color:#0f5f61;
+color:#0b5c5b;
+border-radius:22px;
+padding:24px;
+box-shadow:0 10px 25px rgba(0,0,0,0.15);
+margin-bottom:20px;
+}
 
-border-radius:18px;
-
-padding:20px;
-
-box-shadow:0 8px 20px rgba(0,0,0,0.15);
-
+.account-title{
+font-size:14px;
+opacity:0.7;
+margin-bottom:6px;
 }
 
 .balance{
-
-font-size:34px;
+font-size:38px;
 font-weight:700;
-
 }
 
 .balance-date{
-
-font-size:12px;
+font-size:13px;
 opacity:0.7;
-
-margin-top:4px;
-
+margin-bottom:12px;
 }
 
-.bank-name{
-
-margin-top:6px;
-
+.owner{
+font-size:14px;
 font-weight:600;
-
 }
 
 .iban{
-
-margin-top:6px;
-
 font-size:12px;
 opacity:0.6;
-
 }
 
-/* ACTIONS */
+/* ACTIONS RAPIDES */
 
 .quick-actions{
-
 display:flex;
 justify-content:space-around;
-
 margin-top:20px;
-
-text-align:center;
-
 }
 
 .action{
-
 display:flex;
 flex-direction:column;
 align-items:center;
-
-font-size:11px;
-
 gap:6px;
-
-}
-
-/* TRANSACTIONS */
-
-.transactions{
-
-background:#f2f4f5;
-
-color:#0f5f61;
-
-margin-top:20px;
-
-border-radius:22px;
-
-padding:18px;
-
-}
-
-.transactions h3{
-
-font-size:13px;
-margin-bottom:14px;
-
-}
-
-.tx{
-
-display:flex;
-align-items:center;
-justify-content:space-between;
-
-padding:10px 0;
-
-border-bottom:1px solid #e4e7ea;
-
-}
-
-.tx strong{
-
-font-size:14px;
-
-}
-
-.tx span{
-
-font-size:11px;
-
-opacity:0.7;
-
-}
-
-.tx-info{
-
-flex:1;
-margin-left:10px;
-
 font-size:12px;
-
+cursor:pointer;
 }
 
-.tx-amount{
+/* BALANCE BAR */
 
+.balance-bar{
+position:fixed;
+top:120px;
+left:0;
+right:0;
+background:white;
+color:#0b5c5b;
+padding:10px 20px;
+transform:translateY(-100%);
+transition:0.3s;
+z-index:998;
+}
+
+.balance-bar.show{
+transform:translateY(0);
+}
+
+.balance-content{
+display:flex;
+justify-content:space-between;
 font-weight:600;
-
 }
 
 /* BOTTOM NAV */
 
 .bottom-nav{
-
 position:fixed;
-
-bottom:18px;
+bottom:20px;
 left:20px;
 right:20px;
-
+height:70px;
 background:white;
-
-border-radius:22px;
-
-height:68px;
-
+border-radius:20px;
 display:flex;
 justify-content:space-around;
 align-items:center;
-
-box-shadow:0 10px 30px rgba(0,0,0,0.25);
-
+box-shadow:0 10px 30px rgba(0,0,0,0.15);
 }
 
 .nav-item{
-
 background:none;
 border:none;
-
 display:flex;
 flex-direction:column;
 align-items:center;
-
 font-size:11px;
-
-color:#0f5f61;
-
+color:#0b5c5b;
 cursor:pointer;
-
 }
 
 .nav-item.active{
+color:#10a37f;
+}
 
-color:#12b886;
+/* MOBILE */
+
+@media (max-width:768px){
+
+.tabs{
+overflow-x:auto;
+}
+
+.tab{
+white-space:nowrap;
+}
 
 }
 
 /* DESKTOP */
 
-@media(min-width:900px){
+@media (min-width:900px){
 
 .bank-app{
-
 max-width:420px;
 margin:auto;
-
-box-shadow:0 0 40px rgba(0,0,0,0.25);
-
+box-shadow:0 0 40px rgba(0,0,0,0.2);
 }
 
 }
