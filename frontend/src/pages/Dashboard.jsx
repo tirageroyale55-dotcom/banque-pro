@@ -60,20 +60,17 @@ export default function Dashboard() {
 
     <div className="bank-app">
 
-      <Header data={data}/>
+      <Header data={data} />
 
-      <Tabs
+<Tabs
   activeTab={activeTab}
   setActiveTab={setActiveTab}
-  balance={data.balance}
-  showBalance={showBalanceBar}
 />
 
-      <BalanceBar
-        balance={data.balance}
-        visible={showBalanceBar}
-      />
-
+<BalanceBar
+  balance={data.balance}
+  visible={showBalanceBar}
+/>
       {/* CONTENU DES TABS */}
 
       {activeTab === "accounts" && <Accounts />}

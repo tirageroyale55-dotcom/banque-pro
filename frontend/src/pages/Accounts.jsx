@@ -1,15 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
 
-export default function Accounts() {
-
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    api("/client/dashboard").then(setData);
-  }, []);
-
-  if (!data) return null;
+export default function Accounts({ data }) {
 
   return (
 

@@ -4,13 +4,9 @@ export default function BalanceBar({ balance, visible }) {
 
     <div className={`balance-bar ${visible ? "show" : ""}`}>
 
-      <div className="balance-content">
+      <span>Solde disponible</span>
 
-        <span>Solde disponible</span>
-
-        <strong>{balance} €</strong>
-
-      </div>
+      <strong>{balance} €</strong>
 
     </div>
 
