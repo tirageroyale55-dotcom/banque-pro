@@ -3,6 +3,8 @@ import { api } from "../services/api";
 
 export default function Accounts({ data }) {
 
+  if (!data) return null;
+
   return (
 
     <div className="content">
