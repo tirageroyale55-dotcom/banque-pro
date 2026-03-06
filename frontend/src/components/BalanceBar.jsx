@@ -1,19 +1,19 @@
 export default function BalanceBar({ balance, visible }) {
 
-  return (
+return (
 
-    <div className={`balance-bar ${visible ? "show" : ""}`}>
+<div className={`balance-bar ${visible ? "show" : ""}`}>
 
-      <div className="balance-content">
+<div className="balance-content">
 
-        <span>Solde disponible</span>
+<span>Solde disponible</span>
 
-        <strong>{balance} €</strong>
+<strong>{balance} €</strong>
 
-      </div>
+</div>
 
-    </div>
+</div>
 
-  );
+);
 
 }

@@ -13,90 +13,93 @@ import "../styles/dashboard.css";
 
 export default function Dashboard() {
 
-  const [data, setData] = useState(null);
-  const [activeTab, setActiveTab] = useState("accounts");
+const [data, setData] = useState(null);
+const [activeTab, setActiveTab] = useState("accounts");
 
-  const [showBalanceBar, setShowBalanceBar] = useState(false);
-  const [lastScroll, setLastScroll] = useState(0);
+const [showBalanceBar, setShowBalanceBar] = useState(false);
+const [lastScroll, setLastScroll] = useState(0);
 
-  const navigate = useNavigate();
+const navigate = useNavigate();
 
-  useEffect(() => {
+useEffect(() => {
 
-    api("/client/dashboard")
-      .then(setData)
-      .catch(() => {
-        localStorage.removeItem("token");
-        navigate("/login");
-      });
+api("/client/dashboard")
+.then(setData)
+.catch(() => {
+localStorage.removeItem("token");
+navigate("/login");
+});
 
-  }, []);
+}, []);
 
-  useEffect(() => {
+useEffect(() => {
 
-    const handleScroll = () => {
+const handleScroll = () => {
 
-      const currentScroll = window.scrollY;
+const currentScroll = window.scrollY;
 
-      if (currentScroll < lastScroll && currentScroll > 120) {
-        setShowBalanceBar(true);
-      } else {
-        setShowBalanceBar(false);
-      }
+if (currentScroll < lastScroll && currentScroll > 120) {
+setShowBalanceBar(true);
+} else {
+setShowBalanceBar(false);
+}
 
-      setLastScroll(currentScroll);
+setLastScroll(currentScroll);
 
-    };
+};
 
-    window.addEventListener("scroll", handleScroll);
+window.addEventListener("scroll", handleScroll);
 
-    return () => window.removeEventListener("scroll", handleScroll);
+return () => window.removeEventListener("scroll", handleScroll);
 
-  }, [lastScroll]);
+}, [lastScroll]);
 
-  if (!data) return null;
+if (!data) return null;
 
-  return (
+return (
 
-    <div className="bank-app">
+<div className="bank-app">
 
-      <Header data={data} />
+<Header data={data} />
 
 <Tabs
-  activeTab={activeTab}
-  setActiveTab={setActiveTab}
+activeTab={activeTab}
+setActiveTab={setActiveTab}
 />
 
 <BalanceBar
-  balance={data.balance}
-  visible={showBalanceBar}
+balance={data.balance}
+visible={showBalanceBar}
 />
-      {/* CONTENU DES TABS */}
 
-      {activeTab === "accounts" && <Accounts />}
+<div className="page-content">
 
-      {activeTab === "cards" && (
-        <div className="content">
-          <div className="account-card">
-            <h3>Mes cartes</h3>
-            <p>Aucune carte active</p>
-          </div>
-        </div>
-      )}
+{activeTab === "accounts" && <Accounts data={data}/>}
 
-      {activeTab === "financing" && (
-        <div className="content">
-          <div className="account-card">
-            <h3>Financements</h3>
-            <p>Aucun financement disponible</p>
-          </div>
-        </div>
-      )}
+{activeTab === "cards" && (
+<div className="content">
+<div className="account-card">
+<h3>Mes cartes</h3>
+<p>Aucune carte active</p>
+</div>
+</div>
+)}
 
-      <BottomNav/>
+{activeTab === "financing" && (
+<div className="content">
+<div className="account-card">
+<h3>Financements</h3>
+<p>Aucun financement disponible</p>
+</div>
+</div>
+)}
 
-    </div>
+</div>
 
-  );
+<BottomNav/>
+
+</div>
+
+);
 
 }

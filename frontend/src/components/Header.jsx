@@ -3,39 +3,40 @@ import { useNavigate } from "react-router-dom";
 
 export default function Header({ data }) {
 
-  const navigate = useNavigate();
+const navigate = useNavigate();
 
-  return (
+return (
 
-    <div className="header">
+<div className="header">
 
-      <div
-        className="profile"
-        onClick={() => navigate("/profile")}
-      >
+<div
+className="profile"
+onClick={() => navigate("/profile")}
+>
 
-        <div className="avatar">
-          {data.firstname?.charAt(0)}
-          {data.lastname?.charAt(0)}
-        </div>
+<div className="avatar">
+{data.firstname?.charAt(0)}
+{data.lastname?.charAt(0)}
+</div>
 
-      </div>
+</div>
 
-      <div className="header-icons">
+<div className="header-icons">
 
-        <Bell
-          size={22}
-          onClick={() => navigate("/notifications")}
-        />
+<Bell
+size={22}
+onClick={() => navigate("/notifications")}
+/>
 
-        <HelpCircle
-          size={22}
-          onClick={() => navigate("/help")}
-        />
+<HelpCircle
+size={22}
+onClick={() => navigate("/help")}
+/>
 
-      </div>
+</div>
 
-    </div>
+</div>
 
-  );
+);
+
 }

@@ -1,46 +1,43 @@
-import { useEffect, useState } from "react";
-import { api } from "../services/api";
+export default function Accounts({ data }) {
 
-export default function Accounts() {
+return (
 
-  const [data, setData] = useState(null);
+<div className="content">
 
-  useEffect(() => {
-    api("/client/dashboard").then(setData);
-  }, []);
+<div className="account-card">
 
-  if (!data) return null;
+<div className="account-title">
+Compte principal
+</div>
 
-  return (
+<div className="balance">
+{data.balance} €
+</div>
 
-    <div className="content">
+<div className="balance-date">
+Solde disponible
+</div>
 
-      <div className="account-card">
+<div className="owner">
+{data.firstname} {data.lastname}
+</div>
 
-        <div className="account-header">
-          Compte principal
-        </div>
+<div className="iban">
+{data.iban}
+</div>
 
-        <div className="balance">
-          {data.balance} €
-        </div>
+</div>
 
-        <div className="balance-date">
-          Solde disponible
-        </div>
+<div className="quick-actions">
 
-        <div className="owner">
-          {data.firstname} {data.lastname}
-        </div>
+<div className="action">Bonifico</div>
+<div className="action">Ricarica</div>
+<div className="action">CBill</div>
 
-        <div className="iban">
-          {data.iban}
-        </div>
+</div>
 
-      </div>
+</div>
 
-    </div>
-
-  );
+);
 
 }
