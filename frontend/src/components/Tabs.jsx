@@ -9,9 +9,9 @@ export default function Tabs({
 
   return (
 
-    <div className="tabs">
+    <div className="tabs-wrapper">
 
-      <div className="tab-group">
+      <div className="tabs">
 
         <button
           className={activeTab === "accounts" ? "tab active" : "tab"}
@@ -20,35 +20,32 @@ export default function Tabs({
           <Landmark size={18}/> Comptes
         </button>
 
-        {/* SOLDE DYNAMIQUE */}
+        <button
+          className={activeTab === "cards" ? "tab active" : "tab"}
+          onClick={() => setActiveTab("cards")}
+        >
+          <CreditCard size={18}/> Cartes
+        </button>
 
-        {activeTab === "accounts" && (
-
-          <div className={`tab-balance ${showBalance ? "show" : ""}`}>
-
-            <span>Solde disponible</span>
-
-            <strong>{balance} €</strong>
-
-          </div>
-
-        )}
+        <button
+          className={activeTab === "financing" ? "tab active" : "tab"}
+          onClick={() => setActiveTab("financing")}
+        >
+          <Wallet size={18}/> Financement
+        </button>
 
       </div>
 
-      <button
-        className={activeTab === "cards" ? "tab active" : "tab"}
-        onClick={() => setActiveTab("cards")}
-      >
-        <CreditCard size={18}/> Cartes
-      </button>
+      {activeTab === "accounts" && (
 
-      <button
-        className={activeTab === "financing" ? "tab active" : "tab"}
-        onClick={() => setActiveTab("financing")}
-      >
-        <Wallet size={18}/> Financement
-      </button>
+        <div className={`tab-balance ${showBalance ? "show" : ""}`}>
+
+          <span>Solde disponible</span>
+          <strong>{balance} €</strong>
+
+        </div>
+
+      )}
 
     </div>
 

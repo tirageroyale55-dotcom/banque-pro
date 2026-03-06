@@ -167,6 +167,74 @@ scroll-behavior:smooth;
 
 
 
+/* wrapper tabs */
 
+.tabs-wrapper{
+
+  background:white;
+
+  position:sticky;
+  top:60px;
+  z-index:50;
+
+}
+
+/* tabs horizontaux */
+
+.tabs{
+
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+
+  border-bottom:1px solid #eee;
+
+  padding:10px 0;
+
+}
+
+/* solde dynamique */
+
+.tab-balance{
+
+  text-align:center;
+
+  overflow:hidden;
+
+  max-height:0;
+  opacity:0;
+
+  transition:all .35s ease;
+
+}
+
+/* quand visible */
+
+.tab-balance.show{
+
+  max-height:50px;
+  opacity:1;
+
+  padding-bottom:8px;
+
+}
+
+/* texte */
+
+.tab-balance span{
+
+  font-size:12px;
+  color:#777;
+
+}
+
+.tab-balance strong{
+
+  display:block;
+
+  font-size:18px;
+  font-weight:700;
+
+}
 
 
