@@ -6,46 +6,58 @@ Gem,
 Headphones
 } from "lucide-react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function BottomNav() {
 
 const navigate = useNavigate();
+const location = useLocation();
+
+const isActive = (path) => location.pathname === path;
 
 return (
 
 <div className="bottom-nav">
 
-<div
-className="nav-item active"
+<button
+className={isActive("/dashboard") ? "nav-item active" : "nav-item"}
 onClick={() => navigate("/dashboard")}
 >
-<Home size={24}/>
-<span>Accueil</span>
-</div>
+<Home size={22}/>
+<span>Home</span>
+</button>
 
-<div className="nav-item">
-<ArrowRightLeft size={24}/>
-<span>Payer</span>
-</div>
+<button
+className={isActive("/pay") ? "nav-item active" : "nav-item"}
+onClick={() => navigate("/pay")}
+>
+<ArrowRightLeft size={22}/>
+<span>Paga</span>
+</button>
 
-<div className="nav-item">
-<Grid size={24}/>
-<span>Produits</span>
-</div>
+<button
+className={isActive("/products") ? "nav-item active" : "nav-item"}
+onClick={() => navigate("/products")}
+>
+<Grid size={22}/>
+<span>Prodotti</span>
+</button>
 
-<div className="nav-item">
-<Gem size={24}/>
+<button
+className={isActive("/lifestyle") ? "nav-item active" : "nav-item"}
+onClick={() => navigate("/lifestyle")}
+>
+<Gem size={22}/>
 <span>Lifestyle</span>
-</div>
+</button>
 
-<div
-className="nav-item"
+<button
+className={isActive("/help") ? "nav-item active" : "nav-item"}
 onClick={() => navigate("/help")}
 >
-<Headphones size={24}/>
-<span>Aide</span>
-</div>
+<Headphones size={22}/>
+<span>Aiuto</span>
+</button>
 
 </div>
 

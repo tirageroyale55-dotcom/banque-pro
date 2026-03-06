@@ -1,9 +1,6 @@
 import { Landmark, CreditCard, Wallet } from "lucide-react";
 
-export default function Tabs({
-activeTab,
-setActiveTab
-}) {
+export default function Tabs({ activeTab, setActiveTab }) {
 
 return (
 
@@ -15,21 +12,24 @@ return (
 className={activeTab === "accounts" ? "tab active" : "tab"}
 onClick={() => setActiveTab("accounts")}
 >
-<Landmark size={18}/> Comptes
+<Landmark size={16}/>
+Conti
 </button>
 
 <button
 className={activeTab === "cards" ? "tab active" : "tab"}
 onClick={() => setActiveTab("cards")}
 >
-<CreditCard size={18}/> Cartes
+<CreditCard size={16}/>
+Carte
 </button>
 
 <button
 className={activeTab === "financing" ? "tab active" : "tab"}
 onClick={() => setActiveTab("financing")}
 >
-<Wallet size={18}/> Financement
+<Wallet size={16}/>
+Finanziamenti
 </button>
 
 </div>
