@@ -73,7 +73,8 @@ export default function Dashboard() {
 />
       {/* CONTENU DES TABS */}
 
-      <Accounts />
+      {activeTab === "accounts" && <Accounts />}
+
       {activeTab === "cards" && (
         <div className="content">
           <div className="account-card">
