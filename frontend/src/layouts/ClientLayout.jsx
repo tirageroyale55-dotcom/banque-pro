@@ -1,24 +1,15 @@
-import { Outlet, useLocation } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import { Outlet } from "react-router-dom";
 
 export default function ClientLayout() {
 
-const location = useLocation();
+  return (
 
-const hideNavbar = location.pathname === "/dashboard";
+    <div className="bank-layout">
 
-return (
+      <Outlet />
 
-<div className="bank-layout">
+    </div>
 
-{!hideNavbar && <Navbar />}
-
-<div className="page-content">
-<Outlet />
-</div>
-
-</div>
-
-);
+  );
 
 }
