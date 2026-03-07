@@ -6,7 +6,13 @@ export default function ClientLayout() {
 
     <div className="bank-layout">
 
-      <Outlet />
+      {/* HEADER / NAVBAR */}
+      <Navbar />
+
+      {/* PAGE CONTENT */}
+      <div className="page-content">
+        <Outlet />
+      </div>
 
     </div>
 
