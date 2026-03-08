@@ -1,20 +1,26 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
-
 export default function Welcome() {
 
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user =
+    location.state?.user ||
+    JSON.parse(localStorage.getItem("user"));
 
-  if (!user) {
-    navigate("/login");
-    return null;
-  }
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+
+  if (!user) return null;
 
   return (
     <div className="apply-bg welcome-page">
+
       <div className="apply-card welcome-card">
 
         <h2 className="welcome-title">
@@ -29,6 +35,7 @@ export default function Welcome() {
         </button>
 
       </div>
+
     </div>
   );
 }
