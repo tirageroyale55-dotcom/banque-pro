@@ -1,20 +1,20 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 export default function Welcome() {
-
   const navigate = useNavigate();
   const location = useLocation();
 
-  const user = location.state?.user;
+  const stateUser = location.state?.user;
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
+  const storedUser = JSON.parse(localStorage.getItem("user"));
 
-  if (!user) return null;
+  const user = stateUser || storedUser;
+
+  // sécurité si accès direct
+  if (!user) {
+    navigate("/login");
+    return null;
+  }
 
   return (
     <div className="apply-bg welcome-page">
@@ -22,7 +22,7 @@ export default function Welcome() {
       <div className="apply-card welcome-card">
 
         <h2 className="welcome-title">
-          Bienvenue {user.prenom} {user.nom}
+          Bienvenue {user.firstname || user.prenom} {user.lastname || user.nom}
         </h2>
 
         <button
@@ -33,7 +33,6 @@ export default function Welcome() {
         </button>
 
       </div>
-
     </div>
   );
 }
