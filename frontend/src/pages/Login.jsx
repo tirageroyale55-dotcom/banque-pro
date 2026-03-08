@@ -56,6 +56,8 @@ export default function Login() {
     try {
       const res = await api("/auth/login", "POST", { personalId, pin });
       
+      console.log("LOGIN RESPONSE:", res);
+
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
 

@@ -6,9 +6,13 @@ export default function Welcome() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  console.log("location.state:", location.state);
+  
   const user =
     location.state?.user ||
     JSON.parse(localStorage.getItem("user"));
+    
+    console.log("user:", user);
 
   useEffect(() => {
     if (!user) {
