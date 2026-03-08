@@ -1,25 +1,39 @@
 import { useLocation, useNavigate } from "react-router-dom";
-
-
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function Welcome() {
 
-  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const user = location.state?.user;
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    if (!user) {
+      navigate("/login");
     }
-  }, []);
+  }, [user, navigate]);
 
   if (!user) return null;
 
   return (
-    <div className="welcome-page">
-      <h1>Bienvenue {user.prenom}</h1>
+    <div className="apply-bg welcome-page">
+
+      <div className="apply-card welcome-card">
+
+        <h2 className="welcome-title">
+          Bienvenue {user.prenom} 
+        </h2>
+
+        <button
+          className="btn-solid welcome-btn"
+          onClick={() => navigate("/dashboard")}
+        >
+          Entrer
+        </button>
+
+      </div>
+
     </div>
   );
 }
