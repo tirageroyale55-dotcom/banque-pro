@@ -55,7 +55,9 @@ export default function Login() {
 
     try {
       const res = await api("/auth/login", "POST", { personalId, pin });
+      
       localStorage.setItem("token", res.token);
+      localStorage.setItem("user", JSON.stringify(res.user));
 
       if (res.user.role === "ADMIN") {
         navigate("/admin");
