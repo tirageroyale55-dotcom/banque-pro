@@ -7,7 +7,9 @@ export default function Welcome() {
   const location = useLocation();
 
   const [user, setUser] = useState(location.state?.user || null);
-
+  
+  console.log("USER:", user);
+  
   useEffect(() => {
 
     // si user venant du login
