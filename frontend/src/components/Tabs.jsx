@@ -13,7 +13,7 @@ className={activeTab === "accounts" ? "tab active" : "tab"}
 onClick={() => setActiveTab("accounts")}
 >
 <Landmark size={16}/>
-Conti
+Compte
 </button>
 
 <button
@@ -21,7 +21,7 @@ className={activeTab === "cards" ? "tab active" : "tab"}
 onClick={() => setActiveTab("cards")}
 >
 <CreditCard size={16}/>
-Carte
+Cartes
 </button>
 
 <button
@@ -29,7 +29,7 @@ className={activeTab === "financing" ? "tab active" : "tab"}
 onClick={() => setActiveTab("financing")}
 >
 <Wallet size={16}/>
-Finanziamenti
+Financement
 </button>
 
 </div>

@@ -18,17 +18,25 @@ position:relative;
 
 /* HEADER */
 
+/* HEADER */
+
 .header{
 position:fixed;
 top:0;
 left:0;
 right:0;
 height:70px;
+
 display:flex;
 justify-content:space-between;
 align-items:center;
+
 padding:0 20px;
-background:#0b5c5b;
+
+background:rgba(11,92,91,0.85); /* transparence */
+
+backdrop-filter:blur(10px); /* effet verre */
+
 z-index:1000;
 }
 
@@ -164,14 +172,21 @@ cursor:pointer;
 
 .balance-bar{
 position:fixed;
-top:120px;
+
+top:110px; /* parfait entre header et tabs */
+
 left:0;
 right:0;
-background:white;
-color:#0b5c5b;
-padding:10px 20px;
+
+background:rgba(11,92,91,0.95);
+
+color:white;
+
+padding:12px 20px;
+
 transform:translateY(-100%);
 transition:0.3s;
+
 z-index:998;
 }
 
@@ -182,6 +197,7 @@ transform:translateY(0);
 .balance-content{
 display:flex;
 justify-content:space-between;
+align-items:center;
 font-weight:600;
 }
 

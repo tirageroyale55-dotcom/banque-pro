@@ -1,13 +1,14 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Welcome() {
-
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = location.state?.user;
 
+  // sécurité si accès direct
   if (!user) {
-    navigate("/login");
+    navigate("/");
     return null;
   }
 
@@ -17,7 +18,7 @@ export default function Welcome() {
       <div className="apply-card welcome-card">
 
         <h2 className="welcome-title">
-          Bienvenue {user.prenom}
+          Bienvenue {user.prenom} {user.nom}
         </h2>
 
         <button
@@ -28,7 +29,6 @@ export default function Welcome() {
         </button>
 
       </div>
-
     </div>
   );
 }
