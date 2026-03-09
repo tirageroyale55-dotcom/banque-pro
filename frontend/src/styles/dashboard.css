@@ -308,90 +308,70 @@ white-space:nowrap;
 
 /* DESKTOP */
 
-/* DESKTOP VERSION BANQUE */
+/* DASHBOARD ORDINATEUR */
 
-@media (min-width:900px){
+@media (min-width:1024px){
 
-body{
+.dashboard-grid{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:40px;
+
+max-width:1100px;
+
+margin:0 auto;
+
+}
+
+.dashboard-left{
+
 display:flex;
 justify-content:center;
-background:#0b5c5b;
-}
-
-/* zone principale */
-
-.bank-app{
-
-width:100%;
-max-width:1200px;
-
-margin:0 auto;
 
 }
 
-/* HEADER */
+.dashboard-right{
 
-.header{
-
-max-width:1200px;
-margin:0 auto;
-
-padding:0 40px;
+display:flex;
+flex-direction:column;
 
 }
 
-/* TABS */
+.transactions-card{
 
-.tabs-wrapper{
+background:#e5e7eb;
 
-max-width:1200px;
-margin:0 auto;
+color:#0b5c5b;
 
-}
+border-radius:25px;
 
-.tabs{
+padding:24px;
 
-padding:12px 40px;
-
-}
-
-/* CONTENU */
-
-.page-content{
-
-max-width:900px;
-margin:140px auto 0 auto;
+box-shadow:0 10px 25px rgba(0,0,0,0.15);
 
 }
 
-/* CARD COMPTE */
+.transaction{
 
-.account-card{
+display:flex;
 
-max-width:600px;
-margin:auto;
+justify-content:space-between;
 
-}
+padding:12px 0;
 
-/* ACTIONS */
-
-.quick-actions{
-
-max-width:500px;
-margin:25px auto 0 auto;
+border-bottom:1px solid rgba(0,0,0,0.08);
 
 }
 
-/* NAVIGATION BAS */
+.transaction:last-child{
+border-bottom:none;
+}
 
 .bottom-nav{
-
-max-width:700px;
-margin:auto;
-
-left:0;
-right:0;
-
+display:none;
 }
 
 }

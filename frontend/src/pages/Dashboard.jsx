@@ -82,6 +82,10 @@ visible={showBalanceBar}
 
 <div className="page-content">
 
+<div className="dashboard-grid">
+
+<div className="dashboard-left">
+
 {activeTab === "accounts" && <Accounts data={data}/>}
 
 {activeTab === "cards" && (
@@ -101,6 +105,34 @@ visible={showBalanceBar}
 </div>
 </div>
 )}
+
+</div>
+
+<div className="dashboard-right">
+
+<div className="transactions-card">
+<h3>Dernières opérations</h3>
+
+<div className="transaction">
+<span>Amazon</span>
+<strong>-45 €</strong>
+</div>
+
+<div className="transaction">
+<span>Carrefour</span>
+<strong>-82 €</strong>
+</div>
+
+<div className="transaction">
+<span>Salaire</span>
+<strong>+2500 €</strong>
+</div>
+
+</div>
+
+</div>
+
+</div>
 
 </div>
 
