@@ -41,20 +41,18 @@ useEffect(() => {
 
 const handleScroll = () => {
 
-if(activeTab !== "accounts"){
+if (activeTab !== "accounts") {
 setShowBalanceBar(false);
 return;
 }
 
-const currentScroll = window.scrollY;
+const scroll = window.scrollY;
 
-if (currentScroll < lastScroll && currentScroll > 120) {
+if (scroll > 160) {
 setShowBalanceBar(true);
 } else {
 setShowBalanceBar(false);
 }
-
-setLastScroll(currentScroll);
 
 };
 
@@ -62,7 +60,7 @@ window.addEventListener("scroll", handleScroll);
 
 return () => window.removeEventListener("scroll", handleScroll);
 
-}, [lastScroll, activeTab]);
+}, [activeTab]);
 
 if (!data) return null;
 
