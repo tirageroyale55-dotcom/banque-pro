@@ -32,35 +32,34 @@ navigate("/login");
 
 }, []);
 
-useEffect(()=>{
-setShowBalanceBar(false)
-window.scrollTo(0,0)
-},[activeTab])
+
 
 useEffect(() => {
 
 const handleScroll = () => {
 
 if(activeTab !== "accounts"){
-setShowBalanceBar(false)
-return
+setShowBalanceBar(false);
+return;
 }
 
-const scroll = window.scrollY
+const currentScroll = window.scrollY;
 
-if(scroll > 140){
-setShowBalanceBar(true)
-}else{
-setShowBalanceBar(false)
+if (currentScroll < lastScroll && currentScroll > 120) {
+setShowBalanceBar(true);
+} else {
+setShowBalanceBar(false);
 }
 
-}
+setLastScroll(currentScroll);
 
-window.addEventListener("scroll", handleScroll)
+};
 
-return () => window.removeEventListener("scroll", handleScroll)
+window.addEventListener("scroll", handleScroll);
 
-}, [activeTab])
+return () => window.removeEventListener("scroll", handleScroll);
+
+}, [lastScroll, activeTab]);
 
 if (!data) return null;
 
