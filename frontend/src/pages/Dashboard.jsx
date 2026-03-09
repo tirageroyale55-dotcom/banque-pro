@@ -32,9 +32,19 @@ navigate("/login");
 
 }, []);
 
+useEffect(()=>{
+setShowBalanceBar(false)
+window.scrollTo(0,0)
+},[activeTab])
+
 useEffect(() => {
 
 const handleScroll = () => {
+
+if(activeTab !== "accounts"){
+setShowBalanceBar(false);
+return;
+}
 
 const currentScroll = window.scrollY;
 
@@ -52,7 +62,7 @@ window.addEventListener("scroll", handleScroll);
 
 return () => window.removeEventListener("scroll", handleScroll);
 
-}, [lastScroll]);
+}, [lastScroll, activeTab]);
 
 if (!data) return null;
 
