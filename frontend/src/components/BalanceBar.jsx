@@ -6,17 +6,8 @@ return (
 
 <div className="balance-content">
 
-<div className="balance-left">
-
-<span className="balance-page">Compte</span>
-
-<span className="balance-label">Solde disponible</span>
-
-</div>
-
-<strong className="balance-amount">
-{balance} €
-</strong>
+<span>Solde disponible</span>
+<strong>{balance}€</strong>
 
 </div>
 
