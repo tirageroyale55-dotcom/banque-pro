@@ -1,3 +1,19 @@
+/* BACKGROUND GLOBAL */
+
+html,
+body,
+#root{
+margin:0;
+padding:0;
+
+background:#0b5c5b !important;
+
+min-height:100%;
+
+font-family:"Inter",sans-serif;
+color:white;
+}
+
 /* BASE */
 
 html,body{
@@ -11,7 +27,7 @@ overflow-x:hidden;
 
 /* APP */
 .bank-app{
-background:transparent;
+background:#0b5c5b;
 min-height:100vh;
 position:relative;
 }
