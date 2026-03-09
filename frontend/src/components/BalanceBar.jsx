@@ -5,7 +5,7 @@ return (
 <div className={`balance-bar ${visible ? "show" : ""}`}>
   <div className="balance-content">
     <span>Solde disponible</span>
-    <strong>1000000 €</strong>
+    <strong>12345768987671000000 €</strong>
   </div>
 </div>
 
