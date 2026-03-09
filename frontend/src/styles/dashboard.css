@@ -124,6 +124,31 @@ margin-top:145px;
 padding-bottom:120px;
 }
 
+
+.balance-left{
+display:flex;
+flex-direction:column;
+line-height:1.2;
+}
+
+.balance-page{
+font-size:12px;
+font-weight:600;
+opacity:0.8;
+}
+
+.balance-label{
+font-size:13px;
+opacity:0.7;
+}
+
+.balance-amount{
+font-size:18px;
+font-weight:700;
+letter-spacing:0.5px;
+}
+
+
 /* CONTENT */
 
 .content{
