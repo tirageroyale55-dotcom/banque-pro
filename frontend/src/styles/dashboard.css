@@ -308,14 +308,90 @@ white-space:nowrap;
 
 /* DESKTOP */
 
+/* DESKTOP VERSION BANQUE */
+
 @media (min-width:900px){
 
+body{
+display:flex;
+justify-content:center;
+background:#0b5c5b;
+}
+
+/* zone principale */
+
 .bank-app{
-max-width:420px;
+
+width:100%;
+max-width:1200px;
+
+margin:0 auto;
+
+}
+
+/* HEADER */
+
+.header{
+
+max-width:1200px;
+margin:0 auto;
+
+padding:0 40px;
+
+}
+
+/* TABS */
+
+.tabs-wrapper{
+
+max-width:1200px;
+margin:0 auto;
+
+}
+
+.tabs{
+
+padding:12px 40px;
+
+}
+
+/* CONTENU */
+
+.page-content{
+
+max-width:900px;
+margin:140px auto 0 auto;
+
+}
+
+/* CARD COMPTE */
+
+.account-card{
+
+max-width:600px;
 margin:auto;
-box-shadow:0 0 40px rgba(0,0,0,0.2);
-border-radius:20px;
-overflow:hidden;
+
+}
+
+/* ACTIONS */
+
+.quick-actions{
+
+max-width:500px;
+margin:25px auto 0 auto;
+
+}
+
+/* NAVIGATION BAS */
+
+.bottom-nav{
+
+max-width:700px;
+margin:auto;
+
+left:0;
+right:0;
+
 }
 
 }
