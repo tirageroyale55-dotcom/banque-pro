@@ -32,7 +32,10 @@ navigate("/login");
 
 }, []);
 
-
+useEffect(()=>{
+setShowBalanceBar(false)
+window.scrollTo(0,0)
+},[activeTab])
 
 useEffect(() => {
 
