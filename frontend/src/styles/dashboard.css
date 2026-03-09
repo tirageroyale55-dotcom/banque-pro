@@ -120,7 +120,7 @@ font-weight:600;
 /* PAGE CONTENT */
 
 .page-content{
-margin-top:135px;
+margin-top:145px;
 padding-bottom:120px;
 }
 
@@ -197,7 +197,7 @@ cursor:pointer;
 
 position:fixed;
 
-top:135px; /* juste sous les Tabs */
+top:145px; /* juste sous les Tabs */
 
 left:0;
 right:0;
