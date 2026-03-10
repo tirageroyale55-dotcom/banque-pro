@@ -1,206 +1,168 @@
-/* ----- GLOBAL ----- */
+/* GLOBAL */
 html, body, #root {
-  margin: 0;
-  padding: 0;
-  font-family: "Inter", sans-serif;
-  color: white;
-  background: #0b5c5b;
-  overflow-x: hidden;
+  margin:0;
+  padding:0;
+  font-family:"Inter",sans-serif;
+  background:#0b5c5b;
+  color:white;
+  overflow-x:hidden;
 }
 
-/* ----- BANK APP ----- */
-.bank-app {
-  max-width: 480px; /* version desktop légèrement plus large que mobile */
-  margin: auto;
-  min-height: 100vh;
-  position: relative;
-  border-radius: 20px;
-  box-shadow: 0 0 50px rgba(0,0,0,0.25);
-  background: #0b5c5b;
+/* BANK APP DESKTOP */
+.bank-app-desktop {
+  min-height:100vh;
 }
 
-/* ----- HEADER ----- */
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 70px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 24px;
-  background: rgba(11,92,91,0.75);
-  backdrop-filter: blur(12px);
-  z-index: 1000;
+/* HEADER LARGE */
+.header-desktop{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px 40px;
+  background:rgba(11,92,91,0.9);
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  position:sticky;
+  top:0;
+  z-index:1000;
 }
 
-/* Avatar + notifications */
-.avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: #d1d5db;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  color: #0b5c5b;
-  cursor: pointer;
-}
-.header-icons {
-  display: flex;
-  gap: 20px;
-  cursor: pointer;
+.header-left .bank-logo{
+  font-size:24px;
+  font-weight:700;
 }
 
-/* ----- TABS ----- */
-.tabs-wrapper {
-  position: fixed;
-  top: 70px;
-  left: 0;
-  right: 0;
-  background: rgba(11,92,91,0.75);
-  backdrop-filter: blur(12px);
-  padding-bottom: 12px;
-  z-index: 999;
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:16px;
 }
 
-.tabs {
-  display: flex;
-  gap: 12px;
-  padding: 14px 20px;
+.user-name{
+  font-size:16px;
 }
 
-.tab {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 12px 18px;
-  border-radius: 25px;
-  background: #0f6d6c;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.avatar{
+  width:48px;
+  height:48px;
+  background:#e5e7eb;
+  border-radius:50%;
+  color:#0b5c5b;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-weight:700;
 }
 
-.tab.active {
-  background: white;
-  color: #0b5c5b;
-  font-weight: 600;
+/* MENU DESKTOP */
+.desktop-tabs{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  padding:12px 0;
+  background:rgba(11,92,91,0.85);
+  backdrop-filter:blur(10px);
+  position:sticky;
+  top:80px;
+  z-index:999;
 }
 
-/* ----- PAGE CONTENT ----- */
-.page-content {
-  margin-top: 145px;
-  padding-bottom: 140px;
+.tab-desktop{
+  padding:12px 28px;
+  background:#0f6d6c;
+  color:white;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
+  font-size:16px;
+  transition: all 0.2s ease;
 }
 
-/* ----- ACCOUNT CARD ----- */
-.account-card {
-  background: #e5e7eb;
-  color: #0b5c5b;
-  border-radius: 24px;
-  padding: 28px 24px;
-  margin-bottom: 22px;
-  box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease;
+.tab-desktop.active{
+  background:white;
+  color:#0b5c5b;
+  font-weight:600;
 }
 
-.account-card:hover {
-  transform: translateY(-4px);
+.tab-desktop:hover{
+  background:#10a37f;
 }
 
-.account-card h3 {
-  font-size: 18px;
-  margin-bottom: 12px;
+/* CONTENT DESKTOP */
+.content-desktop{
+  width:90%;
+  max-width:1000px;
+  margin:40px auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:30px;
 }
 
-.account-card p {
-  font-size: 14px;
-  opacity: 0.7;
+/* ACCOUNT CARD */
+.account-card{
+  background:#f1f5f9;
+  color:#0b5c5b;
+  border-radius:20px;
+  padding:28px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.15);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* ----- BALANCE BAR ----- */
-.balance-bar {
-  position: fixed;
-  top: 142px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  transform: translateY(-120%);
-  opacity: 0;
-  transition: all 0.25s ease;
-  z-index: 997;
+.account-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 12px 28px rgba(0,0,0,0.2);
 }
 
-.balance-bar.show {
-  transform: translateY(0);
-  opacity: 1;
+.account-card h3{
+  font-size:18px;
+  margin-bottom:12px;
 }
 
-.balance-content {
-  width: 90%;
-  max-width: 420px;
-  background: rgba(11,92,91,0.85);
-  backdrop-filter: blur(15px);
-  padding: 12px 20px;
-  border-radius: 14px;
-  display: flex;
-  justify-content: space-between;
-  font-weight: 600;
-  color: #fff;
+/* BALANCE BAR */
+.balance-bar .balance-content{
+  width:400px;
+  margin:auto;
+  background:rgba(11,92,91,0.9);
+  box-shadow:0 8px 20px rgba(0,0,0,0.2);
+  border-radius:16px;
+  padding:12px 20px;
+  display:flex;
+  justify-content:space-between;
+  font-size:16px;
+  font-weight:600;
 }
 
-.balance-content span {
-  font-size: 14px;
-  opacity: 0.8;
+/* BOTTOM NAV */
+.bottom-nav{
+  display:none; /* caché sur desktop */
 }
 
-.balance-content strong {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-/* ----- BOTTOM NAV ----- */
-.bottom-nav {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  right: 20px;
-  height: 75px;
-  background: #e5e7eb;
-  border-radius: 30px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-}
-
-.nav-item {
-  background: none;
-  border: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 12px;
-  color: #0b5c5b;
-  cursor: pointer;
-}
-
-.nav-item.active {
-  color: #10a37f;
-}
-
-/* ----- DESKTOP ----- */
-@media (min-width: 900px) {
-  .bank-app {
-    max-width: 480px;
-    margin: 40px auto;
-    border-radius: 20px;
-    overflow: hidden;
+/* RESPONSIVE MOBILE INTACT */
+@media (max-width:900px){
+  .bank-app-desktop .bottom-nav{
+    display:flex;
+  }
+  .desktop-tabs{
+    display:none;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

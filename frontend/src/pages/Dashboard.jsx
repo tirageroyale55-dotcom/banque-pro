@@ -3,7 +3,6 @@ import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 import Header from "../components/Header";
-import Tabs from "../components/Tabs";
 import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 
@@ -12,13 +11,13 @@ import Accounts from "./Accounts";
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
+
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("accounts");
-  const [showBalanceBar, setShowBalanceBar] = useState(false);
+  const [showBalanceBar, setShowBalanceBar] = useState(true);
 
   const navigate = useNavigate();
 
-  // Récupération données utilisateur
   useEffect(() => {
     api("/client/dashboard")
       .then(setData)
@@ -28,69 +27,65 @@ export default function Dashboard() {
       });
   }, []);
 
-  // Reset scroll et balance bar à chaque tab
-  useEffect(() => {
-    setShowBalanceBar(false);
-    window.scrollTo(0, 0);
-  }, [activeTab]);
-
-  // Affichage balance bar au scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      if (activeTab !== "accounts") {
-        setShowBalanceBar(false);
-        return;
-      }
-      const scroll = window.scrollY;
-      setShowBalanceBar(scroll > 160);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [activeTab]);
-
   if (!data) return null;
 
+  const tabs = [
+    { key: "accounts", label: "Comptes" },
+    { key: "cards", label: "Cartes" },
+    { key: "financing", label: "Financements" },
+  ];
+
   return (
-    <div className="bank-app">
+    <div className="bank-app-desktop">
 
-      {/* Header fixe */}
-      <Header data={data} />
+      {/* HEADER LARGE */}
+      <header className="header-desktop">
+        <div className="header-left">
+          <h2 className="bank-logo">MobilBox Vida</h2>
+        </div>
+        <div className="header-right">
+          <span className="user-name">{data.userName}</span>
+          <div className="avatar">{data.userInitials}</div>
+        </div>
+      </header>
 
-      {/* Tabs fixes sous header */}
-      <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      {/* MENU DESKTOP */}
+      <nav className="desktop-tabs">
+        {tabs.map(tab => (
+          <button
+            key={tab.key}
+            className={`tab-desktop ${activeTab === tab.key ? "active" : ""}`}
+            onClick={() => setActiveTab(tab.key)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
 
-      {/* Balance bar */}
+      {/* BALANCE BAR */}
       <BalanceBar balance={data.balance} visible={showBalanceBar} />
 
-      {/* Contenu principal */}
-      <div className="page-content">
-
-        {activeTab === "accounts" && <Accounts data={data} />}
+      {/* CONTENU CENTRAL */}
+      <main className="content-desktop">
+        {activeTab === "accounts" && <Accounts data={data}/>}
 
         {activeTab === "cards" && (
-          <div className="content">
-            <div className="account-card">
-              <h3>Mes cartes</h3>
-              <p>Aucune carte active</p>
-            </div>
+          <div className="account-card">
+            <h3>Mes cartes</h3>
+            <p>Aucune carte active</p>
           </div>
         )}
 
         {activeTab === "financing" && (
-          <div className="content">
-            <div className="account-card">
-              <h3>Financements</h3>
-              <p>Aucun financement disponible</p>
-            </div>
+          <div className="account-card">
+            <h3>Financements</h3>
+            <p>Aucun financement disponible</p>
           </div>
         )}
+      </main>
 
-      </div>
-
-      {/* Navigation bottom */}
+      {/* Bottom nav pour mobile */}
       <BottomNav />
-
     </div>
   );
 }
