@@ -308,17 +308,7 @@ white-space:nowrap;
 
 /* DESKTOP */
 
-@media (min-width:900px){
 
-.bank-app{
-max-width:420px;
-margin:auto;
-box-shadow:0 0 40px rgba(0,0,0,0.2);
-border-radius:20px;
-overflow:hidden;
-}
-
-}
 
 
 
