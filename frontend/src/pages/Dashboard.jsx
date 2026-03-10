@@ -2,107 +2,112 @@ import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
-import { Bell, Headphones } from "lucide-react";
+import Header from "../components/Header";
+import Tabs from "../components/Tabs";
+import BalanceBar from "../components/BalanceBar";
+import BottomNav from "../components/BottomNav";
 
 import Accounts from "./Accounts";
+
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
 
-  const [data, setData] = useState(null);
-  const [activeTab, setActiveTab] = useState("accounts");
+const [data, setData] = useState(null);
+const [activeTab, setActiveTab] = useState("accounts");
 
-  const navigate = useNavigate();
+const [showBalanceBar, setShowBalanceBar] = useState(false);
+const [lastScroll, setLastScroll] = useState(0);
 
-  useEffect(() => {
-    api("/client/dashboard")
-      .then(setData)
-      .catch(() => {
-        localStorage.removeItem("token");
-        navigate("/login");
-      });
-  }, []);
+const navigate = useNavigate();
 
-  if (!data) return null;
+useEffect(() => {
 
-  // MENU ITEMS
-  const menuItems = [
-    { key: "accounts", label: "Accueil" },
-    { key: "payer", label: "Payer" },
-    { key: "produits", label: "Produits" },
-    { key: "lifestyle", label: "Lifestyle" },
-    { key: "cards", label: "Cartes" },
-    { key: "financing", label: "Financements" },
-  ];
+api("/client/dashboard")
+.then(setData)
+.catch(() => {
+localStorage.removeItem("token");
+navigate("/login");
+});
 
-  return (
-    <div className="bank-app-desktop">
+}, []);
 
-      {/* MENU GAUCHE */}
-      <aside className="sidebar">
-        <div className="profile">
-          <div className="avatar">{data.user?.initials || "U"}</div>
-          <span className="username">{data.user?.name || "Utilisateur"}</span>
-        </div>
-        <nav className="menu">
-          {menuItems.map(item => (
-            <button
-              key={item.key}
-              className={`menu-item ${activeTab === item.key ? "active" : ""}`}
-              onClick={() => setActiveTab(item.key)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
-      </aside>
+useEffect(()=>{
+setShowBalanceBar(false)
+window.scrollTo(0,0)
+},[activeTab])
 
-      {/* CONTENU PRINCIPAL */}
-      <div className="main-content">
-        {/* HEADER */}
-        <header className="desktop-header">
-          <div className="header-left">
-            <h2>{menuItems.find(i => i.key === activeTab)?.label}</h2>
-          </div>
-          <div className="header-right">
-            <button className="icon-btn"><Bell size={24} /></button>
-            <button className="icon-btn"><Headphones size={24} /></button>
-          </div>
-        </header>
+useEffect(() => {
 
-        {/* DASHBOARD CONTENT */}
-        <div className="content-wrapper">
-          {activeTab === "accounts" && <Accounts data={data} />}
+const handleScroll = () => {
 
-          {activeTab === "cards" && (
-            <div className="content">
-              <div className="account-card">
-                <h3>Mes cartes</h3>
-                <p>Aucune carte active</p>
-              </div>
-            </div>
-          )}
+if (activeTab !== "accounts") {
+setShowBalanceBar(false);
+return;
+}
 
-          {activeTab === "financing" && (
-            <div className="content">
-              <div className="account-card">
-                <h3>Financements</h3>
-                <p>Aucun financement disponible</p>
-              </div>
-            </div>
-          )}
+const scroll = window.scrollY;
 
-          {/* Autres onglets */}
-          {["payer","produits","lifestyle"].includes(activeTab) && (
-            <div className="content">
-              <div className="account-card">
-                <h3>{menuItems.find(i => i.key === activeTab)?.label}</h3>
-                <p>Contenu en développement</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+if (scroll > 160) {
+setShowBalanceBar(true);
+} else {
+setShowBalanceBar(false);
+}
+
+};
+
+window.addEventListener("scroll", handleScroll);
+
+return () => window.removeEventListener("scroll", handleScroll);
+
+}, [activeTab]);
+
+if (!data) return null;
+
+return (
+
+<div className="bank-app">
+
+<Header data={data} />
+
+<Tabs
+activeTab={activeTab}
+setActiveTab={setActiveTab}
+/>
+
+<BalanceBar
+balance={data.balance}
+visible={showBalanceBar}
+/>
+
+<div className="page-content">
+
+{activeTab === "accounts" && <Accounts data={data}/>}
+
+{activeTab === "cards" && (
+<div className="content">
+<div className="account-card">
+<h3>Mes cartes</h3>
+<p>Aucune carte active</p>
+</div>
+</div>
+)}
+
+{activeTab === "financing" && (
+<div className="content">
+<div className="account-card">
+<h3>Financements</h3>
+<p>Aucun financement disponible</p>
+</div>
+</div>
+)}
+
+</div>
+
+<BottomNav/>
+
+</div>
+
+);
+
 }
