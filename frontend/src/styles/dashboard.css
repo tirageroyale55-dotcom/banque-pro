@@ -342,95 +342,151 @@ overflow:hidden;
 
 
 
-/* ========================= */
-/* DESKTOP VERSION PRO */
-/* ========================= */
+/* ============================= */
+/* DESKTOP BANK LAYOUT */
+/* ============================= */
 
 @media (min-width:900px){
 
-/* layout général */
-
 .bank-app{
-display:flex;
-flex-direction:column;
-margin-left:240px;
 max-width:none;
 border-radius:0;
 box-shadow:none;
 }
 
-/* MENU GAUCHE */
+/* LAYOUT */
 
-.bottom-nav{
+.desktop-layout{
+display:flex;
+min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+
+width:260px;
+
+background:#094948;
+
+padding:30px 20px;
+
+display:flex;
+flex-direction:column;
+
+justify-content:flex-start;
 
 position:fixed;
 
 top:0;
-left:0;
 bottom:0;
-
-width:240px;
-height:100vh;
-
-background:#0b5c5b;
-
-flex-direction:column;
-justify-content:flex-start;
-align-items:flex-start;
-
-padding-top:90px;
-gap:8px;
-
-border-radius:0;
-
-box-shadow:4px 0 25px rgba(0,0,0,0.25);
+left:0;
 
 }
 
-/* nav items */
+/* PROFILE */
+
+.sidebar-profile{
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+margin-bottom:40px;
+
+}
+
+.profile-info span{
+
+font-size:12px;
+
+opacity:0.7;
+
+}
+
+/* MENU */
+
+.bottom-nav{
+
+position:relative;
+
+bottom:auto;
+left:auto;
+right:auto;
+
+height:auto;
+
+background:none;
+
+box-shadow:none;
+
+border-radius:0;
+
+flex-direction:column;
+
+align-items:flex-start;
+
+gap:10px;
+
+}
+
+/* MENU ITEM */
 
 .nav-item{
 
 flex-direction:row;
 
-gap:14px;
+gap:12px;
+
+font-size:15px;
+
+padding:12px 14px;
 
 width:100%;
 
-padding:14px 28px;
+border-radius:10px;
 
-font-size:15px;
+transition:0.2s;
+
+}
+
+.nav-item:hover{
+
+background:#0f6d6c;
+
+}
+
+.nav-item.active{
+
+background:#10a37f;
 
 color:white;
 
 }
 
-/* texte menu */
+/* MAIN AREA */
 
-.nav-item span{
-font-size:15px;
-}
+.main-area{
 
-/* hover */
+margin-left:260px;
 
-.nav-item:hover{
-background:#0f6d6c;
-border-radius:10px;
-}
+width:100%;
 
-/* actif */
-
-.nav-item.active{
-background:white;
-color:#0b5c5b;
-border-radius:10px;
 }
 
 /* HEADER */
 
 .header{
 
-left:240px;
+left:260px;
+
+height:80px;
+
+padding:0 40px;
+
+background:rgba(11,92,91,0.75);
 
 }
 
@@ -438,47 +494,39 @@ left:240px;
 
 .tabs-wrapper{
 
-left:240px;
+left:260px;
 
 }
 
-/* BALANCE */
-
-.balance-bar{
-
-left:240px;
-
-}
-
-/* CONTENU */
+/* PAGE */
 
 .page-content{
 
-max-width:900px;
+max-width:1100px;
 
-margin:auto;
+margin:160px auto;
 
-margin-top:160px;
+padding:0 30px;
 
 }
 
-/* CARTES */
+/* ACCOUNT CARD */
 
 .account-card{
 
-border-radius:20px;
+border-radius:18px;
 
 padding:30px;
 
-box-shadow:0 15px 35px rgba(0,0,0,0.15);
+box-shadow:0 15px 40px rgba(0,0,0,0.2);
 
 }
 
-/* solde */
+/* BALANCE BAR */
 
-.balance{
+.balance-bar{
 
-font-size:48px;
+left:260px;
 
 }
 
