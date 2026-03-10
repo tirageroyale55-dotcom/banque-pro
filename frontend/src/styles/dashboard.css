@@ -342,4 +342,169 @@ overflow:hidden;
 
 
 
+/* ========================= */
+/* DESKTOP BANK LAYOUT */
+/* ========================= */
 
+@media (min-width:900px){
+
+.bank-desktop-layout{
+display:flex;
+min-height:100vh;
+}
+
+/* MENU GAUCHE */
+
+.bottom-nav{
+
+position:fixed;
+top:0;
+left:0;
+bottom:0;
+
+width:240px;
+height:100vh;
+
+flex-direction:column;
+justify-content:flex-start;
+align-items:flex-start;
+
+padding-top:30px;
+gap:10px;
+
+background:#0b5c5b;
+border-radius:0;
+
+box-shadow:4px 0 25px rgba(0,0,0,0.2);
+
+}
+
+/* PROFIL */
+
+.bottom-nav::before{
+
+content:"Profil";
+
+font-weight:600;
+font-size:18px;
+
+color:white;
+
+padding-left:30px;
+margin-bottom:20px;
+
+}
+
+/* MENU ITEMS */
+
+.nav-item{
+
+flex-direction:row;
+gap:14px;
+
+width:100%;
+
+padding:14px 30px;
+
+font-size:15px;
+
+color:white;
+
+}
+
+.nav-item span{
+font-size:15px;
+}
+
+/* hover pro */
+
+.nav-item:hover{
+
+background:#0f6d6c;
+border-radius:12px;
+
+}
+
+/* actif */
+
+.nav-item.active{
+
+background:white;
+color:#0b5c5b;
+
+border-radius:12px;
+
+}
+
+/* ZONE PRINCIPALE */
+
+.bank-app{
+
+margin-left:240px;
+
+width:100%;
+
+max-width:none;
+
+border-radius:0;
+
+box-shadow:none;
+
+}
+
+/* HEADER */
+
+.header{
+
+left:240px;
+
+}
+
+/* TABS */
+
+.tabs-wrapper{
+
+left:240px;
+
+}
+
+/* BALANCE BAR */
+
+.balance-bar{
+
+left:240px;
+
+}
+
+/* PAGE CONTENT */
+
+.page-content{
+
+max-width:900px;
+margin:auto;
+
+margin-top:160px;
+
+}
+
+/* CARTES */
+
+.account-card{
+
+border-radius:20px;
+
+padding:28px;
+
+box-shadow:0 15px 35px rgba(0,0,0,0.15);
+
+}
+
+/* BALANCE */
+
+.balance{
+
+font-size:48px;
+
+}
+
+}

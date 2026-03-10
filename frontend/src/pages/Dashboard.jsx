@@ -15,9 +15,7 @@ export default function Dashboard() {
 
 const [data, setData] = useState(null);
 const [activeTab, setActiveTab] = useState("accounts");
-
 const [showBalanceBar, setShowBalanceBar] = useState(false);
-const [lastScroll, setLastScroll] = useState(0);
 
 const navigate = useNavigate();
 
@@ -66,6 +64,10 @@ if (!data) return null;
 
 return (
 
+<div className="bank-desktop-layout">
+
+<BottomNav/>
+
 <div className="bank-app">
 
 <Header data={data} />
@@ -104,10 +106,9 @@ visible={showBalanceBar}
 
 </div>
 
-<BottomNav/>
+</div>
 
 </div>
 
 );
-
 }
