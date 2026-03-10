@@ -3,6 +3,7 @@ import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 import Header from "../components/Header";
+import Tabs from "../components/Tabs";
 import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 
@@ -10,37 +11,66 @@ import Accounts from "./Accounts";
 
 import "../styles/dashboard.css";
 
-export default function Dashboard(){
+export default function Dashboard() {
 
-const [data,setData] = useState(null);
+const [data, setData] = useState(null);
+const [activeTab, setActiveTab] = useState("accounts");
 
-const [activeTab,setActiveTab] = useState("accounts");
-
-const [showBalanceBar,setShowBalanceBar] = useState(false);
+const [showBalanceBar, setShowBalanceBar] = useState(false);
+const [lastScroll, setLastScroll] = useState(0);
 
 const navigate = useNavigate();
 
-useEffect(()=>{
+useEffect(() => {
 
 api("/client/dashboard")
 .then(setData)
-.catch(()=>{
+.catch(() => {
 localStorage.removeItem("token");
 navigate("/login");
 });
 
-},[]);
+}, []);
 
-if(!data) return null;
+useEffect(()=>{
+setShowBalanceBar(false)
+window.scrollTo(0,0)
+},[activeTab])
 
-return(
+useEffect(() => {
+
+const handleScroll = () => {
+
+if (activeTab !== "accounts") {
+setShowBalanceBar(false);
+return;
+}
+
+const scroll = window.scrollY;
+
+if (scroll > 160) {
+setShowBalanceBar(true);
+} else {
+setShowBalanceBar(false);
+}
+
+};
+
+window.addEventListener("scroll", handleScroll);
+
+return () => window.removeEventListener("scroll", handleScroll);
+
+}, [activeTab]);
+
+if (!data) return null;
+
+return (
 
 <div className="bank-app">
 
 <div className="desktop-layout">
 
-{/* SIDEBAR */}
-
+{/* MENU GAUCHE */}
 <aside className="sidebar">
 
 <div className="sidebar-profile">
@@ -56,42 +86,42 @@ return(
 
 </div>
 
-
+{/* TABS dans menu */}
 <div className="sidebar-tabs">
 
 <button
-className={activeTab==="accounts"?"side-btn active":"side-btn"}
-onClick={()=>setActiveTab("accounts")}
+className={activeTab === "accounts" ? "side-tab active" : "side-tab"}
+onClick={() => setActiveTab("accounts")}
 >
 Comptes
 </button>
 
 <button
-className={activeTab==="cards"?"side-btn active":"side-btn"}
-onClick={()=>setActiveTab("cards")}
+className={activeTab === "cards" ? "side-tab active" : "side-tab"}
+onClick={() => setActiveTab("cards")}
 >
 Cartes
 </button>
 
 <button
-className={activeTab==="financing"?"side-btn active":"side-btn"}
-onClick={()=>setActiveTab("financing")}
+className={activeTab === "financing" ? "side-tab active" : "side-tab"}
+onClick={() => setActiveTab("financing")}
 >
 Financements
 </button>
 
 </div>
 
+{/* MENU navigation */}
 <BottomNav/>
 
 </aside>
 
 
-{/* MAIN */}
-
+{/* ZONE PRINCIPALE */}
 <div className="main-area">
 
-<Header data={data}/>
+<Header data={data} />
 
 <BalanceBar
 balance={data.balance}
@@ -100,28 +130,24 @@ visible={showBalanceBar}
 
 <div className="page-content">
 
-{activeTab==="accounts" && <Accounts data={data}/>}
+{activeTab === "accounts" && <Accounts data={data}/>}
 
-{activeTab==="cards" && (
-
+{activeTab === "cards" && (
 <div className="content">
 <div className="account-card">
 <h3>Mes cartes</h3>
 <p>Aucune carte active</p>
 </div>
 </div>
-
 )}
 
-{activeTab==="financing" && (
-
+{activeTab === "financing" && (
 <div className="content">
 <div className="account-card">
 <h3>Financements</h3>
 <p>Aucun financement disponible</p>
 </div>
 </div>
-
 )}
 
 </div>
