@@ -1,12 +1,17 @@
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
+import { Bell, Headphones } from "lucide-react";
+
+import Accounts from "./Accounts";
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
+
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("accounts");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,95 +25,84 @@ export default function Dashboard() {
 
   if (!data) return null;
 
+  // MENU ITEMS
   const menuItems = [
-    { key: "accounts", label: "Comptes" },
+    { key: "accounts", label: "Accueil" },
+    { key: "payer", label: "Payer" },
+    { key: "produits", label: "Produits" },
+    { key: "lifestyle", label: "Lifestyle" },
     { key: "cards", label: "Cartes" },
     { key: "financing", label: "Financements" },
-    { key: "settings", label: "Paramètres" },
-    { key: "logout", label: "Déconnexion" },
   ];
-
-  const handleMenuClick = (key) => {
-    if (key === "logout") {
-      localStorage.removeItem("token");
-      navigate("/login");
-      return;
-    }
-    setActiveTab(key);
-  };
 
   return (
     <div className="bank-app-desktop">
 
-      {/* MENU LATÉRAL GAUCHE */}
-      <nav className="sidebar">
-        <div className="sidebar-header">
-          <h2>MobilBox Vida</h2>
+      {/* MENU GAUCHE */}
+      <aside className="sidebar">
+        <div className="profile">
+          <div className="avatar">{data.user?.initials || "U"}</div>
+          <span className="username">{data.user?.name || "Utilisateur"}</span>
         </div>
-        <ul className="menu-list">
+        <nav className="menu">
           {menuItems.map(item => (
-            <li
+            <button
               key={item.key}
               className={`menu-item ${activeTab === item.key ? "active" : ""}`}
-              onClick={() => handleMenuClick(item.key)}
+              onClick={() => setActiveTab(item.key)}
             >
               {item.label}
-            </li>
+            </button>
           ))}
-        </ul>
-      </nav>
+        </nav>
+      </aside>
 
       {/* CONTENU PRINCIPAL */}
       <div className="main-content">
-        
         {/* HEADER */}
-        <header className="header-desktop">
+        <header className="desktop-header">
           <div className="header-left">
-            <h3>{activeTab === "accounts" ? "Mes Comptes" :
-                 activeTab === "cards" ? "Mes Cartes" :
-                 activeTab === "financing" ? "Financements" :
-                 "Paramètres"}</h3>
+            <h2>{menuItems.find(i => i.key === activeTab)?.label}</h2>
           </div>
           <div className="header-right">
-            <div className="balance-header">
-              Solde: <strong>{data.balance} €</strong>
-            </div>
-            <div className="avatar">A</div>
+            <button className="icon-btn"><Bell size={24} /></button>
+            <button className="icon-btn"><Headphones size={24} /></button>
           </div>
         </header>
 
-        {/* CONTENU DES ONGLETS */}
-        <div className="content-area">
-          {activeTab === "accounts" && (
-            <div className="account-card">
-              <h3>Comptes</h3>
-              <p>Solde disponible: {data.balance} €</p>
-            </div>
-          )}
+        {/* DASHBOARD CONTENT */}
+        <div className="content-wrapper">
+          {activeTab === "accounts" && <Accounts data={data} />}
 
           {activeTab === "cards" && (
-            <div className="account-card">
-              <h3>Cartes</h3>
-              <p>Aucune carte active</p>
+            <div className="content">
+              <div className="account-card">
+                <h3>Mes cartes</h3>
+                <p>Aucune carte active</p>
+              </div>
             </div>
           )}
 
           {activeTab === "financing" && (
-            <div className="account-card">
-              <h3>Financements</h3>
-              <p>Aucun financement disponible</p>
+            <div className="content">
+              <div className="account-card">
+                <h3>Financements</h3>
+                <p>Aucun financement disponible</p>
+              </div>
             </div>
           )}
 
-          {activeTab === "settings" && (
-            <div className="account-card">
-              <h3>Paramètres</h3>
-              <p>Options du compte</p>
+          {/* Autres onglets */}
+          {["payer","produits","lifestyle"].includes(activeTab) && (
+            <div className="content">
+              <div className="account-card">
+                <h3>{menuItems.find(i => i.key === activeTab)?.label}</h3>
+                <p>Contenu en développement</p>
+              </div>
             </div>
           )}
         </div>
       </div>
-
     </div>
   );
 }
