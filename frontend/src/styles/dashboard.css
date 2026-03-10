@@ -1,168 +1,470 @@
-/* GLOBAL */
+/* BACKGROUND GLOBAL */
+
+html,
+body,
+#root{
+margin:0;
+padding:0;
+
+background:#0b5c5b !important;
+
+min-height:100%;
+
+font-family:"Inter",sans-serif;
+color:white;
+}
+
+/* BASE */
+
+html,body{
+margin:0;
+padding:0;
+background:#0b5c5b;
+font-family:"Inter",sans-serif;
+color:white;
+overflow-x:hidden;
+}
+
+/* APP */
+.bank-app{
+background:#0b5c5b;
+min-height:100vh;
+position:relative;
+}
+
+
+
+
+/* HEADER */
+
+
+.header{
+position:fixed;
+top:0;
+left:0;
+right:0;
+height:70px;
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+padding:0 20px;
+
+background:rgba(11,92,91,0.55);
+backdrop-filter:blur(10px);
+
+z-index:1000;
+}
+
+.avatar{
+width:48px;
+height:48px;
+background:#d1d5db;
+border-radius:14px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:700;
+color:#0b5c5b;
+}
+
+.header-icons{
+display:flex;
+gap:16px;
+cursor:pointer;
+}
+
+
+/* TABS */
+
+.tabs-wrapper{
+position:fixed;
+
+top:70px;
+left:0;
+right:0;
+
+background:rgba(11,92,91,0.55);
+backdrop-filter:blur(10px);
+
+padding-bottom:10px;
+
+z-index:999;
+}
+.tabs{
+display:flex;
+gap:10px;
+padding:12px 20px;
+}
+
+.tab{
+display:flex;
+align-items:center;
+gap:6px;
+background:#0f6d6c;
+padding:10px 16px;
+border-radius:20px;
+border:none;
+color:white;
+cursor:pointer;
+font-size:14px;
+}
+
+.tab.active{
+background:white;
+color:#0b5c5b;
+font-weight:600;
+}
+
+/* PAGE CONTENT */
+
+.page-content{
+margin-top:145px;
+padding-bottom:120px;
+}
+
+
+/* CONTENT */
+
+.content{
+padding:20px;
+background:transparent;
+}
+
+/* ACCOUNT CARD */
+
+.account-card{
+background:#e5e7eb;
+color:#0b5c5b;
+
+border-radius:30px;
+
+padding:24px;
+
+box-shadow:0 10px 25px rgba(0,0,0,0.15);
+
+margin-bottom:20px;
+}
+
+.account-title{
+font-size:14px;
+opacity:0.7;
+margin-bottom:8px;
+}
+
+.balance{
+font-size:42px;
+font-weight:700;
+margin-bottom:4px;
+}
+
+.balance-date{
+font-size:14px;
+opacity:0.7;
+margin-bottom:12px;
+}
+
+.owner{
+font-size:14px;
+font-weight:600;
+}
+
+.iban{
+font-size:13px;
+opacity:0.7;
+}
+
+/* ACTIONS RAPIDES */
+
+.quick-actions{
+display:flex;
+justify-content:space-around;
+margin-top:18px;
+}
+
+.action{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:6px;
+font-size:13px;
+cursor:pointer;
+}
+
+/* BALANCE BAR */
+
+.balance-bar{
+
+position:fixed;
+
+top:142px; /* juste sous les Tabs */
+
+left:0;
+right:0;
+
+display:flex;
+justify-content:center;
+
+transform:translateY(-120%);
+opacity:0;
+
+transition:all 0.25s ease;
+
+z-index:997;
+
+}
+
+.balance-bar.show{
+
+transform:translateY(0);
+opacity:1;
+
+}
+
+.balance-content{
+
+width:88%;
+max-width:390px;
+
+background:rgba(11,92,91,0.85);
+
+backdrop-filter:blur(10px);
+
+padding:10px 18px;
+
+border-radius:12px;
+
+display:flex;
+justify-content:space-between;
+
+font-weight:600;
+
+}
+
+.balance-content span {
+  font-size:13px;
+  opacity:0.8;
+  margin-right:6px; /* réduit l’écart avec le solde */
+}
+
+.balance-content strong {
+  font-size:16px;
+  font-weight:600;
+  margin-left:0; /* pas d’espace supplémentaire */
+}
+/* BOTTOM NAV */
+
+.bottom-nav{
+position:fixed;
+bottom:20px;
+left:20px;
+right:20px;
+
+height:75px;
+
+background:#e5e7eb;
+
+border-radius:30px;
+
+display:flex;
+justify-content:space-around;
+align-items:center;
+
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+.nav-item{
+background:none;
+border:none;
+
+display:flex;
+flex-direction:column;
+align-items:center;
+
+font-size:12px;
+color:#0b5c5b;
+
+cursor:pointer;
+}
+
+.nav-item.active{
+color:#10a37f;
+}
+
+/* MOBILE */
+
+@media (max-width:768px){
+
+.tabs{
+overflow-x:auto;
+}
+
+.tab{
+white-space:nowrap;
+}
+
+}
+
+/* DESKTOP */
+
+@media (min-width:900px){
+
+.bank-app{
+max-width:420px;
+margin:auto;
+box-shadow:0 0 40px rgba(0,0,0,0.2);
+border-radius:20px;
+overflow:hidden;
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ---- GLOBAL ---- */
 html, body, #root {
   margin:0;
   padding:0;
   font-family:"Inter",sans-serif;
   background:#0b5c5b;
   color:white;
-  overflow-x:hidden;
 }
 
-/* BANK APP DESKTOP */
+/* ---- LAYOUT DESKTOP ---- */
 .bank-app-desktop {
+  display:flex;
   min-height:100vh;
+  overflow:hidden;
 }
 
-/* HEADER LARGE */
-.header-desktop{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:20px 40px;
-  background:rgba(11,92,91,0.9);
-  box-shadow:0 4px 20px rgba(0,0,0,0.3);
-  position:sticky;
-  top:0;
-  z-index:1000;
-}
-
-.header-left .bank-logo{
-  font-size:24px;
-  font-weight:700;
-}
-
-.header-right{
-  display:flex;
-  align-items:center;
-  gap:16px;
-}
-
-.user-name{
-  font-size:16px;
-}
-
-.avatar{
-  width:48px;
-  height:48px;
-  background:#e5e7eb;
-  border-radius:50%;
-  color:#0b5c5b;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-weight:700;
-}
-
-/* MENU DESKTOP */
-.desktop-tabs{
-  display:flex;
-  justify-content:center;
-  gap:20px;
-  padding:12px 0;
-  background:rgba(11,92,91,0.85);
-  backdrop-filter:blur(10px);
-  position:sticky;
-  top:80px;
-  z-index:999;
-}
-
-.tab-desktop{
-  padding:12px 28px;
+/* ---- MENU LATÉRAL GAUCHE ---- */
+.sidebar {
+  width:250px;
   background:#0f6d6c;
-  color:white;
-  border:none;
-  border-radius:30px;
-  cursor:pointer;
-  font-size:16px;
-  transition: all 0.2s ease;
+  display:flex;
+  flex-direction:column;
+  padding:20px;
 }
 
-.tab-desktop.active{
+.sidebar-header h2 {
+  color:white;
+  margin-bottom:30px;
+  font-size:20px;
+}
+
+.menu-list {
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+
+.menu-item {
+  padding:12px 16px;
+  border-radius:10px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition: background 0.2s, color 0.2s;
+  color:white;
+}
+
+.menu-item.active,
+.menu-item:hover {
   background:white;
   color:#0b5c5b;
   font-weight:600;
 }
 
-.tab-desktop:hover{
-  background:#10a37f;
+/* ---- CONTENU PRINCIPAL ---- */
+.main-content {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  background:#0b5c5b;
+  padding:20px 40px;
+  overflow-y:auto;
 }
 
-/* CONTENT DESKTOP */
-.content-desktop{
-  width:90%;
-  max-width:1000px;
-  margin:40px auto;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:30px;
-}
-
-/* ACCOUNT CARD */
-.account-card{
-  background:#f1f5f9;
-  color:#0b5c5b;
-  border-radius:20px;
-  padding:28px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.15);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.account-card:hover{
-  transform:translateY(-6px);
-  box-shadow:0 12px 28px rgba(0,0,0,0.2);
-}
-
-.account-card h3{
-  font-size:18px;
-  margin-bottom:12px;
-}
-
-/* BALANCE BAR */
-.balance-bar .balance-content{
-  width:400px;
-  margin:auto;
-  background:rgba(11,92,91,0.9);
-  box-shadow:0 8px 20px rgba(0,0,0,0.2);
-  border-radius:16px;
-  padding:12px 20px;
+/* ---- HEADER ---- */
+.header-desktop {
   display:flex;
   justify-content:space-between;
+  align-items:center;
+  padding-bottom:20px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.header-left h3 {
+  font-size:22px;
+  font-weight:600;
+}
+
+.header-right {
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+
+.balance-header {
   font-size:16px;
   font-weight:600;
 }
 
-/* BOTTOM NAV */
-.bottom-nav{
-  display:none; /* caché sur desktop */
+.avatar {
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:#e5e7eb;
+  color:#0b5c5b;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
 }
 
-/* RESPONSIVE MOBILE INTACT */
-@media (max-width:900px){
-  .bank-app-desktop .bottom-nav{
-    display:flex;
-  }
-  .desktop-tabs{
-    display:none;
-  }
+/* ---- CONTENT AREA ---- */
+.content-area {
+  margin-top:20px;
 }
 
+.account-card {
+  background:#f1f5f9;
+  color:#0b5c5b;
+  border-radius:20px;
+  padding:24px;
+  margin-bottom:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
 
+.account-card:hover {
+  transform:translateY(-4px);
+  box-shadow:0 15px 30px rgba(0,0,0,0.2);
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* ---- MEDIA QUERY MOBILE (ne rien toucher, version actuelle intacte) ---- */
+@media (max-width:768px){
+  .bank-app-desktop {
+    display:block;
+  }
+}

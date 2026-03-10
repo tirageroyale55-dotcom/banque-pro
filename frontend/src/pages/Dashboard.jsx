@@ -2,20 +2,11 @@ import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
-import Header from "../components/Header";
-import BalanceBar from "../components/BalanceBar";
-import BottomNav from "../components/BottomNav";
-
-import Accounts from "./Accounts";
-
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
-
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("accounts");
-  const [showBalanceBar, setShowBalanceBar] = useState(true);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,63 +20,95 @@ export default function Dashboard() {
 
   if (!data) return null;
 
-  const tabs = [
+  const menuItems = [
     { key: "accounts", label: "Comptes" },
     { key: "cards", label: "Cartes" },
     { key: "financing", label: "Financements" },
+    { key: "settings", label: "Paramètres" },
+    { key: "logout", label: "Déconnexion" },
   ];
+
+  const handleMenuClick = (key) => {
+    if (key === "logout") {
+      localStorage.removeItem("token");
+      navigate("/login");
+      return;
+    }
+    setActiveTab(key);
+  };
 
   return (
     <div className="bank-app-desktop">
 
-      {/* HEADER LARGE */}
-      <header className="header-desktop">
-        <div className="header-left">
-          <h2 className="bank-logo">MobilBox Vida</h2>
+      {/* MENU LATÉRAL GAUCHE */}
+      <nav className="sidebar">
+        <div className="sidebar-header">
+          <h2>MobilBox Vida</h2>
         </div>
-        <div className="header-right">
-          <span className="user-name">{data.userName}</span>
-          <div className="avatar">{data.userInitials}</div>
-        </div>
-      </header>
-
-      {/* MENU DESKTOP */}
-      <nav className="desktop-tabs">
-        {tabs.map(tab => (
-          <button
-            key={tab.key}
-            className={`tab-desktop ${activeTab === tab.key ? "active" : ""}`}
-            onClick={() => setActiveTab(tab.key)}
-          >
-            {tab.label}
-          </button>
-        ))}
+        <ul className="menu-list">
+          {menuItems.map(item => (
+            <li
+              key={item.key}
+              className={`menu-item ${activeTab === item.key ? "active" : ""}`}
+              onClick={() => handleMenuClick(item.key)}
+            >
+              {item.label}
+            </li>
+          ))}
+        </ul>
       </nav>
 
-      {/* BALANCE BAR */}
-      <BalanceBar balance={data.balance} visible={showBalanceBar} />
-
-      {/* CONTENU CENTRAL */}
-      <main className="content-desktop">
-        {activeTab === "accounts" && <Accounts data={data}/>}
-
-        {activeTab === "cards" && (
-          <div className="account-card">
-            <h3>Mes cartes</h3>
-            <p>Aucune carte active</p>
+      {/* CONTENU PRINCIPAL */}
+      <div className="main-content">
+        
+        {/* HEADER */}
+        <header className="header-desktop">
+          <div className="header-left">
+            <h3>{activeTab === "accounts" ? "Mes Comptes" :
+                 activeTab === "cards" ? "Mes Cartes" :
+                 activeTab === "financing" ? "Financements" :
+                 "Paramètres"}</h3>
           </div>
-        )}
-
-        {activeTab === "financing" && (
-          <div className="account-card">
-            <h3>Financements</h3>
-            <p>Aucun financement disponible</p>
+          <div className="header-right">
+            <div className="balance-header">
+              Solde: <strong>{data.balance} €</strong>
+            </div>
+            <div className="avatar">A</div>
           </div>
-        )}
-      </main>
+        </header>
 
-      {/* Bottom nav pour mobile */}
-      <BottomNav />
+        {/* CONTENU DES ONGLETS */}
+        <div className="content-area">
+          {activeTab === "accounts" && (
+            <div className="account-card">
+              <h3>Comptes</h3>
+              <p>Solde disponible: {data.balance} €</p>
+            </div>
+          )}
+
+          {activeTab === "cards" && (
+            <div className="account-card">
+              <h3>Cartes</h3>
+              <p>Aucune carte active</p>
+            </div>
+          )}
+
+          {activeTab === "financing" && (
+            <div className="account-card">
+              <h3>Financements</h3>
+              <p>Aucun financement disponible</p>
+            </div>
+          )}
+
+          {activeTab === "settings" && (
+            <div className="account-card">
+              <h3>Paramètres</h3>
+              <p>Options du compte</p>
+            </div>
+          )}
+        </div>
+      </div>
+
     </div>
   );
 }
