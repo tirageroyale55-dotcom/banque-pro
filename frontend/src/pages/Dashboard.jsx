@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; 
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
@@ -12,134 +12,85 @@ import Accounts from "./Accounts";
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
+  const [data, setData] = useState(null);
+  const [activeTab, setActiveTab] = useState("accounts");
+  const [showBalanceBar, setShowBalanceBar] = useState(false);
 
-const [data, setData] = useState(null);
-const [activeTab, setActiveTab] = useState("accounts");
+  const navigate = useNavigate();
 
-const [showBalanceBar, setShowBalanceBar] = useState(false);
-const [lastScroll, setLastScroll] = useState(0);
+  // Récupération données utilisateur
+  useEffect(() => {
+    api("/client/dashboard")
+      .then(setData)
+      .catch(() => {
+        localStorage.removeItem("token");
+        navigate("/login");
+      });
+  }, []);
 
-const navigate = useNavigate();
+  // Reset scroll et balance bar à chaque tab
+  useEffect(() => {
+    setShowBalanceBar(false);
+    window.scrollTo(0, 0);
+  }, [activeTab]);
 
-useEffect(() => {
+  // Affichage balance bar au scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (activeTab !== "accounts") {
+        setShowBalanceBar(false);
+        return;
+      }
+      const scroll = window.scrollY;
+      setShowBalanceBar(scroll > 160);
+    };
 
-api("/client/dashboard")
-.then(setData)
-.catch(() => {
-localStorage.removeItem("token");
-navigate("/login");
-});
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [activeTab]);
 
-}, []);
+  if (!data) return null;
 
-useEffect(()=>{
-setShowBalanceBar(false)
-window.scrollTo(0,0)
-},[activeTab])
+  return (
+    <div className="bank-app">
 
-useEffect(() => {
+      {/* Header fixe */}
+      <Header data={data} />
 
-const handleScroll = () => {
+      {/* Tabs fixes sous header */}
+      <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-if (activeTab !== "accounts") {
-setShowBalanceBar(false);
-return;
-}
+      {/* Balance bar */}
+      <BalanceBar balance={data.balance} visible={showBalanceBar} />
 
-const scroll = window.scrollY;
+      {/* Contenu principal */}
+      <div className="page-content">
 
-if (scroll > 160) {
-setShowBalanceBar(true);
-} else {
-setShowBalanceBar(false);
-}
+        {activeTab === "accounts" && <Accounts data={data} />}
 
-};
+        {activeTab === "cards" && (
+          <div className="content">
+            <div className="account-card">
+              <h3>Mes cartes</h3>
+              <p>Aucune carte active</p>
+            </div>
+          </div>
+        )}
 
-window.addEventListener("scroll", handleScroll);
+        {activeTab === "financing" && (
+          <div className="content">
+            <div className="account-card">
+              <h3>Financements</h3>
+              <p>Aucun financement disponible</p>
+            </div>
+          </div>
+        )}
 
-return () => window.removeEventListener("scroll", handleScroll);
+      </div>
 
-}, [activeTab]);
+      {/* Navigation bottom */}
+      <BottomNav />
 
-if (!data) return null;
-
-return (
-
-<div className="bank-app">
-
-<Header data={data} />
-
-<Tabs
-activeTab={activeTab}
-setActiveTab={setActiveTab}
-/>
-
-<BalanceBar
-balance={data.balance}
-visible={showBalanceBar}
-/>
-
-<div className="page-content">
-
-<div className="dashboard-grid">
-
-<div className="dashboard-left">
-
-{activeTab === "accounts" && <Accounts data={data}/>}
-
-{activeTab === "cards" && (
-<div className="content">
-<div className="account-card">
-<h3>Mes cartes</h3>
-<p>Aucune carte active</p>
-</div>
-</div>
-)}
-
-{activeTab === "financing" && (
-<div className="content">
-<div className="account-card">
-<h3>Financements</h3>
-<p>Aucun financement disponible</p>
-</div>
-</div>
-)}
-
-</div>
-
-<div className="dashboard-right">
-
-<div className="transactions-card">
-<h3>Dernières opérations</h3>
-
-<div className="transaction">
-<span>Amazon</span>
-<strong>-45 €</strong>
-</div>
-
-<div className="transaction">
-<span>Carrefour</span>
-<strong>-82 €</strong>
-</div>
-
-<div className="transaction">
-<span>Salaire</span>
-<strong>+2500 €</strong>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<BottomNav/>
-
-</div>
-
-);
-
+    </div>
+  );
 }
