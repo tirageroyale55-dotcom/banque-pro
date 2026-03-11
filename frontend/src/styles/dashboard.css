@@ -471,3 +471,143 @@ left:260px;
 }
 
 }
+
+
+/* ========================= */
+/* DESKTOP ONLY */
+/* ========================= */
+
+@media (min-width: 900px){
+
+/* layout principal */
+.desktop-layout{
+display:flex;
+}
+
+/* sidebar gauche */
+
+.sidebar{
+display:flex;
+flex-direction:column;
+
+width:260px;
+
+position:fixed;
+top:0;
+left:0;
+bottom:0;
+
+padding:30px 20px;
+
+background:#083f3e;
+
+border-right:1px solid rgba(255,255,255,0.06);
+}
+
+/* profil */
+
+.sidebar-profile{
+display:flex;
+align-items:center;
+gap:12px;
+margin-bottom:40px;
+}
+
+/* avatar desktop */
+
+.sidebar .avatar{
+width:42px;
+height:42px;
+background:#10a37f;
+color:white;
+border-radius:12px;
+}
+
+/* tabs */
+
+.sidebar-tabs{
+display:flex;
+flex-direction:column;
+gap:8px;
+margin-bottom:30px;
+}
+
+.side-tab{
+background:none;
+border:none;
+color:white;
+text-align:left;
+padding:12px 14px;
+border-radius:10px;
+cursor:pointer;
+font-size:14px;
+}
+
+.side-tab:hover{
+background:#0f6d6c;
+}
+
+.side-tab.active{
+background:#10a37f;
+}
+
+/* navigation (BottomNav devient menu) */
+
+.sidebar .bottom-nav{
+position:relative;
+bottom:auto;
+left:auto;
+right:auto;
+
+background:none;
+box-shadow:none;
+height:auto;
+
+flex-direction:column;
+align-items:flex-start;
+gap:6px;
+}
+
+.sidebar .nav-item{
+flex-direction:row;
+gap:12px;
+width:100%;
+padding:10px 12px;
+border-radius:10px;
+color:white;
+}
+
+.sidebar .nav-item:hover{
+background:#0f6d6c;
+}
+
+.sidebar .nav-item.active{
+background:#10a37f;
+color:white;
+}
+
+/* contenu principal */
+
+.main-area{
+margin-left:260px;
+width:calc(100% - 260px);
+}
+
+/* header */
+
+.header{
+left:260px;
+width:calc(100% - 260px);
+height:80px;
+padding:0 40px;
+}
+
+/* page */
+
+.page-content{
+max-width:1100px;
+margin:120px auto;
+padding:0 40px;
+}
+
+}
