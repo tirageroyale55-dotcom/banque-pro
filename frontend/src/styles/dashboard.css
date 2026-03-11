@@ -1,19 +1,31 @@
-/* ============================= */
-/* GLOBAL */
-/* ============================= */
+/* BACKGROUND GLOBAL */
 
 html,
 body,
 #root{
 margin:0;
 padding:0;
-background:#0b5c5b;
+
+background:#0b5c5b !important;
+
 min-height:100%;
+
+font-family:"Inter",sans-serif;
+color:white;
+}
+
+/* BASE */
+
+html,body{
+margin:0;
+padding:0;
+background:#0b5c5b;
 font-family:"Inter",sans-serif;
 color:white;
 overflow-x:hidden;
 }
 
+/* APP */
 .bank-app{
 background:#0b5c5b;
 min-height:100vh;
@@ -21,16 +33,16 @@ position:relative;
 }
 
 
-/* ============================= */
+
+
 /* HEADER */
-/* ============================= */
+
 
 .header{
 position:fixed;
 top:0;
 left:0;
 right:0;
-
 height:70px;
 
 display:flex;
@@ -45,34 +57,26 @@ backdrop-filter:blur(10px);
 z-index:1000;
 }
 
+.avatar{
+width:48px;
+height:48px;
+background:#d1d5db;
+border-radius:14px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:700;
+color:#0b5c5b;
+}
+
 .header-icons{
 display:flex;
 gap:16px;
 cursor:pointer;
 }
 
-/* avatar mobile */
 
-.avatar{
-width:48px;
-height:48px;
-
-background:#d1d5db;
-
-border-radius:14px;
-
-display:flex;
-align-items:center;
-justify-content:center;
-
-font-weight:700;
-color:#0b5c5b;
-}
-
-
-/* ============================= */
-/* TABS MOBILE */
-/* ============================= */
+/* TABS */
 
 .tabs-wrapper{
 position:fixed;
@@ -88,7 +92,6 @@ padding-bottom:10px;
 
 z-index:999;
 }
-
 .tabs{
 display:flex;
 gap:10px;
@@ -96,20 +99,14 @@ padding:12px 20px;
 }
 
 .tab{
-
 display:flex;
 align-items:center;
 gap:6px;
-
 background:#0f6d6c;
-
 padding:10px 16px;
-
 border-radius:20px;
-
 border:none;
 color:white;
-
 cursor:pointer;
 font-size:14px;
 }
@@ -120,28 +117,24 @@ color:#0b5c5b;
 font-weight:600;
 }
 
-
-/* ============================= */
 /* PAGE CONTENT */
-/* ============================= */
 
 .page-content{
 margin-top:145px;
 padding-bottom:120px;
 }
 
+
+/* CONTENT */
+
 .content{
 padding:20px;
 background:transparent;
 }
 
-
-/* ============================= */
 /* ACCOUNT CARD */
-/* ============================= */
 
 .account-card{
-
 background:#e5e7eb;
 color:#0b5c5b;
 
@@ -154,9 +147,22 @@ box-shadow:0 10px 25px rgba(0,0,0,0.15);
 margin-bottom:20px;
 }
 
+.account-title{
+font-size:14px;
+opacity:0.7;
+margin-bottom:8px;
+}
+
 .balance{
 font-size:42px;
 font-weight:700;
+margin-bottom:4px;
+}
+
+.balance-date{
+font-size:14px;
+opacity:0.7;
+margin-bottom:12px;
 }
 
 .owner{
@@ -169,16 +175,31 @@ font-size:13px;
 opacity:0.7;
 }
 
+/* ACTIONS RAPIDES */
 
-/* ============================= */
+.quick-actions{
+display:flex;
+justify-content:space-around;
+margin-top:18px;
+}
+
+.action{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:6px;
+font-size:13px;
+cursor:pointer;
+}
+
 /* BALANCE BAR */
-/* ============================= */
 
 .balance-bar{
 
 position:fixed;
 
-top:142px;
+top:142px; /* juste sous les Tabs */
+
 left:0;
 right:0;
 
@@ -188,15 +209,17 @@ justify-content:center;
 transform:translateY(-120%);
 opacity:0;
 
-transition:all .25s ease;
+transition:all 0.25s ease;
 
 z-index:997;
+
 }
 
 .balance-bar.show{
 
 transform:translateY(0);
 opacity:1;
+
 }
 
 .balance-content{
@@ -216,17 +239,24 @@ display:flex;
 justify-content:space-between;
 
 font-weight:600;
+
 }
 
+.balance-content span {
+  font-size:13px;
+  opacity:0.8;
+  margin-right:6px; /* réduit l’écart avec le solde */
+}
 
-/* ============================= */
-/* BOTTOM NAV MOBILE */
-/* ============================= */
+.balance-content strong {
+  font-size:16px;
+  font-weight:600;
+  margin-left:0; /* pas d’espace supplémentaire */
+}
+/* BOTTOM NAV */
 
 .bottom-nav{
-
 position:fixed;
-
 bottom:20px;
 left:20px;
 right:20px;
@@ -242,12 +272,9 @@ justify-content:space-around;
 align-items:center;
 
 box-shadow:0 10px 30px rgba(0,0,0,0.2);
-
-z-index:1000;
 }
 
 .nav-item{
-
 background:none;
 border:none;
 
@@ -265,139 +292,157 @@ cursor:pointer;
 color:#10a37f;
 }
 
-
-/* ============================= */
 /* MOBILE */
-/* ============================= */
 
-@media (max-width:900px){
+@media (max-width:768px){
 
-.sidebar{
-display:none;
+.tabs{
+overflow-x:auto;
+}
+
+.tab{
+white-space:nowrap;
 }
 
 }
 
 
-/* ============================= */
-/* DESKTOP VERSION */
-/* ============================= */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @media (min-width:900px){
 
-/* cacher tabs mobile */
-
-.tabs-wrapper{
-display:none;
-}
-
-/* cacher bottom nav mobile */
-
-.bottom-nav{
-display:none;
-}
-
-/* layout */
+/* LAYOUT */
 
 .desktop-layout{
 display:flex;
+min-height:100vh;
 }
 
-
-/* ============================= */
-/* SIDEBAR PROFESSIONNELLE */
-/* ============================= */
+/* SIDEBAR */
 
 .sidebar{
 
-width:260px;
+width:270px;
 
-background:#083f3e;
+background:#094948;
 
 position:fixed;
 
-top:0;
 left:0;
+top:0;
 bottom:0;
 
 padding:30px 20px;
 
 display:flex;
+
 flex-direction:column;
 
-border-right:1px solid rgba(255,255,255,0.05);
 }
 
-
-/* profil */
+/* PROFIL */
 
 .sidebar-profile{
 
 display:flex;
+
 align-items:center;
 
 gap:12px;
 
-margin-bottom:40px;
+margin-bottom:30px;
+
 }
 
-/* avatar desktop */
-
-.sidebar .avatar{
-
-width:42px;
-height:42px;
-
-background:#10a37f;
-
-color:white;
-
-border-radius:12px;
-}
-
-
-/* tabs */
+/* TABS */
 
 .sidebar-tabs{
 
 display:flex;
+
 flex-direction:column;
 
-gap:6px;
+gap:8px;
 
-margin-bottom:40px;
+margin-bottom:30px;
+
 }
 
 .side-tab{
 
 background:none;
+
 border:none;
 
 color:white;
 
 text-align:left;
 
-padding:12px 14px;
+padding:10px 14px;
 
 border-radius:10px;
 
 cursor:pointer;
 
 font-size:14px;
+
+transition:0.2s;
+
 }
 
 .side-tab:hover{
+
 background:#0f6d6c;
+
 }
 
 .side-tab.active{
+
 background:#10a37f;
+
 }
 
+/* MENU NAV */
 
-/* navigation */
+.bottom-nav{
 
-.sidebar .nav-item{
+position:relative;
+
+flex-direction:column;
+
+background:none;
+
+box-shadow:none;
+
+height:auto;
+
+gap:6px;
+
+align-items:flex-start;
+
+}
+
+.nav-item{
 
 flex-direction:row;
 
@@ -405,50 +450,51 @@ gap:12px;
 
 width:100%;
 
-padding:10px 12px;
+padding:10px 14px;
 
 border-radius:10px;
 
-color:white;
 }
 
-.sidebar .nav-item:hover{
+.nav-item:hover{
+
 background:#0f6d6c;
+
 }
 
-.sidebar .nav-item.active{
+.nav-item.active{
+
 background:#10a37f;
+
 color:white;
+
 }
 
-
-/* main content */
+/* CONTENU */
 
 .main-area{
 
-margin-left:260px;
+margin-left:270px;
 
-width:calc(100% - 260px);
+width:100%;
+
 }
 
-
-/* header */
+/* HEADER */
 
 .header{
 
-left:260px;
-
-width:calc(100% - 260px);
+left:270px;
 
 height:80px;
 
 padding:0 40px;
 
 background:rgba(11,92,91,0.75);
+
 }
 
-
-/* page */
+/* PAGE */
 
 .page-content{
 
@@ -456,158 +502,155 @@ max-width:1100px;
 
 margin:120px auto;
 
+padding:0 30px;
+
+}
+
+/* BALANCE BAR */
+
+.balance-bar{
+
+left:270px;
+
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.sidebar{
+
+width:230px;
+background:#0b4f4e;
+
+display:flex;
+flex-direction:column;
+
+padding:28px 18px;
+
+border-right:1px solid rgba(255,255,255,0.05);
+
+}
+
+/* PROFILE */
+
+.sidebar-profile{
+
+display:flex;
+align-items:center;
+gap:12px;
+
+margin-bottom:35px;
+
+}
+
+.avatar{
+
+width:42px;
+height:42px;
+
+background:#10a37f;
+
+border-radius:12px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+font-weight:700;
+
+color:white;
+
+font-size:15px;
+
+}
+
+.profile-info strong{
+font-size:14px;
+}
+
+/* SECTION */
+
+.sidebar-tabs{
+margin-bottom:25px;
+}
+
+.sidebar-tabs::after{
+content:"";
+display:block;
+height:1px;
+background:rgba(255,255,255,0.08);
+margin-top:18px;
+}
+
+/* MENU ITEM */
+
+.nav-item{
+
+display:flex;
+align-items:center;
+
+gap:12px;
+
+width:100%;
+
+padding:10px 12px;
+
+border-radius:10px;
+
+font-size:14px;
+
+color:white;
+
+opacity:0.85;
+
+}
+
+.nav-item:hover{
+
+background:#0f6d6c;
+
+opacity:1;
+
+}
+
+.nav-item.active{
+
+background:#10a37f;
+
+color:white;
+
+}
+
+.page-content{
+
+max-width:1000px;
+
+margin:120px auto;
+
 padding:0 40px;
+
 }
 
 .account-card{
 
-max-width:900px;
+max-width:850px;
 
 margin:auto;
-}
-
-.balance-bar{
-left:260px;
-}
-
-}
-
-
-/* ========================= */
-/* DESKTOP ONLY */
-/* ========================= */
-
-@media (min-width: 900px){
-
-/* layout principal */
-.desktop-layout{
-display:flex;
-}
-
-/* sidebar gauche */
-
-.sidebar{
-display:flex;
-flex-direction:column;
-
-width:260px;
-
-position:fixed;
-top:0;
-left:0;
-bottom:0;
-
-padding:30px 20px;
-
-background:#083f3e;
-
-border-right:1px solid rgba(255,255,255,0.06);
-}
-
-/* profil */
-
-.sidebar-profile{
-display:flex;
-align-items:center;
-gap:12px;
-margin-bottom:40px;
-}
-
-/* avatar desktop */
-
-.sidebar .avatar{
-width:42px;
-height:42px;
-background:#10a37f;
-color:white;
-border-radius:12px;
-}
-
-/* tabs */
-
-.sidebar-tabs{
-display:flex;
-flex-direction:column;
-gap:8px;
-margin-bottom:30px;
-}
-
-.side-tab{
-background:none;
-border:none;
-color:white;
-text-align:left;
-padding:12px 14px;
-border-radius:10px;
-cursor:pointer;
-font-size:14px;
-}
-
-.side-tab:hover{
-background:#0f6d6c;
-}
-
-.side-tab.active{
-background:#10a37f;
-}
-
-/* navigation (BottomNav devient menu) */
-
-.sidebar .bottom-nav{
-position:relative;
-bottom:auto;
-left:auto;
-right:auto;
-
-background:none;
-box-shadow:none;
-height:auto;
-
-flex-direction:column;
-align-items:flex-start;
-gap:6px;
-}
-
-.sidebar .nav-item{
-flex-direction:row;
-gap:12px;
-width:100%;
-padding:10px 12px;
-border-radius:10px;
-color:white;
-}
-
-.sidebar .nav-item:hover{
-background:#0f6d6c;
-}
-
-.sidebar .nav-item.active{
-background:#10a37f;
-color:white;
-}
-
-/* contenu principal */
-
-.main-area{
-margin-left:260px;
-width:calc(100% - 260px);
-}
-
-/* header */
-
-.header{
-left:260px;
-width:calc(100% - 260px);
-height:80px;
-padding:0 40px;
-}
-
-/* page */
-
-.page-content{
-max-width:1100px;
-margin:120px auto;
-padding:0 40px;
-}
 
 }
