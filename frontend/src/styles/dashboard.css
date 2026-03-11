@@ -1,3 +1,10 @@
+/* SIDEBAR CACHEE SUR MOBILE */
+
+.sidebar{
+display:none;
+}
+
+
 /* BACKGROUND GLOBAL */
 
 html,
@@ -538,6 +545,39 @@ left:270px;
 
 
 @media (min-width:900px){
+
+
+  @media (min-width:900px){
+
+.tabs-wrapper{
+display:none;
+}
+
+}
+
+  .sidebar{
+display:flex;
+
+width:230px;
+
+background:#0b4f4e;
+
+position:fixed;
+
+top:0;
+bottom:0;
+left:0;
+
+flex-direction:column;
+
+padding:28px 18px;
+}
+
+.main-area{
+margin-left:230px;
+width:calc(100% - 230px);
+}
+
 
 .bank-app{
 max-width:none;

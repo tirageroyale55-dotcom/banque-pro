@@ -75,9 +75,7 @@ return (
 
 <div className="bank-app">
 
-<div className="desktop-layout">
-
-{/* MENU GAUCHE */}
+{/* SIDEBAR DESKTOP */}
 <aside className="sidebar">
 
 <div className="sidebar-profile">
@@ -93,7 +91,6 @@ return (
 
 </div>
 
-{/* TABS dans menu */}
 <div className="sidebar-tabs">
 
 <button
@@ -119,16 +116,20 @@ Financements
 
 </div>
 
-{/* MENU navigation */}
 <BottomNav/>
 
 </aside>
 
 
-{/* ZONE PRINCIPALE */}
+{/* CONTENU */}
 <div className="main-area">
 
 <Header data={data} />
+
+<Tabs
+activeTab={activeTab}
+setActiveTab={setActiveTab}
+/>
 
 <BalanceBar
 balance={data.balance}
@@ -156,8 +157,6 @@ visible={showBalanceBar}
 </div>
 </div>
 )}
-
-</div>
 
 </div>
 
