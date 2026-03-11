@@ -310,14 +310,120 @@ white-space:nowrap;
 
 /* DESKTOP */
 
-@media (min-width:900px){
+/* =========================
+DESKTOP LAYOUT
+========================= */
+
+@media (min-width:1000px){
 
 .bank-app{
-max-width:420px;
+display:flex;
+max-width:1400px;
 margin:auto;
-box-shadow:0 0 40px rgba(0,0,0,0.2);
-border-radius:20px;
-overflow:hidden;
+box-shadow:none;
 }
 
-}   
+/* SIDEBAR */
+
+.sidebar{
+width:260px;
+background:#0b5c5b;
+height:100vh;
+position:fixed;
+left:0;
+top:0;
+
+display:flex;
+flex-direction:column;
+
+padding:30px 20px;
+
+border-right:1px solid rgba(255,255,255,0.05);
+}
+
+.sidebar-profile{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:10px;
+margin-bottom:40px;
+}
+
+.avatar.large{
+width:60px;
+height:60px;
+border-radius:20px;
+}
+
+.sidebar-menu{
+display:flex;
+flex-direction:column;
+gap:14px;
+}
+
+.side-item{
+display:flex;
+align-items:center;
+gap:12px;
+
+background:none;
+border:none;
+
+color:white;
+
+padding:12px 14px;
+border-radius:14px;
+
+cursor:pointer;
+font-size:14px;
+}
+
+.side-item:hover{
+background:#0f6d6c;
+}
+
+.side-item.active{
+background:white;
+color:#0b5c5b;
+font-weight:600;
+}
+
+/* CONTENT */
+
+.desktop-content{
+margin-left:260px;
+width:100%;
+}
+
+/* HEADER adaptation */
+
+.header{
+left:260px;
+}
+
+/* TABS */
+
+.tabs-wrapper{
+left:260px;
+}
+
+/* BALANCE BAR */
+
+.balance-bar{
+left:260px;
+}
+
+/* PAGE CONTENT */
+
+.page-content{
+max-width:900px;
+margin:auto;
+}
+
+/* HIDE MOBILE NAV */
+
+.bottom-nav{
+display:none;
+}
+
+}

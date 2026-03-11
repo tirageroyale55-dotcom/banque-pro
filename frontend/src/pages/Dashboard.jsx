@@ -11,6 +11,8 @@ import Accounts from "./Accounts";
 
 import "../styles/dashboard.css";
 
+import Sidebar from "../components/Sidebar";
+
 export default function Dashboard() {
 
 const [data, setData] = useState(null);
@@ -68,6 +70,10 @@ return (
 
 <div className="bank-app">
 
+<Sidebar/>
+
+<div className="desktop-content">
+
 <Header data={data} />
 
 <Tabs
@@ -101,6 +107,8 @@ visible={showBalanceBar}
 </div>
 </div>
 )}
+
+</div>
 
 </div>
 
