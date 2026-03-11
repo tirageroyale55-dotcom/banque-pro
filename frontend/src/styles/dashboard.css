@@ -124,7 +124,6 @@ margin-top:145px;
 padding-bottom:120px;
 }
 
-
 /* CONTENT */
 
 .content{
@@ -198,7 +197,7 @@ cursor:pointer;
 
 position:fixed;
 
-top:142px; /* juste sous les Tabs */
+top:145px; /* juste sous les Tabs */
 
 left:0;
 right:0;
@@ -240,18 +239,6 @@ justify-content:space-between;
 
 font-weight:600;
 
-}
-
-.balance-content span {
-  font-size:13px;
-  opacity:0.8;
-  margin-right:6px; /* réduit l’écart avec le solde */
-}
-
-.balance-content strong {
-  font-size:16px;
-  font-weight:600;
-  margin-left:0; /* pas d’espace supplémentaire */
 }
 /* BOTTOM NAV */
 
@@ -340,191 +327,3 @@ overflow:hidden;
 
 
 
-
-
-@media (min-width:900px){
-
-/* LAYOUT */
-
-.desktop-layout{
-display:flex;
-min-height:100vh;
-}
-
-/* SIDEBAR */
-
-.sidebar{
-
-width:270px;
-
-background:#094948;
-
-position:fixed;
-
-left:0;
-top:0;
-bottom:0;
-
-padding:30px 20px;
-
-display:flex;
-
-flex-direction:column;
-
-}
-
-/* PROFIL */
-
-.sidebar-profile{
-
-display:flex;
-
-align-items:center;
-
-gap:12px;
-
-margin-bottom:30px;
-
-}
-
-/* TABS */
-
-.sidebar-tabs{
-
-display:flex;
-
-flex-direction:column;
-
-gap:8px;
-
-margin-bottom:30px;
-
-}
-
-.side-tab{
-
-background:none;
-
-border:none;
-
-color:white;
-
-text-align:left;
-
-padding:10px 14px;
-
-border-radius:10px;
-
-cursor:pointer;
-
-font-size:14px;
-
-transition:0.2s;
-
-}
-
-.side-tab:hover{
-
-background:#0f6d6c;
-
-}
-
-.side-tab.active{
-
-background:#10a37f;
-
-}
-
-/* MENU NAV */
-
-.bottom-nav{
-
-position:relative;
-
-flex-direction:column;
-
-background:none;
-
-box-shadow:none;
-
-height:auto;
-
-gap:6px;
-
-align-items:flex-start;
-
-}
-
-.nav-item{
-
-flex-direction:row;
-
-gap:12px;
-
-width:100%;
-
-padding:10px 14px;
-
-border-radius:10px;
-
-}
-
-.nav-item:hover{
-
-background:#0f6d6c;
-
-}
-
-.nav-item.active{
-
-background:#10a37f;
-
-color:white;
-
-}
-
-/* CONTENU */
-
-.main-area{
-
-margin-left:270px;
-
-width:100%;
-
-}
-
-/* HEADER */
-
-.header{
-
-left:270px;
-
-height:80px;
-
-padding:0 40px;
-
-background:rgba(11,92,91,0.75);
-
-}
-
-/* PAGE */
-
-.page-content{
-
-max-width:1100px;
-
-margin:120px auto;
-
-padding:0 30px;
-
-}
-
-/* BALANCE BAR */
-
-.balance-bar{
-
-left:270px;
-
-}
-
-}
