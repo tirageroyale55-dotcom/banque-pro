@@ -1,4 +1,6 @@
-/* BACKGROUND GLOBAL */
+
+ 
+ /* BACKGROUND GLOBAL */
 
 html,
 body,
@@ -124,6 +126,7 @@ margin-top:145px;
 padding-bottom:120px;
 }
 
+
 /* CONTENT */
 
 .content{
@@ -197,7 +200,7 @@ cursor:pointer;
 
 position:fixed;
 
-top:145px; /* juste sous les Tabs */
+top:142px; /* juste sous les Tabs */
 
 left:0;
 right:0;
@@ -239,6 +242,18 @@ justify-content:space-between;
 
 font-weight:600;
 
+}
+
+.balance-content span {
+  font-size:13px;
+  opacity:0.8;
+  margin-right:6px; /* réduit l’écart avec le solde */
+}
+
+.balance-content strong {
+  font-size:16px;
+  font-weight:600;
+  margin-left:0; /* pas d’espace supplémentaire */
 }
 /* BOTTOM NAV */
 
@@ -305,25 +320,4 @@ border-radius:20px;
 overflow:hidden;
 }
 
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}   

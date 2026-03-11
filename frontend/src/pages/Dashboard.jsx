@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; 
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
@@ -68,60 +68,12 @@ return (
 
 <div className="bank-app">
 
-<div className="desktop-layout">
-
-{/* MENU GAUCHE */}
-<aside className="sidebar">
-
-<div className="sidebar-profile">
-
-<div className="avatar">
-{data.name?.charAt(0)}
-</div>
-
-<div className="profile-info">
-<strong>{data.name}</strong>
-<span>Client</span>
-</div>
-
-</div>
-
-{/* TABS dans menu */}
-<div className="sidebar-tabs">
-
-<button
-className={activeTab === "accounts" ? "side-tab active" : "side-tab"}
-onClick={() => setActiveTab("accounts")}
->
-Comptes
-</button>
-
-<button
-className={activeTab === "cards" ? "side-tab active" : "side-tab"}
-onClick={() => setActiveTab("cards")}
->
-Cartes
-</button>
-
-<button
-className={activeTab === "financing" ? "side-tab active" : "side-tab"}
-onClick={() => setActiveTab("financing")}
->
-Financements
-</button>
-
-</div>
-
-{/* MENU navigation */}
-<BottomNav/>
-
-</aside>
-
-
-{/* ZONE PRINCIPALE */}
-<div className="main-area">
-
 <Header data={data} />
+
+<Tabs
+activeTab={activeTab}
+setActiveTab={setActiveTab}
+/>
 
 <BalanceBar
 balance={data.balance}
@@ -152,12 +104,10 @@ visible={showBalanceBar}
 
 </div>
 
-</div>
-
-</div>
+<BottomNav/>
 
 </div>
 
 );
 
-}
+}  
