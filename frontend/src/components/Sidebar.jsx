@@ -5,7 +5,8 @@ Grid,
 Gem,
 Headphones,
 CreditCard,
-User
+User,
+Wallet
 } from "lucide-react";
 
 import { useNavigate, useLocation } from "react-router-dom";
@@ -19,12 +20,23 @@ return(
 
 <div className="sidebar">
 
-<div className="sidebar-profile">
+{/* PROFILE */}
+
+<div
+className="sidebar-profile"
+onClick={()=>navigate("/profil")}
+>
 <div className="avatar large">
 <User size={22}/>
 </div>
-<span>Profil</span>
+
+<div className="profile-info">
+<strong>Profil</strong>
 </div>
+
+</div>
+
+{/* MENU */}
 
 <div className="sidebar-menu">
 
@@ -36,12 +48,18 @@ onClick={()=>navigate("/dashboard")}
 <span>Accueil</span>
 </button>
 
-<button className="side-item">
-<Grid size={20}/>
+<button
+className={location.pathname === "/accounts" ? "side-item active" : "side-item"}
+onClick={()=>navigate("/accounts")}
+>
+<Wallet size={20}/>
 <span>Comptes</span>
 </button>
 
-<button className="side-item">
+<button
+className={location.pathname === "/cards" ? "side-item active" : "side-item"}
+onClick={()=>navigate("/cards")}
+>
 <CreditCard size={20}/>
 <span>Cartes</span>
 </button>
