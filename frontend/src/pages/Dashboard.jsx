@@ -64,6 +64,13 @@ return () => window.removeEventListener("scroll", handleScroll);
 
 if (!data) return null;
 
+const initials = data?.name
+  ?.split(" ")
+  .map(n => n[0])
+  .join("")
+  .substring(0,2)
+  .toUpperCase();
+
 return (
 
 <div className="bank-app">
@@ -76,7 +83,7 @@ return (
 <div className="sidebar-profile">
 
 <div className="avatar">
-{data.name?.charAt(0)}
+{initials}
 </div>
 
 <div className="profile-info">
