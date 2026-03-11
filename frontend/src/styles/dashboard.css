@@ -503,8 +503,14 @@ margin:auto;
 left:230px;
 }
 
+}
 
 
+/* ============================= */
+/* DESKTOP VERSION */
+/* ============================= */
+
+@media (min-width:900px){
 
 /* cacher bottom nav mobile */
 
