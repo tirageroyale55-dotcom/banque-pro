@@ -64,24 +64,19 @@ return () => window.removeEventListener("scroll", handleScroll);
 
 if (!data) return null;
 
-const initials = data?.name
-  ?.split(" ")
-  .map(n => n[0])
-  .join("")
-  .substring(0,2)
-  .toUpperCase();
-
 return (
 
 <div className="bank-app">
 
-{/* SIDEBAR DESKTOP */}
+<div className="desktop-layout">
+
+{/* MENU GAUCHE */}
 <aside className="sidebar">
 
 <div className="sidebar-profile">
 
 <div className="avatar">
-{initials}
+{data.name?.charAt(0)}
 </div>
 
 <div className="profile-info">
@@ -91,6 +86,7 @@ return (
 
 </div>
 
+{/* TABS dans menu */}
 <div className="sidebar-tabs">
 
 <button
@@ -116,20 +112,16 @@ Financements
 
 </div>
 
+{/* MENU navigation */}
 <BottomNav/>
 
 </aside>
 
 
-{/* CONTENU */}
+{/* ZONE PRINCIPALE */}
 <div className="main-area">
 
 <Header data={data} />
-
-<Tabs
-activeTab={activeTab}
-setActiveTab={setActiveTab}
-/>
 
 <BalanceBar
 balance={data.balance}
@@ -157,6 +149,8 @@ visible={showBalanceBar}
 </div>
 </div>
 )}
+
+</div>
 
 </div>
 

@@ -537,3 +537,55 @@ left:270px;
 
 
 
+@media (min-width:900px){
+
+.bank-app{
+max-width:none;
+margin:0;
+border-radius:0;
+box-shadow:none;
+}
+
+/* LAYOUT */
+
+.desktop-layout{
+display:flex;
+min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:260px;
+background:#094948;
+position:fixed;
+top:0;
+left:0;
+bottom:0;
+padding:30px 20px;
+}
+
+/* CONTENU */
+
+.main-area{
+margin-left:260px;
+width:calc(100% - 260px);
+min-height:100vh;
+}
+
+/* HEADER */
+
+.header{
+left:260px;
+width:calc(100% - 260px);
+}
+
+/* PAGE */
+
+.page-content{
+max-width:1200px;
+margin:140px auto;
+padding:0 40px;
+}
+
+}
