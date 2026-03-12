@@ -329,15 +329,20 @@ PRO DESKTOP BANK LAYOUT
 display:none;
 }
 
-/* DESKTOP */
+/* =========================
+DESKTOP BANK LAYOUT
+========================= */
 
 @media (min-width:1000px){
 
-.sidebar{
-
+.bank-app{
 display:flex;
-flex-direction:column;
+height:100vh;
+}
 
+/* SIDEBAR */
+
+.sidebar{
 width:240px;
 height:100vh;
 
@@ -345,77 +350,72 @@ background:#0a4f4e;
 
 padding:30px 20px;
 
-position:fixed;
-left:0;
-top:0;
-
-}
-
-/* PROFILE */
-
-.sidebar-profile{
-
 display:flex;
-align-items:center;
-gap:12px;
+flex-direction:column;
 
-margin-bottom:40px;
-
-color:white;
-font-weight:600;
-
+position:relative;
 }
 
-/* MENU */
+/* CONTENU DROIT */
 
-.sidebar-menu{
+.desktop-content{
+flex:1;
 
 display:flex;
 flex-direction:column;
-gap:8px;
 
+height:100vh;
 }
 
-/* ITEM */
+/* HEADER */
 
-.side-item{
+.header{
+position:relative;
+
+height:80px;
 
 display:flex;
 align-items:center;
-gap:12px;
+justify-content:flex-end;
 
-width:100%;
+padding:0 30px;
 
-background:none;
-border:none;
-
-color:white;
-
-padding:12px 14px;
-
-border-radius:12px;
-
-font-size:14px;
-
-cursor:pointer;
-
+background:rgba(11,92,91,0.6);
+backdrop-filter:blur(10px);
 }
 
-/* HOVER */
+/* TABS */
 
-.side-item:hover{
-background:#0f6d6c;
+.tabs-wrapper{
+position:relative;
+
+top:0;
+
+padding:20px 30px;
 }
 
-/* ACTIVE */
+/* CONTENT */
 
-.side-item.active{
+.page-content{
+flex:1;
 
-background:white;
-color:#0b5c5b;
+overflow-y:auto;
 
-font-weight:600;
+padding:30px;
 
+margin-top:0;
+}
+
+/* HIDE MOBILE NAV */
+
+.bottom-nav{
+display:none;
+}
+
+/* DESKTOP ACCOUNT CARD WIDTH */
+
+.content{
+max-width:900px;
 }
 
 }
