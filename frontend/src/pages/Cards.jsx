@@ -21,11 +21,11 @@ return(
 
 <div className="bank-app">
 
-<Header data={{firstname:"",lastname:""}} />
+<Header data={{}} />
 
-<div className="cards-container">
+<div className="cards-page">
 
-<h2 className="cards-title">Ma carte bancaire</h2>
+<h2>Ma carte bancaire</h2>
 
 {card && <BankCard card={card}/>}
 

@@ -1,44 +1,39 @@
-export default function BankCard({card}){
+export default function BankCard({ card }) {
 
-const formatNumber=(num)=>{
-if(!num) return "**** **** **** ****"
-return num.replace(/(.{4})/g,"$1 ").trim()
-}
-
-return(
+return (
 
 <div className="bank-card">
 
-<div className="card-top">
+<div className="card-header">
 
 <div className="chip"></div>
 
-<div className="bank-logo">
-BPER
+<div className="card-brand">
+{card.brand?.toUpperCase()}
 </div>
 
 </div>
 
 <div className="card-number">
-{formatNumber(card.number)}
+•••• •••• •••• {card.last4}
 </div>
 
-<div className="card-bottom">
+<div className="card-footer">
 
-<div>
+<div className="card-holder">
 <span>TITULAIRE</span>
 <strong>{card.holder}</strong>
 </div>
 
-<div>
+<div className="card-exp">
 <span>EXP</span>
-<strong>{card.exp}</strong>
+<strong>{card.exp_month}/{card.exp_year}</strong>
 </div>
 
 </div>
 
 </div>
 
-)
+);
 
 }
