@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
 
+import Header from "../components/Header";
+import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
 
 export default function Cards(){
@@ -15,28 +17,21 @@ api("/client/card")
 
 },[]);
 
-if(!card){
 return(
-<div className="cards-page">
-<h2>Carte bancaire</h2>
-<p>Chargement...</p>
+
+<div className="bank-app">
+
+<Header data={{firstname:"",lastname:""}} />
+
+<div className="cards-container">
+
+<h2 className="cards-title">Ma carte bancaire</h2>
+
+{card && <BankCard card={card}/>}
+
 </div>
-)
-}
 
-return(
-
-<div className="cards-page">
-
-<h2>Carte bancaire</h2>
-
-<BankCard
-card={{
-number:card.number,
-holder:card.holder,
-exp:card.exp
-}}
-/>
+<BottomNav/>
 
 </div>
 

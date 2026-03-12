@@ -1,31 +1,37 @@
 export default function BankCard({card}){
 
 const formatNumber=(num)=>{
-if(!num) return "•••• •••• •••• ••••";
-return num.replace(/(.{4})/g,"$1 ").trim();
+if(!num) return "**** **** **** ****"
+return num.replace(/(.{4})/g,"$1 ").trim()
 }
 
 return(
 
 <div className="bank-card">
 
-<div className="card-header">
-<span className="bank-name">BPER</span>
+<div className="card-top">
+
+<div className="chip"></div>
+
+<div className="bank-logo">
+BPER
+</div>
+
 </div>
 
 <div className="card-number">
 {formatNumber(card.number)}
 </div>
 
-<div className="card-footer">
+<div className="card-bottom">
 
-<div className="card-holder">
-<span>Titulaire</span>
+<div>
+<span>TITULAIRE</span>
 <strong>{card.holder}</strong>
 </div>
 
-<div className="card-exp">
-<span>Expiration</span>
+<div>
+<span>EXP</span>
 <strong>{card.exp}</strong>
 </div>
 
