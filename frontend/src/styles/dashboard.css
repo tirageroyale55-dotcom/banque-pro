@@ -316,9 +316,7 @@ white-space:nowrap;
 
 
 
-.sidebar{
-display:none;
-}
+
 
 
 /* =========================
@@ -327,14 +325,10 @@ PRO DESKTOP BANK LAYOUT
 
 @media (min-width:1000px){
 
-.sidebar{
+.bank-app{
 display:flex;
-width:260px;
-background:#083f3e;
 height:100vh;
-padding:30px 20px;
-flex-direction:column;
-gap:30px;
+background:#0b5c5b;
 }
 
 
