@@ -2,6 +2,14 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+
+const Card = require("../models/Card");
+const {
+generateCardNumber,
+generateCVV,
+generateExpiry
+} = require("../utils/cardGenerator");
+
 // ======================
 // Normalisation téléphone
 // ======================
@@ -116,6 +124,32 @@ exports.activateAccount = async (req, res) => {
     user.activationExpires = undefined;
 
     await user.save();
+
+    // ======================
+// CREATION CARTE BANCAIRE
+// ======================
+
+const expiry = generateExpiry();
+
+const number = generateCardNumber();
+
+await Card.create({
+
+user:user._id,
+
+brand:"visa",
+
+number:number,
+
+last4:number.slice(-4),
+
+cvv:generateCVV(),
+
+exp_month:expiry.month,
+
+exp_year:expiry.year
+
+});
 
     // 5️⃣ Réponse
     res.json({
