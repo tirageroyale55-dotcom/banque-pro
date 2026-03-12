@@ -7,6 +7,7 @@ import Tabs from "../components/Tabs";
 import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 import Sidebar from "../components/Sidebar";
+import BankCard from "../components/BankCard";
 
 import Accounts from "./Accounts";
 
@@ -102,10 +103,19 @@ visible={showBalanceBar}
 
 {activeTab === "cards" && (
 <div className="content">
-<div className="account-card">
-<h3>Mes cartes</h3>
-<p>Aucune carte active</p>
-</div>
+
+<h3>Ma carte bancaire</h3>
+
+<BankCard
+card={{
+brand: "visa",
+last4: "2345",
+holder: data.firstname + " " + data.lastname,
+exp_month: "08",
+exp_year: "29"
+}}
+/>
+
 </div>
 )}
 
