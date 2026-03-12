@@ -5,7 +5,6 @@ Grid,
 Gem,
 Headphones,
 CreditCard,
-User,
 Wallet
 } from "lucide-react";
 
@@ -19,24 +18,6 @@ const location = useLocation();
 return(
 
 <div className="sidebar">
-
-{/* PROFILE */}
-
-<div
-className="sidebar-profile"
-onClick={()=>navigate("/profil")}
->
-<div className="avatar large">
-<User size={22}/>
-</div>
-
-<div className="profile-info">
-<strong>Profil</strong>
-</div>
-
-</div>
-
-{/* MENU */}
 
 <div className="sidebar-menu">
 

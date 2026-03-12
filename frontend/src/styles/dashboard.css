@@ -419,35 +419,58 @@ max-width:900px;
 }
 
 
-/* SIDEBAR MENU CLEAN */
+/* SIDEBAR */
+
+.sidebar{
+display:none;
+}
+
+/* DESKTOP */
+
+@media (min-width:1000px){
+
+.sidebar{
+
+display:flex;
+flex-direction:column;
+
+width:240px;
+height:100vh;
+
+background:#0a4f4e;
+
+padding:30px 16px;
+
+}
+
+/* MENU */
 
 .sidebar-menu{
 display:flex;
 flex-direction:column;
 gap:6px;
-margin-top:20px;
 }
 
-/* RESET BUTTON STYLE */
+/* ITEM */
 
 .side-item{
+
 all:unset;
 
 display:flex;
 align-items:center;
-gap:12px;
-
-width:100%;
+gap:14px;
 
 padding:12px 14px;
 
 border-radius:12px;
 
-color:white;
-
 font-size:14px;
 
+color:white;
+
 cursor:pointer;
+
 }
 
 /* HOVER */
@@ -459,11 +482,15 @@ background:#0f6d6c;
 /* ACTIVE */
 
 .side-item.active{
+
 background:white;
 color:#0b5c5b;
+
 font-weight:600;
+
 }
 
+}
 }
 
 
