@@ -2,50 +2,43 @@ import { useState } from "react";
 
 export default function BankCard({ card }) {
 
-const [flipped,setFlipped] = useState(false);
-
-const brandLogo = () => {
-if(card.brand === "visa") return "/visa.svg";
-if(card.brand === "mastercard") return "/mastercard.svg";
-return "";
-};
+const [flip,setFlip] = useState(false);
 
 return (
 
 <div
-className={`card-3d ${flipped ? "flipped" : ""}`}
-onClick={()=>setFlipped(!flipped)}
+className={`bper-card ${flip ? "flip" : ""}`}
+onClick={()=>setFlip(!flip)}
 >
 
-<div className="card-inner">
+<div className="bper-card-inner">
 
 {/* FRONT */}
 
-<div className="card-front">
+<div className="bper-card-front">
 
-<div className="card-header">
+<div className="bper-top">
 
-<div className="chip"></div>
+<div className="bper-chip"></div>
 
-<img
-src={brandLogo()}
-className="card-brand-logo"
-/>
+<div className="bper-brand">
+{card.brand?.toUpperCase()}
+</div>
 
 </div>
 
-<div className="card-number">
+<div className="bper-number">
 •••• •••• •••• {card.last4}
 </div>
 
-<div className="card-footer">
+<div className="bper-bottom">
 
-<div className="card-holder">
+<div>
 <span>TITULAIRE</span>
 <strong>{card.holder}</strong>
 </div>
 
-<div className="card-exp">
+<div>
 <span>EXP</span>
 <strong>{card.exp_month}/{card.exp_year}</strong>
 </div>
@@ -54,16 +47,17 @@ className="card-brand-logo"
 
 </div>
 
-
 {/* BACK */}
 
-<div className="card-back">
+<div className="bper-card-back">
 
-<div className="magnetic"></div>
+<div className="bper-stripe"></div>
 
-<div className="cvv-box">
+<div className="bper-cvv">
+
 <span>CVV</span>
 <strong>{card.cvv || "***"}</strong>
+
 </div>
 
 </div>
@@ -73,5 +67,4 @@ className="card-brand-logo"
 </div>
 
 );
-
 }
