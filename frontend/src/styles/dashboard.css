@@ -492,3 +492,99 @@ font-weight:600;
 }
 
 
+
+
+
+
+
+/* PAGE CARDS */
+
+.cards-page{
+
+padding:30px;
+
+}
+
+/* BANK CARD */
+
+.bank-card{
+
+width:100%;
+max-width:420px;
+
+height:230px;
+
+border-radius:20px;
+
+padding:24px;
+
+background:linear-gradient(135deg,#0f6d6c,#0b5c5b);
+
+color:white;
+
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+
+box-shadow:0 20px 40px rgba(0,0,0,0.3);
+
+margin-top:20px;
+
+}
+
+/* HEADER */
+
+.card-header{
+
+display:flex;
+justify-content:flex-end;
+
+}
+
+.bank-name{
+
+font-weight:700;
+font-size:18px;
+
+letter-spacing:1px;
+
+}
+
+/* NUMBER */
+
+.card-number{
+
+font-size:22px;
+
+letter-spacing:3px;
+
+font-weight:600;
+
+}
+
+/* FOOTER */
+
+.card-footer{
+
+display:flex;
+justify-content:space-between;
+
+font-size:13px;
+
+}
+
+.card-footer span{
+
+font-size:11px;
+opacity:0.7;
+
+display:block;
+
+}
+
+.card-footer strong{
+
+font-size:14px;
+
+}
+
