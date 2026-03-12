@@ -699,3 +699,224 @@ font-size:10px;
 .card-footer strong{
 font-size:14px;
 }
+
+
+
+
+
+
+
+
+/* 3D CARD */
+
+.card-3d{
+
+width:100%;
+max-width:420px;
+height:240px;
+
+perspective:1200px;
+
+cursor:pointer;
+
+}
+
+/* INNER */
+
+.card-inner{
+
+width:100%;
+height:100%;
+
+position:relative;
+
+transform-style:preserve-3d;
+
+transition:transform .8s cubic-bezier(.4,.2,.2,1);
+
+}
+
+/* FLIP */
+
+.card-3d.flipped .card-inner{
+
+transform:rotateY(180deg);
+
+}
+
+/* FRONT + BACK */
+
+.card-front,
+.card-back{
+
+position:absolute;
+
+width:100%;
+height:100%;
+
+border-radius:22px;
+
+padding:26px;
+
+backface-visibility:hidden;
+
+color:white;
+
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+
+box-shadow:0 25px 50px rgba(0,0,0,0.45);
+
+}
+
+/* FRONT DESIGN */
+
+.card-front{
+
+background:
+
+radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15), transparent 60%),
+
+linear-gradient(135deg,#0f6d6c,#0b5c5b);
+
+}
+
+/* BACK */
+
+.card-back{
+
+transform:rotateY(180deg);
+
+background:
+
+linear-gradient(135deg,#1a1a1a,#000);
+
+}
+
+/* MAGNETIC STRIPE */
+
+.magnetic{
+
+height:40px;
+width:100%;
+
+background:black;
+
+margin-top:20px;
+
+}
+
+/* CVV */
+
+.cvv-box{
+
+background:white;
+
+color:black;
+
+padding:10px;
+
+width:80px;
+
+border-radius:6px;
+
+margin-top:20px;
+
+font-size:12px;
+
+}
+
+/* CHIP REALISTIC */
+
+.chip{
+
+width:46px;
+height:34px;
+
+border-radius:6px;
+
+background:
+
+linear-gradient(135deg,#d4af37,#f6d97b);
+
+box-shadow:
+
+inset 0 0 4px rgba(0,0,0,0.4);
+
+position:relative;
+
+}
+
+/* CHIP LINES */
+
+.chip::before{
+
+content:"";
+
+position:absolute;
+
+top:8px;
+left:8px;
+
+width:30px;
+height:18px;
+
+border:2px solid rgba(0,0,0,0.2);
+
+border-radius:4px;
+
+}
+
+/* HEADER */
+
+.card-header{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+}
+
+/* CARD NUMBER */
+
+.card-number{
+
+font-size:22px;
+letter-spacing:3px;
+
+}
+
+/* FOOTER */
+
+.card-footer{
+
+display:flex;
+justify-content:space-between;
+
+font-size:12px;
+
+}
+
+.card-footer span{
+
+opacity:0.7;
+font-size:10px;
+
+}
+
+.card-footer strong{
+
+font-size:14px;
+
+}
+
+/* BRAND LOGO */
+
+.card-brand-logo{
+
+height:26px;
+
+object-fit:contain;
+
+}
