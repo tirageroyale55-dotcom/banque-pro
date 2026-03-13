@@ -707,190 +707,233 @@ font-size:14px;
 
 
 
-/* =========================
-   PAGE CARTE
-========================= */
-
-.cards-page{
-padding:110px 20px 120px;
-display:flex;
-justify-content:center;
-}
-
-.content{
-width:100%;
-max-width:420px;
-}
-
-/* =========================
-   CARTE BANCAIRE
-========================= */
+/* 3D CARD */
 
 .card-3d{
+
 width:100%;
 max-width:420px;
 height:240px;
+
 perspective:1200px;
+
 cursor:pointer;
+
 }
+
+/* INNER */
 
 .card-inner{
+
 width:100%;
 height:100%;
+
 position:relative;
+
 transform-style:preserve-3d;
-transition:transform .7s ease;
+
+transition:transform .8s cubic-bezier(.4,.2,.2,1);
+
 }
+
+/* FLIP */
 
 .card-3d.flipped .card-inner{
+
 transform:rotateY(180deg);
+
 }
 
-/* =========================
-   FACE AVANT
-========================= */
+/* FRONT + BACK */
 
-.card-front{
+.card-front,
+.card-back{
+
 position:absolute;
+
 width:100%;
 height:100%;
-border-radius:18px;
+
+border-radius:22px;
+
 padding:26px;
-color:white;
+
 backface-visibility:hidden;
+
+color:white;
 
 display:flex;
 flex-direction:column;
 justify-content:space-between;
 
-background:
-radial-gradient(circle at 20% 20%,rgba(255,255,255,.15),transparent 50%),
-linear-gradient(135deg,#007e7a,#004f4d);
+box-shadow:0 25px 50px rgba(0,0,0,0.45);
 
-box-shadow:0 25px 45px rgba(0,0,0,0.35);
 }
 
-/* =========================
-   FACE ARRIERE
-========================= */
+/* FRONT DESIGN */
+
+.card-front{
+
+background:
+
+radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15), transparent 60%),
+
+linear-gradient(135deg,#0f6d6c,#0b5c5b);
+
+}
+
+/* BACK */
 
 .card-back{
-position:absolute;
-width:100%;
-height:100%;
-border-radius:18px;
-padding:26px;
 
 transform:rotateY(180deg);
-backface-visibility:hidden;
 
-background:linear-gradient(135deg,#0c0c0c,#000);
-color:white;
+background:
+
+linear-gradient(135deg,#1a1a1a,#000);
+
 }
 
-/* =========================
-   HEADER
-========================= */
+/* MAGNETIC STRIPE */
 
-.card-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
+.magnetic{
+
+height:40px;
+width:100%;
+
+background:black;
+
+margin-top:20px;
+
 }
 
-/* =========================
-   LOGO BPER
-========================= */
+/* CVV */
 
-.card-bank{
-font-size:18px;
-font-weight:700;
-letter-spacing:1px;
+.cvv-box{
+
+background:white;
+
+color:black;
+
+padding:10px;
+
+width:80px;
+
+border-radius:6px;
+
+margin-top:20px;
+
+font-size:12px;
+
 }
 
-/* =========================
-   CHIP
-========================= */
+/* CHIP REALISTIC */
 
 .chip{
-width:48px;
-height:36px;
+
+width:46px;
+height:34px;
 
 border-radius:6px;
 
 background:
-linear-gradient(135deg,#d4af37,#f8de7e);
+
+linear-gradient(135deg,#d4af37,#f6d97b);
 
 box-shadow:
-inset 0 0 4px rgba(0,0,0,.4);
+
+inset 0 0 4px rgba(0,0,0,0.4);
 
 position:relative;
+
 }
+
+/* CHIP LINES */
 
 .chip::before{
+
 content:"";
+
 position:absolute;
+
 top:8px;
-left:10px;
-width:26px;
+left:8px;
+
+width:30px;
 height:18px;
-border:2px solid rgba(0,0,0,.2);
+
+border:2px solid rgba(0,0,0,0.2);
+
 border-radius:4px;
+
 }
 
-/* =========================
-   NUMERO CARTE
-========================= */
+/* HEADER */
 
-.card-number{
-font-size:22px;
-letter-spacing:3px;
-font-weight:500;
-margin-top:20px;
-}
+.card-header{
 
-/* =========================
-   FOOTER
-========================= */
-
-.card-footer{
 display:flex;
 justify-content:space-between;
-align-items:flex-end;
+align-items:center;
+
+}
+
+/* CARD NUMBER */
+
+.card-number{
+
+font-size:22px;
+letter-spacing:3px;
+
+}
+
+/* FOOTER */
+
+.card-footer{
+
+display:flex;
+justify-content:space-between;
+
 font-size:12px;
+
 }
 
 .card-footer span{
-display:block;
+
+opacity:0.7;
 font-size:10px;
-opacity:.7;
+
 }
 
 .card-footer strong{
+
 font-size:14px;
-font-weight:600;
+
 }
 
-/* =========================
-   BANDE MAGNETIQUE
-========================= */
+/* BRAND LOGO */
 
-.magnetic{
-height:42px;
-background:black;
-margin-top:18px;
+.card-brand-logo{
+
+height:26px;
+
+object-fit:contain;
+
 }
 
-/* =========================
-   CVV
-========================= */
 
-.cvv-box{
-margin-top:20px;
-background:white;
-color:black;
-width:80px;
-padding:8px;
-border-radius:4px;
-font-size:12px;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
