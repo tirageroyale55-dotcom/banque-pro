@@ -4,6 +4,16 @@ export default function BankCard({ card }) {
 
 const [flipped,setFlipped] = useState(false);
 
+// sécurité si aucune carte
+if(!card) return null;
+
+// format numéro carte
+const formatNumber = (num) => {
+if(!num) return "•••• •••• •••• ••••";
+return num.match(/.{1,4}/g).join(" ");
+};
+
+// logo VISA / Mastercard
 const brandLogo = () => {
 if(card.brand === "visa") return "/visa.svg";
 if(card.brand === "mastercard") return "/mastercard.svg";
@@ -19,7 +29,7 @@ onClick={()=>setFlipped(!flipped)}
 
 <div className="card-inner">
 
-{/* FRONT */}
+{/* ================= FRONT ================= */}
 
 <div className="card-front">
 
@@ -27,15 +37,12 @@ onClick={()=>setFlipped(!flipped)}
 
 <div className="chip"></div>
 
-<img
-src={brandLogo()}
-className="card-brand-logo"
-/>
+<div className="card-bank">BPER</div>
 
 </div>
 
 <div className="card-number">
-•••• •••• •••• {card.last4}
+{formatNumber(card.number)}
 </div>
 
 <div className="card-footer">
@@ -50,12 +57,16 @@ className="card-brand-logo"
 <strong>{card.exp_month}/{card.exp_year}</strong>
 </div>
 
-</div>
+<img
+src={brandLogo()}
+className="card-brand-logo"
+/>
 
 </div>
 
+</div>
 
-{/* BACK */}
+{/* ================= BACK ================= */}
 
 <div className="card-back">
 
@@ -63,7 +74,7 @@ className="card-brand-logo"
 
 <div className="cvv-box">
 <span>CVV</span>
-<strong>{card.cvv || "***"}</strong>
+<strong>{card.cvv}</strong>
 </div>
 
 </div>
