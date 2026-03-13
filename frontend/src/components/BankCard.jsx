@@ -4,20 +4,11 @@ export default function BankCard({ card }) {
 
 const [flipped,setFlipped] = useState(false);
 
-// sécurité si aucune carte
 if(!card) return null;
 
-// format numéro carte
 const formatNumber = (num) => {
 if(!num) return "•••• •••• •••• ••••";
-return num.match(/.{1,4}/g).join(" ");
-};
-
-// logo VISA / Mastercard
-const brandLogo = () => {
-if(card.brand === "visa") return "/visa.svg";
-if(card.brand === "mastercard") return "/mastercard.svg";
-return "";
+return "•••• •••• •••• " + num.slice(-4);
 };
 
 return (
@@ -29,17 +20,19 @@ onClick={()=>setFlipped(!flipped)}
 
 <div className="card-inner">
 
-{/* ================= FRONT ================= */}
+{/* FRONT */}
 
 <div className="card-front">
 
 <div className="card-header">
 
-<div className="chip"></div>
+<div className="card-bank">BPER:</div>
 
-<div className="card-bank">BPER</div>
+<img src="/bancomat.svg" height="28"/>
 
 </div>
+
+<div className="chip"></div>
 
 <div className="card-number">
 {formatNumber(card.number)}
@@ -47,26 +40,27 @@ onClick={()=>setFlipped(!flipped)}
 
 <div className="card-footer">
 
-<div className="card-holder">
+<div>
 <span>TITULAIRE</span>
 <strong>{card.holder}</strong>
 </div>
 
-<div className="card-exp">
+<div>
 <span>EXP</span>
 <strong>{card.exp_month}/{card.exp_year}</strong>
 </div>
 
 <img
-src={brandLogo()}
-className="card-brand-logo"
+src="/mastercard.svg"
+className="mastercard"
 />
 
 </div>
 
 </div>
 
-{/* ================= BACK ================= */}
+
+{/* BACK */}
 
 <div className="card-back">
 
@@ -84,5 +78,4 @@ className="card-brand-logo"
 </div>
 
 );
-
 }
