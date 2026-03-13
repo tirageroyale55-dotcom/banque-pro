@@ -10,11 +10,6 @@ if(card.brand === "mastercard") return "/mastercard.svg";
 return "";
 };
 
-const formatNumber = (number)=>{
-if(!number) return "";
-return number.match(/.{1,4}/g).join(" ");
-};
-
 return (
 
 <div
@@ -40,7 +35,7 @@ className="card-brand-logo"
 </div>
 
 <div className="card-number">
-{formatNumber(card.number)}
+•••• •••• •••• {card.last4}
 </div>
 
 <div className="card-footer">
@@ -59,6 +54,7 @@ className="card-brand-logo"
 
 </div>
 
+
 {/* BACK */}
 
 <div className="card-back">
@@ -67,7 +63,7 @@ className="card-brand-logo"
 
 <div className="cvv-box">
 <span>CVV</span>
-<strong>{card.cvv}</strong>
+<strong>{card.cvv || "***"}</strong>
 </div>
 
 </div>
@@ -77,4 +73,5 @@ className="card-brand-logo"
 </div>
 
 );
+
 }

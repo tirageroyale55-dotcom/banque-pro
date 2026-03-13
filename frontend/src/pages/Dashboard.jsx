@@ -27,7 +27,7 @@ useEffect(()=>{
 
 api("/client/card")
 .then(setCard)
-.catch(err => console.log(err));
+.catch(()=>console.log("Erreur carte"));
 
 },[]);
 
@@ -110,14 +110,16 @@ visible={showBalanceBar}
 
 {activeTab === "accounts" && <Accounts data={data}/>}
 
-{activeTab === "cards" && (
+{activeTab === "cards" && card && (
+
 <div className="content">
 
 <h3>Ma carte bancaire</h3>
 
-{card && <BankCard card={card} />}
+<BankCard card={card} />
 
 </div>
+
 )}
 
 {activeTab === "financing" && (
