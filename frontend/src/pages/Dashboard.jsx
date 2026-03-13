@@ -19,8 +19,17 @@ const [data, setData] = useState(null);
 const [activeTab, setActiveTab] = useState("accounts");
 const [showBalanceBar, setShowBalanceBar] = useState(false);
 const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
+const [card,setCard] = useState(null);
 
 const navigate = useNavigate();
+
+useEffect(()=>{
+
+api("/client/card")
+.then(setCard)
+.catch(()=>console.log("Erreur carte"));
+
+},[]);
 
 useEffect(() => {
 
@@ -101,22 +110,16 @@ visible={showBalanceBar}
 
 {activeTab === "accounts" && <Accounts data={data}/>}
 
-{activeTab === "cards" && (
+{activeTab === "cards" && card && (
+
 <div className="content">
 
 <h3>Ma carte bancaire</h3>
 
-<BankCard
-card={{
-brand: "visa",
-last4: "2345",
-holder: data.firstname + " " + data.lastname,
-exp_month: "08",
-exp_year: "29"
-}}
-/>
+<BankCard card={card} />
 
 </div>
+
 )}
 
 {activeTab === "financing" && (

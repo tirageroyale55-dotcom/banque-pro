@@ -1,14 +1,19 @@
 const router = require("express").Router();
 const Card = require("../models/Card");
 const User = require("../models/User");
+const auth = require("../middleware/auth.middleware");
 
-router.get("/client/card", async (req,res)=>{
+router.get("/client/card", auth, async (req,res)=>{
 
 try{
 
 const user = await User.findById(req.user.id);
 
 const card = await Card.findOne({user:user._id});
+
+if(!card){
+return res.status(404).json({message:"Carte introuvable"});
+}
 
 res.json({
 
