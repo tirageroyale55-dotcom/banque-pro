@@ -599,9 +599,8 @@ inset 0 -2px 4px rgba(0,0,0,.35);
 
 .nfc{
 position:absolute;
-top:85px;
-left:110px;   /* ajuste selon ta puce */
-opacity:0.9;
+top:90px;
+left:100px;
 }
 
 /* numéro */
