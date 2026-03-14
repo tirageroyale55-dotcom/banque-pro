@@ -34,13 +34,12 @@ onClick={()=>setFlipped(!flipped)}
 
 <div className="chip-area">
 
-  <div className="chip"></div>
-
-  <div class="nfc">
-  <span class="arc1"></span>
-  <span class="arc2"></span>
-  <span class="arc3"></span>
-  <span class="arc4"></span>
+  <div className="nfc">
+  <svg viewBox="0 0 24 24" width="28" height="28">
+    <path d="M3 12a9 9 0 0 1 9-9" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
+    <path d="M6 12a6 6 0 0 1 6-6" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
+    <path d="M9 12a3 3 0 0 1 3-3" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
+  </svg>
 </div>
 
 </div>
