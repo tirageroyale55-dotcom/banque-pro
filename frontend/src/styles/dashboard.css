@@ -529,6 +529,7 @@ transform:rotateY(180deg);
 position:absolute;
 width:100%;
 height:100%;
+position:relative;
 
 border-radius:18px;
 padding:24px;
@@ -567,72 +568,77 @@ letter-spacing:1px;
 
 /* chip */
 
-/* =========================
-   PUCE EMV REALISTE
-========================= */
-
-.card-chip{
-
+.chip{
 position:absolute;
-
-top:90px;
-left:30px;
+top:78px;
+left:32px;
 
 width:58px;
 height:42px;
 
 border-radius:6px;
 
-background:
-linear-gradient(145deg,#f7e3a1,#d6b453 40%,#b8962f);
+background:linear-gradient(
+145deg,
+#f7e3a1 0%,
+#d7b75a 40%,
+#b99633 100%
+);
 
 box-shadow:
-inset 0 2px 3px rgba(255,255,255,.5),
-inset 0 -3px 4px rgba(0,0,0,.35),
+inset 0 2px 2px rgba(255,255,255,.5),
+inset 0 -2px 4px rgba(0,0,0,.4),
 0 2px 4px rgba(0,0,0,.25);
 
-/* motif EMV interne */
-
-background-image:
-
-linear-gradient(#a8872d,#a8872d),
-linear-gradient(#a8872d,#a8872d),
-linear-gradient(#a8872d,#a8872d),
-linear-gradient(#a8872d,#a8872d);
-
-background-size:
-
-3px 70%,
-70% 3px,
-3px 70%,
-70% 3px;
-
-background-position:
-
-16px center,
-center 12px,
-calc(100% - 16px) center,
-center calc(100% - 12px);
-
-background-repeat:no-repeat;
 }
-/* =========================
-   NFC EXACT POSITION
-========================= */
 
-.card-nfc{
+/* motif interne EMV */
+
+.chip::before{
+
+content:"";
+
+position:absolute;
+inset:7px;
+
+border:2px solid rgba(120,90,20,.7);
+border-radius:3px;
+
+}
+
+.chip::after{
+
+content:"";
 
 position:absolute;
 
-top:85px;
-right:30px;
+top:50%;
+left:50%;
+
+width:70%;
+height:2px;
+
+background:#a8862a;
+
+transform:translate(-50%,-50%);
+}
+/* =========================
+   NFC CONTACTLESS
+========================= */
+
+.contactless{
+
+position:absolute;
+
+top:82px;
+right:38px;
 
 display:flex;
 flex-direction:column;
 gap:4px;
 }
 
-.card-nfc span{
+.contactless i{
 
 display:block;
 
@@ -646,22 +652,22 @@ border-radius:0 20px 20px 0;
 
 /* arcs progressifs */
 
-.card-nfc span:nth-child(1){
+.contactless i:nth-child(1){
 width:10px;
 opacity:.6;
 }
 
-.card-nfc span:nth-child(2){
+.contactless i:nth-child(2){
 width:16px;
 opacity:.75;
 }
 
-.card-nfc span:nth-child(3){
+.contactless i:nth-child(3){
 width:22px;
 opacity:.9;
 }
 
-.card-nfc span:nth-child(4){
+.contactless i:nth-child(4){
 width:28px;
 }
 

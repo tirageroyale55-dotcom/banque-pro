@@ -32,13 +32,13 @@ onClick={()=>setFlipped(!flipped)}
 
 </div>
 
-<div className="card-chip"></div>
+<div className="chip"></div>
 
-<div className="card-nfc">
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
+<div className="contactless">
+  <i></i>
+  <i></i>
+  <i></i>
+  <i></i>
 </div>
 
 <div className="card-number">
