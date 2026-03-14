@@ -35,7 +35,7 @@ onClick={()=>setFlipped(!flipped)}
 <div className="chip-area">
 
   <div className="nfc">
-<svg viewBox="0 0 32 32" width="28" height="28">
+<svg viewBox="0 0 32 32" width="28" height="100">
   <path d="M8 16a4 4 0 0 1 4-4" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
   <path d="M8 16a8 8 0 0 1 8-8" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
   <path d="M8 16a12 12 0 0 1 12-12" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
