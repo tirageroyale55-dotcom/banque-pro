@@ -32,7 +32,16 @@ onClick={()=>setFlipped(!flipped)}
 
 </div>
 
-<div className="chip"></div>
+<div className="chip">
+  <div className="chip-lines"></div>
+</div>
+
+<div className="contactless">
+  <span></span>
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
 
 <div className="card-number">
 {formatNumber(card.number)}
