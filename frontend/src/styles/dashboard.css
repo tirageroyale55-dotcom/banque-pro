@@ -526,10 +526,9 @@ transform:rotateY(180deg);
 
 .card-front{
 
-
+position:absolute;
 width:100%;
 height:100%;
-position:relative;
 
 border-radius:18px;
 padding:24px;
