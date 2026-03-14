@@ -571,109 +571,97 @@ letter-spacing:1px;
    PUCE EMV REALISTE
 ========================= */
 
-.chip{
+.card-chip{
+
+position:absolute;
+
+top:90px;
+left:30px;
+
 width:58px;
 height:42px;
-border-radius:6px;
-position:relative;
 
-/* effet métal doré */
+border-radius:6px;
 
 background:
-linear-gradient(145deg,#f7e3a1 0%,#e0c36b 40%,#caa437 100%);
+linear-gradient(145deg,#f7e3a1,#d6b453 40%,#b8962f);
 
 box-shadow:
-inset 0 2px 3px rgba(255,255,255,.6),
-inset 0 -3px 6px rgba(0,0,0,.35),
-0 2px 5px rgba(0,0,0,.3);
-}
+inset 0 2px 3px rgba(255,255,255,.5),
+inset 0 -3px 4px rgba(0,0,0,.35),
+0 2px 4px rgba(0,0,0,.25);
 
-
-/* grille interne de la puce */
-
-.chip-grid{
-position:absolute;
-inset:6px;
-
-border-radius:3px;
-
-/* lignes verticales et horizontales */
+/* motif EMV interne */
 
 background-image:
-linear-gradient(#b8962f,#b8962f),
-linear-gradient(#b8962f,#b8962f),
-linear-gradient(#b8962f,#b8962f),
-linear-gradient(#b8962f,#b8962f),
-linear-gradient(#b8962f,#b8962f),
-linear-gradient(#b8962f,#b8962f);
+
+linear-gradient(#a8872d,#a8872d),
+linear-gradient(#a8872d,#a8872d),
+linear-gradient(#a8872d,#a8872d),
+linear-gradient(#a8872d,#a8872d);
 
 background-size:
 
-3px 100%,
-100% 3px,
-3px 100%,
-100% 3px,
-40% 3px,
-3px 40%;
+3px 70%,
+70% 3px,
+3px 70%,
+70% 3px;
 
 background-position:
 
-12px 0,
-0 12px,
-calc(100% - 12px) 0,
-0 calc(100% - 12px),
-center,
-center;
+16px center,
+center 12px,
+calc(100% - 16px) center,
+center calc(100% - 12px);
 
 background-repeat:no-repeat;
 }
-
 /* =========================
-   NFC CONTACTLESS
+   NFC EXACT POSITION
 ========================= */
 
-.nfc{
+.card-nfc{
 
 position:absolute;
+
+top:85px;
 right:30px;
-top:95px;
 
 display:flex;
 flex-direction:column;
 gap:4px;
-
-transform:rotate(90deg);
 }
 
-.nfc span{
+.card-nfc span{
 
 display:block;
 
 height:14px;
+
 border:3px solid rgba(255,255,255,.9);
 border-left:none;
 
 border-radius:0 20px 20px 0;
 }
 
-/* taille progressive comme sur les vraies cartes */
+/* arcs progressifs */
 
-.nfc span:nth-child(1){
+.card-nfc span:nth-child(1){
 width:10px;
 opacity:.6;
 }
 
-.nfc span:nth-child(2){
+.card-nfc span:nth-child(2){
 width:16px;
 opacity:.75;
 }
 
-.nfc span:nth-child(3){
+.card-nfc span:nth-child(3){
 width:22px;
 opacity:.9;
 }
 
-.nfc span:nth-child(4){
+.card-nfc span:nth-child(4){
 width:28px;
 }
 
@@ -754,8 +742,8 @@ border-radius:4px;
 @media (max-width:480px){
 
 .card-3d{
-width:340px;
-height:200px;
+width:390px;
+height:240px;
 }
 
 .chip{
