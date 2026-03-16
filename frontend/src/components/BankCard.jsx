@@ -11,6 +11,18 @@ if(!num) return "•••• •••• •••• ••••";
 return "•••• •••• •••• " + num.slice(-4);
 };
 
+/* statut par défaut */
+
+const status = card.status || "inactive";
+
+/* texte affiché */
+
+const statusText = {
+inactive: "Carte inactive",
+active: "Carte active",
+blocked: "Carte bloquée"
+};
+
 return (
 
 <div
@@ -34,23 +46,19 @@ onClick={()=>setFlipped(!flipped)}
 
 </div>
 
-{/* INDICATEUR STATUT */}
+{/* STATUT */}
 
-<div className={`status-dot ${card.status || "inactive"}`}></div>
-
-{/* PUCE */}
+<div className={`card-status ${status}`}>
+{statusText[status]}
+</div>
 
 <div className="chip-area">
 <div className="chip"></div>
 </div>
 
-{/* NUMERO */}
-
 <div className="card-number">
 {formatNumber(card.number)}
 </div>
-
-{/* FOOTER */}
 
 <div className="card-footer">
 
@@ -71,16 +79,7 @@ className="mastercard"
 
 </div>
 
-{/* OVERLAY BLOQUE */}
-
-{card.status === "blocked" && (
-<div className="card-overlay">
-CARTE BLOQUÉE
 </div>
-)}
-
-</div>
-
 
 {/* BACK */}
 
