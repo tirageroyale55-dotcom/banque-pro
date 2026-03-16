@@ -114,22 +114,26 @@ visible={showBalanceBar}
 
 <div className="cards-section">
 
-<h3>Mes cartes</h3>
+<h3 className="cards-title">Mes cartes</h3>
 
-<div className="cards-scroll">
+<div className="cards-slider">
 
 {card && (
-<div className="card-item">
+<div className="cards-slide">
 <BankCard card={card}/>
 </div>
 )}
 
 <div
-className="card-add"
+className="cards-slide card-request"
 onClick={()=>navigate("/request-card")}
 >
-<div className="add-icon">+</div>
+
+<div className="card-request-inner">
+<div className="card-plus">+</div>
 <p>Demander une carte</p>
+</div>
+
 </div>
 
 </div>

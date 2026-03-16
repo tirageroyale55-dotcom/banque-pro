@@ -717,78 +717,89 @@ top:80px;
 ========================= */
 
 .cards-section{
-margin-top:20px;
+margin-top:24px;
 }
 
-.cards-scroll{
+.cards-title{
+margin-bottom:16px;
+font-size:18px;
+font-weight:600;
+}
+
+/* slider horizontal */
+
+.cards-slider{
 
 display:flex;
-gap:20px;
+gap:22px;
 
 overflow-x:auto;
+overflow-y:hidden;
+
 padding-bottom:10px;
 
 scroll-snap-type:x mandatory;
+scroll-behavior:smooth;
 }
 
-/* scroll plus propre */
+/* cacher scrollbar */
 
-.cards-scroll::-webkit-scrollbar{
-height:6px;
+.cards-slider::-webkit-scrollbar{
+display:none;
 }
 
-.cards-scroll::-webkit-scrollbar-thumb{
-background:rgba(255,255,255,0.2);
-border-radius:10px;
-}
+/* slide */
 
-/* chaque carte */
-
-.card-item{
+.cards-slide{
 flex:0 0 auto;
 scroll-snap-align:start;
 }
 
-/* carte ajout */
+/* =========================
+   CARTE DEMANDE
+========================= */
 
-.card-add{
+.card-request{
 
-flex:0 0 260px;
-height:160px;
+width:420px;
+height:240px;
 
-border-radius:16px;
+border-radius:18px;
 
-border:2px dashed rgba(255,255,255,0.3);
+border:2px dashed rgba(255,255,255,0.25);
 
 display:flex;
-flex-direction:column;
 align-items:center;
 justify-content:center;
 
 cursor:pointer;
 
-color:white;
-
-transition:all .2s;
+transition:all .25s ease;
 }
 
-.card-add:hover{
+.card-request:hover{
 background:rgba(255,255,255,0.05);
 }
 
-.add-icon{
+.card-request-inner{
+text-align:center;
+}
 
-font-size:40px;
-line-height:1;
+.card-plus{
+font-size:42px;
+margin-bottom:8px;
+}
 
-margin-bottom:10px;
+.card-request p{
+font-size:14px;
+opacity:.8;
 }
 
 @media (max-width:600px){
 
-.card-add{
-flex:0 0 220px;
-height:140px;
+.card-request{
+width:360px;
+height:210px;
 }
 
 }
