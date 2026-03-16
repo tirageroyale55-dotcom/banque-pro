@@ -25,7 +25,7 @@ return(
 
 <div className="cards-page">
 
-<h2>Ma carte bancair</h2>
+<h2>Ma carte bancaire</h2>
 
 {card && <BankCard card={card}/>}
 

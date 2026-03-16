@@ -110,13 +110,29 @@ visible={showBalanceBar}
 
 {activeTab === "accounts" && <Accounts data={data}/>}
 
-{activeTab === "cards" && card && (
+{activeTab === "cards" && (
 
-<div className="content">
+<div className="cards-section">
 
-<h3>Ma carte bancaire</h3>
+<h3>Mes cartes</h3>
 
-<BankCard card={card} />
+<div className="cards-scroll">
+
+{card && (
+<div className="card-item">
+<BankCard card={card}/>
+</div>
+)}
+
+<div
+className="card-add"
+onClick={()=>navigate("/request-card")}
+>
+<div className="add-icon">+</div>
+<p>Demander une carte</p>
+</div>
+
+</div>
 
 </div>
 
