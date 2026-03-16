@@ -18,6 +18,14 @@ className={`card-3d ${flipped ? "flipped" : ""}`}
 onClick={()=>setFlipped(!flipped)}
 >
 
+{/* STATUT CARTE */}
+
+{card.status !== "active" && (
+<div className={`card-overlay ${card.status || "inactive"}`}>
+{card.status === "blocked" ? "CARTE BLOQUÉE" : "CARTE NON ACTIVE"}
+</div>
+)}
+
 <div className="card-inner">
 
 {/* FRONT */}
@@ -32,13 +40,7 @@ onClick={()=>setFlipped(!flipped)}
 
 </div>
 
-{/* STATUT CARTE */}
 
-<div className={`card-status ${card.status || "inactive"}`}>
-{card.status === "active" && "Carte active"}
-{card.status === "blocked" && "Carte bloquée"}
-{(!card.status || card.status === "inactive") && "Carte non active"}
-</div>
 
 <div className="chip-area">
   <div className="chip"></div>

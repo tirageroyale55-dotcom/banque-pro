@@ -813,50 +813,51 @@ height:210px;
 
 
 /* =========================
-   STATUT CARTE
+   STATUT CARTE OVERLAY
 ========================= */
 
-.card-status{
+.card-3d{
+position:relative;
+}
 
-margin-top:6px;
-margin-bottom:8px;
+/* overlay */
 
-font-size:11px;
-font-weight:600;
+.card-overlay{
 
-padding:4px 10px;
+position:absolute;
+top:0;
+left:0;
+right:0;
+bottom:0;
 
-border-radius:20px;
+display:flex;
+align-items:center;
+justify-content:center;
 
-width:fit-content;
+border-radius:18px;
 
-letter-spacing:.4px;
+font-size:14px;
+font-weight:700;
+letter-spacing:1px;
+
+z-index:10;
 
 }
 
 /* carte non active */
 
-.card-status.inactive{
+.card-overlay.inactive{
 
-background:#ffe5e5;
-color:#c40000;
-
-}
-
-/* carte active */
-
-.card-status.active{
-
-background:#e6f7ee;
-color:#0c8a4b;
+background:rgba(0,0,0,0.35);
+color:#ff4d4d;
 
 }
 
 /* carte bloquée */
 
-.card-status.blocked{
+.card-overlay.blocked{
 
-background:#ffdede;
-color:#b30000;
+background:rgba(0,0,0,0.55);
+color:#ff2b2b;
 
 }
