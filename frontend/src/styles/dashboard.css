@@ -570,7 +570,6 @@ letter-spacing:1px;
 .chip-area{
 display:flex;
 align-items:center;
-gap:16px;
 margin-top:14px;
 }
 
@@ -610,12 +609,6 @@ linear-gradient(90deg,#a07f2c 2px, transparent 2px);
 
 background-size:12px 12px;
 opacity:.6;
-}
-/* NFC */
-
-.nfc{
-opacity:.9;
-margin-top:2px;
 }
 
 /* numéro */
