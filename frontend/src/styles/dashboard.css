@@ -805,3 +805,58 @@ height:210px;
 }
 
 }
+
+
+
+
+
+
+
+/* =========================
+   STATUT CARTE
+========================= */
+
+.card-status{
+
+margin-top:6px;
+margin-bottom:8px;
+
+font-size:11px;
+font-weight:600;
+
+padding:4px 10px;
+
+border-radius:20px;
+
+width:fit-content;
+
+letter-spacing:.4px;
+
+}
+
+/* carte non active */
+
+.card-status.inactive{
+
+background:#ffe5e5;
+color:#c40000;
+
+}
+
+/* carte active */
+
+.card-status.active{
+
+background:#e6f7ee;
+color:#0c8a4b;
+
+}
+
+/* carte bloquée */
+
+.card-status.blocked{
+
+background:#ffdede;
+color:#b30000;
+
+}

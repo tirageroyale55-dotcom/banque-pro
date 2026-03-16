@@ -32,6 +32,14 @@ onClick={()=>setFlipped(!flipped)}
 
 </div>
 
+{/* STATUT CARTE */}
+
+<div className={`card-status ${card.status || "inactive"}`}>
+{card.status === "active" && "Carte active"}
+{card.status === "blocked" && "Carte bloquée"}
+{(!card.status || card.status === "inactive") && "Carte non active"}
+</div>
+
 <div className="chip-area">
   <div className="chip"></div>
 </div>
