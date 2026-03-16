@@ -766,6 +766,8 @@ height:240px;
 
 border-radius:18px;
 
+border:2px dashed rgba(255,255,255,0.25);
+
 display:flex;
 align-items:center;
 justify-content:center;
@@ -775,9 +777,7 @@ cursor:pointer;
 transition:all .25s ease;
 }
 
-.card-request:hover{
-background:rgba(255,255,255,0.05);
-}
+
 
 .card-request-inner{
 text-align:center;
