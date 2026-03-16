@@ -567,65 +567,55 @@ letter-spacing:1px;
 
 /* chip */
 
+.chip-area{
+display:flex;
+align-items:center;
+gap:16px;
+margin-top:14px;
+}
+
 .chip{
-width:58px;
-height:42px;
+width:52px;
+height:38px;
 border-radius:6px;
 position:relative;
 
 background:linear-gradient(
 145deg,
-#f8e6a8,
-#d7b758,
-#b8932c
+#f7e3a1 0%,
+#e2c76a 35%,
+#c9a43c 60%,
+#a88221 100%
 );
 
 box-shadow:
-inset 0 2px 3px rgba(255,255,255,.6),
-inset 0 -3px 6px rgba(0,0,0,.35);
+inset 0 2px 2px rgba(255,255,255,.6),
+inset 0 -3px 4px rgba(0,0,0,.4);
 }
 
-/* lignes verticales à gauche */
+/* contacts internes */
 
-.chip-lines{
+.chip-contact{
 position:absolute;
-left:6px;
 top:6px;
-bottom:6px;
-display:flex;
-flex-direction:column;
-justify-content:space-between;
-}
-
-.chip-lines span{
-width:10px;
-height:6px;
-background:rgba(120,90,20,.35);
-border-radius:2px;
-}
-
-/* grille contacts */
-
-.chip-grid{
-position:absolute;
+left:6px;
 right:6px;
-top:8px;
-display:grid;
-grid-template-columns:repeat(2,12px);
-grid-gap:4px;
-}
+bottom:6px;
 
-.chip-grid span{
-width:12px;
-height:8px;
-background:rgba(120,90,20,.35);
-border-radius:2px;
+border-radius:4px;
+
+background-image:
+linear-gradient(#a07f2c 2px, transparent 2px),
+linear-gradient(90deg,#a07f2c 2px, transparent 2px);
+
+background-size:12px 12px;
+opacity:.6;
 }
 /* NFC */
 
 .nfc{
-margin-left:8px;
-opacity:.95;
+opacity:.9;
+margin-top:2px;
 }
 
 /* numéro */
