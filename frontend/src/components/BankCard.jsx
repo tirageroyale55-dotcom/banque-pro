@@ -18,37 +18,39 @@ className={`card-3d ${flipped ? "flipped" : ""}`}
 onClick={()=>setFlipped(!flipped)}
 >
 
-{/* STATUT CARTE */}
-
-{card.status !== "active" && (
-<div className={`card-overlay ${card.status || "inactive"}`}>
-{card.status === "blocked" ? "CARTE BLOQUÉE" : "CARTE NON ACTIVE"}
-</div>
-)}
-
 <div className="card-inner">
 
 {/* FRONT */}
 
 <div className="card-front">
 
+{/* HEADER */}
+
 <div className="card-header">
 
-<div className="card-bank">BPER:</div>
+<div className="card-bank">BPER</div>
 
 <img src="/bancomat.svg" height="28"/>
 
 </div>
 
+{/* INDICATEUR STATUT */}
 
+<div className={`status-dot ${card.status || "inactive"}`}></div>
+
+{/* PUCE */}
 
 <div className="chip-area">
-  <div className="chip"></div>
+<div className="chip"></div>
 </div>
+
+{/* NUMERO */}
 
 <div className="card-number">
 {formatNumber(card.number)}
 </div>
+
+{/* FOOTER */}
 
 <div className="card-footer">
 
@@ -68,6 +70,14 @@ className="mastercard"
 />
 
 </div>
+
+{/* OVERLAY BLOQUE */}
+
+{card.status === "blocked" && (
+<div className="card-overlay">
+CARTE BLOQUÉE
+</div>
+)}
 
 </div>
 
