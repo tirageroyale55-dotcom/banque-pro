@@ -26,7 +26,7 @@ blocked: "Carte bloquée"
 return (
 
 <div
-className={`card-3d ${flipped ? "flipped" : ""}`}
+className={`card-3d ${flipped ? "flipped" : ""} ${status}`}
 onClick={()=>setFlipped(!flipped)}
 >
 
