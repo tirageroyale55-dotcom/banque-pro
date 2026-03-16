@@ -720,12 +720,6 @@ top:80px;
 margin-top:24px;
 }
 
-.cards-section{
-background:rgba(255,255,255,0.03);
-border-radius:20px;
-padding:20px;
-}
-
 .cards-title{
 margin-bottom:16px;
 font-size:18px;
@@ -771,8 +765,6 @@ width:420px;
 height:240px;
 
 border-radius:18px;
-
-border:2px dashed rgba(255,255,255,0.25);
 
 display:flex;
 align-items:center;
