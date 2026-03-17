@@ -1011,6 +1011,15 @@ opacity:0.9;
 /* =========================
    TRANSACTIONS CARD
 ========================= */
+
+.empty-transactions {
+  text-align: center;
+  padding: 30px 10px;
+  font-size: 0.85rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
 .transactions {
   background: #ffffff;
   border-radius: 18px;

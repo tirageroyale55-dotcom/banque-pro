@@ -129,38 +129,46 @@ export default function Accounts({ data }) {
             </button>
           </div>
         </div>
+<div className="transactions-list">
 
-        <div className="transactions-list">
-          {transactions.map((tx, i) => (
-            <div 
-               key={i} 
-               className="transaction"
-               data-type={tx.amount > 0 ? "Crédit" : "Débit"}
-            >
+  {transactions.length === 0 ? (
+    <div className="empty-transactions">
+      Aucune transaction disponible
+    </div>
+  ) : (
+    transactions.map((tx, i) => (
+      <div 
+        key={i} 
+        className="transaction"
+        data-type={tx.amount > 0 ? "Crédit" : "Débit"}
+      >
 
-              <div className="left">
-                {tx.type === "virement" && <Send size={18}/>}
-                {tx.type === "paiement" && <Receipt size={18}/>}
-                {tx.type === "ajout" && <PlusCircle size={18}/>}
+        <div className="left">
+          {tx.type === "virement" && <Send size={18}/>}
+          {tx.type === "paiement" && <Receipt size={18}/>}
+          {tx.type === "ajout" && <PlusCircle size={18}/>}
 
-                <div>
-                  <div className="motif">{tx.motif}</div>
-                  <div className="date">{tx.date} {tx.time}</div>
-                </div>
-              </div>
-
-              <div className={tx.amount > 0 ? "amount plus" : "amount minus"}>
-                {tx.amount > 0 ? `+${tx.amount}` : tx.amount} €
-              </div>
-
-              <div className="details">
-                IBAN: {tx.iban || "—"} <br/>
-                Ref: {tx.ref || "—"}
-              </div>
-
-            </div>
-          ))}
+          <div>
+            <div className="motif">{tx.motif}</div>
+            <div className="date">{tx.date} {tx.time}</div>
+          </div>
         </div>
+
+        <div className={tx.amount > 0 ? "amount plus" : "amount minus"}>
+          {tx.amount > 0 ? `+${tx.amount}` : tx.amount} €
+        </div>
+
+        <div className="details">
+          IBAN: {tx.iban || "—"} <br/>
+          Ref: {tx.ref || "—"}
+        </div>
+
+      </div>
+    ))
+  )}
+
+</div>
+        
       </div>
 
       {/* 🔹 GRAPHIQUES APRÈS */}
