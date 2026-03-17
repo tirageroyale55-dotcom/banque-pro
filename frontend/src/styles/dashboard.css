@@ -1007,33 +1007,8 @@ opacity:0.9;
   color: #1f2937;
 }
 
-/* ===== CARD COMPTE ===== */
-.account-card {
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  color: #ffffff;
-  padding: 22px;
-  border-radius: 16px;
-  margin-bottom: 20px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-}
 
-.balance {
-  font-size: 2.2rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
 
-.owner {
-  margin-top: 6px;
-  font-size: 0.95rem;
-  opacity: 0.85;
-}
-
-.iban {
-  font-size: 0.8rem;
-  opacity: 0.6;
-  margin-top: 4px;
-}
 
 /* ===== ACTIONS ===== */
 .quick-actions {
