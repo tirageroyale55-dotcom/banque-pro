@@ -132,7 +132,11 @@ export default function Accounts({ data }) {
 
         <div className="transactions-list">
           {transactions.map((tx, i) => (
-            <div key={i} className="transaction">
+            <div 
+               key={i} 
+               className="transaction"
+               data-type={tx.amount > 0 ? "Crédit" : "Débit"}
+            >
 
               <div className="left">
                 {tx.type === "virement" && <Send size={18}/>}
