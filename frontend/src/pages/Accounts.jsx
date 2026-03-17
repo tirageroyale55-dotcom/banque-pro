@@ -1,23 +1,36 @@
 import { useState } from "react";
 import { Send, PlusCircle, Receipt, ArrowUp, ArrowDown } from "lucide-react";
-import { Bar } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
   Legend
 } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export default function Accounts({ data }) {
+
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
   const [visibleTx, setVisibleTx] = useState(20);
 
+  // 🔹 FILTRE + TRI
   const filteredTransactions = data.transactions
     .filter(tx =>
       filter === "all" ||
@@ -26,10 +39,11 @@ export default function Accounts({ data }) {
     )
     .sort((a, b) =>
       sortAsc
-        ? new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time)
-        : new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)
+        ? new Date(a.date + " " + a.time) - new Date(b.date + " " + b.time)
+        : new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time)
     );
 
+  // 🔹 TOTALS
   const totalEntrants = data.transactions
     .filter(tx => tx.amount > 0)
     .reduce((acc, tx) => acc + tx.amount, 0);
@@ -38,16 +52,71 @@ export default function Accounts({ data }) {
     .filter(tx => tx.amount < 0)
     .reduce((acc, tx) => acc + Math.abs(tx.amount), 0);
 
-  const chartData = {
-    labels: ["Entrées", "Sorties"],
-    datasets: [{
-      label: "Montants €",
-      data: [totalEntrants, totalSortants],
-      backgroundColor: ["#34D399", "#F87171"],
-      borderRadius: 6
-    }]
+  // 🔹 GRAPH BARRES (historique par date)
+  const groupedByDate = {};
+
+  data.transactions.forEach(tx => {
+    if (!groupedByDate[tx.date]) {
+      groupedByDate[tx.date] = { entrants: 0, sortants: 0 };
+    }
+
+    if (tx.amount > 0) {
+      groupedByDate[tx.date].entrants += tx.amount;
+    } else {
+      groupedByDate[tx.date].sortants += Math.abs(tx.amount);
+    }
+  });
+
+  const sortedDates = Object.keys(groupedByDate).sort(
+    (a, b) => new Date(a) - new Date(b)
+  );
+
+  const barData = {
+    labels: sortedDates,
+    datasets: [
+      {
+        label: "Entrées",
+        data: sortedDates.map(d => groupedByDate[d].entrants),
+        backgroundColor: "#34D399"
+      },
+      {
+        label: "Sorties",
+        data: sortedDates.map(d => groupedByDate[d].sortants),
+        backgroundColor: "#F87171"
+      }
+    ]
   };
 
+  // 🔹 GRAPH COURBE (évolution solde)
+  let runningBalance = 0;
+  const balanceHistory = sortedDates.map(date => {
+    const day = groupedByDate[date];
+    runningBalance += day.entrants - day.sortants;
+    return runningBalance;
+  });
+
+  const lineData = {
+    labels: sortedDates,
+    datasets: [
+      {
+        label: "Solde",
+        data: balanceHistory,
+        borderColor: "#2563EB",
+        backgroundColor: "#93C5FD",
+        tension: 0.3
+      }
+    ]
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" }
+    },
+    animation: { duration: 800 }
+  };
+
+  // 🔹 LAZY LOAD
   const handleScroll = (e) => {
     const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
     if (bottom && visibleTx < filteredTransactions.length) {
@@ -67,73 +136,81 @@ export default function Accounts({ data }) {
         <div className="iban">{data.iban}</div>
       </div>
 
-      {/* Actions rapides */}
+      {/* Actions */}
       <div className="quick-actions">
         <div className="action"><Send size={22}/> <span>Virement</span></div>
         <div className="action"><PlusCircle size={22}/> <span>Ajouter</span></div>
         <div className="action"><Receipt size={22}/> <span>Paiement</span></div>
       </div>
 
-      {/* Résumé + Graphique */}
-      <div className="month-summary grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="summary-card entrants flex items-center p-4 rounded-lg bg-green-100">
-          <ArrowDown size={24} className="mr-2 text-green-700" />
-          <div>
-            <div className="label font-semibold text-gray-700">Total Entrées</div>
-            <div className="amount font-bold text-green-800">+{totalEntrants} €</div>
-          </div>
+      {/* Résumé */}
+      <div className="month-summary grid md:grid-cols-3 gap-4 mb-6">
+        <div className="summary-card entrants">
+          <ArrowDown size={22}/>
+          <div>+{totalEntrants} €</div>
         </div>
-        <div className="summary-card sortants flex items-center p-4 rounded-lg bg-red-100">
-          <ArrowUp size={24} className="mr-2 text-red-700" />
-          <div>
-            <div className="label font-semibold text-gray-700">Total Sorties</div>
-            <div className="amount font-bold text-red-800">-{totalSortants} €</div>
-          </div>
-        </div>
-        <div className="chart-card p-4 rounded-lg bg-gray-50">
-          <Bar data={chartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+        <div className="summary-card sortants">
+          <ArrowUp size={22}/>
+          <div>-{totalSortants} €</div>
         </div>
       </div>
 
-      {/* Filtres et tri */}
-      <div className="filters flex justify-between items-center mb-4">
-        <div className="filter-buttons flex gap-2">
-          <button className={`px-3 py-1 rounded ${filter==='all'?'bg-blue-600 text-white':'bg-gray-200'}`} onClick={()=>setFilter("all")}>Toutes</button>
-          <button className={`px-3 py-1 rounded ${filter==='entrants'?'bg-green-600 text-white':'bg-gray-200'}`} onClick={()=>setFilter("entrants")}>Entrées</button>
-          <button className={`px-3 py-1 rounded ${filter==='sortants'?'bg-red-600 text-white':'bg-gray-200'}`} onClick={()=>setFilter("sortants")}>Sorties</button>
+      {/* Graphiques */}
+      <div className="grid md:grid-cols-2 gap-4 mb-6">
+        <div className="chart-card">
+          <Bar data={barData} options={chartOptions}/>
         </div>
-        <button className="px-3 py-1 rounded bg-gray-300" onClick={()=>setSortAsc(!sortAsc)}>
-          {sortAsc ? "Tri ↓" : "Tri ↑"}
+        <div className="chart-card">
+          <Line data={lineData} options={chartOptions}/>
+        </div>
+      </div>
+
+      {/* Filtres */}
+      <div className="filters">
+        <div>
+          <button onClick={()=>setFilter("all")}>Toutes</button>
+          <button onClick={()=>setFilter("entrants")}>Entrées</button>
+          <button onClick={()=>setFilter("sortants")}>Sorties</button>
+        </div>
+        <button onClick={()=>setSortAsc(!sortAsc)}>
+          {sortAsc ? "↓" : "↑"}
         </button>
       </div>
 
-      {/* Historique transactions lazy-load */}
-      <div className="transactions-history bg-white rounded-lg shadow p-4 max-h-[500px] overflow-y-auto" onScroll={handleScroll}>
-        {filteredTransactions.slice(0, visibleTx).map((tx, index) => (
-          <div key={index} className="transaction-row flex justify-between items-center p-2 border-b relative hover:bg-gray-50 group">
+      {/* Transactions */}
+      <div className="transactions-history" onScroll={handleScroll}>
+        {filteredTransactions.slice(0, visibleTx).map((tx, i) => (
+          <div key={i} className="transaction-row group">
+
             <div className="flex items-center gap-2">
-              {tx.type === "virement" && <Send size={20} className="text-blue-500" />}
-              {tx.type === "paiement" && <Receipt size={20} className="text-purple-500" />}
-              {tx.type === "ajout" && <PlusCircle size={20} className="text-green-500" />}
-              <div className="tx-info">
-                <div className="tx-motif font-medium">{tx.motif}</div>
-                <div className="tx-date text-gray-500 text-sm">{tx.date} {tx.time}</div>
+              {tx.type === "virement" && <Send size={18}/>}
+              {tx.type === "paiement" && <Receipt size={18}/>}
+              {tx.type === "ajout" && <PlusCircle size={18}/>}
+
+              <div>
+                <div>{tx.motif}</div>
+                <div className="tx-date">{tx.date} {tx.time}</div>
               </div>
             </div>
-            <div className={`tx-amount font-semibold ${tx.amount>0?'text-green-600':'text-red-600'}`}>
-              {tx.amount>0?`+${tx.amount} €`:`${tx.amount} €`}
+
+            <div className={tx.amount > 0 ? "positive" : "negative"}>
+              {tx.amount > 0 ? `+${tx.amount}` : tx.amount} €
             </div>
-            <div className="tx-badge absolute left-1/2 transform -translate-x-1/2 top-full mt-1 px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700 border">
-              {tx.amount>0?'Crédit':'Débit'}
+
+            <div className="tx-badge">
+              {tx.amount > 0 ? "Crédit" : "Débit"}
             </div>
-            <div className="tx-details hidden group-hover:block absolute bg-white shadow-lg p-2 rounded text-sm right-4 top-full z-10 w-64">
+
+            <div className="tx-details">
               <div>IBAN: {tx.iban || "—"}</div>
-              <div>Catégorie: {tx.type}</div>
-              <div>Référence: {tx.ref || "—"}</div>
+              <div>Type: {tx.type}</div>
+              <div>Ref: {tx.ref || "—"}</div>
             </div>
+
           </div>
         ))}
       </div>
+
     </div>
   );
 }
