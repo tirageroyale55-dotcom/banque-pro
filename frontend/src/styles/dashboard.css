@@ -997,28 +997,25 @@ opacity:0.9;
 
 
 
-/* Base */
+/* =========================
+   CONTAINER GLOBAL
+========================= */
 .content {
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 24px 16px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  
-  color: #1f2937;
+  max-width: 950px;
+  margin: auto;
+  padding: 16px;
+  background: #f5f7fb;
 }
 
-
-
-
-
-
-/* ===== TRANSACTIONS ===== */
+/* =========================
+   TRANSACTIONS (STYLE BANQUE)
+========================= */
 .transactions {
   background: #ffffff;
   border-radius: 16px;
   padding: 16px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+  margin-top: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
 }
 
 /* Header */
@@ -1026,12 +1023,13 @@ opacity:0.9;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .transactions-header h3 {
   font-size: 1rem;
   font-weight: 600;
+  color: #111827;
 }
 
 /* Controls */
@@ -1042,42 +1040,42 @@ opacity:0.9;
 
 .controls select,
 .controls button {
-  border: none;
-  background: #f1f5f9;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
   padding: 6px 10px;
   border-radius: 8px;
   font-size: 0.8rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
 }
 
 .controls button:hover,
 .controls select:hover {
-  background: #e2e8f0;
+  background: #eef2ff;
 }
 
-/* List */
+/* Liste */
 .transactions-list {
-  max-height: 420px;
+  max-height: 380px;
   overflow-y: auto;
 }
 
-/* Transaction row */
+/* Ligne transaction */
 .transaction {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 6px;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 12px 10px;
+  border-bottom: 1px solid #f1f1f1;
   position: relative;
-  transition: background 0.15s ease;
+  transition: background 0.2s ease;
 }
 
 .transaction:hover {
   background: #f9fafb;
 }
 
-/* Left */
+/* Partie gauche */
 .left {
   display: flex;
   align-items: center;
@@ -1085,23 +1083,27 @@ opacity:0.9;
 }
 
 .left svg {
-  color: #64748b;
+  background: #f3f4f6;
+  padding: 6px;
+  border-radius: 8px;
 }
 
+/* Texte */
 .motif {
   font-size: 0.9rem;
   font-weight: 500;
+  color: #111827;
 }
 
 .date {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: #6b7280;
 }
 
-/* Amount */
+/* Montant */
 .amount {
-  font-weight: 600;
   font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .amount.plus {
@@ -1112,60 +1114,77 @@ opacity:0.9;
   color: #dc2626;
 }
 
-/* Hover details (pro style, discret) */
+/* Badge Crédit / Débit */
+.transaction::after {
+  content: attr(data-type);
+  position: absolute;
+  right: 10px;
+  top: -8px;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+/* Hover details */
 .details {
   display: none;
   position: absolute;
   right: 0;
   top: 100%;
   margin-top: 6px;
-  background: #ffffff;
+  background: white;
   border-radius: 10px;
   padding: 10px;
-  width: 240px;
   font-size: 0.75rem;
-  color: #475569;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  line-height: 1.4;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  width: 220px;
+  z-index: 10;
 }
 
 .transaction:hover .details {
   display: block;
 }
 
-/* Scrollbar clean */
+/* =========================
+   SCROLLBAR BANCAIRE
+========================= */
 .transactions-list::-webkit-scrollbar {
   width: 6px;
 }
-
 .transactions-list::-webkit-scrollbar-thumb {
-  background: #cbd5f5;
+  background: #d1d5db;
   border-radius: 10px;
 }
+.transactions-list::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
 
-/* ===== CHARTS ===== */
+/* =========================
+   CHARTS (STYLE PRO)
+========================= */
 .charts {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+  margin-top: 16px;
 }
 
 .chart {
   background: #ffffff;
   border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  padding: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
 }
 
-/* ===== RESPONSIVE ===== */
+/* =========================
+   MOBILE OPTIMISÉ
+========================= */
 @media (max-width: 640px) {
 
-  .quick-actions {
-    flex-direction: column;
-  }
-
-  .charts {
-    grid-template-columns: 1fr;
+  .transactions {
+    padding: 12px;
   }
 
   .transaction {
@@ -1176,5 +1195,15 @@ opacity:0.9;
 
   .amount {
     align-self: flex-end;
+  }
+
+  .charts {
+    grid-template-columns: 1fr;
+  }
+
+  .details {
+    right: auto;
+    left: 0;
+    width: 100%;
   }
 }
