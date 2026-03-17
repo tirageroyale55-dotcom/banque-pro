@@ -27,13 +27,25 @@ export default function Accounts({ data }) {
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   // 🔹 TRI + FILTRE
   const transactions = data.transactions
-    .filter(tx =>
+  .filter(tx => {
+
+    const txDate = new Date(tx.date);
+
+    const matchType =
       filter === "all" ||
       (filter === "entrants" && tx.amount > 0) ||
-      (filter === "sortants" && tx.amount < 0)
-    )
+      (filter === "sortants" && tx.amount < 0);
+
+    const matchStart = startDate ? txDate >= new Date(startDate) : true;
+    const matchEnd = endDate ? txDate <= new Date(endDate) : true;
+
+    return matchType && matchStart && matchEnd;
+  })
     .sort((a, b) =>
       sortAsc
         ? new Date(a.date + " " + a.time)
@@ -95,7 +107,36 @@ export default function Accounts({ data }) {
   };
 
   return (
-    <div className="content">
+  <div className="content">
+    <div className="transactions-header">
+  <h3>Historique des transactions</h3>
+
+  <div className="controls">
+
+    <select onChange={(e)=>setFilter(e.target.value)}>
+      <option value="all">Toutes</option>
+      <option value="entrants">Entrées</option>
+      <option value="sortants">Sorties</option>
+    </select>
+
+    <input 
+      type="date"
+      value={startDate}
+      onChange={(e)=>setStartDate(e.target.value)}
+    />
+
+    <input 
+      type="date"
+      value={endDate}
+      onChange={(e)=>setEndDate(e.target.value)}
+    />
+
+    <button onClick={()=>setSortAsc(!sortAsc)}>
+      {sortAsc ? "↑" : "↓"}
+    </button>
+
+  </div>
+</div>
 
       {/* 🔹 CARD COMPTE */}
       <div className="account-card">
