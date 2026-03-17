@@ -997,126 +997,233 @@ opacity:0.9;
 
 
 
+/* Base */
 .content {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
-  font-family: system-ui;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f5f7fa;
+  color: #1f2937;
 }
 
-/* Carte */
+/* ===== CARD COMPTE ===== */
 .account-card {
-  background: #111827;
-  color: white;
-  padding: 20px;
-  border-radius: 12px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #ffffff;
+  padding: 22px;
+  border-radius: 16px;
   margin-bottom: 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
 
 .balance {
-  font-size: 2rem;
-  font-weight: bold;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
-/* Actions */
+.owner {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+.iban {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  margin-top: 4px;
+}
+
+/* ===== ACTIONS ===== */
 .quick-actions {
   display: flex;
   justify-content: space-between;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
-/* Transactions */
-.transactions {
-  background: white;
+.quick-actions div {
+  flex: 1;
+  background: #ffffff;
+  padding: 12px;
   border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 20px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
+.quick-actions div:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+}
+
+/* ===== TRANSACTIONS ===== */
+.transactions {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+
+/* Header */
 .transactions-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  align-items: center;
+  margin-bottom: 14px;
 }
 
+.transactions-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Controls */
 .controls {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
+.controls select,
+.controls button {
+  border: none;
+  background: #f1f5f9;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.controls button:hover,
+.controls select:hover {
+  background: #e2e8f0;
+}
+
+/* List */
 .transactions-list {
-  max-height: 350px;
+  max-height: 420px;
   overflow-y: auto;
 }
 
+/* Transaction row */
 .transaction {
   display: flex;
   justify-content: space-between;
-  padding: 10px;
-  border-bottom: 1px solid #eee;
+  align-items: center;
+  padding: 12px 6px;
+  border-bottom: 1px solid #f1f5f9;
   position: relative;
+  transition: background 0.15s ease;
 }
 
 .transaction:hover {
   background: #f9fafb;
 }
 
+/* Left */
 .left {
   display: flex;
+  align-items: center;
   gap: 10px;
 }
 
+.left svg {
+  color: #64748b;
+}
+
 .motif {
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
 .date {
-  font-size: 0.8rem;
-  color: gray;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* Amount */
+.amount {
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .amount.plus {
-  color: green;
-  font-weight: bold;
+  color: #16a34a;
 }
 
 .amount.minus {
-  color: red;
-  font-weight: bold;
+  color: #dc2626;
 }
 
-/* Hover details */
+/* Hover details (pro style, discret) */
 .details {
   display: none;
   position: absolute;
   right: 0;
   top: 100%;
-  background: white;
-  padding: 8px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  margin-top: 6px;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 10px;
+  width: 240px;
+  font-size: 0.75rem;
+  color: #475569;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  line-height: 1.4;
 }
 
 .transaction:hover .details {
   display: block;
 }
 
-/* Charts */
+/* Scrollbar clean */
+.transactions-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.transactions-list::-webkit-scrollbar-thumb {
+  background: #cbd5f5;
+  border-radius: 10px;
+}
+
+/* ===== CHARTS ===== */
 .charts {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
+  gap: 14px;
 }
 
 .chart {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
 }
 
-/* Mobile */
-@media(max-width: 600px){
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+
+  .quick-actions {
+    flex-direction: column;
+  }
+
   .charts {
     grid-template-columns: 1fr;
+  }
+
+  .transaction {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .amount {
+    align-self: flex-end;
   }
 }
