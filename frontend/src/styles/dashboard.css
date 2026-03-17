@@ -997,89 +997,25 @@ opacity:0.9;
 
 
 
-.content {
-  padding: 16px;
-  max-width: 800px;
-  margin: auto;
-  font-family: 'Arial', sans-serif;
-}
-
-.account-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
+.transaction-filter {
+  display: flex;
+  align-items: center;
   margin-bottom: 16px;
+  background: #f1f3f5;
+  border-radius: 8px;
+  padding: 6px 10px;
 }
 
-.shadow {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.account-title {
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 8px;
-}
-
-.balance {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-
-.balance-date, .owner, .iban {
-  font-size: 0.9rem;
-  color: #555;
-  margin-bottom: 2px;
-}
-
-.quick-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.action {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 0.8rem;
-  color: #333;
-}
-
-.month-summary {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.summary-card {
+.transaction-filter input {
+  border: none;
+  background: transparent;
   flex: 1;
-  display: flex;
-  align-items: center;
-  background: #f6f8fa;
-  border-radius: 10px;
-  padding: 12px;
+  padding-left: 6px;
+  font-size: 0.9rem;
 }
 
-.summary-card.entrants .amount { color: green; font-weight: bold; }
-.summary-card.sortants .amount { color: red; font-weight: bold; }
-
-.icon {
-  margin-right: 8px;
-  color: #555;
-}
-
-.transactions-history {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.history-title {
-  font-weight: 600;
-  margin-bottom: 12px;
+.transaction-filter input:focus {
+  outline: none;
 }
 
 .transactions-list {
@@ -1089,32 +1025,55 @@ opacity:0.9;
 
 .transaction-row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding: 10px 0;
+  padding: 12px 0;
   border-bottom: 1px solid #eee;
 }
 
+.tx-icon {
+  width: 24px;
+  text-align: center;
+  margin-right: 10px;
+}
+
 .tx-info {
+  flex: 2;
   display: flex;
   flex-direction: column;
 }
 
 .tx-date {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #777;
 }
 
 .tx-motif {
-  font-size: 0.95rem;
   font-weight: 500;
 }
 
 .tx-amount.positive { color: green; font-weight: bold; }
 .tx-amount.negative { color: red; font-weight: bold; }
 
+.load-more {
+  width: 100%;
+  padding: 10px 0;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.load-more:hover {
+  background-color: #0056b3;
+}
+
 /* Responsive */
 @media(max-width: 600px) {
-  .quick-actions { gap: 8px; }
-  .summary-card { flex-direction: column; align-items: flex-start; }
-  .transactions-list { max-height: 300px; }
+  .month-summary { flex-direction: column; gap: 12px; }
+  .transaction-row { flex-direction: column; align-items: flex-start; }
+  .tx-amount { margin-top: 6px; text-align: left; }
 }
