@@ -35,6 +35,7 @@ import Financing from "./pages/Financing";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUserDetails from "./pages/admin/AdminUserDetails";
 import AdminReset from "./pages/admin/AdminReset";
+import AdminClient from "./pages/admin/AdminClient";
 
 export default function App() {
   return (
@@ -81,6 +82,15 @@ export default function App() {
           element={
             <AdminRoute>
               <AdminUserDetails />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/client/:id"
+          element={
+            <AdminRoute>
+              <AdminClient />
             </AdminRoute>
           }
         />

@@ -36,6 +36,12 @@ required:true
 exp_year:{
 type:String,
 required:true
+},
+
+status:{
+type:String,
+enum:["inactive","active","blocked"],
+default:"inactive"
 }
 
 },{timestamps:true});
