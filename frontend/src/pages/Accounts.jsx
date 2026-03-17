@@ -8,7 +8,6 @@ import {
   BarElement,
   LineElement,
   PointElement,
-  Title,
   Tooltip,
   Legend
 } from "chart.js";
@@ -19,7 +18,6 @@ ChartJS.register(
   BarElement,
   LineElement,
   PointElement,
-  Title,
   Tooltip,
   Legend
 );
@@ -28,10 +26,9 @@ export default function Accounts({ data }) {
 
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
-  const [visibleTx, setVisibleTx] = useState(20);
 
-  // 🔹 FILTRE + TRI
-  const filteredTransactions = data.transactions
+  // 🔹 TRI + FILTRE
+  const transactions = data.transactions
     .filter(tx =>
       filter === "all" ||
       (filter === "entrants" && tx.amount > 0) ||
@@ -39,176 +36,137 @@ export default function Accounts({ data }) {
     )
     .sort((a, b) =>
       sortAsc
-        ? new Date(a.date + " " + a.time) - new Date(b.date + " " + b.time)
-        : new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time)
+        ? new Date(a.date + " " + a.time)
+        - new Date(b.date + " " + b.time)
+        : new Date(b.date + " " + b.time)
+        - new Date(a.date + " " + a.time)
     );
 
-  // 🔹 TOTALS
-  const totalEntrants = data.transactions
-    .filter(tx => tx.amount > 0)
-    .reduce((acc, tx) => acc + tx.amount, 0);
-
-  const totalSortants = data.transactions
-    .filter(tx => tx.amount < 0)
-    .reduce((acc, tx) => acc + Math.abs(tx.amount), 0);
-
-  // 🔹 GRAPH BARRES (historique par date)
-  const groupedByDate = {};
-
+  // 🔹 GROUP BY DATE
+  const grouped = {};
   data.transactions.forEach(tx => {
-    if (!groupedByDate[tx.date]) {
-      groupedByDate[tx.date] = { entrants: 0, sortants: 0 };
+    if (!grouped[tx.date]) {
+      grouped[tx.date] = { in: 0, out: 0 };
     }
-
-    if (tx.amount > 0) {
-      groupedByDate[tx.date].entrants += tx.amount;
-    } else {
-      groupedByDate[tx.date].sortants += Math.abs(tx.amount);
-    }
+    tx.amount > 0
+      ? grouped[tx.date].in += tx.amount
+      : grouped[tx.date].out += Math.abs(tx.amount);
   });
 
-  const sortedDates = Object.keys(groupedByDate).sort(
+  const dates = Object.keys(grouped).sort(
     (a, b) => new Date(a) - new Date(b)
   );
 
+  // 🔹 GRAPH BAR
   const barData = {
-    labels: sortedDates,
+    labels: dates,
     datasets: [
       {
         label: "Entrées",
-        data: sortedDates.map(d => groupedByDate[d].entrants),
-        backgroundColor: "#34D399"
+        data: dates.map(d => grouped[d].in),
+        backgroundColor: "#16a34a"
       },
       {
         label: "Sorties",
-        data: sortedDates.map(d => groupedByDate[d].sortants),
-        backgroundColor: "#F87171"
+        data: dates.map(d => grouped[d].out),
+        backgroundColor: "#dc2626"
       }
     ]
   };
 
-  // 🔹 GRAPH COURBE (évolution solde)
-  let runningBalance = 0;
-  const balanceHistory = sortedDates.map(date => {
-    const day = groupedByDate[date];
-    runningBalance += day.entrants - day.sortants;
-    return runningBalance;
+  // 🔹 GRAPH LINE (solde)
+  let balance = 0;
+  const balanceData = dates.map(d => {
+    balance += grouped[d].in - grouped[d].out;
+    return balance;
   });
 
   const lineData = {
-    labels: sortedDates,
+    labels: dates,
     datasets: [
       {
         label: "Solde",
-        data: balanceHistory,
-        borderColor: "#2563EB",
-        backgroundColor: "#93C5FD",
+        data: balanceData,
+        borderColor: "#2563eb",
+        backgroundColor: "#93c5fd",
         tension: 0.3
       }
     ]
   };
 
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: { position: "top" }
-    },
-    animation: { duration: 800 }
-  };
-
-  // 🔹 LAZY LOAD
-  const handleScroll = (e) => {
-    const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
-    if (bottom && visibleTx < filteredTransactions.length) {
-      setVisibleTx(prev => prev + 20);
-    }
-  };
-
   return (
     <div className="content">
 
-      {/* Carte compte */}
-      <div className="account-card shadow">
-        <div className="account-title">Compte principal</div>
+      {/* 🔹 CARD COMPTE */}
+      <div className="account-card">
         <div className="balance">{data.balance} €</div>
-        <div className="balance-date">Solde disponible</div>
         <div className="owner">{data.firstname} {data.lastname}</div>
         <div className="iban">{data.iban}</div>
       </div>
 
-      {/* Actions */}
+      {/* 🔹 ACTIONS */}
       <div className="quick-actions">
-        <div className="action"><Send size={22}/> <span>Virement</span></div>
-        <div className="action"><PlusCircle size={22}/> <span>Ajouter</span></div>
-        <div className="action"><Receipt size={22}/> <span>Paiement</span></div>
+        <div><Send size={20}/> Virement</div>
+        <div><PlusCircle size={20}/> Ajouter</div>
+        <div><Receipt size={20}/> Paiement</div>
       </div>
 
-      {/* Résumé */}
-      <div className="month-summary grid md:grid-cols-3 gap-4 mb-6">
-        <div className="summary-card entrants">
-          <ArrowDown size={22}/>
-          <div>+{totalEntrants} €</div>
-        </div>
-        <div className="summary-card sortants">
-          <ArrowUp size={22}/>
-          <div>-{totalSortants} €</div>
-        </div>
-      </div>
+      {/* 🔴 HISTORIQUE (EN PREMIER) */}
+      <div className="transactions">
 
-      {/* Graphiques */}
-      <div className="grid md:grid-cols-2 gap-4 mb-6">
-        <div className="chart-card">
-          <Bar data={barData} options={chartOptions}/>
-        </div>
-        <div className="chart-card">
-          <Line data={lineData} options={chartOptions}/>
-        </div>
-      </div>
+        <div className="transactions-header">
+          <h3>Historique des transactions</h3>
 
-      {/* Filtres */}
-      <div className="filters">
-        <div>
-          <button onClick={()=>setFilter("all")}>Toutes</button>
-          <button onClick={()=>setFilter("entrants")}>Entrées</button>
-          <button onClick={()=>setFilter("sortants")}>Sorties</button>
-        </div>
-        <button onClick={()=>setSortAsc(!sortAsc)}>
-          {sortAsc ? "↓" : "↑"}
-        </button>
-      </div>
+          <div className="controls">
+            <select onChange={(e)=>setFilter(e.target.value)}>
+              <option value="all">Toutes</option>
+              <option value="entrants">Entrées</option>
+              <option value="sortants">Sorties</option>
+            </select>
 
-      {/* Transactions */}
-      <div className="transactions-history" onScroll={handleScroll}>
-        {filteredTransactions.slice(0, visibleTx).map((tx, i) => (
-          <div key={i} className="transaction-row group">
-
-            <div className="flex items-center gap-2">
-              {tx.type === "virement" && <Send size={18}/>}
-              {tx.type === "paiement" && <Receipt size={18}/>}
-              {tx.type === "ajout" && <PlusCircle size={18}/>}
-
-              <div>
-                <div>{tx.motif}</div>
-                <div className="tx-date">{tx.date} {tx.time}</div>
-              </div>
-            </div>
-
-            <div className={tx.amount > 0 ? "positive" : "negative"}>
-              {tx.amount > 0 ? `+${tx.amount}` : tx.amount} €
-            </div>
-
-            <div className="tx-badge">
-              {tx.amount > 0 ? "Crédit" : "Débit"}
-            </div>
-
-            <div className="tx-details">
-              <div>IBAN: {tx.iban || "—"}</div>
-              <div>Type: {tx.type}</div>
-              <div>Ref: {tx.ref || "—"}</div>
-            </div>
-
+            <button onClick={()=>setSortAsc(!sortAsc)}>
+              {sortAsc ? "↑" : "↓"}
+            </button>
           </div>
-        ))}
+        </div>
+
+        <div className="transactions-list">
+          {transactions.map((tx, i) => (
+            <div key={i} className="transaction">
+
+              <div className="left">
+                {tx.type === "virement" && <Send size={18}/>}
+                {tx.type === "paiement" && <Receipt size={18}/>}
+                {tx.type === "ajout" && <PlusCircle size={18}/>}
+
+                <div>
+                  <div className="motif">{tx.motif}</div>
+                  <div className="date">{tx.date} {tx.time}</div>
+                </div>
+              </div>
+
+              <div className={tx.amount > 0 ? "amount plus" : "amount minus"}>
+                {tx.amount > 0 ? `+${tx.amount}` : tx.amount} €
+              </div>
+
+              <div className="details">
+                IBAN: {tx.iban || "—"} <br/>
+                Ref: {tx.ref || "—"}
+              </div>
+
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 🔹 GRAPHIQUES APRÈS */}
+      <div className="charts">
+        <div className="chart">
+          <Bar data={barData}/>
+        </div>
+        <div className="chart">
+          <Line data={lineData}/>
+        </div>
       </div>
 
     </div>

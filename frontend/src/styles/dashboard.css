@@ -997,3 +997,126 @@ opacity:0.9;
 
 
 
+.content {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+  font-family: system-ui;
+}
+
+/* Carte */
+.account-card {
+  background: #111827;
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.balance {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* Actions */
+.quick-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+/* Transactions */
+.transactions {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.transactions-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+}
+
+.transactions-list {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.transaction {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+
+.transaction:hover {
+  background: #f9fafb;
+}
+
+.left {
+  display: flex;
+  gap: 10px;
+}
+
+.motif {
+  font-weight: 500;
+}
+
+.date {
+  font-size: 0.8rem;
+  color: gray;
+}
+
+.amount.plus {
+  color: green;
+  font-weight: bold;
+}
+
+.amount.minus {
+  color: red;
+  font-weight: bold;
+}
+
+/* Hover details */
+.details {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: white;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.transaction:hover .details {
+  display: block;
+}
+
+/* Charts */
+.charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.chart {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+/* Mobile */
+@media(max-width: 600px){
+  .charts {
+    grid-template-columns: 1fr;
+  }
+}
