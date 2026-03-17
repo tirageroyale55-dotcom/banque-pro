@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Send, PlusCircle, Receipt, ArrowUp, ArrowDown } from "lucide-react";
 import { Bar } from "react-chartjs-2";
 import {
@@ -16,15 +16,27 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 export default function Accounts({ data }) {
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
-  const [visibleTx, setVisibleTx] = useState(20); // lazy-load: 20 transactions au départ
+  const [visibleTx, setVisibleTx] = useState(20);
 
-  // Filtrage et tri
   const filteredTransactions = data.transactions
-    .filter(tx => filter === "all" || (filter === "entrants" && tx.amount > 0) || (filter === "sortants" && tx.amount < 0))
-    .sort((a, b) => sortAsc ? new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time) : new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time));
+    .filter(tx =>
+      filter === "all" ||
+      (filter === "entrants" && tx.amount > 0) ||
+      (filter === "sortants" && tx.amount < 0)
+    )
+    .sort((a, b) =>
+      sortAsc
+        ? new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time)
+        : new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)
+    );
 
-  const totalEntrants = data.transactions.filter(tx => tx.amount > 0).reduce((acc, tx) => acc + tx.amount, 0);
-  const totalSortants = data.transactions.filter(tx => tx.amount < 0).reduce((acc, tx) => acc + Math.abs(tx.amount), 0);
+  const totalEntrants = data.transactions
+    .filter(tx => tx.amount > 0)
+    .reduce((acc, tx) => acc + tx.amount, 0);
+
+  const totalSortants = data.transactions
+    .filter(tx => tx.amount < 0)
+    .reduce((acc, tx) => acc + Math.abs(tx.amount), 0);
 
   const chartData = {
     labels: ["Entrées", "Sorties"],
@@ -36,7 +48,6 @@ export default function Accounts({ data }) {
     }]
   };
 
-  // Lazy-load scroll
   const handleScroll = (e) => {
     const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
     if (bottom && visibleTx < filteredTransactions.length) {
@@ -63,23 +74,23 @@ export default function Accounts({ data }) {
         <div className="action"><Receipt size={22}/> <span>Paiement</span></div>
       </div>
 
-      {/* Résumé du mois + graphique */}
+      {/* Résumé + Graphique */}
       <div className="month-summary grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="summary-card entrants flex items-center p-4 rounded-lg bg-green-100 animate-fadeIn">
+        <div className="summary-card entrants flex items-center p-4 rounded-lg bg-green-100">
           <ArrowDown size={24} className="mr-2 text-green-700" />
           <div>
             <div className="label font-semibold text-gray-700">Total Entrées</div>
             <div className="amount font-bold text-green-800">+{totalEntrants} €</div>
           </div>
         </div>
-        <div className="summary-card sortants flex items-center p-4 rounded-lg bg-red-100 animate-fadeIn">
+        <div className="summary-card sortants flex items-center p-4 rounded-lg bg-red-100">
           <ArrowUp size={24} className="mr-2 text-red-700" />
           <div>
             <div className="label font-semibold text-gray-700">Total Sorties</div>
             <div className="amount font-bold text-red-800">-{totalSortants} €</div>
           </div>
         </div>
-        <div className="chart-card p-4 rounded-lg bg-gray-50 animate-fadeIn">
+        <div className="chart-card p-4 rounded-lg bg-gray-50">
           <Bar data={chartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
         </div>
       </div>
@@ -96,29 +107,25 @@ export default function Accounts({ data }) {
         </button>
       </div>
 
-      {/* Historique des transactions avec lazy-load */}
+      {/* Historique transactions lazy-load */}
       <div className="transactions-history bg-white rounded-lg shadow p-4 max-h-[500px] overflow-y-auto" onScroll={handleScroll}>
         {filteredTransactions.slice(0, visibleTx).map((tx, index) => (
           <div key={index} className="transaction-row flex justify-between items-center p-2 border-b relative hover:bg-gray-50 group">
-            
             <div className="flex items-center gap-2">
               {tx.type === "virement" && <Send size={20} className="text-blue-500" />}
               {tx.type === "paiement" && <Receipt size={20} className="text-purple-500" />}
               {tx.type === "ajout" && <PlusCircle size={20} className="text-green-500" />}
-
               <div className="tx-info">
                 <div className="tx-motif font-medium">{tx.motif}</div>
                 <div className="tx-date text-gray-500 text-sm">{tx.date} {tx.time}</div>
               </div>
             </div>
-
             <div className={`tx-amount font-semibold ${tx.amount>0?'text-green-600':'text-red-600'}`}>
               {tx.amount>0?`+${tx.amount} €`:`${tx.amount} €`}
             </div>
-
-            <div className="tx-badge absolute left-1/2 transform -translate-x-1/2 top-full mt-1 px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700 border">{tx.amount>0?'Crédit':'Débit'}</div>
-
-            {/* Survol details */}
+            <div className="tx-badge absolute left-1/2 transform -translate-x-1/2 top-full mt-1 px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700 border">
+              {tx.amount>0?'Crédit':'Débit'}
+            </div>
             <div className="tx-details hidden group-hover:block absolute bg-white shadow-lg p-2 rounded text-sm right-4 top-full z-10 w-64">
               <div>IBAN: {tx.iban || "—"}</div>
               <div>Catégorie: {tx.type}</div>
