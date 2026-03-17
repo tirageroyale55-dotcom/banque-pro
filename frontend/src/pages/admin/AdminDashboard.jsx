@@ -44,9 +44,7 @@ export default function AdminDashboard() {
             <strong>{user.nom} {user.prenom}</strong><br />
             <small>{user.email}</small>
           </div>
-<Link to={"/admin/client/"+user._id}>
-Voir client
-</Link>
+
           <Link className="btn-small" to={`/admin/user/${user._id}`}>
             Vérifier
           </Link>
