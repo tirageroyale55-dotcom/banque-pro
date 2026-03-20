@@ -121,22 +121,27 @@ font-weight:600;
 
 /* PAGE CONTENT */
 
-.page-content {
-  margin-top: 145px; /* déjà présent pour header + tabs */
-  padding-bottom: 120px; /* laisse la place au BottomNav */
-  min-height: calc(100vh - 145px); /* assure que le contenu fait toute la hauteur */
-  overflow-y: auto; /* scroll normal */
+.page-content{
+margin-top:145px;
+padding-bottom:120px;
 }
 
-.transactions, .charts, .filters-panel {
-  position: relative; /* pas absolute ou fixed */
-}
 
 /* CONTENT */
 
 .content{
 padding:20px;
 background:transparent;
+}
+
+.page-content {
+  height: calc(100vh - 145px); /* 145px = header + tabs */
+  overflow-y: auto;            /* scroll interne */
+  padding-bottom: 20px;        /* espace avant le BottomNav */
+}
+
+.content {
+  min-height: 100%;            /* assure que le contenu remplit le scroll */
 }
 
 /* ACCOUNT CARD */
