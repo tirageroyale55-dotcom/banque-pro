@@ -128,6 +128,9 @@ font-weight:600;
   overflow-y: auto; /* scroll normal */
 }
 
+.transactions, .charts, .filters-panel {
+  position: relative; /* pas absolute ou fixed */
+}
 
 /* CONTENT */
 
