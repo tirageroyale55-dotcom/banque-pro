@@ -998,37 +998,27 @@ opacity:0.9;
 
 
 /* =========================
-   GLOBAL (BPER STYLE)
+   GLOBAL
 ========================= */
 .content {
   max-width: 860px;
   margin: auto;
-  padding: 14px;
-  
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding: 12px;
+  background: #f4f6f9;
 }
 
 /* =========================
    TRANSACTIONS CARD
 ========================= */
-
-.empty-transactions {
-  text-align: center;
-  padding: 30px 10px;
-  font-size: 0.85rem;
-  color: #9ca3af;
-  font-weight: 500;
-}
-
 .transactions {
   background: #ffffff;
   border-radius: 18px;
   padding: 14px;
   margin-top: 14px;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-/* Header */
+/* HEADER */
 .transactions-header {
   display: flex;
   justify-content: space-between;
@@ -1039,57 +1029,61 @@ opacity:0.9;
 .transactions-header h3 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #1f2937;
 }
 
-/* Controls minimalistes */
-.controls {
-  display: flex;
-  gap: 6px;
-}
-
-.controls select,
-.controls button {
-  border: none;
+/* FILTER BUTTON */
+.filter-btn {
   background: #eef2f7;
-  padding: 5px 8px;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  color: #374151;
+  border: none;
+  padding: 6px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
-/* =========================
-   LISTE TRANSACTIONS
-========================= */
-.transactions-list {
-  max-height: 360px;
-  overflow-y: auto;
+/* FILTER PANEL */
+.filters-panel {
+  margin-top: 10px;
+  background: #f9fafc;
+  padding: 10px;
+  border-radius: 12px;
+  display: grid;
+  gap: 8px;
 }
 
-/* Ligne */
+.filters-panel select,
+.filters-panel input,
+.filters-panel button {
+  border: none;
+  padding: 7px;
+  border-radius: 8px;
+  background: white;
+  font-size: 0.75rem;
+}
+
+/* =========================
+   TRANSACTION LIST
+========================= */
+.transactions-list {
+  margin-top: 8px;
+}
+
+/* LIGNE */
 .transaction {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 6px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f1f1f1;
   position: relative;
 }
 
-/* Hover très subtil */
-.transaction:hover {
-  background: #f9fafc;
-}
-
-/* Gauche */
+/* LEFT */
 .left {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-/* Icône style BPER */
 .left svg {
   background: #eef2f7;
   padding: 6px;
@@ -1098,11 +1092,10 @@ opacity:0.9;
   height: 28px;
 }
 
-/* Texte */
+/* TEXT */
 .motif {
   font-size: 0.85rem;
   font-weight: 500;
-  color: #111827;
 }
 
 .date {
@@ -1110,7 +1103,7 @@ opacity:0.9;
   color: #9ca3af;
 }
 
-/* Montant */
+/* AMOUNT */
 .amount {
   font-size: 0.9rem;
   font-weight: 600;
@@ -1124,52 +1117,45 @@ opacity:0.9;
   color: #dc2626;
 }
 
-/* Badge discret */
+/* BADGE */
 .transaction::after {
   content: attr(data-type);
   position: absolute;
   right: 6px;
   top: -6px;
   font-size: 0.6rem;
+  background: #eef2f7;
   padding: 2px 6px;
   border-radius: 999px;
-  background: #eef2f7;
-  color: #4b5563;
 }
 
-/* Hover details (style carte bancaire) */
+/* DETAILS */
 .details {
   display: none;
   position: absolute;
   right: 0;
   top: 100%;
-  margin-top: 4px;
-  background: #ffffff;
-  border-radius: 12px;
+  background: white;
   padding: 10px;
+  border-radius: 12px;
   font-size: 0.7rem;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-  width: 200px;
-  z-index: 20;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
 .transaction:hover .details {
   display: block;
 }
 
-/* =========================
-   SCROLLBAR MINIMAL
-========================= */
-.transactions-list::-webkit-scrollbar {
-  width: 4px;
-}
-.transactions-list::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 10px;
+/* EMPTY */
+.empty-transactions {
+  text-align: center;
+  padding: 25px;
+  font-size: 0.8rem;
+  color: #9ca3af;
 }
 
 /* =========================
-   CHARTS BPER STYLE
+   CHARTS
 ========================= */
 .charts {
   display: grid;
@@ -1179,14 +1165,13 @@ opacity:0.9;
 }
 
 .chart {
-  background: #ffffff;
-  border-radius: 18px;
+  background: white;
+  border-radius: 16px;
   padding: 12px;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
 }
 
 /* =========================
-   MOBILE PRIORITY (BPER)
+   MOBILE FIX (IMPORTANT)
 ========================= */
 @media (max-width: 640px) {
 
@@ -1197,7 +1182,7 @@ opacity:0.9;
   .transaction {
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
+    gap: 6px;
   }
 
   .amount {
@@ -1208,55 +1193,13 @@ opacity:0.9;
     grid-template-columns: 1fr;
   }
 
+  .filters-panel {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .details {
     left: 0;
     right: auto;
     width: 100%;
   }
-}
-
-
-/* Bouton filtre */
-.filter-btn {
-  background: #eef2f7;
-  border: none;
-  padding: 6px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-/* Panel filtre */
-.filters-panel {
-  margin-top: 10px;
-  background: #f9fafc;
-  padding: 12px;
-  border-radius: 12px;
-  display: grid;
-  gap: 10px;
-  animation: fadeIn 0.2s ease;
-}
-
-/* Groupe */
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.filter-group select,
-.filter-group input,
-.filter-group button {
-  margin-top: 4px;
-  padding: 6px;
-  border-radius: 8px;
-  border: none;
-  background: #ffffff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-/* Animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
 }
