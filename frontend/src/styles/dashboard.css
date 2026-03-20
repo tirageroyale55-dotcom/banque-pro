@@ -119,17 +119,22 @@ color:#0b5c5b;
 font-weight:600;
 }
 
+/* PAGE CONTENT */
 
-
-.page-content {
-  height: calc(100vh - 145px); /* 145px = header + tabs */
-  overflow-y: auto;            /* scroll interne */
-  padding-bottom: 20px;        /* espace avant le BottomNav */
+.page-content{
+margin-top:145px;
+padding-bottom:120px;
 }
 
-.content {
-  min-height: 100%;            /* assure que le contenu remplit le scroll */
+
+/* CONTENT */
+
+.content{
+padding:20px;
+background:transparent;
 }
+
+
 
 /* ACCOUNT CARD */
 
