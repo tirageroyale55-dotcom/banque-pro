@@ -104,5 +104,23 @@ res.status(500).json({message:"Erreur serveur"});
 
 });
 
+
+router.get("/clients", auth, role("ADMIN"), async (req,res)=>{
+
+try{
+
+const users = await User.find({role:"CLIENT"})
+.select("nom prenom email status")
+
+res.json(users)
+
+}catch(err){
+
+res.status(500).json({message:"Erreur serveur"})
+
+}
+
+})
+
 module.exports = router;
 

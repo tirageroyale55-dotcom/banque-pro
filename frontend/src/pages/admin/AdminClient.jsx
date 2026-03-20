@@ -1,132 +1,120 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { api } from "../../services/api";
 
 export default function AdminClient(){
 
-const { id } = useParams();
+const [clients,setClients] = useState([]);
+const [selected,setSelected] = useState(null);
 
-const [data,setData] = useState(null);
-
-const loadClient = () => {
-
-api("/admin/client/"+id)
-.then(setData)
-.catch(()=>alert("Erreur chargement"));
-
-};
+/* charger liste */
 
 useEffect(()=>{
 
-loadClient();
+api("/admin/clients")
+.then(setClients)
 
 },[]);
 
+/* charger détail */
 
-const activateCard = async () => {
+const loadClient = (id) => {
 
-await api("/admin/card/activate/"+data.card._id,{method:"POST"});
-
-loadClient();
-
-};
-
-const blockCard = async () => {
-
-await api("/admin/card/block/"+data.card._id,{method:"POST"});
-
-loadClient();
+api("/admin/client/"+id)
+.then(setSelected)
 
 };
 
-const blockAccount = async () => {
+/* ACTIONS */
 
-await api("/admin/account/block/"+data.account._id,{method:"POST"});
+const toggleAccount = async () => {
 
-loadClient();
+const isBlocked = selected.account.status === "BLOCKED";
+
+await api(
+"/admin/account/" + (isBlocked ? "activate" : "block") + "/" + selected.account._id,
+{method:"POST"}
+);
+
+loadClient(selected.user._id);
 
 };
 
-const activateAccount = async () => {
+const toggleCard = async () => {
 
-await api("/admin/account/activate/"+data.account._id,{method:"POST"});
+const status = selected.card.status;
 
-loadClient();
+let action = "activate";
+
+if(status === "active") action = "block";
+if(status === "blocked") action = "activate";
+if(status === "inactive") action = "activate";
+
+await api("/admin/card/"+action+"/"+selected.card._id,{method:"POST"});
+
+loadClient(selected.user._id);
 
 };
-
-
-if(!data) return <p>Chargement...</p>;
 
 return(
 
 <div className="admin-page">
 
-<h1>Gestion Client</h1>
+<h1>Gestion des clients</h1>
 
-{/* CLIENT */}
+{/* LISTE CLIENTS */}
 
-<div className="admin-card">
+<div className="admin-list">
 
-<h2>Informations client</h2>
+{clients.map(c=>(
+<div key={c._id} className="admin-user">
 
-<p><b>Nom :</b> {data.user.nom}</p>
-<p><b>Email :</b> {data.user.email}</p>
-<p><b>ID Personnel :</b> {data.user.personalId}</p>
-
+<div>
+<b>{c.nom} {c.prenom}</b>
 </div>
 
-
-{/* COMPTE */}
-
-<div className="admin-card">
-
-<h2>Compte bancaire</h2>
-
-<p><b>IBAN :</b> {data.account?.iban}</p>
-
-<p><b>Solde :</b> {data.account?.balance} €</p>
-
-<p><b>Status :</b> {data.account?.status}</p>
-
-<div className="admin-actions">
-
-<button onClick={activateAccount}>
-Activer compte
-</button>
-
-<button onClick={blockAccount}>
-Bloquer compte
+<button onClick={()=>loadClient(c._id)}>
+Voir infos client
 </button>
 
 </div>
+))}
 
 </div>
 
+{/* DETAILS */}
 
-{/* CARTE */}
+{selected && (
 
-<div className="admin-card">
+<div className="admin-details">
 
-<h2>Carte bancaire</h2>
+<h2>Détails client</h2>
 
-<p><b>Numéro :</b> **** **** **** {data.card?.last4}</p>
+<p><b>Nom :</b> {selected.user.nom} {selected.user.prenom}</p>
+<p><b>Email :</b> {selected.user.email}</p>
+<p><b>Status :</b> {selected.user.status}</p>
 
-<p><b>Status :</b> {data.card?.status}</p>
+<h3>Compte</h3>
 
-<div className="admin-actions">
+<p><b>IBAN :</b> {selected.account?.iban}</p>
+<p><b>Solde :</b> {selected.account?.balance} €</p>
+<p><b>Status :</b> {selected.account?.status}</p>
 
-<button onClick={activateCard}>
-Activer carte
+<button onClick={toggleAccount}>
+{selected.account.status === "BLOCKED" ? "Activer compte" : "Bloquer compte"}
 </button>
 
-<button onClick={blockCard}>
-Bloquer carte
+<h3>Carte</h3>
+
+<p><b>Numéro :</b> **** **** **** {selected.card?.last4}</p>
+<p><b>Status :</b> {selected.card?.status}</p>
+
+<button onClick={toggleCard}>
+{selected.card.status === "active" ? "Bloquer carte" : "Activer carte"}
 </button>
 
 </div>
 
-</div>
+)}
 
 </div>
 
