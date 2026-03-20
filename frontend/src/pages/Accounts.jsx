@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, PlusCircle, Receipt } from "lucide-react";
+import { Send, PlusCircle, Receipt, Filter } from "lucide-react";
 import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -28,8 +28,9 @@ export default function Accounts({ data }) {
   const [filter, setFilter] = useState("all");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
-  // 🔹 FILTRE + TRI (corrigé)
+  // 🔹 FILTRE + TRI
   const transactions = data.transactions
     .filter(tx => {
       const txDate = new Date(tx.date);
@@ -50,9 +51,9 @@ export default function Accounts({ data }) {
         : new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time)
     );
 
-  // 🔹 GROUP DATA (inchangé)
+  // 🔹 GRAPH basé sur transactions filtrées
   const grouped = {};
-  data.transactions.forEach(tx => {
+  transactions.forEach(tx => {
     if (!grouped[tx.date]) {
       grouped[tx.date] = { in: 0, out: 0 };
     }
@@ -70,12 +71,12 @@ export default function Accounts({ data }) {
     datasets: [
       {
         label: "Entrées",
-        data: dates.map(d => grouped[d].in),
+        data: dates.map(d => grouped[d]?.in || 0),
         backgroundColor: "#16a34a"
       },
       {
         label: "Sorties",
-        data: dates.map(d => grouped[d].out),
+        data: dates.map(d => grouped[d]?.out || 0),
         backgroundColor: "#dc2626"
       }
     ]
@@ -83,7 +84,7 @@ export default function Accounts({ data }) {
 
   let balance = 0;
   const balanceData = dates.map(d => {
-    balance += grouped[d].in - grouped[d].out;
+    balance += (grouped[d]?.in || 0) - (grouped[d]?.out || 0);
     return balance;
   });
 
@@ -94,7 +95,6 @@ export default function Accounts({ data }) {
         label: "Solde",
         data: balanceData,
         borderColor: "#2563eb",
-        backgroundColor: "#93c5fd",
         tension: 0.3
       }
     ]
@@ -103,27 +103,37 @@ export default function Accounts({ data }) {
   return (
     <div className="content">
 
-      {/* 🔹 CARD */}
+      {/* CARD */}
       <div className="account-card">
         <div className="balance">{data.balance} €</div>
         <div className="owner">{data.firstname} {data.lastname}</div>
         <div className="iban">{data.iban}</div>
       </div>
 
-      {/* 🔹 ACTIONS */}
+      {/* ACTIONS */}
       <div className="quick-actions">
         <div><Send size={20}/> Virement</div>
         <div><PlusCircle size={20}/> Ajouter</div>
         <div><Receipt size={20}/> Paiement</div>
       </div>
 
-      {/* 🔴 HISTORIQUE */}
+      {/* HISTORIQUE */}
       <div className="transactions">
 
         <div className="transactions-header">
-          <h3>Historique des transactions</h3>
+          <h3>Historique</h3>
 
-          <div className="controls">
+          <button 
+            className="filter-btn"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter size={18}/>
+          </button>
+        </div>
+
+        {/* PANEL FILTRE */}
+        {showFilters && (
+          <div className="filters-panel">
 
             <select onChange={(e)=>setFilter(e.target.value)}>
               <option value="all">Toutes</option>
@@ -144,12 +154,13 @@ export default function Accounts({ data }) {
             />
 
             <button onClick={()=>setSortAsc(!sortAsc)}>
-              {sortAsc ? "↑" : "↓"}
+              {sortAsc ? "↑ Croissant" : "↓ Décroissant"}
             </button>
 
           </div>
-        </div>
+        )}
 
+        {/* LISTE */}
         <div className="transactions-list">
 
           {transactions.length === 0 ? (
@@ -191,7 +202,7 @@ export default function Accounts({ data }) {
         </div>
       </div>
 
-      {/* 🔹 CHARTS */}
+      {/* CHARTS */}
       <div className="charts">
         <div className="chart">
           <Bar data={barData}/>
