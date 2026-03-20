@@ -26,17 +26,8 @@ export default function Accounts({ data }) {
 
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
-  const today = new Date();
-
-// début du mois
-const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-
-// format YYYY-MM-DD (obligatoire pour input date)
-const formatDate = (date) => date.toISOString().split("T")[0];
-
-const [startDate, setStartDate] = useState(formatDate(firstDay));
-const [endDate, setEndDate] = useState(formatDate(today));
-
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
   // 🔹 FILTRE + TRI
