@@ -167,6 +167,7 @@ const [endDate, setEndDate] = useState(formatDate(today));
     onChange={(e)=>setEndDate(e.target.value)}
   />
 </div>
+
             <button onClick={()=>setSortAsc(!sortAsc)}>
               {sortAsc ? "↑ Croissant" : "↓ Décroissant"}
             </button>
