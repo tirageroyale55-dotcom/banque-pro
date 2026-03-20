@@ -141,17 +141,24 @@ export default function Accounts({ data }) {
               <option value="sortants">Sorties</option>
             </select>
 
-            <input 
-              type="date"
-              value={startDate}
-              onChange={(e)=>setStartDate(e.target.value)}
-            />
+            <div className="date-field">
+  <label>Du</label>
+  <input 
+    type="date"
+    placeholder="Choisir une date"
+    value={startDate}
+    onChange={(e)=>setStartDate(e.target.value)}
+  />
+</div>
 
-            <input 
-              type="date"
-              value={endDate}
-              onChange={(e)=>setEndDate(e.target.value)}
-            />
+<div className="date-field">
+  <label>Au</label>
+  <input 
+    type="date"
+    value={endDate}
+    onChange={(e)=>setEndDate(e.target.value)}
+  />
+</div>
 
             <button onClick={()=>setSortAsc(!sortAsc)}>
               {sortAsc ? "↑ Croissant" : "↓ Décroissant"}

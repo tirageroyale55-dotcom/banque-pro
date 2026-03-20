@@ -1103,6 +1103,25 @@ opacity:0.9;
   color: #9ca3af;
 }
 
+.date-field {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+.date-field label {
+  margin-bottom: 3px;
+}
+
+.date-field input {
+  background: white;
+  border-radius: 8px;
+  padding: 6px;
+  border: none;
+  font-size: 0.75rem;
+}
+
 /* AMOUNT */
 .amount {
   font-size: 0.9rem;
