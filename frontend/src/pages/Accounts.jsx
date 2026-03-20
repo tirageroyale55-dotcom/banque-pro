@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, PlusCircle, Receipt, ArrowUp, ArrowDown } from "lucide-react";
+import { Send, PlusCircle, Receipt } from "lucide-react";
 import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -26,35 +26,31 @@ export default function Accounts({ data }) {
 
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
-
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // 🔹 TRI + FILTRE
+  // 🔹 FILTRE + TRI (corrigé)
   const transactions = data.transactions
-  .filter(tx => {
+    .filter(tx => {
+      const txDate = new Date(tx.date);
 
-    const txDate = new Date(tx.date);
+      const matchType =
+        filter === "all" ||
+        (filter === "entrants" && tx.amount > 0) ||
+        (filter === "sortants" && tx.amount < 0);
 
-    const matchType =
-      filter === "all" ||
-      (filter === "entrants" && tx.amount > 0) ||
-      (filter === "sortants" && tx.amount < 0);
+      const matchStart = startDate ? txDate >= new Date(startDate) : true;
+      const matchEnd = endDate ? txDate <= new Date(endDate) : true;
 
-    const matchStart = startDate ? txDate >= new Date(startDate) : true;
-    const matchEnd = endDate ? txDate <= new Date(endDate) : true;
-
-    return matchType && matchStart && matchEnd;
-  })
+      return matchType && matchStart && matchEnd;
+    })
     .sort((a, b) =>
       sortAsc
-        ? new Date(a.date + " " + a.time)
-        - new Date(b.date + " " + b.time)
-        : new Date(b.date + " " + b.time)
-        - new Date(a.date + " " + a.time)
+        ? new Date(a.date + " " + a.time) - new Date(b.date + " " + b.time)
+        : new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time)
     );
 
-  // 🔹 GROUP BY DATE
+  // 🔹 GROUP DATA (inchangé)
   const grouped = {};
   data.transactions.forEach(tx => {
     if (!grouped[tx.date]) {
@@ -69,7 +65,6 @@ export default function Accounts({ data }) {
     (a, b) => new Date(a) - new Date(b)
   );
 
-  // 🔹 GRAPH BAR
   const barData = {
     labels: dates,
     datasets: [
@@ -86,7 +81,6 @@ export default function Accounts({ data }) {
     ]
   };
 
-  // 🔹 GRAPH LINE (solde)
   let balance = 0;
   const balanceData = dates.map(d => {
     balance += grouped[d].in - grouped[d].out;
@@ -107,38 +101,9 @@ export default function Accounts({ data }) {
   };
 
   return (
-  <div className="content">
-    <div className="transactions-header">
-  <h3>Historique des transactions</h3>
+    <div className="content">
 
-  <div className="controls">
-
-    <select onChange={(e)=>setFilter(e.target.value)}>
-      <option value="all">Toutes</option>
-      <option value="entrants">Entrées</option>
-      <option value="sortants">Sorties</option>
-    </select>
-
-    <input 
-      type="date"
-      value={startDate}
-      onChange={(e)=>setStartDate(e.target.value)}
-    />
-
-    <input 
-      type="date"
-      value={endDate}
-      onChange={(e)=>setEndDate(e.target.value)}
-    />
-
-    <button onClick={()=>setSortAsc(!sortAsc)}>
-      {sortAsc ? "↑" : "↓"}
-    </button>
-
-  </div>
-</div>
-
-      {/* 🔹 CARD COMPTE */}
+      {/* 🔹 CARD */}
       <div className="account-card">
         <div className="balance">{data.balance} €</div>
         <div className="owner">{data.firstname} {data.lastname}</div>
@@ -152,67 +117,81 @@ export default function Accounts({ data }) {
         <div><Receipt size={20}/> Paiement</div>
       </div>
 
-      {/* 🔴 HISTORIQUE (EN PREMIER) */}
+      {/* 🔴 HISTORIQUE */}
       <div className="transactions">
 
         <div className="transactions-header">
           <h3>Historique des transactions</h3>
 
           <div className="controls">
+
             <select onChange={(e)=>setFilter(e.target.value)}>
               <option value="all">Toutes</option>
               <option value="entrants">Entrées</option>
               <option value="sortants">Sorties</option>
             </select>
 
+            <input 
+              type="date"
+              value={startDate}
+              onChange={(e)=>setStartDate(e.target.value)}
+            />
+
+            <input 
+              type="date"
+              value={endDate}
+              onChange={(e)=>setEndDate(e.target.value)}
+            />
+
             <button onClick={()=>setSortAsc(!sortAsc)}>
               {sortAsc ? "↑" : "↓"}
             </button>
-          </div>
-        </div>
-<div className="transactions-list">
 
-  {transactions.length === 0 ? (
-    <div className="empty-transactions">
-      Aucune transaction disponible
-    </div>
-  ) : (
-    transactions.map((tx, i) => (
-      <div 
-        key={i} 
-        className="transaction"
-        data-type={tx.amount > 0 ? "Crédit" : "Débit"}
-      >
-
-        <div className="left">
-          {tx.type === "virement" && <Send size={18}/>}
-          {tx.type === "paiement" && <Receipt size={18}/>}
-          {tx.type === "ajout" && <PlusCircle size={18}/>}
-
-          <div>
-            <div className="motif">{tx.motif}</div>
-            <div className="date">{tx.date} {tx.time}</div>
           </div>
         </div>
 
-        <div className={tx.amount > 0 ? "amount plus" : "amount minus"}>
-          {tx.amount > 0 ? `+${tx.amount}` : tx.amount} €
+        <div className="transactions-list">
+
+          {transactions.length === 0 ? (
+            <div className="empty-transactions">
+              Aucune transaction disponible
+            </div>
+          ) : (
+            transactions.map((tx, i) => (
+              <div 
+                key={i} 
+                className="transaction"
+                data-type={tx.amount > 0 ? "Crédit" : "Débit"}
+              >
+
+                <div className="left">
+                  {tx.type === "virement" && <Send size={18}/>}
+                  {tx.type === "paiement" && <Receipt size={18}/>}
+                  {tx.type === "ajout" && <PlusCircle size={18}/>}
+
+                  <div>
+                    <div className="motif">{tx.motif}</div>
+                    <div className="date">{tx.date} {tx.time}</div>
+                  </div>
+                </div>
+
+                <div className={tx.amount > 0 ? "amount plus" : "amount minus"}>
+                  {tx.amount > 0 ? `+${tx.amount}` : tx.amount} €
+                </div>
+
+                <div className="details">
+                  IBAN: {tx.iban || "—"} <br/>
+                  Ref: {tx.ref || "—"}
+                </div>
+
+              </div>
+            ))
+          )}
+
         </div>
-
-        <div className="details">
-          IBAN: {tx.iban || "—"} <br/>
-          Ref: {tx.ref || "—"}
-        </div>
-
-      </div>
-    ))
-  )}
-
-</div>
-        
       </div>
 
-      {/* 🔹 GRAPHIQUES APRÈS */}
+      {/* 🔹 CHARTS */}
       <div className="charts">
         <div className="chart">
           <Bar data={barData}/>
