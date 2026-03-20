@@ -999,18 +999,6 @@ margin-top:10px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-/* HEADER */
-.transactions-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.transactions-header h3 {
-  font-size: 0.95rem;
-  font-weight: 600;
-}
 
 /* FILTER BUTTON */
 .filter-btn {
