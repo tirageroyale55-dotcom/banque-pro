@@ -1022,13 +1022,16 @@ margin-top:10px;
 }
 
 /* FILTER PANEL */
+/* PANEL FILTRE */
 .filters-panel {
-  margin-top: 10px;
   background: #f9fafc;
   padding: 10px;
   border-radius: 12px;
   display: grid;
   gap: 8px;
+  margin-top: 8px;
+  /* important pour ne pas influencer le scroll global */
+  position: relative; 
 }
 
 .filters-panel select,
