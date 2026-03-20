@@ -23,16 +23,16 @@ ChartJS.register(
 );
 
 export default function Accounts({ data }) {
+
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
-
   const today = new Date();
+
   const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
   const formatDate = (date) => date.toISOString().split("T")[0];
 
   const [startDate, setStartDate] = useState(formatDate(firstDay));
   const [endDate, setEndDate] = useState(formatDate(today));
-
   const [showFilters, setShowFilters] = useState(false);
 
   // 🔹 FILTRE + TRI
@@ -43,8 +43,10 @@ export default function Accounts({ data }) {
         filter === "all" ||
         (filter === "entrants" && tx.amount > 0) ||
         (filter === "sortants" && tx.amount < 0);
+
       const matchStart = startDate ? txDate >= new Date(startDate) : true;
       const matchEnd = endDate ? txDate <= new Date(endDate) : true;
+
       return matchType && matchStart && matchEnd;
     })
     .sort((a, b) =>
@@ -53,13 +55,13 @@ export default function Accounts({ data }) {
         : new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time)
     );
 
-  // 🔹 GRAPH basé sur transactions filtrées
+  // 🔹 GRAPH
   const grouped = {};
   transactions.forEach(tx => {
     if (!grouped[tx.date]) grouped[tx.date] = { in: 0, out: 0 };
     tx.amount > 0
-      ? (grouped[tx.date].in += tx.amount)
-      : (grouped[tx.date].out += Math.abs(tx.amount));
+      ? grouped[tx.date].in += tx.amount
+      : grouped[tx.date].out += Math.abs(tx.amount);
   });
 
   const dates = Object.keys(grouped).sort((a, b) => new Date(a) - new Date(b));
@@ -84,9 +86,9 @@ export default function Accounts({ data }) {
   };
 
   return (
-    // ✅ Important: wrapper avec "page-content" pour scroll normal
-    <div className="page-content">
+    <div className="page-content" style={{ overflowY: "auto" }}> {/* <-- ici le scroll */}
       <div className="content">
+
         {/* CARD */}
         <div className="account-card">
           <div className="balance">{data.balance} €</div>
@@ -110,7 +112,6 @@ export default function Accounts({ data }) {
             </button>
           </div>
 
-          {/* PANEL FILTRE */}
           {showFilters && (
             <div className="filters-panel">
               <select onChange={(e)=>setFilter(e.target.value)}>
@@ -121,12 +122,12 @@ export default function Accounts({ data }) {
 
               <div className="date-field">
                 <label>Du</label>
-                <input type="date" value={startDate} onChange={(e)=>setStartDate(e.target.value)} />
+                <input type="date" value={startDate} onChange={(e)=>setStartDate(e.target.value)}/>
               </div>
 
               <div className="date-field">
                 <label>Au</label>
-                <input type="date" value={endDate} onChange={(e)=>setEndDate(e.target.value)} />
+                <input type="date" value={endDate} onChange={(e)=>setEndDate(e.target.value)}/>
               </div>
 
               <button onClick={()=>setSortAsc(!sortAsc)}>
@@ -146,14 +147,17 @@ export default function Accounts({ data }) {
                     {tx.type === "virement" && <Send size={18}/>}
                     {tx.type === "paiement" && <Receipt size={18}/>}
                     {tx.type === "ajout" && <PlusCircle size={18}/>}
+
                     <div>
                       <div className="motif">{tx.motif}</div>
                       <div className="date">{tx.date} {tx.time}</div>
                     </div>
                   </div>
+
                   <div className={tx.amount > 0 ? "amount plus" : "amount minus"}>
                     {tx.amount > 0 ? `+${tx.amount}` : tx.amount} €
                   </div>
+
                   <div className="details">
                     IBAN: {tx.iban || "—"} <br/>
                     Ref: {tx.ref || "—"}
@@ -169,6 +173,7 @@ export default function Accounts({ data }) {
           <div className="chart"><Bar data={barData}/></div>
           <div className="chart"><Line data={lineData}/></div>
         </div>
+
       </div>
     </div>
   );
