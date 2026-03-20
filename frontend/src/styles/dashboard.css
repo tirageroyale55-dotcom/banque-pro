@@ -119,20 +119,7 @@ color:#0b5c5b;
 font-weight:600;
 }
 
-/* PAGE CONTENT */
 
-.page-content{
-margin-top:145px;
-padding-bottom:120px;
-}
-
-
-/* CONTENT */
-
-.content{
-padding:20px;
-background:transparent;
-}
 
 .page-content {
   height: calc(100vh - 145px); /* 145px = header + tabs */
