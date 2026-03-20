@@ -991,12 +991,22 @@ margin-top:10px;
 /* =========================
    TRANSACTIONS CARD
 ========================= */
+/* transactions + charts fixes dans le flux normal */
 .transactions {
   background: #ffffff;
   border-radius: 18px;
   padding: 14px;
   margin-top: 14px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  position: relative; /* assure que rien n’est absolu */
+}
+
+.charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+  position: relative; /* idem */
 }
 
 /* HEADER */
