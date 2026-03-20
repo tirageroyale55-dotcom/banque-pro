@@ -123,6 +123,7 @@ font-weight:600;
 
 .page-content{
 margin-top:145px;
+overflow-y: auto;
 padding-bottom:120px;
 }
 
