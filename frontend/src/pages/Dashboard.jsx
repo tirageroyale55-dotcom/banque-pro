@@ -59,29 +59,22 @@ setShowBalanceBar(false)
 window.scrollTo(0,0)
 },[activeTab])
 
+// Dashboard.jsx
 useEffect(() => {
+  const handleScroll = () => {
+    if (activeTab === "accounts" && window.scrollY > 160) {
+      setShowBalanceBar(true);
+    } else {
+      setShowBalanceBar(false);
+    }
+  };
 
-const handleScroll = () => {
+  window.addEventListener("scroll", handleScroll);
 
-if (activeTab !== "accounts") {
-setShowBalanceBar(false);
-return;
-}
+  // Trigger initial check (important si la page est déjà scrollée)
+  handleScroll();
 
-const scroll = window.scrollY;
-
-if (scroll > 160) {
-setShowBalanceBar(true);
-} else {
-setShowBalanceBar(false);
-}
-
-};
-
-window.addEventListener("scroll", handleScroll);
-
-return () => window.removeEventListener("scroll", handleScroll);
-
+  return () => window.removeEventListener("scroll", handleScroll);
 }, [activeTab]);
 
 if (!data) return null;
