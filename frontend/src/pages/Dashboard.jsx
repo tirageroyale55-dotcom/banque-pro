@@ -56,34 +56,36 @@ return () => window.removeEventListener("resize", handleResize);
 
 useEffect(() => {
 
-  let lastScroll = window.scrollY;
+  const container = document.querySelector(".page-content");
+
+  if (!container) return;
+
+  let lastScroll = container.scrollTop;
 
   const handleScroll = () => {
 
-    const currentScroll = window.scrollY;
-
-    // 🔥 uniquement sur Accounts
     if (activeTab !== "accounts") {
       setShowBalanceBar(false);
       return;
     }
 
-    // 🔥 si tu remontes ET que t'es pas en haut
+    const currentScroll = container.scrollTop;
+
+    // 🔼 remonte
     if (currentScroll < lastScroll && currentScroll > 50) {
       setShowBalanceBar(true);
-    } else if (currentScroll > lastScroll) {
+    }
+    // 🔽 descend
+    else if (currentScroll > lastScroll) {
       setShowBalanceBar(false);
     }
 
     lastScroll = currentScroll;
   };
 
-  const container = document.querySelector(".page-content");
+  container.addEventListener("scroll", handleScroll);
 
-container.addEventListener("scroll", handleScroll);
-
-return () => container.removeEventListener("scroll", handleScroll);
-  
+  return () => container.removeEventListener("scroll", handleScroll);
 
 }, [activeTab]);
 
