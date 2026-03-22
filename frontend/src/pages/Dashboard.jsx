@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
@@ -11,8 +11,6 @@ import BankCard from "../components/BankCard";
 
 import Accounts from "./Accounts";
 
-import "../styles/dashboard.css";
-
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("accounts");
@@ -21,9 +19,8 @@ export default function Dashboard() {
   const [card, setCard] = useState(null);
 
   const navigate = useNavigate();
-  const pageContentRef = useRef(null); // ← pour scroll desktop
 
-  // Charger les cartes
+  // Charger la carte
   useEffect(() => {
     api("/client/card").then(setCard).catch(() => console.log("Erreur carte"));
   }, []);
@@ -45,39 +42,23 @@ export default function Dashboard() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Reset BalanceBar à chaque changement d'onglet
+  // Scroll listener **mobile seulement**
   useEffect(() => {
-    setShowBalanceBar(false);
-    if (!isDesktop) window.scrollTo(0, 0);
-  }, [activeTab, isDesktop]);
-
-  // Scroll listener
-  useEffect(() => {
-    if (!data) return;
-
-    const scrollContainer = isDesktop ? pageContentRef.current : window;
+    if (isDesktop) return; // desktop ignore le BalanceBar
 
     const handleScroll = () => {
-      const scrollTop = isDesktop
-        ? scrollContainer.scrollTop
-        : window.scrollY;
-
-      // Affiche BalanceBar si on scroll de plus de 160px sur l'onglet Comptes
-      if (activeTab === "accounts" && scrollTop > 160) {
+      if (activeTab === "accounts" && window.scrollY > 160) {
         setShowBalanceBar(true);
       } else {
         setShowBalanceBar(false);
       }
     };
 
-    // Ajouter listener
-    scrollContainer.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // check initial
 
-    // Trigger initial check
-    handleScroll();
-
-    return () => scrollContainer.removeEventListener("scroll", handleScroll);
-  }, [activeTab, isDesktop, data]);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [activeTab, isDesktop]);
 
   if (!data) return null;
 
@@ -85,15 +66,16 @@ export default function Dashboard() {
     <div className="bank-app">
       {isDesktop && <Sidebar />}
 
-      <div className={isDesktop ? "desktop-content" : ""} ref={pageContentRef}>
+      <div className={isDesktop ? "desktop-content" : ""}>
         <Header data={data} />
         <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        {/* BalanceBar toujours sous Tabs */}
-        <BalanceBar balance={data.balance} visible={showBalanceBar} />
+        {/* BalanceBar mobile seulement */}
+        {!isDesktop && <BalanceBar balance={data.balance} visible={showBalanceBar} />}
 
         <div className="page-content">
           {activeTab === "accounts" && <Accounts data={data} />}
+
           {activeTab === "cards" && (
             <div className="cards-section">
               <h3 className="cards-title">Mes cartes</h3>
@@ -115,6 +97,7 @@ export default function Dashboard() {
               </div>
             </div>
           )}
+
           {activeTab === "financing" && (
             <div className="content">
               <div className="account-card">
