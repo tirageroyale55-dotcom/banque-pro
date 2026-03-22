@@ -83,7 +83,7 @@ useEffect(() => {
 container.addEventListener("scroll", handleScroll);
 
 return () => container.removeEventListener("scroll", handleScroll);
-  return () => window.removeEventListener("scroll", handleScroll);
+  
 
 }, [activeTab]);
 
