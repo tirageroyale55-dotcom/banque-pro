@@ -59,22 +59,25 @@ setShowBalanceBar(false)
 window.scrollTo(0,0)
 },[activeTab])
 
-// Dashboard.jsx
 useEffect(() => {
+  if (!document) return;
+  const pageContent = document.querySelector(".page-content");
+  if (!pageContent) return;
+
   const handleScroll = () => {
-    if (activeTab === "accounts" && window.scrollY > 160) {
+    if (activeTab === "accounts" && pageContent.scrollTop > 160) {
       setShowBalanceBar(true);
     } else {
       setShowBalanceBar(false);
     }
   };
 
-  window.addEventListener("scroll", handleScroll);
+  pageContent.addEventListener("scroll", handleScroll);
 
-  // Trigger initial check (important si la page est déjà scrollée)
+  // Trigger initial check
   handleScroll();
 
-  return () => window.removeEventListener("scroll", handleScroll);
+  return () => pageContent.removeEventListener("scroll", handleScroll);
 }, [activeTab]);
 
 if (!data) return null;

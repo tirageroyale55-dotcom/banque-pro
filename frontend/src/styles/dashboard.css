@@ -124,8 +124,10 @@ font-weight:600;
 /* PAGE CONTENT */
 
 .page-content{
-margin-top:145px;
-padding-bottom:120px;
+  flex:1;
+  overflow-y:auto; /* <-- ici le scroll est interne, pas window */
+  padding:30px;
+  margin-top:0;
 }
 
 
@@ -136,9 +138,7 @@ padding:20px;
 background:transparent;
 }
 
-.page-content{
-  overflow-y: visible;
-}
+
 
 
 /* ACCOUNT CARD */
