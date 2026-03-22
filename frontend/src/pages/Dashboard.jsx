@@ -21,16 +21,14 @@ export default function Dashboard() {
   const [card, setCard] = useState(null);
 
   const navigate = useNavigate();
-  const pageContentRef = useRef(null); // ← ref pour desktop scroll
+  const pageContentRef = useRef(null); // ← pour scroll desktop
 
   // Charger les cartes
   useEffect(() => {
-    api("/client/card")
-      .then(setCard)
-      .catch(() => console.log("Erreur carte"));
+    api("/client/card").then(setCard).catch(() => console.log("Erreur carte"));
   }, []);
 
-  // Charger les données dashboard
+  // Charger dashboard
   useEffect(() => {
     api("/client/dashboard")
       .then(setData)
@@ -40,7 +38,7 @@ export default function Dashboard() {
       });
   }, []);
 
-  // Détecter le resize pour desktop/mobile
+  // Resize listener
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
     window.addEventListener("resize", handleResize);
@@ -55,6 +53,8 @@ export default function Dashboard() {
 
   // Scroll listener
   useEffect(() => {
+    if (!data) return;
+
     const scrollContainer = isDesktop ? pageContentRef.current : window;
 
     const handleScroll = () => {
@@ -62,6 +62,7 @@ export default function Dashboard() {
         ? scrollContainer.scrollTop
         : window.scrollY;
 
+      // Affiche BalanceBar si on scroll de plus de 160px sur l'onglet Comptes
       if (activeTab === "accounts" && scrollTop > 160) {
         setShowBalanceBar(true);
       } else {
@@ -69,11 +70,14 @@ export default function Dashboard() {
       }
     };
 
+    // Ajouter listener
     scrollContainer.addEventListener("scroll", handleScroll);
-    handleScroll(); // check initial scroll
+
+    // Trigger initial check
+    handleScroll();
 
     return () => scrollContainer.removeEventListener("scroll", handleScroll);
-  }, [activeTab, isDesktop]);
+  }, [activeTab, isDesktop, data]);
 
   if (!data) return null;
 
@@ -83,14 +87,13 @@ export default function Dashboard() {
 
       <div className={isDesktop ? "desktop-content" : ""} ref={pageContentRef}>
         <Header data={data} />
-
         <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
+        {/* BalanceBar toujours sous Tabs */}
         <BalanceBar balance={data.balance} visible={showBalanceBar} />
 
         <div className="page-content">
           {activeTab === "accounts" && <Accounts data={data} />}
-
           {activeTab === "cards" && (
             <div className="cards-section">
               <h3 className="cards-title">Mes cartes</h3>
@@ -112,7 +115,6 @@ export default function Dashboard() {
               </div>
             </div>
           )}
-
           {activeTab === "financing" && (
             <div className="content">
               <div className="account-card">
