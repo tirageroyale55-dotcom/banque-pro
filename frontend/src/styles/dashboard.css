@@ -1,8 +1,6 @@
 
  /* BACKGROUND GLOBAL */
-html, body {
-  height: 100%;
-}
+
 
 html,
 body,
@@ -205,7 +203,7 @@ cursor:pointer;
 
 position:fixed;
 
-top:400px; /* juste sous les Tabs */
+top:142px; /* juste sous les Tabs */
 
 left:0;
 right:0;
