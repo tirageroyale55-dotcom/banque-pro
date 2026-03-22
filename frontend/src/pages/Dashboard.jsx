@@ -78,8 +78,11 @@ useEffect(() => {
     lastScroll = currentScroll;
   };
 
-  window.addEventListener("scroll", handleScroll);
+  const container = document.querySelector(".page-content");
 
+container.addEventListener("scroll", handleScroll);
+
+return () => container.removeEventListener("scroll", handleScroll);
   return () => window.removeEventListener("scroll", handleScroll);
 
 }, [activeTab]);
