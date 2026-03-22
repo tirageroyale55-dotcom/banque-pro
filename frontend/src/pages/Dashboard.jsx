@@ -56,48 +56,30 @@ return () => window.removeEventListener("resize", handleResize);
 
 useEffect(() => {
 
-  let lastScroll = 0;
-
   const handleScroll = () => {
-
-    const container = document.querySelector(".page-content");
-
-    // 🔥 détecte la vraie position scroll
-    const currentScroll = container
-      ? container.scrollTop
-      : window.scrollY;
 
     if (activeTab !== "accounts") {
       setShowBalanceBar(false);
       return;
     }
 
-    // 🔼 scroll vers le haut
-    if (currentScroll < lastScroll && currentScroll > 50) {
+    const currentScroll = window.scrollY;
+
+    // 🔼 remonte
+    if (currentScroll < lastScrollRef.current && currentScroll > 50) {
       setShowBalanceBar(true);
     }
-    // 🔽 scroll vers le bas
-    else if (currentScroll > lastScroll) {
+    // 🔽 descend
+    else if (currentScroll > lastScrollRef.current) {
       setShowBalanceBar(false);
     }
 
-    lastScroll = currentScroll;
+    lastScrollRef.current = currentScroll;
   };
 
-  // 🔥 écoute LES DEUX
   window.addEventListener("scroll", handleScroll);
 
-  const container = document.querySelector(".page-content");
-  if (container) {
-    container.addEventListener("scroll", handleScroll);
-  }
-
-  return () => {
-    window.removeEventListener("scroll", handleScroll);
-    if (container) {
-      container.removeEventListener("scroll", handleScroll);
-    }
-  };
+  return () => window.removeEventListener("scroll", handleScroll);
 
 }, [activeTab]);
 
