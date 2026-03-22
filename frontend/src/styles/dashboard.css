@@ -1,6 +1,9 @@
 
  
  /* BACKGROUND GLOBAL */
+html, body {
+  height: 100%;
+}
 
 html,
 body,
@@ -260,22 +263,24 @@ font-weight:600;
 /* BOTTOM NAV */
 
 .bottom-nav{
-position:fixed;
-bottom:20px;
-left:20px;
-right:20px;
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
 
-height:75px;
+  height: 75px;
 
-background:#e5e7eb;
+  background:#e5e7eb;
+  border-radius:30px;
 
-border-radius:30px;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
 
-display:flex;
-justify-content:space-around;
-align-items:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
 
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  z-index: 9999;          /* 🔥 important */
+  transform: translateZ(0); /* 🔥 fix scroll mobile */
 }
 
 .nav-item{
