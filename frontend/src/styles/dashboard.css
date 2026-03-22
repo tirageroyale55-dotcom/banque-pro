@@ -136,6 +136,9 @@ padding:20px;
 background:transparent;
 }
 
+.page-content{
+  overflow-y: visible;
+}
 
 
 /* ACCOUNT CARD */
