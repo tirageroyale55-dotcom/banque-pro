@@ -60,18 +60,18 @@ useEffect(() => {
 
   const handleScroll = () => {
 
+    const currentScroll = window.scrollY;
+
+    // 🔥 uniquement sur Accounts
     if (activeTab !== "accounts") {
       setShowBalanceBar(false);
       return;
     }
 
-    const currentScroll = window.scrollY;
-
-    if (currentScroll < lastScroll && currentScroll > 120) {
-      // 🔼 tu remontes
+    // 🔥 si tu remontes ET que t'es pas en haut
+    if (currentScroll < lastScroll && currentScroll > 50) {
       setShowBalanceBar(true);
-    } else {
-      // 🔽 tu descends
+    } else if (currentScroll > lastScroll) {
       setShowBalanceBar(false);
     }
 
