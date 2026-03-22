@@ -54,34 +54,33 @@ return () => window.removeEventListener("resize", handleResize);
 
 },[]);
 
+useEffect(()=>{
+setShowBalanceBar(false)
+window.scrollTo(0,0)
+},[activeTab])
+
 useEffect(() => {
 
-  let lastScroll = window.scrollY;
+const handleScroll = () => {
 
-  const handleScroll = () => {
+if (activeTab !== "accounts") {
+setShowBalanceBar(false);
+return;
+}
 
-    if (activeTab !== "accounts") {
-      setShowBalanceBar(false);
-      return;
-    }
+const scroll = window.scrollY;
 
-    const scroll = window.scrollY;
+if (scroll > 160) {
+setShowBalanceBar(true);
+} else {
+setShowBalanceBar(false);
+}
 
-    // 🔼 si tu remontes
-    if (scroll < lastScroll && scroll > 160) {
-      setShowBalanceBar(true);
-    } 
-    // 🔽 si tu descends
-    else if (scroll > lastScroll) {
-      setShowBalanceBar(false);
-    }
+};
 
-    lastScroll = scroll;
-  };
+window.addEventListener("scroll", handleScroll);
 
-  window.addEventListener("scroll", handleScroll);
-
-  return () => window.removeEventListener("scroll", handleScroll);
+return () => window.removeEventListener("scroll", handleScroll);
 
 }, [activeTab]);
 
