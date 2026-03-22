@@ -11,6 +11,8 @@ import BankCard from "../components/BankCard";
 
 import Accounts from "./Accounts";
 
+import { useRef } from "react";
+
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
@@ -22,6 +24,8 @@ const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
 const [card,setCard] = useState(null);
 
 const navigate = useNavigate();
+
+const pageContentRef = useRef(null);
 
 useEffect(()=>{
 
@@ -60,24 +64,21 @@ window.scrollTo(0,0)
 },[activeTab])
 
 useEffect(() => {
-  if (!document) return;
-  const pageContent = document.querySelector(".page-content");
-  if (!pageContent) return;
+  const container = pageContentRef.current;
+  if (!container) return;
 
   const handleScroll = () => {
-    if (activeTab === "accounts" && pageContent.scrollTop > 160) {
+    if (activeTab === "accounts" && container.scrollTop > 160) {
       setShowBalanceBar(true);
     } else {
       setShowBalanceBar(false);
     }
   };
 
-  pageContent.addEventListener("scroll", handleScroll);
+  container.addEventListener("scroll", handleScroll);
+  handleScroll(); // check initial position
 
-  // Trigger initial check
-  handleScroll();
-
-  return () => pageContent.removeEventListener("scroll", handleScroll);
+  return () => container.removeEventListener("scroll", handleScroll);
 }, [activeTab]);
 
 if (!data) return null;
@@ -102,7 +103,7 @@ balance={data.balance}
 visible={showBalanceBar}
 />
 
-<div className="page-content">
+<div className="page-content" ref={pageContentRef}>
 
 {activeTab === "accounts" && <Accounts data={data}/>}
 
