@@ -56,6 +56,8 @@ return () => window.removeEventListener("resize", handleResize);
 
 useEffect(() => {
 
+  let lastScroll = window.scrollY;
+
   const handleScroll = () => {
 
     if (activeTab !== "accounts") {
@@ -63,18 +65,18 @@ useEffect(() => {
       return;
     }
 
-    const currentScroll = window.scrollY;
+    const scroll = window.scrollY;
 
-    // 🔼 remonte
-    if (currentScroll < lastScrollRef.current && currentScroll > 50) {
+    // 🔼 si tu remontes
+    if (scroll < lastScroll && scroll > 160) {
       setShowBalanceBar(true);
-    }
-    // 🔽 descend
-    else if (currentScroll > lastScrollRef.current) {
+    } 
+    // 🔽 si tu descends
+    else if (scroll > lastScroll) {
       setShowBalanceBar(false);
     }
 
-    lastScrollRef.current = currentScroll;
+    lastScroll = scroll;
   };
 
   window.addEventListener("scroll", handleScroll);
