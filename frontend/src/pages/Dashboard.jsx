@@ -66,9 +66,7 @@ window.scrollTo(0,0)
 
 
 useEffect(() => {
-  if (!contentRef.current) return;
-
-  const el = contentRef.current;
+  const el = contentRef.current || window; // fallback vers window
 
   const handleScroll = () => {
     if (activeTab !== "accounts") {
@@ -76,9 +74,7 @@ useEffect(() => {
       return;
     }
 
-    const scrollTop = el.scrollTop;
-
-    // 🔹 apparait après 160px de scroll
+    const scrollTop = el.scrollTop ?? window.scrollY; // support window
     if (scrollTop > 160) {
       setShowBalanceBar(true);
     } else {
@@ -86,13 +82,14 @@ useEffect(() => {
     }
   };
 
+  // attache l’event
   el.addEventListener("scroll", handleScroll);
 
-  // 🔹 trigger immédiat pour le cas où on recharge déjà scrollé
+  // trigger immédiat
   handleScroll();
 
   return () => el.removeEventListener("scroll", handleScroll);
-}, [activeTab, data]);
+}, [activeTab]);
 
 if (!data) return null;
 
