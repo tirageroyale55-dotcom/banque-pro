@@ -22,7 +22,7 @@ ChartJS.register(
   Legend
 );
 
-export default function Accounts({ data }) {
+export default function Accounts({ data, accountRef }) {
 
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
@@ -114,7 +114,7 @@ const [endDate, setEndDate] = useState(formatDate(today));
     <div className="content">
 
       {/* CARD */}
-      <div className="account-card">
+      <div className="account-card" ref={accountRef}>
         <div className="balance">{data.balance} €</div>
         <div className="owner">{data.firstname} {data.lastname}</div>
         <div className="iban">{data.iban}</div>

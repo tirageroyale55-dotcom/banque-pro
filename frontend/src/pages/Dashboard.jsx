@@ -67,38 +67,27 @@ window.scrollTo(0,0)
 
 useEffect(() => {
 
-  const el = contentRef.current;
-  if (!el) return;
+  if (!accountRef.current) return;
 
-  const handleScroll = () => {
-
-    if (activeTab !== "accounts") {
-      setShowBalanceBar(false);
-      return;
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      // 🔥 si la carte n'est plus visible
+      if (!entry.isIntersecting) {
+        setShowBalanceBar(true);
+      } else {
+        setShowBalanceBar(false);
+      }
+    },
+    {
+      threshold: 0.1,
     }
+  );
 
-    const currentScroll = el.scrollTop;
+  observer.observe(accountRef.current);
 
-    console.log("SCROLL OK:", currentScroll); // 👈 IMPORTANT
+  return () => observer.disconnect();
 
-    if (
-      currentScroll < lastScrollRef.current &&
-      currentScroll > 100
-    ) {
-      setShowBalanceBar(true);
-    } else {
-      setShowBalanceBar(false);
-    }
-
-    lastScrollRef.current = currentScroll;
-  };
-
-  // 🔥 ATTACHE ICI (après render réel)
-  el.addEventListener("scroll", handleScroll);
-
-  return () => el.removeEventListener("scroll", handleScroll);
-
-}, [activeTab, data]); // 🔥 data force un rerun quand DOM prêt
+}, [activeTab]);
 
 if (!data) return null;
 
@@ -124,7 +113,9 @@ visible={showBalanceBar}
 
 <div className="page-content" ref={contentRef}>
 
-{activeTab === "accounts" && <Accounts data={data}/>}
+{activeTab === "accounts" && (
+  <Accounts data={data} accountRef={accountRef} />
+)}
 
 {activeTab === "cards" && (
 
