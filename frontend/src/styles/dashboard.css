@@ -404,13 +404,12 @@ padding:20px 30px;
 /* CONTENT */
 
 .page-content{
-flex:1;
+  flex:1;
+  overflow-y:auto;
 
-overflow-y:auto;
+  height: calc(100vh - 160px);
 
-padding:30px;
-
-margin-top:0;
+  padding:30px;
 }
 
 /* HIDE MOBILE NAV */
