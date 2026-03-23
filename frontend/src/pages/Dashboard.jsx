@@ -66,28 +66,33 @@ window.scrollTo(0,0)
 
 
 useEffect(() => {
+  if (!contentRef.current) return;
 
-  if (!accountRef.current) return;
+  const el = contentRef.current;
 
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      // 🔥 si la carte n'est plus visible
-      if (!entry.isIntersecting) {
-        setShowBalanceBar(true);
-      } else {
-        setShowBalanceBar(false);
-      }
-    },
-    {
-      threshold: 0.1,
+  const handleScroll = () => {
+    if (activeTab !== "accounts") {
+      setShowBalanceBar(false);
+      return;
     }
-  );
 
-  observer.observe(accountRef.current);
+    const scrollTop = el.scrollTop;
 
-  return () => observer.disconnect();
+    // 🔹 apparait après 160px de scroll
+    if (scrollTop > 160) {
+      setShowBalanceBar(true);
+    } else {
+      setShowBalanceBar(false);
+    }
+  };
 
-}, [activeTab]);
+  el.addEventListener("scroll", handleScroll);
+
+  // 🔹 trigger immédiat pour le cas où on recharge déjà scrollé
+  handleScroll();
+
+  return () => el.removeEventListener("scroll", handleScroll);
+}, [activeTab, data]);
 
 if (!data) return null;
 
