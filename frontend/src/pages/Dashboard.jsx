@@ -67,6 +67,9 @@ window.scrollTo(0,0)
 
 useEffect(() => {
 
+  const el = contentRef.current;
+  if (!el) return;
+
   const handleScroll = () => {
 
     if (activeTab !== "accounts") {
@@ -74,12 +77,9 @@ useEffect(() => {
       return;
     }
 
-    const scrollWindow = window.scrollY;
-    const scrollContent = contentRef.current?.scrollTop || 0;
+    const currentScroll = el.scrollTop;
 
-    const currentScroll = Math.max(scrollWindow, scrollContent);
-
-    console.log("scroll:", currentScroll);
+    console.log("SCROLL OK:", currentScroll); // 👈 IMPORTANT
 
     if (
       currentScroll < lastScrollRef.current &&
@@ -93,20 +93,12 @@ useEffect(() => {
     lastScrollRef.current = currentScroll;
   };
 
-  // 🔥 ON ECOUTE LES DEUX
-  window.addEventListener("scroll", handleScroll);
+  // 🔥 ATTACHE ICI (après render réel)
+  el.addEventListener("scroll", handleScroll);
 
-  const el = contentRef.current;
-  if (el) {
-    el.addEventListener("scroll", handleScroll);
-  }
+  return () => el.removeEventListener("scroll", handleScroll);
 
-  return () => {
-    window.removeEventListener("scroll", handleScroll);
-    if (el) el.removeEventListener("scroll", handleScroll);
-  };
-
-}, [activeTab]);
+}, [activeTab, data]); // 🔥 data force un rerun quand DOM prêt
 
 if (!data) return null;
 
