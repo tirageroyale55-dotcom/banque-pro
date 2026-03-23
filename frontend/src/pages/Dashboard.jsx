@@ -66,7 +66,9 @@ window.scrollTo(0,0)
 
 
 useEffect(() => {
-  const el = contentRef.current || window; // fallback vers window
+  const el = contentRef.current;
+
+  if (!el) return;
 
   const handleScroll = () => {
     if (activeTab !== "accounts") {
@@ -74,7 +76,9 @@ useEffect(() => {
       return;
     }
 
-    const scrollTop = el.scrollTop ?? window.scrollY; // support window
+    // ici on regarde le scroll de .page-content
+    const scrollTop = el.scrollTop;
+
     if (scrollTop > 160) {
       setShowBalanceBar(true);
     } else {
@@ -82,10 +86,9 @@ useEffect(() => {
     }
   };
 
-  // attache l’event
   el.addEventListener("scroll", handleScroll);
 
-  // trigger immédiat
+  // déclenche une fois au chargement
   handleScroll();
 
   return () => el.removeEventListener("scroll", handleScroll);

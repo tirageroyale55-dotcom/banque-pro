@@ -407,7 +407,7 @@ padding:20px 30px;
   flex:1;
   overflow-y:auto;
 
-  height: calc(100vh - 160px);
+  height: calc(100vh - 145px);
 
   padding:30px;
 }
