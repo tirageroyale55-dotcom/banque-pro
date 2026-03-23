@@ -59,7 +59,10 @@ return () => window.removeEventListener("resize", handleResize);
 
 },[]);
 
-
+useEffect(()=>{
+setShowBalanceBar(false)
+window.scrollTo(0,0)
+},[activeTab])
 
 
 useEffect(() => {
@@ -71,13 +74,13 @@ useEffect(() => {
       return;
     }
 
-    const currentScroll = contentRef.current
-      ? contentRef.current.scrollTop
-      : window.scrollY;
+    const scrollWindow = window.scrollY;
+    const scrollContent = contentRef.current?.scrollTop || 0;
+
+    const currentScroll = Math.max(scrollWindow, scrollContent);
 
     console.log("scroll:", currentScroll);
 
-    // 🔥 SCROLL VERS LE HAUT
     if (
       currentScroll < lastScrollRef.current &&
       currentScroll > 100
@@ -90,11 +93,18 @@ useEffect(() => {
     lastScrollRef.current = currentScroll;
   };
 
-  const scrollEl = contentRef.current || window;
+  // 🔥 ON ECOUTE LES DEUX
+  window.addEventListener("scroll", handleScroll);
 
-  scrollEl.addEventListener("scroll", handleScroll);
+  const el = contentRef.current;
+  if (el) {
+    el.addEventListener("scroll", handleScroll);
+  }
 
-  return () => scrollEl.removeEventListener("scroll", handleScroll);
+  return () => {
+    window.removeEventListener("scroll", handleScroll);
+    if (el) el.removeEventListener("scroll", handleScroll);
+  };
 
 }, [activeTab]);
 
