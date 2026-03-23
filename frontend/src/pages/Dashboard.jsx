@@ -122,8 +122,8 @@ setActiveTab={setActiveTab}
 />
 
 <BalanceBar
-balance={data.balance}
-visible={showBalanceBar}
+  balance={data.balance}
+  visible={true}
 />
 
 <div className="page-content" ref={contentRef}>
