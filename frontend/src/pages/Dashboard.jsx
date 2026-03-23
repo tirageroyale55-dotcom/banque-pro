@@ -59,10 +59,7 @@ return () => window.removeEventListener("resize", handleResize);
 
 },[]);
 
-useEffect(()=>{
-setShowBalanceBar(false)
-window.scrollTo(0,0)
-},[activeTab])
+
 
 
 useEffect(() => {
