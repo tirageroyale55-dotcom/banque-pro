@@ -67,14 +67,6 @@ window.scrollTo(0,0)
 
 useEffect(() => {
 
-  let lastScroll = 0;
-
-  const getScroll = () => {
-    return contentRef.current
-      ? contentRef.current.scrollTop
-      : window.scrollY;
-  };
-
   const handleScroll = () => {
 
     if (activeTab !== "accounts") {
@@ -82,18 +74,23 @@ useEffect(() => {
       return;
     }
 
-    const currentScroll = getScroll();
+    const currentScroll = contentRef.current
+      ? contentRef.current.scrollTop
+      : window.scrollY;
 
-    console.log("scroll:", currentScroll); // 👈 debug
+    console.log("scroll:", currentScroll);
 
-    // 🔥 APPARAÎT quand on remonte
-    if (currentScroll < lastScroll && currentScroll > 100) {
+    // 🔥 SCROLL VERS LE HAUT
+    if (
+      currentScroll < lastScrollRef.current &&
+      currentScroll > 100
+    ) {
       setShowBalanceBar(true);
     } else {
       setShowBalanceBar(false);
     }
 
-    lastScroll = currentScroll;
+    lastScrollRef.current = currentScroll;
   };
 
   const scrollEl = contentRef.current || window;
@@ -122,8 +119,8 @@ setActiveTab={setActiveTab}
 />
 
 <BalanceBar
-  balance={data.balance}
-  visible={true}
+balance={data.balance}
+visible={showBalanceBar}
 />
 
 <div className="page-content" ref={contentRef}>
