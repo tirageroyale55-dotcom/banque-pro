@@ -9,6 +9,8 @@ import BottomNav from "../components/BottomNav";
 import Sidebar from "../components/Sidebar";
 import BankCard from "../components/BankCard";
 
+import { useRef } from "react"; // en haut
+
 import Accounts from "./Accounts";
 
 import "../styles/dashboard.css";
@@ -22,6 +24,8 @@ const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
 const [card,setCard] = useState(null);
 
 const navigate = useNavigate();
+
+const lastScrollRef = useRef(0);
 
 useEffect(()=>{
 
@@ -59,9 +63,8 @@ setShowBalanceBar(false)
 window.scrollTo(0,0)
 },[activeTab])
 
-useEffect(() => {
 
-  let lastScroll = 0;
+useEffect(() => {
 
   const handleScroll = () => {
 
@@ -72,16 +75,16 @@ useEffect(() => {
 
     const currentScroll = window.scrollY;
 
-    // 🔥 si on remonte
-    if (currentScroll < lastScroll && currentScroll > 120) {
+    // 🔥 SCROLL VERS LE HAUT
+    if (currentScroll < lastScrollRef.current && currentScroll > 120) {
       setShowBalanceBar(true);
     } 
-    // 🔥 si on descend
+    // 🔥 SCROLL VERS LE BAS
     else {
       setShowBalanceBar(false);
     }
 
-    lastScroll = currentScroll;
+    lastScrollRef.current = currentScroll;
   };
 
   window.addEventListener("scroll", handleScroll);
