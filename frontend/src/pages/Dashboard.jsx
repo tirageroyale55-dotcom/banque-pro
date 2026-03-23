@@ -26,6 +26,7 @@ const [card,setCard] = useState(null);
 const navigate = useNavigate();
 
 const lastScrollRef = useRef(0);
+const contentRef = useRef(null);
 
 useEffect(()=>{
 
@@ -66,6 +67,11 @@ window.scrollTo(0,0)
 
 useEffect(() => {
 
+  const el = contentRef.current;
+  if (!el) return;
+
+  let lastScroll = 0;
+
   const handleScroll = () => {
 
     if (activeTab !== "accounts") {
@@ -73,23 +79,21 @@ useEffect(() => {
       return;
     }
 
-    const currentScroll = window.scrollY;
+    const currentScroll = el.scrollTop;
 
-    // 🔥 SCROLL VERS LE HAUT
-    if (currentScroll < lastScrollRef.current && currentScroll > 120) {
+    // 🔥 scroll vers le haut
+    if (currentScroll < lastScroll && currentScroll > 100) {
       setShowBalanceBar(true);
-    } 
-    // 🔥 SCROLL VERS LE BAS
-    else {
+    } else {
       setShowBalanceBar(false);
     }
 
-    lastScrollRef.current = currentScroll;
+    lastScroll = currentScroll;
   };
 
-  window.addEventListener("scroll", handleScroll);
+  el.addEventListener("scroll", handleScroll);
 
-  return () => window.removeEventListener("scroll", handleScroll);
+  return () => el.removeEventListener("scroll", handleScroll);
 
 }, [activeTab]);
 
@@ -115,7 +119,7 @@ balance={data.balance}
 visible={showBalanceBar}
 />
 
-<div className="page-content">
+<div className="page-content" ref={contentRef}>
 
 {activeTab === "accounts" && <Accounts data={data}/>}
 
