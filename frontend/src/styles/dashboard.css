@@ -203,12 +203,12 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 135px; 
+  top: 145px; 
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
-  z-index: 100000; /* On force le passage devant le Header et les Tabs */
+  z-index: 99999; /* On force le passage devant le Header et les Tabs */
   
   /* État caché */
   transform: translateY(-200%); 
