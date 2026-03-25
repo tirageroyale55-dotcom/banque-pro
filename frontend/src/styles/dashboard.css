@@ -203,38 +203,32 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 135px; /* Vérifie que Header(70) + Tabs(65) = 135 */
+  top: 138px; /* Ajustement précis sous les onglets */
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   
-  /* On la met TRÈS haut en z-index mais sous les Tabs */
-  z-index: 2000; 
-  
-  /* Position de départ : cachée derrière les tabs */
-  transform: translateY(-150%);
+  /* POSITION DE DÉPART : Cachée plus haut */
+  transform: translateY(-50px); 
   opacity: 0;
   
-  /* Transition ultra rapide pour la réactivité */
-  transition: transform 0.3s ease-out, opacity 0.2s ease-out;
-  pointer-events: none;
+  /* ANIMATION : Plus rapide (0.3s) pour être réactive */
+  transition: all 0.3s ease-out;
+  
+  z-index: 990; /* Juste en dessous des Tabs (999) */
 }
 
 .balance-bar.show {
-  /* On la fait descendre */
+  /* POSITION FINALE : Elle descend à sa place */
   transform: translateY(0);
   opacity: 1;
-  pointer-events: auto;
 }
 
-/* IMPORTANT : Tes Tabs DOIVENT avoir un fond pour masquer la barre qui monte */
+/* S'assurer que les onglets sont bien opaques pour masquer la barre */
 .tabs-wrapper {
-  position: fixed;
-  top: 70px;
-  background: #0b5c5b !important; /* Pas de transparence ici ! */
-  z-index: 3000; /* Toujours au-dessus de la balance-bar */
-  width: 100%;
+  background-color: #0b5c5b !important;
+  z-index: 999;
 }
 
 
