@@ -82,20 +82,18 @@ cursor:pointer;
 
 /* TABS */
 
-.tabs-wrapper{
-position:fixed;
-
-top:70px;
-left:0;
-right:0;
-
-background:rgba(11,92,91,0.55);
-backdrop-filter:blur(10px);
-
-padding-bottom:10px;
-
-z-index:100000;
+.tabs-wrapper {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  background: #0b5c5b; /* Couleur unie identique au fond */
+  z-index: 1000; /* Toujours au-dessus de la balance bar */
+  padding-bottom: 12px;
+  /* Optionnel : petite ombre sous les onglets pour séparer les plans */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
+
 .tabs{
 display:flex;
 gap:10px;
@@ -203,44 +201,47 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 145px; 
+  top: 135px; /* Ajuste selon la hauteur cumulée Header + Tabs */
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
-  z-index: 99999; /* On force le passage devant le Header et les Tabs */
   
-  /* État caché */
-  transform: translateY(-200%); 
+  /* Transition fluide et pro */
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  
+  /* On la cache pile derrière les onglets */
+  transform: translateY(-80%); 
   opacity: 0;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  
+  /* Z-index juste sous les onglets */
+  z-index: 900; 
+  pointer-events: none;
 }
 
 .balance-bar.show {
-  /* État visible */
-  transform: translateY(0);
+  transform: translateY(10px); /* Petit effet de rebond vers le bas pour le style */
   opacity: 1;
+  pointer-events: auto;
 }
 
-
-.balance-content{
-
-width:88%;
-max-width:390px;
-
-background:rgba(11,92,91,0.85);
-
-backdrop-filter:blur(10px);
-
-padding:10px 18px;
-
-border-radius:12px;
-
-display:flex;
-justify-content:space-between;
-
-font-weight:600;
-
+.balance-content {
+  width: 92%;
+  max-width: 400px;
+  background: rgba(15, 109, 108, 0.95); /* Plus opaque pour le contraste */
+  backdrop-filter: blur(12px);
+  padding: 12px 20px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  /* Ombre portée élégante */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 
+              0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  
+  /* Bordure fine interne pour l'aspect premium */
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .balance-content span {

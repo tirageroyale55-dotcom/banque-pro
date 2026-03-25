@@ -66,34 +66,33 @@ window.scrollTo(0,0)
 
 
 useEffect(() => {
+  let scrollTimeout;
 
-  let lastScroll = 0;
+  const handleScroll = (e) => {
+    if (activeTab !== "accounts") return;
 
-  const handleScroll = () => {
-
-    if (activeTab !== "accounts") {
+    const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
+    
+    // On ne déclenche rien si on est trop près du haut (moins de 150px)
+    if (scrollTop < 150) {
       setShowBalanceBar(false);
       return;
     }
 
-    const currentScroll = window.scrollY;
-
-    // 🔥 si on remonte
-    if (currentScroll < lastScroll && currentScroll > 120) {
+    // Détection de la direction
+    if (scrollTop < lastScrollRef.current) {
+      // On remonte : on montre la barre
       setShowBalanceBar(true);
-    } 
-    // 🔥 si on descend
-    else {
+    } else {
+      // On descend : on cache la barre
       setShowBalanceBar(false);
     }
 
-    lastScroll = currentScroll;
+    lastScrollRef.current = scrollTop;
   };
 
-  window.addEventListener("scroll", handleScroll);
-
-  return () => window.removeEventListener("scroll", handleScroll);
-
+  window.addEventListener("scroll", handleScroll, true);
+  return () => window.removeEventListener("scroll", handleScroll, true);
 }, [activeTab]);
 
 if (!data) return null;
