@@ -65,42 +65,36 @@ window.scrollTo(0,0)
 },[activeTab])
 
 
-// Dans Dashboard.jsx, modifie le useEffect du scroll :
-
 useEffect(() => {
+
+  let lastScroll = 0;
+
   const handleScroll = () => {
+
     if (activeTab !== "accounts") {
       setShowBalanceBar(false);
       return;
     }
 
-    // On récupère la position actuelle du scroll
-    // Si contentRef est le scroll interne (desktop), on l'utilise, sinon window
-    const currentScroll = isDesktop && contentRef.current 
-      ? contentRef.current.scrollTop 
-      : window.scrollY;
+    const currentScroll = window.scrollY;
 
-    // LOGIQUE DE DÉTECTION
-    // 1. On scrolle vers le haut (current < last)
-    // 2. On n'est pas tout en haut de la page (current > 50)
-    const isScrollingUp = currentScroll < lastScrollRef.current;
-    const isNotAtTop = currentScroll > 50;
-
-    if (isScrollingUp && isNotAtTop) {
+    // 🔥 si on remonte
+    if (currentScroll < lastScroll && currentScroll > 120) {
       setShowBalanceBar(true);
-    } else {
+    } 
+    // 🔥 si on descend
+    else {
       setShowBalanceBar(false);
     }
 
-    lastScrollRef.current = currentScroll;
+    lastScroll = currentScroll;
   };
 
-  // On attache l'évenement au bon endroit
-  const scrollEl = (isDesktop && contentRef.current) ? contentRef.current : window;
-  
-  scrollEl.addEventListener("scroll", handleScroll);
-  return () => scrollEl.removeEventListener("scroll", handleScroll);
-}, [activeTab, isDesktop]); // Ajoute isDesktop ici
+  window.addEventListener("scroll", handleScroll);
+
+  return () => window.removeEventListener("scroll", handleScroll);
+
+}, [activeTab]);
 
 if (!data) return null;
 
