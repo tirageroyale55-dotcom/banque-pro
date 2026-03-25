@@ -201,32 +201,26 @@ cursor:pointer;
 
 /* BALANCE BAR */
 
-.balance-bar{
-
-position:fixed;
-
-top:142px; /* juste sous les Tabs */
-
-left:0;
-right:0;
-
-display:flex;
-justify-content:center;
-
-transform:translateY(-120%);
-opacity:0;
-
-transition:all 0.25s ease;
-
-z-index:997;
-
+.balance-bar {
+  position: fixed;
+  top: 142px; 
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  /* Augmente le z-index pour être sûr qu'il soit au dessus du contenu blanc */
+  z-index: 998; 
+  
+  transform: translateY(-150%); /* Légèrement plus haut pour bien cacher */
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none; /* Évite de bloquer les clics quand invisible */
 }
 
-.balance-bar.show{
-
-transform:translateY(0);
-opacity:1;
-
+.balance-bar.show {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .balance-content{
@@ -318,52 +312,7 @@ white-space:nowrap;
 
 
 
-/* Nouveau conteneur pour grouper Tabs et BalanceBar */
-.sticky-header-container {
-  position: fixed;
-  top: 70px; /* Hauteur du Header */
-  left: 0;
-  right: 0;
-  z-index: 999;
-}
 
-/* On ajuste Tabs.jsx pour qu'il ne soit plus fixed lui-même 
-   (il l'est via son parent maintenant) */
-.tabs-wrapper {
-  position: relative; /* Change de fixed à relative */
-  top: 0; 
-  background: rgba(11, 92, 91, 0.9); /* Un peu plus opaque pour la lisibilité */
-  backdrop-filter: blur(10px);
-  padding-bottom: 5px;
-}
-
-/* Ajustement de la Balance Bar */
-.balance-bar {
-  position: relative; /* Change de fixed à relative */
-  top: 0; 
-  display: flex;
-  justify-content: center;
-  
-  /* Animation de glissement depuis le haut (sous les tabs) */
-  transform: translateY(-100%); 
-  opacity: 0;
-  height: 0; /* Pour ne pas prendre de place quand elle est cachée */
-  overflow: hidden;
-  transition: all 0.3s ease-in-out;
-}
-
-.balance-bar.show {
-  transform: translateY(0);
-  opacity: 1;
-  height: 50px; /* Hauteur de la barre visible */
-  margin-top: 5px;
-}
-
-/* Important : Ajuster la marge du contenu pour ne pas que le Header cache le début */
-.page-content {
-  margin-top: 150px; /* Ajuste selon la hauteur totale Header + Tabs */
-  padding-bottom: 120px;
-}
 
 
 
