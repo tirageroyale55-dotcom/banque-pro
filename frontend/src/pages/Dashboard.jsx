@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
@@ -9,138 +9,170 @@ import BottomNav from "../components/BottomNav";
 import Sidebar from "../components/Sidebar";
 import BankCard from "../components/BankCard";
 
+import { useRef } from "react"; // en haut
+
 import Accounts from "./Accounts";
+
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
-  const [data, setData] = useState(null);
-  const [activeTab, setActiveTab] = useState("accounts");
-  const [showBalanceBar, setShowBalanceBar] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
-  const [card, setCard] = useState(null);
 
-  const navigate = useNavigate();
-  const lastScrollRef = useRef(0);
-  const contentRef = useRef(null);
+const [data, setData] = useState(null);
+const [activeTab, setActiveTab] = useState("accounts");
+const [showBalanceBar, setShowBalanceBar] = useState(false);
+const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
+const [card,setCard] = useState(null);
 
-  // 1. Chargement des données
-  useEffect(() => {
-    api("/client/card")
-      .then(setCard)
-      .catch(() => console.log("Erreur carte"));
+const navigate = useNavigate();
 
-    api("/client/dashboard")
-      .then(setData)
-      .catch(() => {
-        localStorage.removeItem("token");
-        navigate("/login");
-      });
-  }, [navigate]);
+const lastScrollRef = useRef(0);
+const contentRef = useRef(null);
 
-  // 2. Gestion du Redimensionnement
-  useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+useEffect(()=>{
 
-  // 3. Reset quand on change d'onglet
-  useEffect(() => {
-    setShowBalanceBar(false);
-    // On remonte le scroll au changement d'onglet
-    if (isDesktop && contentRef.current) {
-      contentRef.current.scrollTo(0, 0);
-    } else {
-      window.scrollTo(0, 0);
-    }
-  }, [activeTab, isDesktop]);
+api("/client/card")
+.then(setCard)
+.catch(()=>console.log("Erreur carte"));
 
-  // 4. LOGIQUE DU SCROLL (La correction est ici)
-  useEffect(() => {
-    const handleScroll = () => {
-      // On ne montre la barre que sur l'onglet "accounts"
-      if (activeTab !== "accounts") {
-        setShowBalanceBar(false);
-        return;
-      }
+},[]);
 
-      // Déterminer quelle source de scroll utiliser
-      const currentScroll = (isDesktop && contentRef.current)
-        ? contentRef.current.scrollTop
-        : window.scrollY;
+useEffect(() => {
 
-      // Seuil de déclenchement (pour ne pas l'afficher tout en haut)
-      const threshold = 120; 
+api("/client/dashboard")
+.then(setData)
+.catch(() => {
+localStorage.removeItem("token");
+navigate("/login");
+});
 
-      // Condition : On remonte (current < last) ET on n'est pas tout en haut
-      if (currentScroll < lastScrollRef.current && currentScroll > threshold) {
-        setShowBalanceBar(true);
-      } else {
-        setShowBalanceBar(false);
-      }
+}, []);
 
-      lastScrollRef.current = currentScroll;
-    };
+useEffect(()=>{
 
-    // L'élément à écouter dépend du mode Desktop/Mobile
-    const scrollTarget = (isDesktop && contentRef.current) ? contentRef.current : window;
+const handleResize = () => {
+setIsDesktop(window.innerWidth >= 1000);
+};
 
-    scrollTarget.addEventListener("scroll", handleScroll);
-    return () => scrollTarget.removeEventListener("scroll", handleScroll);
+window.addEventListener("resize", handleResize);
+
+return () => window.removeEventListener("resize", handleResize);
+
+},[]);
+
+useEffect(()=>{
+setShowBalanceBar(false)
+window.scrollTo(0,0)
+},[activeTab])
+
+
+useEffect(() => {
+  const handleScroll = () => {
+    if (activeTab !== "accounts") return;
+
+    // Cette ligne récupère le scroll PEU IMPORTE d'où il vient (window ou div)
+    const currentScroll = window.scrollY || document.documentElement.scrollTop || (contentRef.current ? contentRef.current.scrollTop : 0);
     
-  }, [activeTab, isDesktop, data]); // On ajoute data pour recalculer si le contenu change
+    // Debug: décommente la ligne suivante pour voir les chiffres dans ta console
+    // console.log("Position:", currentScroll, "Dernier:", lastScrollRef.current);
 
-  if (!data) return null;
+    const isScrollingUp = currentScroll < lastScrollRef.current;
+    
+    // On l'affiche si on remonte ET qu'on a scrollé au moins de 80px
+    if (isScrollingUp && currentScroll > 80) {
+      setShowBalanceBar(true);
+    } else {
+      setShowBalanceBar(false);
+    }
 
-  return (
-    <div className="bank-app">
-      {isDesktop && <Sidebar />}
+    lastScrollRef.current = currentScroll;
+  };
 
-      <div className={isDesktop ? "desktop-content" : ""}>
-        <Header data={data} />
+  // On écoute sur window ET sur la div de contenu pour couvrir 100% des cas
+  window.addEventListener("scroll", handleScroll, true);
+  const div = contentRef.current;
+  if (div) div.addEventListener("scroll", handleScroll);
 
-        <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+  return () => {
+    window.removeEventListener("scroll", handleScroll, true);
+    if (div) div.removeEventListener("scroll", handleScroll);
+  };
+}, [activeTab, isDesktop]);
 
-        <BalanceBar balance={data.balance} visible={showBalanceBar} />
+if (!data) return null;
 
-        {/* Note: Sur desktop, cette div scrolle. Sur mobile, c'est le body */}
-        <div className="page-content" ref={contentRef}>
-          {activeTab === "accounts" && <Accounts data={data} />}
+return (
 
-          {activeTab === "cards" && (
-            <div className="cards-section">
-              <h3 className="cards-title">Mes cartes</h3>
-              <div className="cards-slider">
-                {card && (
-                  <div className="cards-slide">
-                    <BankCard card={card} />
-                  </div>
-                )}
-                <div
-                  className="cards-slide card-request"
-                  onClick={() => navigate("/request-card")}
-                >
-                  <div className="card-request-inner">
-                    <div className="card-plus">+</div>
-                    <p>Demander une carte</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+<div className="bank-app">
 
-          {activeTab === "financing" && (
-            <div className="content">
-              <div className="account-card">
-                <h3>Financements</h3>
-                <p>Aucun financement disponible</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+{isDesktop && <Sidebar/>}
 
-      {!isDesktop && <BottomNav />}
-    </div>
-  );
+<div className={isDesktop ? "desktop-content" : ""}>
+
+<Header data={data} />
+
+<Tabs
+activeTab={activeTab}
+setActiveTab={setActiveTab}
+/>
+
+<BalanceBar
+balance={data.balance}
+visible={showBalanceBar}
+/>
+
+<div className="page-content" ref={contentRef}>
+
+{activeTab === "accounts" && <Accounts data={data}/>}
+
+{activeTab === "cards" && (
+
+<div className="cards-section">
+
+<h3 className="cards-title">Mes cartes</h3>
+
+<div className="cards-slider">
+
+{card && (
+<div className="cards-slide">
+<BankCard card={card}/>
+</div>
+)}
+
+<div
+className="cards-slide card-request"
+onClick={()=>navigate("/request-card")}
+>
+
+<div className="card-request-inner">
+<div className="card-plus">+</div>
+<p>Demander une carte</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
+{activeTab === "financing" && (
+<div className="content">
+<div className="account-card">
+<h3>Financements</h3>
+<p>Aucun financement disponible</p>
+</div>
+</div>
+)}
+
+</div>
+
+</div>
+
+{!isDesktop && <BottomNav/>}
+
+</div>
+
+);
+
 }
