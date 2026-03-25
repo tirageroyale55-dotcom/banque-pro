@@ -66,37 +66,32 @@ window.scrollTo(0,0)
 
 
 useEffect(() => {
-  const handleScroll = () => {
+  const handleScroll = (e) => {
+    // 1. On vérifie qu'on est sur le bon onglet
     if (activeTab !== "accounts") return;
 
-    // Cette ligne récupère le scroll PEU IMPORTE d'où il vient (window ou div)
-    const currentScroll = window.scrollY || document.documentElement.scrollTop || (contentRef.current ? contentRef.current.scrollTop : 0);
+    // 2. On récupère le scroll de n'importe quelle source (Div ou Window)
+    const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
     
-    // Debug: décommente la ligne suivante pour voir les chiffres dans ta console
-    // console.log("Position:", currentScroll, "Dernier:", lastScrollRef.current);
-
-    const isScrollingUp = currentScroll < lastScrollRef.current;
-    
-    // On l'affiche si on remonte ET qu'on a scrollé au moins de 80px
-    if (isScrollingUp && currentScroll > 80) {
+    // 3. LOGIQUE SIMPLE : 
+    // Si on descend (scroll > last) -> on cache
+    // Si on remonte (scroll < last) ET qu'on n'est pas tout en haut (scroll > 50) -> on montre
+    if (scrollTop < lastScrollRef.current && scrollTop > 50) {
       setShowBalanceBar(true);
     } else {
       setShowBalanceBar(false);
     }
 
-    lastScrollRef.current = currentScroll;
+    lastScrollRef.current = scrollTop;
   };
 
-  // On écoute sur window ET sur la div de contenu pour couvrir 100% des cas
+  // On écoute PARTOUT (capture: true permet de capter le scroll des div enfants)
   window.addEventListener("scroll", handleScroll, true);
-  const div = contentRef.current;
-  if (div) div.addEventListener("scroll", handleScroll);
 
   return () => {
     window.removeEventListener("scroll", handleScroll, true);
-    if (div) div.removeEventListener("scroll", handleScroll);
   };
-}, [activeTab, isDesktop]);
+}, [activeTab]);
 
 if (!data) return null;
 
