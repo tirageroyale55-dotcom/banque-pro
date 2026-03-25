@@ -208,7 +208,7 @@ cursor:pointer;
   right: 0;
   display: flex;
   justify-content: center;
-  z-index: 99999; /* On force le passage devant le Header et les Tabs */
+  z-index: 100000; /* On force le passage devant le Header et les Tabs */
   
   /* État caché */
   transform: translateY(-200%); 
@@ -222,11 +222,6 @@ cursor:pointer;
   opacity: 1;
 }
 
-/* IMPORTANT : Tes Tabs doivent avoir un fond opaque pour cacher la barre */
-.tabs-wrapper {
-  background: #0b5c5b !important;
-  /* Encore plus haut que la barre */
-}
 
 .balance-content{
 
