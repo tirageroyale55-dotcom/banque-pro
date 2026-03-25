@@ -66,33 +66,34 @@ window.scrollTo(0,0)
 
 
 useEffect(() => {
-  const handleScroll = () => {
-    if (activeTab !== "accounts") {
-      setShowBalanceBar(false);
-      return;
-    }
+  const handleScroll = (e) => {
+    if (activeTab !== "accounts") return;
 
-    // On récupère la position du scroll
-    const scrollTop = contentRef.current ? contentRef.current.scrollTop : window.scrollY;
-
-    // SEUIL AUTOMATIQUE : 
-    // La carte solde fait environ 200px de haut + 145px de margin top.
-    // Donc si on a scrollé plus de 280px, la carte est cachée -> on montre la barre.
-    const triggerPoint = 280; 
-
-    if (scrollTop > triggerPoint) {
+    // On récupère le scroll de n'importe quelle source
+    const currentScroll = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
+    
+    // 1. CALCUL DE LA DIRECTION
+    const isScrollingUp = currentScroll < lastScrollRef.current;
+    
+    // 2. CONDITION DE SORTIE (Plus simple et plus robuste) :
+    // On montre si : on remonte ET on a dépassé la carte du haut ( > 150px)
+    if (isScrollingUp && currentScroll > 150) {
       setShowBalanceBar(true);
     } else {
+      // On cache si : on descend OU si on est tout en haut
       setShowBalanceBar(false);
     }
+
+    lastScrollRef.current = currentScroll;
   };
 
-  // On écoute sur window et la div (pour mobile et desktop)
-  const target = (isDesktop && contentRef.current) ? contentRef.current : window;
-  target.addEventListener("scroll", handleScroll);
+  // L'écouteur global "capture" pour attraper le scroll des div
+  window.addEventListener("scroll", handleScroll, true);
 
-  return () => target.removeEventListener("scroll", handleScroll);
-}, [activeTab, isDesktop]);
+  return () => {
+    window.removeEventListener("scroll", handleScroll, true);
+  };
+}, [activeTab]);
 
 if (!data) return null;
 

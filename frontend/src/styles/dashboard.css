@@ -94,7 +94,7 @@ backdrop-filter:blur(10px);
 
 padding-bottom:10px;
 
-z-index:100000;
+z-index:999;
 }
 .tabs{
 display:flex;
@@ -201,28 +201,40 @@ cursor:pointer;
 
 /* BALANCE BAR */
 
-/* La barre est cachée par défaut (plus haut) */
 .balance-bar {
   position: fixed;
-  top: 135px; 
+  top: 135px; /* Vérifie que Header(70) + Tabs(65) = 135 */
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
-  z-index: 998; 
-
-  /* Animation fluide de glissement */
-  transform: translateY(-150%); 
+  
+  /* On la met TRÈS haut en z-index mais sous les Tabs */
+  z-index: 2000; 
+  
+  /* Position de départ : cachée derrière les tabs */
+  transform: translateY(-150%);
   opacity: 0;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  /* Transition ultra rapide pour la réactivité */
+  transition: transform 0.3s ease-out, opacity 0.2s ease-out;
   pointer-events: none;
 }
 
-/* Quand on ajoute la classe .show via le JS */
 .balance-bar.show {
+  /* On la fait descendre */
   transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
+}
+
+/* IMPORTANT : Tes Tabs DOIVENT avoir un fond pour masquer la barre qui monte */
+.tabs-wrapper {
+  position: fixed;
+  top: 70px;
+  background: #0b5c5b !important; /* Pas de transparence ici ! */
+  z-index: 3000; /* Toujours au-dessus de la balance-bar */
+  width: 100%;
 }
 
 
