@@ -65,33 +65,42 @@ window.scrollTo(0,0)
 },[activeTab])
 
 
-useEffect(() => {
-  const handleScroll = (e) => {
-    // 1. On vérifie qu'on est sur le bon onglet
-    if (activeTab !== "accounts") return;
+// Dans Dashboard.jsx, modifie le useEffect du scroll :
 
-    // 2. On récupère le scroll de n'importe quelle source (Div ou Window)
-    const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
-    
-    // 3. LOGIQUE SIMPLE : 
-    // Si on descend (scroll > last) -> on cache
-    // Si on remonte (scroll < last) ET qu'on n'est pas tout en haut (scroll > 50) -> on montre
-    if (scrollTop < lastScrollRef.current && scrollTop > 50) {
+useEffect(() => {
+  const handleScroll = () => {
+    if (activeTab !== "accounts") {
+      setShowBalanceBar(false);
+      return;
+    }
+
+    // On récupère la position actuelle du scroll
+    // Si contentRef est le scroll interne (desktop), on l'utilise, sinon window
+    const currentScroll = isDesktop && contentRef.current 
+      ? contentRef.current.scrollTop 
+      : window.scrollY;
+
+    // LOGIQUE DE DÉTECTION
+    // 1. On scrolle vers le haut (current < last)
+    // 2. On n'est pas tout en haut de la page (current > 50)
+    const isScrollingUp = currentScroll < lastScrollRef.current;
+    const isNotAtTop = currentScroll > 50;
+
+    if (isScrollingUp && isNotAtTop) {
       setShowBalanceBar(true);
     } else {
       setShowBalanceBar(false);
     }
 
-    lastScrollRef.current = scrollTop;
+    lastScrollRef.current = currentScroll;
   };
 
-  // On écoute PARTOUT (capture: true permet de capter le scroll des div enfants)
-  window.addEventListener("scroll", handleScroll, true);
-
-  return () => {
-    window.removeEventListener("scroll", handleScroll, true);
-  };
-}, [activeTab]);
+  // On attache l'évenement au bon endroit
+  const scrollEl = (isDesktop && contentRef.current) ? contentRef.current : window;
+  
+  scrollEl.addEventListener("scroll", handleScroll);
+  return () => scrollEl.removeEventListener("scroll", handleScroll);
+}, [activeTab, isDesktop]); // Ajoute isDesktop ici
 
 if (!data) return null;
 
