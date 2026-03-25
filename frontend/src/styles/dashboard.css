@@ -82,18 +82,20 @@ cursor:pointer;
 
 /* TABS */
 
-.tabs-wrapper {
-  position: fixed;
-  top: 70px;
-  left: 0;
-  right: 0;
-  background: #0b5c5b; /* Couleur unie identique au fond */
-  z-index: 1000; /* Toujours au-dessus de la balance bar */
-  padding-bottom: 12px;
-  /* Optionnel : petite ombre sous les onglets pour séparer les plans */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
+.tabs-wrapper{
+position:fixed;
 
+top:70px;
+left:0;
+right:0;
+
+background:rgba(11,92,91,0.55);
+backdrop-filter:blur(10px);
+
+padding-bottom:10px;
+
+z-index:999;
+}
 .tabs{
 display:flex;
 gap:10px;
@@ -199,50 +201,30 @@ cursor:pointer;
 
 /* BALANCE BAR */
 
+/* La barre est cachée par défaut (plus haut) */
 .balance-bar {
   position: fixed;
-  top: 135px; /* Ajuste selon la hauteur cumulée Header + Tabs */
+  top: 135px; 
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
-  
-  /* Transition fluide et pro */
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-  
-  /* On la cache pile derrière les onglets */
-  transform: translateY(-80%); 
+  z-index: 998; 
+
+  /* Animation fluide de glissement */
+  transform: translateY(-150%); 
   opacity: 0;
-  
-  /* Z-index juste sous les onglets */
-  z-index: 900; 
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
 }
 
+/* Quand on ajoute la classe .show via le JS */
 .balance-bar.show {
-  transform: translateY(10px); /* Petit effet de rebond vers le bas pour le style */
+  transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
 }
 
-.balance-content {
-  width: 92%;
-  max-width: 400px;
-  background: rgba(15, 109, 108, 0.95); /* Plus opaque pour le contraste */
-  backdrop-filter: blur(12px);
-  padding: 12px 20px;
-  border-radius: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  
-  /* Ombre portée élégante */
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 
-              0 8px 10px -6px rgba(0, 0, 0, 0.3);
-  
-  /* Bordure fine interne pour l'aspect premium */
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
 
 .balance-content span {
   font-size:13px;

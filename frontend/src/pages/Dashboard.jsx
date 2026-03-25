@@ -66,34 +66,33 @@ window.scrollTo(0,0)
 
 
 useEffect(() => {
-  let scrollTimeout;
-
-  const handleScroll = (e) => {
-    if (activeTab !== "accounts") return;
-
-    const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
-    
-    // On ne déclenche rien si on est trop près du haut (moins de 150px)
-    if (scrollTop < 150) {
+  const handleScroll = () => {
+    if (activeTab !== "accounts") {
       setShowBalanceBar(false);
       return;
     }
 
-    // Détection de la direction
-    if (scrollTop < lastScrollRef.current) {
-      // On remonte : on montre la barre
+    // On récupère la position du scroll
+    const scrollTop = contentRef.current ? contentRef.current.scrollTop : window.scrollY;
+
+    // SEUIL AUTOMATIQUE : 
+    // La carte solde fait environ 200px de haut + 145px de margin top.
+    // Donc si on a scrollé plus de 280px, la carte est cachée -> on montre la barre.
+    const triggerPoint = 280; 
+
+    if (scrollTop > triggerPoint) {
       setShowBalanceBar(true);
     } else {
-      // On descend : on cache la barre
       setShowBalanceBar(false);
     }
-
-    lastScrollRef.current = scrollTop;
   };
 
-  window.addEventListener("scroll", handleScroll, true);
-  return () => window.removeEventListener("scroll", handleScroll, true);
-}, [activeTab]);
+  // On écoute sur window et la div (pour mobile et desktop)
+  const target = (isDesktop && contentRef.current) ? contentRef.current : window;
+  target.addEventListener("scroll", handleScroll);
+
+  return () => target.removeEventListener("scroll", handleScroll);
+}, [activeTab, isDesktop]);
 
 if (!data) return null;
 
