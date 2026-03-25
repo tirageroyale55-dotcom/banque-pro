@@ -82,20 +82,16 @@ cursor:pointer;
 
 /* TABS */
 
-.tabs-wrapper{
-position:fixed;
-
-top:70px;
-left:0;
-right:0;
-
-background:rgba(11,92,91,0.55);
-backdrop-filter:blur(10px);
-
-padding-bottom:10px;
-
-z-index:999;
+.tabs-wrapper {
+  position: fixed;
+  top: 70px; /* Juste sous le header */
+  left: 0;
+  right: 0;
+  background: #0b5c5b; /* Fond opaque pour cacher la barre qui monte */
+  padding-bottom: 10px;
+  z-index: 1000; /* Plus haut que la BalanceBar */
 }
+
 .tabs{
 display:flex;
 gap:10px;
@@ -203,24 +199,29 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 142px; 
+  /* top = Header(70px) + Tabs(environ 65px) */
+  top: 135px; 
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
-  /* Augmente le z-index pour être sûr qu'il soit au dessus du contenu blanc */
-  z-index: 998; 
-  
-  transform: translateY(-150%); /* Légèrement plus haut pour bien cacher */
+
+  /* On la cache derrière les onglets au repos */
+  transform: translateY(-100%); 
   opacity: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none; /* Évite de bloquer les clics quand invisible */
+  
+  /* Transition fluide */
+  transition: transform 0.3s ease-out, opacity 0.2s ease-out;
+
+  /* Entre les onglets (1000) et le contenu (990) */
+  z-index: 995; 
+  pointer-events: none; /* Ne bloque pas le clic quand elle est cachée */
 }
 
 .balance-bar.show {
-  transform: translateY(0);
+  transform: translateY(0); /* Elle descend */
   opacity: 1;
-  pointer-events: auto;
+  pointer-events: auto; /* On peut cliquer dessus quand elle est là */
 }
 
 .balance-content{
