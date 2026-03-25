@@ -66,32 +66,39 @@ window.scrollTo(0,0)
 
 
 useEffect(() => {
-  const el = contentRef.current;
-
-  if (!el) return;
 
   const handleScroll = () => {
+
     if (activeTab !== "accounts") {
       setShowBalanceBar(false);
       return;
     }
 
-    // ici on regarde le scroll de .page-content
-    const scrollTop = el.scrollTop;
+    const currentScroll = contentRef.current
+      ? contentRef.current.scrollTop
+      : window.scrollY;
 
-    if (scrollTop > 160) {
+    console.log("scroll:", currentScroll);
+
+    // 🔥 SCROLL VERS LE HAUT
+    if (
+      currentScroll < lastScrollRef.current &&
+      currentScroll > 100
+    ) {
       setShowBalanceBar(true);
     } else {
       setShowBalanceBar(false);
     }
+
+    lastScrollRef.current = currentScroll;
   };
 
-  el.addEventListener("scroll", handleScroll);
+  const scrollEl = contentRef.current || window;
 
-  // déclenche une fois au chargement
-  handleScroll();
+  scrollEl.addEventListener("scroll", handleScroll);
 
-  return () => el.removeEventListener("scroll", handleScroll);
+  return () => scrollEl.removeEventListener("scroll", handleScroll);
+
 }, [activeTab]);
 
 if (!data) return null;
@@ -118,9 +125,7 @@ visible={showBalanceBar}
 
 <div className="page-content" ref={contentRef}>
 
-{activeTab === "accounts" && (
-  <Accounts data={data} accountRef={accountRef} />
-)}
+{activeTab === "accounts" && <Accounts data={data}/>}
 
 {activeTab === "cards" && (
 

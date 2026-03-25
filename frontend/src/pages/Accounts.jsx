@@ -22,7 +22,7 @@ ChartJS.register(
   Legend
 );
 
-export default function Accounts({ data, accountRef }) {
+export default function Accounts({ data }) {
 
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
@@ -37,7 +37,6 @@ const formatDate = (date) => date.toISOString().split("T")[0];
 
 const [startDate, setStartDate] = useState(formatDate(firstDay));
 const [endDate, setEndDate] = useState(formatDate(today));
-
   const [showFilters, setShowFilters] = useState(false);
 
   // 🔹 FILTRE + TRI
@@ -114,7 +113,7 @@ const [endDate, setEndDate] = useState(formatDate(today));
     <div className="content">
 
       {/* CARD */}
-      <div className="account-card" ref={accountRef}>
+      <div className="account-card">
         <div className="balance">{data.balance} €</div>
         <div className="owner">{data.firstname} {data.lastname}</div>
         <div className="iban">{data.iban}</div>
