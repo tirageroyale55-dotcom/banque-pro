@@ -227,17 +227,7 @@ cursor:pointer;
   opacity: 1;
 }
 
-.balance-bar {
-  /* ... tes styles précédents ... */
-  transition: transform 0.2s ease-in-out, opacity 0.15s linear;
-}
 
-/* Force la disparition si on change d'onglet */
-.balance-bar:not(.show) {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-}
 
 .balance-content {
   background: rgba(15, 109, 108, 0.98);

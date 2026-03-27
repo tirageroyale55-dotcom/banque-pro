@@ -72,39 +72,42 @@ window.scrollTo(0,0)
 
 
 useEffect(() => {
-  const handleScroll = () => {
-    const bar = document.querySelector('.balance-bar');
+  const handleScroll = (e) => {
+    if (activeTab !== "accounts") return;
+
+    // Récupération du scroll (compatible tout support)
+    const st = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
+    const bar = document.querySelector('.balance-bar'); // On cible l'élément directement
+    
     if (!bar) return;
 
-    // VERROU : Si on n'est pas sur "accounts", on cache la barre et on arrête tout
-    if (activeTab !== "accounts") {
-      bar.classList.remove('show');
+    // LOGIQUE : 
+    // 1. Si on est en haut (zone de la grosse carte), on cache de force.
+    if (st < 180) {
+      bar.style.transform = "translateY(-100%)";
+      bar.style.opacity = "0";
+      lastScrollRef.current = st;
       return;
     }
 
-    const accountCard = document.querySelector('.account-card');
-    if (!accountCard) return;
-
-    // Détection de la position de la carte verte
-    const cardBottom = accountCard.getBoundingClientRect().bottom;
-    const tabsBottom = 135; // La limite sous tes onglets
-
-    // La barre s'affiche uniquement si la carte a disparu
-    if (cardBottom < tabsBottom) {
-      bar.classList.add('show');
-    } else {
-      bar.classList.remove('show');
+    // 2. Si on remonte (scroll up), on fait sortir la barre INSTANTANÉMENT
+    if (st < lastScrollRef.current) {
+      bar.style.transform = "translateY(0)";
+      bar.style.opacity = "1";
+    } 
+    // 3. Si on descend (scroll down), on la cache INSTANTANÉMENT
+    else {
+      bar.style.transform = "translateY(-100%)";
+      bar.style.opacity = "0";
     }
+
+    lastScrollRef.current = st;
   };
 
-  // On écoute le scroll
+  // Le secret : 'true' pour intercepter le scroll même dans les sous-divs
   window.addEventListener("scroll", handleScroll, true);
-  
-  // Appels immédiats pour vérifier l'état lors du changement d'onglet
-  handleScroll();
-
   return () => window.removeEventListener("scroll", handleScroll, true);
-}, [activeTab]); // Se déclenche à chaque fois que tu cliques sur un bouton/onglet
+}, [activeTab]);
 
 if (!data) return null;
 
