@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
@@ -8,183 +8,147 @@ import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 import Sidebar from "../components/Sidebar";
 import BankCard from "../components/BankCard";
-
-import { useRef } from "react"; // en haut
-
 import Accounts from "./Accounts";
 
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
+  const [data, setData] = useState(null);
+  const [activeTab, setActiveTab] = useState("accounts");
+  const [showBalanceBar, setShowBalanceBar] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
+  const [card, setCard] = useState(null);
+  const [isCardVisible, setIsCardVisible] = useState(true);
 
-const [data, setData] = useState(null);
-const [activeTab, setActiveTab] = useState("accounts");
-const [showBalanceBar, setShowBalanceBar] = useState(false);
-const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
-const [card,setCard] = useState(null);
+  const navigate = useNavigate();
+  const lastScrollRef = useRef(0);
+  const contentRef = useRef(null);
 
-// Ajoute cette Ref en haut avec les autres
-const observerRef = useRef(null);
-const [isCardVisible, setIsCardVisible] = useState(true);
+  // 1. Chargement des données Initiales
+  useEffect(() => {
+    api("/client/card")
+      .then(setCard)
+      .catch(() => console.log("Erreur carte"));
 
-const navigate = useNavigate();
+    api("/client/dashboard")
+      .then(setData)
+      .catch(() => {
+        localStorage.removeItem("token");
+        navigate("/login");
+      });
+  }, [navigate]);
 
-const lastScrollRef = useRef(0);
-const contentRef = useRef(null);
+  // 2. Gestion du Resize
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-useEffect(()=>{
+  // 3. Reset quand on change d'onglet
+  useEffect(() => {
+    setShowBalanceBar(false);
+    // Reset le scroll selon le mode (Desktop ou Mobile)
+    if (isDesktop && contentRef.current) {
+      contentRef.current.scrollTop = 0;
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [activeTab, isDesktop]);
 
-api("/client/card")
-.then(setCard)
-.catch(()=>console.log("Erreur carte"));
-
-},[]);
-
-useEffect(() => {
-
-api("/client/dashboard")
-.then(setData)
-.catch(() => {
-localStorage.removeItem("token");
-navigate("/login");
-});
-
-}, []);
-
-useEffect(()=>{
-
-const handleResize = () => {
-setIsDesktop(window.innerWidth >= 1000);
-};
-
-window.addEventListener("resize", handleResize);
-
-return () => window.removeEventListener("resize", handleResize);
-
-},[]);
-
-useEffect(()=>{
-setShowBalanceBar(false)
-window.scrollTo(0,0)
-},[activeTab])
-
-
-
-
-useEffect(() => {
-  // On crée un observateur qui surveille si la carte est à l'écran
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      setIsCardVisible(entry.isIntersecting);
-    },
-    { threshold: 0 } // Se déclenche dès que le premier pixel sort
-  );
-
-  // On cible la carte de solde (qui est dans Accounts.jsx, ou on met une div invisible pour tester)
-  const target = document.querySelector('.account-card');
-  if (target) observer.observe(target);
-
-  return () => observer.disconnect();
-}, [activeTab]);
-
-useEffect(() => {
-  const handleScroll = (e) => {
+  // 4. LOGIQUE DE DÉTECTION (OBSERVER + SCROLL)
+  useEffect(() => {
     if (activeTab !== "accounts") return;
 
-    const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
-    
-    // CONDITION : La carte n'est plus visible ET on remonte
-    const isScrollingUp = scrollTop < lastScrollRef.current;
+    // Observer pour savoir si la grosse carte solde est à l'écran
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsCardVisible(entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
 
-    if (!isCardVisible && isScrollingUp && scrollTop > 100) {
-      setShowBalanceBar(true);
-    } else {
-      setShowBalanceBar(false);
-    }
+    const target = document.querySelector(".account-card");
+    if (target) observer.observe(target);
 
-    lastScrollRef.current = scrollTop;
-  };
+    // Fonction de Scroll unique
+    const handleScroll = (e) => {
+      // Récupère le scroll peu importe l'élément qui bouge (Window ou Div)
+      const currentScroll = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
+      
+      const isScrollingUp = currentScroll < lastScrollRef.current;
 
-  // On écoute en mode "Capture" (le fameux true) pour capter le scroll des DIV internes
-  window.addEventListener("scroll", handleScroll, true);
-  return () => window.removeEventListener("scroll", handleScroll, true);
-}, [isCardVisible, activeTab]);
+      // CONDITION PRO : La carte est sortie ET on remonte ET on n'est pas tout en haut
+      if (!isCardVisible && isScrollingUp && currentScroll > 100) {
+        setShowBalanceBar(true);
+      } else {
+        setShowBalanceBar(false);
+      }
 
-if (!data) return null;
+      lastScrollRef.current = currentScroll;
+    };
 
-return (
+    // On écoute avec 'true' pour capturer le scroll de n'importe quelle DIV (très important pour ton layout)
+    window.addEventListener("scroll", handleScroll, true);
 
-<div className="bank-app">
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [activeTab, isCardVisible]); // Se relance quand la visibilité de la carte change
 
-{isDesktop && <Sidebar/>}
 
-<div className={isDesktop ? "desktop-content" : ""}>
+  if (!data) return null;
 
-<Header data={data} />
+  return (
+    <div className="bank-app">
+      {isDesktop && <Sidebar />}
 
-<Tabs
-activeTab={activeTab}
-setActiveTab={setActiveTab}
-/>
+      <div className={isDesktop ? "desktop-content" : ""}>
+        <Header data={data} />
 
-<BalanceBar
-balance={data.balance}
-visible={showBalanceBar}
-/>
+        <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-<div className="page-content" ref={contentRef}>
+        {/* Barre de solde persistante au scroll */}
+        <BalanceBar balance={data.balance} visible={showBalanceBar} />
 
-{activeTab === "accounts" && <Accounts data={data}/>}
+        <div className="page-content" ref={contentRef}>
+          {activeTab === "accounts" && <Accounts data={data} />}
 
-{activeTab === "cards" && (
+          {activeTab === "cards" && (
+            <div className="cards-section">
+              <h3 className="cards-title">Mes cartes</h3>
+              <div className="cards-slider">
+                {card && (
+                  <div className="cards-slide">
+                    <BankCard card={card} />
+                  </div>
+                )}
+                <div
+                  className="cards-slide card-request"
+                  onClick={() => navigate("/request-card")}
+                >
+                  <div className="card-request-inner">
+                    <div className="card-plus">+</div>
+                    <p>Demander une carte</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
-<div className="cards-section">
+          {activeTab === "financing" && (
+            <div className="content">
+              <div className="account-card">
+                <h3>Financements</h3>
+                <p>Aucun financement disponible</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
-<h3 className="cards-title">Mes cartes</h3>
-
-<div className="cards-slider">
-
-{card && (
-<div className="cards-slide">
-<BankCard card={card}/>
-</div>
-)}
-
-<div
-className="cards-slide card-request"
-onClick={()=>navigate("/request-card")}
->
-
-<div className="card-request-inner">
-<div className="card-plus">+</div>
-<p>Demander une carte</p>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-)}
-
-{activeTab === "financing" && (
-<div className="content">
-<div className="account-card">
-<h3>Financements</h3>
-<p>Aucun financement disponible</p>
-</div>
-</div>
-)}
-
-</div>
-
-</div>
-
-{!isDesktop && <BottomNav/>}
-
-</div>
-
-);
-
+      {!isDesktop && <BottomNav />}
+    </div>
+  );
 }
