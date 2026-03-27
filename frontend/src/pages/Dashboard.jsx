@@ -66,28 +66,31 @@ window.scrollTo(0,0)
 
 
 useEffect(() => {
-  const handleScroll = () => {
+  const handleScroll = (e) => {
     if (activeTab !== "accounts") return;
 
-    // Détection universelle du scroll (Window ou Div)
-    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+    // On récupère le scroll de la source de l'événement (très fiable)
+    const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
 
-    // 1. On détermine la direction
-    const isScrollingUp = currentScroll < lastScrollRef.current;
+    // Calcul de la direction
+    const isScrollingUp = scrollTop < lastScrollRef.current;
     
-    // 2. On affiche si on remonte ET qu'on a dépassé la carte solde (> 180px)
-    if (isScrollingUp && currentScroll > 180) {
+    // On affiche si on remonte ET qu'on a dépassé la carte du haut (> 150px)
+    if (isScrollingUp && scrollTop > 150) {
       setShowBalanceBar(true);
     } else {
       setShowBalanceBar(false);
     }
 
-    lastScrollRef.current = currentScroll;
+    lastScrollRef.current = scrollTop;
   };
 
-  // On écoute le scroll global
-  window.addEventListener("scroll", handleScroll);
-  return () => window.removeEventListener("scroll", handleScroll);
+  // Le secret : "true" à la fin permet de capter le scroll de n'importe quelle DIV
+  window.addEventListener("scroll", handleScroll, true);
+
+  return () => {
+    window.removeEventListener("scroll", handleScroll, true);
+  };
 }, [activeTab]);
 
 if (!data) return null;

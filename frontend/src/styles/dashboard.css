@@ -203,32 +203,35 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 138px; /* Ajustement précis sous les onglets */
+  top: 140px; /* Pile sous les onglets */
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   
-  /* POSITION DE DÉPART : Cachée plus haut */
-  transform: translateY(-50px); 
+  /* On la met en priorité absolue pour le test */
+  z-index: 99999 !important; 
+  
+  /* État caché : On la remonte de 100px */
+  transform: translateY(-100px); 
   opacity: 0;
   
-  /* ANIMATION : Plus rapide (0.3s) pour être réactive */
+  /* Animation simple et rapide */
   transition: all 0.3s ease-out;
-  
-  z-index: 990; /* Juste en dessous des Tabs (999) */
+  pointer-events: none;
 }
 
 .balance-bar.show {
-  /* POSITION FINALE : Elle descend à sa place */
+  /* État visible : Elle descend à sa place (0) */
   transform: translateY(0);
   opacity: 1;
+  pointer-events: auto;
 }
 
-/* S'assurer que les onglets sont bien opaques pour masquer la barre */
-.tabs-wrapper {
-  background-color: #0b5c5b !important;
-  z-index: 999;
+/* On s'assure que l'entête et les onglets restent devant pour l'effet "tiroir" */
+.header, .tabs-wrapper {
+  z-index: 100000 !important;
+  background: #0b5c5b !important; /* Couleur de fond opaque obligatoire */
 }
 
 
