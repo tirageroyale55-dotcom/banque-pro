@@ -82,18 +82,20 @@ cursor:pointer;
 
 /* TABS */
 
-.tabs-wrapper {
-  position: fixed;
-  top: 70px;
-  left: 0;
-  right: 0;
-  height: 65px;
-  background:rgba(11,92,91,0.55);
-  z-index: 1000; /* Devant la barre */
-  display: flex;
-  align-items: center;
-}
+.tabs-wrapper{
+position:fixed;
 
+top:70px;
+left:0;
+right:0;
+
+background:rgba(11,92,91,0.55);
+backdrop-filter:blur(10px);
+
+padding-bottom:10px;
+
+z-index:999;
+}
 .tabs{
 display:flex;
 gap:10px;
@@ -201,25 +203,26 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 135px; /* Ajuste pour être collé sous tes Tabs */
+  top: 135px; /* Ajuste pour coller sous tes onglets */
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   
-  /* IMPORTANT : Pas de transition CSS ! 
-     C'est le JS qui gère le mouvement au pixel près */
-  transition: none !important; 
+  /* POSITION DERRIÈRE : Doit être plus petit que les Tabs (999) */
+  z-index: 800; 
   
-  /* Derrière les onglets */
-  z-index: 900; 
+  /* ÉTAT CACHÉ : Juste derrière les onglets */
+  transform: translateY(-100%); 
   opacity: 0;
-  transform: translateY(-50px);
+  
+  /* TRANSITION : "ease-out" pour que ce soit réactif au scroll */
+  transition: transform 0.3s ease-out, opacity 0.2s ease-out;
+  pointer-events: none;
 }
 
-
 .balance-bar.show {
-  /* Elle descend à sa position normale */
+  /* ÉTAT VISIBLE : Elle descend */
   transform: translateY(0);
   opacity: 1;
   pointer-events: auto;

@@ -68,43 +68,26 @@ window.scrollTo(0,0)
 },[activeTab])
 
 
-// Remplace ton useEffect de scroll par celui-ci
 useEffect(() => {
   const handleScroll = (e) => {
     if (activeTab !== "accounts") return;
 
-    // Récupération ultra-rapide du scroll
-    const st = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
-
-    // RÉGLAGE DE LA SENSIBILITÉ :
-    // La barre commence à sortir à 150px et est à fond à 220px.
-    const start = 150; 
-    const end = 220;
-
-    if (st > start) {
-      // On calcule un ratio entre 0 et 1
-      const travel = Math.min((st - start) / (end - start), 1);
-      
-      // On déplace la barre de -50px (cachée) à 0px (visible) en temps réel
-      const translateY = -50 + (50 * travel);
-      const opacity = travel;
-
-      // On applique directement au DOM pour éviter le lag du cycle de rendu React
-      const bar = document.querySelector('.balance-bar');
-      if (bar) {
-        bar.style.transform = `translateY(${translateY}px)`;
-        bar.style.opacity = opacity;
-        bar.style.pointerEvents = travel > 0.5 ? 'auto' : 'none';
-      }
+    // Détection du scroll ultra-large (Div ou Window)
+    const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
+    
+    // DIRECTION & SEUIL
+    // On montre la barre si on remonte (scroll < last) 
+    // ET si on a assez scrollé pour que la carte disparaisse (> 160)
+    if (scrollTop < lastScrollRef.current && scrollTop > 160) {
+      setShowBalanceBar(true);
     } else {
-      const bar = document.querySelector('.balance-bar');
-      if (bar) {
-        bar.style.transform = `translateY(-50px)`;
-        bar.style.opacity = 0;
-      }
+      setShowBalanceBar(false);
     }
+
+    lastScrollRef.current = scrollTop;
   };
 
+  // Le "true" ici est capital pour que ça marche sur mobile et desktop
   window.addEventListener("scroll", handleScroll, true);
   return () => window.removeEventListener("scroll", handleScroll, true);
 }, [activeTab]);
