@@ -224,7 +224,7 @@ cursor:pointer;
 
 /* IMPORTANT : Tes Tabs doivent avoir un fond opaque pour cacher la barre */
 .tabs-wrapper {
-  
+  background: #0b5c5b !important;
   z-index: 100000; /* Encore plus haut que la barre */
 }
 
