@@ -72,35 +72,29 @@ window.scrollTo(0,0)
 
 
 useEffect(() => {
-  const handleScroll = (e) => {
+  const handleScroll = () => {
     if (activeTab !== "accounts") return;
 
-    // Récupération du scroll (compatible tout support)
-    const st = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
     const bar = document.querySelector('.balance-bar');
-    if (!bar) return;
-
-    // 1. On calcule la direction (Ancien scroll - Nouveau scroll)
-    const isScrollingUp = st < lastScrollRef.current;
+    // On cherche la carte solde qui est dans Accounts.jsx
+    const accountCard = document.querySelector('.account-card');
     
-    // 2. SEUIL DE SÉCURITÉ : On ne montre pas la barre si on est tout en haut 
-    // pour ne pas cacher la grosse carte de solde.
-    const isTooHigh = st < 120;
+    if (!bar || !accountCard) return;
 
-    // 3. ACTION : Si on remonte ET qu'on n'est pas tout en haut -> Affiche
-    if (isScrollingUp && !isTooHigh) {
+    // On récupère la position du bas de la carte verte
+    const cardBottom = accountCard.getBoundingClientRect().bottom;
+    // On récupère la position du bas des onglets (Tabs)
+    const tabsBottom = 135; 
+
+    // LOGIQUE : Si le bas de la carte passe au-dessus de la limite des onglets
+    if (cardBottom < tabsBottom) {
       bar.classList.add('show');
-    } 
-    // Si on descend OU qu'on revient tout en haut -> Cache
-    else {
+    } else {
       bar.classList.remove('show');
     }
-
-    // On met à jour la position pour le prochain calcul
-    lastScrollRef.current = st;
   };
 
-  // On utilise 'true' pour capturer le scroll sans délai
+  // Ajout de l'écouteur sur la fenêtre
   window.addEventListener("scroll", handleScroll, true);
   return () => window.removeEventListener("scroll", handleScroll, true);
 }, [activeTab]);
