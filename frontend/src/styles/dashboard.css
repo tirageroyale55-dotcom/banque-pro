@@ -204,7 +204,7 @@ cursor:pointer;
 /* BALANCE BAR */
 .balance-bar {
   position: fixed;
-  top: 145px; /* Position exacte sous les tabs */
+  top: 155px; /* Position exacte sous les tabs */
   left: 0;
   right: 0;
   display: flex;
