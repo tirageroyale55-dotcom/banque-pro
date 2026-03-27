@@ -203,25 +203,22 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 135px; /* Ajuste pour être collé sous tes Tabs */
+  top: 135px;
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
+  z-index: 900; 
   
-  /* L'ordre des couches est CRUCIAL */
-  z-index: 800; /* Plus petit que Tabs (1000) */
-  
-  /* État initial : Caché derrière les tabs */
-  transform: translateY(-100%);
+  transform: translateY(-120%); /* On la cache un peu plus haut */
   opacity: 0;
   
-  /* Transition rapide pour le feeling "App native" */
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s linear;
+  /* Transition plus nerveuse */
+  transition: transform 0.2s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.15s ease;
   pointer-events: none;
 }
+
 .balance-bar.show {
-  /* ÉTAT VISIBLE : Elle descend */
   transform: translateY(0);
   opacity: 1;
   pointer-events: auto;

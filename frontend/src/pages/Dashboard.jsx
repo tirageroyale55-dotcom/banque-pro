@@ -75,36 +75,29 @@ useEffect(() => {
   const handleScroll = (e) => {
     if (activeTab !== "accounts") return;
 
-    // Récupération du scroll (compatible tout support)
     const st = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
-    const bar = document.querySelector('.balance-bar'); // On cible l'élément directement
-    
+    const bar = document.querySelector('.balance-bar');
     if (!bar) return;
 
-    // LOGIQUE : 
-    // 1. Si on est en haut (zone de la grosse carte), on cache de force.
-    if (st < 180) {
-      bar.style.transform = "translateY(-100%)";
-      bar.style.opacity = "0";
-      lastScrollRef.current = st;
-      return;
-    }
+    // Calcul de la différence de scroll
+    const diff = lastScrollRef.current - st;
 
-    // 2. Si on remonte (scroll up), on fait sortir la barre INSTANTANÉMENT
-    if (st < lastScrollRef.current) {
-      bar.style.transform = "translateY(0)";
-      bar.style.opacity = "1";
+    // 1. Si on descend : on cache DIRECTEMENT (plus réactif)
+    if (st > lastScrollRef.current) {
+      bar.classList.remove('show');
     } 
-    // 3. Si on descend (scroll down), on la cache INSTANTANÉMENT
-    else {
-      bar.style.transform = "translateY(-100%)";
-      bar.style.opacity = "0";
+    // 2. Si on remonte de plus de 5px (seuil de sensibilité) ET qu'on n'est pas déjà tout en haut
+    else if (diff > 5 && st > 100) {
+      bar.classList.add('show');
+    }
+    // 3. Si on revient tout en haut : on cache pour laisser place à la grosse carte
+    if (st < 100) {
+      bar.classList.remove('show');
     }
 
     lastScrollRef.current = st;
   };
 
-  // Le secret : 'true' pour intercepter le scroll même dans les sous-divs
   window.addEventListener("scroll", handleScroll, true);
   return () => window.removeEventListener("scroll", handleScroll, true);
 }, [activeTab]);
