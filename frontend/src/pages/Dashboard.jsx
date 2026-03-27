@@ -22,6 +22,8 @@ const [activeTab, setActiveTab] = useState("accounts");
 const [showBalanceBar, setShowBalanceBar] = useState(false);
 const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
 const [card,setCard] = useState(null);
+// Crée une ref pour la barre en haut de ton composant
+const balanceBarRef = useRef(null);
 
 const [scrollOffset, setScrollOffset] = useState(-60); // Cachée par défaut
 const [opacity, setOpacity] = useState(0);
@@ -68,34 +70,41 @@ window.scrollTo(0,0)
 },[activeTab])
 
 
+
 useEffect(() => {
   const handleScroll = (e) => {
     if (activeTab !== "accounts") return;
 
+    // Récupération du scroll (compatible tout support)
     const st = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
+    const bar = document.querySelector('.balance-bar'); // On cible l'élément directement
     
-    // 1. On ne fait rien si on est tout en haut (pour laisser la grosse carte tranquille)
-    if (st < 150) {
-      setScrollOffset(-60);
-      setOpacity(0);
+    if (!bar) return;
+
+    // LOGIQUE : 
+    // 1. Si on est en haut (zone de la grosse carte), on cache de force.
+    if (st < 180) {
+      bar.style.transform = "translateY(-100%)";
+      bar.style.opacity = "0";
       lastScrollRef.current = st;
       return;
     }
 
-    // 2. Détection du mouvement vers le HAUT
+    // 2. Si on remonte (scroll up), on fait sortir la barre INSTANTANÉMENT
     if (st < lastScrollRef.current) {
-      // On remonte : on fait apparaître la barre progressivement
-      setScrollOffset((prev) => Math.min(prev + 5, 0)); // Monte vers 0
-      setOpacity((prev) => Math.min(prev + 0.1, 1));    // Monte vers 1
-    } else {
-      // On descend : on cache TOUT DE SUITE
-      setScrollOffset(-60);
-      setOpacity(0);
+      bar.style.transform = "translateY(0)";
+      bar.style.opacity = "1";
+    } 
+    // 3. Si on descend (scroll down), on la cache INSTANTANÉMENT
+    else {
+      bar.style.transform = "translateY(-100%)";
+      bar.style.opacity = "0";
     }
 
     lastScrollRef.current = st;
   };
 
+  // Le secret : 'true' pour intercepter le scroll même dans les sous-divs
   window.addEventListener("scroll", handleScroll, true);
   return () => window.removeEventListener("scroll", handleScroll, true);
 }, [activeTab]);

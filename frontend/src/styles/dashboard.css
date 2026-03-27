@@ -94,7 +94,7 @@ backdrop-filter:blur(10px);
 
 padding-bottom:10px;
 
-z-index:999;
+z-index:1000;
 }
 .tabs{
 display:flex;
@@ -203,20 +203,23 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 135px; /* Sous tes Tabs */
+  top: 135px; /* Ajuste pour être collé sous tes Tabs */
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   
-  /* DERRIÈRE LES TABS */
-  z-index: 800; 
+  /* L'ordre des couches est CRUCIAL */
+  z-index: 800; /* Plus petit que Tabs (1000) */
   
-  /* On met une transition très courte (0.1s) pour lisser le mouvement du JS */
-  transition: transform 0.1s linear, opacity 0.1s linear;
+  /* État initial : Caché derrière les tabs */
+  transform: translateY(-100%);
+  opacity: 0;
+  
+  /* Transition rapide pour le feeling "App native" */
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s linear;
   pointer-events: none;
 }
-
 .balance-bar.show {
   /* ÉTAT VISIBLE : Elle descend */
   transform: translateY(0);
