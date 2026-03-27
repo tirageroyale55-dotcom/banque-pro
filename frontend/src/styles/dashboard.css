@@ -203,25 +203,33 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 135px;
+  top: 135px; /* Vérifie que c'est bien sous tes onglets */
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   z-index: 900; 
-  
-  transform: translateY(-120%); /* On la cache un peu plus haut */
+
+  /* Cachée derrière les onglets */
+  transform: translateY(-110%);
   opacity: 0;
   
-  /* Transition plus nerveuse */
-  transition: transform 0.2s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.15s ease;
+  /* Transition rapide (0.2s) pour suivre le mouvement du doigt */
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s linear;
   pointer-events: none;
 }
 
 .balance-bar.show {
+  /* Sortie immédiate */
   transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
+}
+
+/* IMPORTANT : Tes onglets doivent masquer la barre */
+.tabs-wrapper {
+  background: #0b5c5b !important; /* Pas de transparence ! */
+  z-index: 1000; /* Devant la barre */
 }
 
 .balance-content {
