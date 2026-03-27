@@ -203,21 +203,17 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 135px; /* Ajuste pour coller sous tes onglets */
+  top: 135px; /* Sous tes Tabs */
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   
-  /* POSITION DERRIÈRE : Doit être plus petit que les Tabs (999) */
+  /* DERRIÈRE LES TABS */
   z-index: 800; 
   
-  /* ÉTAT CACHÉ : Juste derrière les onglets */
-  transform: translateY(-100%); 
-  opacity: 0;
-  
-  /* TRANSITION : "ease-out" pour que ce soit réactif au scroll */
-  transition: transform 0.3s ease-out, opacity 0.2s ease-out;
+  /* On met une transition très courte (0.1s) pour lisser le mouvement du JS */
+  transition: transform 0.1s linear, opacity 0.1s linear;
   pointer-events: none;
 }
 

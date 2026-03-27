@@ -72,23 +72,28 @@ useEffect(() => {
   const handleScroll = (e) => {
     if (activeTab !== "accounts") return;
 
-    const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
+    const st = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
     
-    // SEUIL : La barre commence à apparaître après 180px de scroll
-    const startShowing = 180;
-    const endShowing = 250; // Totalement visible à 250px
+    // 1. On ne fait rien si on est tout en haut (pour laisser la grosse carte tranquille)
+    if (st < 150) {
+      setScrollOffset(-60);
+      setOpacity(0);
+      lastScrollRef.current = st;
+      return;
+    }
 
-    if (scrollTop > startShowing) {
-      // Calcul du pourcentage d'apparition (entre 0 et 1)
-      const progress = Math.min((scrollTop - startShowing) / (endShowing - startShowing), 1);
-      
-      // On fait varier la position de -60px à 0px et l'opacité de 0 à 1
-      setScrollOffset(-60 + (60 * progress));
-      setOpacity(progress);
+    // 2. Détection du mouvement vers le HAUT
+    if (st < lastScrollRef.current) {
+      // On remonte : on fait apparaître la barre progressivement
+      setScrollOffset((prev) => Math.min(prev + 5, 0)); // Monte vers 0
+      setOpacity((prev) => Math.min(prev + 0.1, 1));    // Monte vers 1
     } else {
+      // On descend : on cache TOUT DE SUITE
       setScrollOffset(-60);
       setOpacity(0);
     }
+
+    lastScrollRef.current = st;
   };
 
   window.addEventListener("scroll", handleScroll, true);
