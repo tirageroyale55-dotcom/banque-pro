@@ -94,7 +94,7 @@ backdrop-filter:blur(10px);
 
 padding-bottom:10px;
 
-z-index:100000;
+z-index:999;
 }
 .tabs{
 display:flex;
@@ -220,6 +220,12 @@ cursor:pointer;
   /* État visible */
   transform: translateY(0);
   opacity: 1;
+}
+
+/* IMPORTANT : Tes Tabs doivent avoir un fond opaque pour cacher la barre */
+.tabs-wrapper {
+  background: #0b5c5b !important;
+  z-index: 100000; /* Encore plus haut que la barre */
 }
 
 
