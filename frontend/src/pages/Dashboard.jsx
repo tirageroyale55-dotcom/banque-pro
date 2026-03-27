@@ -68,26 +68,40 @@ window.scrollTo(0,0)
 },[activeTab])
 
 
+// Remplace ton useEffect de scroll par celui-ci
 useEffect(() => {
   const handleScroll = (e) => {
     if (activeTab !== "accounts") return;
 
-    const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
-    
-    // SEUIL : La barre commence à apparaître après 180px de scroll
-    const startShowing = 180;
-    const endShowing = 250; // Totalement visible à 250px
+    // Récupération ultra-rapide du scroll
+    const st = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
 
-    if (scrollTop > startShowing) {
-      // Calcul du pourcentage d'apparition (entre 0 et 1)
-      const progress = Math.min((scrollTop - startShowing) / (endShowing - startShowing), 1);
+    // RÉGLAGE DE LA SENSIBILITÉ :
+    // La barre commence à sortir à 150px et est à fond à 220px.
+    const start = 150; 
+    const end = 220;
+
+    if (st > start) {
+      // On calcule un ratio entre 0 et 1
+      const travel = Math.min((st - start) / (end - start), 1);
       
-      // On fait varier la position de -60px à 0px et l'opacité de 0 à 1
-      setScrollOffset(-60 + (60 * progress));
-      setOpacity(progress);
+      // On déplace la barre de -50px (cachée) à 0px (visible) en temps réel
+      const translateY = -50 + (50 * travel);
+      const opacity = travel;
+
+      // On applique directement au DOM pour éviter le lag du cycle de rendu React
+      const bar = document.querySelector('.balance-bar');
+      if (bar) {
+        bar.style.transform = `translateY(${translateY}px)`;
+        bar.style.opacity = opacity;
+        bar.style.pointerEvents = travel > 0.5 ? 'auto' : 'none';
+      }
     } else {
-      setScrollOffset(-60);
-      setOpacity(0);
+      const bar = document.querySelector('.balance-bar');
+      if (bar) {
+        bar.style.transform = `translateY(-50px)`;
+        bar.style.opacity = 0;
+      }
     }
   };
 
