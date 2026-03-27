@@ -23,6 +23,10 @@ const [showBalanceBar, setShowBalanceBar] = useState(false);
 const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
 const [card,setCard] = useState(null);
 
+// Ajoute cette Ref en haut avec les autres
+const observerRef = useRef(null);
+const [isCardVisible, setIsCardVisible] = useState(true);
+
 const navigate = useNavigate();
 
 const lastScrollRef = useRef(0);
@@ -65,18 +69,34 @@ window.scrollTo(0,0)
 },[activeTab])
 
 
+
+
+useEffect(() => {
+  // On crée un observateur qui surveille si la carte est à l'écran
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      setIsCardVisible(entry.isIntersecting);
+    },
+    { threshold: 0 } // Se déclenche dès que le premier pixel sort
+  );
+
+  // On cible la carte de solde (qui est dans Accounts.jsx, ou on met une div invisible pour tester)
+  const target = document.querySelector('.account-card');
+  if (target) observer.observe(target);
+
+  return () => observer.disconnect();
+}, [activeTab]);
+
 useEffect(() => {
   const handleScroll = (e) => {
     if (activeTab !== "accounts") return;
 
-    // On récupère le scroll de la source de l'événement (très fiable)
     const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
-
-    // Calcul de la direction
-    const isScrollingUp = scrollTop < lastScrollRef.current;
     
-    // On affiche si on remonte ET qu'on a dépassé la carte du haut (> 150px)
-    if (isScrollingUp && scrollTop > 150) {
+    // CONDITION : La carte n'est plus visible ET on remonte
+    const isScrollingUp = scrollTop < lastScrollRef.current;
+
+    if (!isCardVisible && isScrollingUp && scrollTop > 100) {
       setShowBalanceBar(true);
     } else {
       setShowBalanceBar(false);
@@ -85,13 +105,10 @@ useEffect(() => {
     lastScrollRef.current = scrollTop;
   };
 
-  // Le secret : "true" à la fin permet de capter le scroll de n'importe quelle DIV
+  // On écoute en mode "Capture" (le fameux true) pour capter le scroll des DIV internes
   window.addEventListener("scroll", handleScroll, true);
-
-  return () => {
-    window.removeEventListener("scroll", handleScroll, true);
-  };
-}, [activeTab]);
+  return () => window.removeEventListener("scroll", handleScroll, true);
+}, [isCardVisible, activeTab]);
 
 if (!data) return null;
 

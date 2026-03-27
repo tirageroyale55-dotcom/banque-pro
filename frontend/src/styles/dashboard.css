@@ -203,35 +203,37 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 140px; /* Pile sous les onglets */
+  top: 142px; /* Sous les tabs */
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   
-  /* On la met en priorité absolue pour le test */
-  z-index: 99999 !important; 
+  /* FORCE L'AFFICHAGE AU DESSUS DU CONTENU */
+  z-index: 9999 !important; 
   
-  /* État caché : On la remonte de 100px */
-  transform: translateY(-100px); 
+  /* Animation propre */
   opacity: 0;
-  
-  /* Animation simple et rapide */
-  transition: all 0.3s ease-out;
+  transform: translateY(-20px);
+  transition: all 0.3s ease-in-out;
   pointer-events: none;
 }
 
 .balance-bar.show {
-  /* État visible : Elle descend à sa place (0) */
-  transform: translateY(0);
-  opacity: 1;
+  opacity: 1 !important;
+  transform: translateY(0) !important;
   pointer-events: auto;
 }
 
-/* On s'assure que l'entête et les onglets restent devant pour l'effet "tiroir" */
-.header, .tabs-wrapper {
-  z-index: 100000 !important;
-  background: #0b5c5b !important; /* Couleur de fond opaque obligatoire */
+/* IMPORTANT : Pour que la barre ne soit pas cachée PAR le contenu des transactions */
+.page-content {
+  position: relative;
+  z-index: 1; /* Très bas */
+}
+
+.tabs-wrapper, .header {
+  z-index: 10000 !important; /* Très haut */
+  background: #0b5c5b;
 }
 
 
