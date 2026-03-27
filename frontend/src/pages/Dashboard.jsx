@@ -75,28 +75,32 @@ useEffect(() => {
   const handleScroll = (e) => {
     if (activeTab !== "accounts") return;
 
-    // Récupération du scroll exact
+    // Récupération du scroll (compatible tout support)
     const st = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
     const bar = document.querySelector('.balance-bar');
     if (!bar) return;
 
-    // 1. On calcule la différence entre l'ancien scroll et le nouveau
-    const diff = lastScrollRef.current - st;
+    // 1. On calcule la direction (Ancien scroll - Nouveau scroll)
+    const isScrollingUp = st < lastScrollRef.current;
+    
+    // 2. SEUIL DE SÉCURITÉ : On ne montre pas la barre si on est tout en haut 
+    // pour ne pas cacher la grosse carte de solde.
+    const isTooHigh = st < 120;
 
-    // 2. LOGIQUE REVOLUT/APPLE :
-    // Si on remonte de plus de 5 pixels, on montre la barre DIRECTEMENT
-    if (diff > 5 && st > 100) { 
+    // 3. ACTION : Si on remonte ET qu'on n'est pas tout en haut -> Affiche
+    if (isScrollingUp && !isTooHigh) {
       bar.classList.add('show');
     } 
-    // Si on descend (même d'un pixel), on cache DIRECTEMENT
-    else if (st > lastScrollRef.current || st <= 100) {
+    // Si on descend OU qu'on revient tout en haut -> Cache
+    else {
       bar.classList.remove('show');
     }
 
+    // On met à jour la position pour le prochain calcul
     lastScrollRef.current = st;
   };
 
-  // On utilise 'true' pour que le scroll soit capté instantanément
+  // On utilise 'true' pour capturer le scroll sans délai
   window.addEventListener("scroll", handleScroll, true);
   return () => window.removeEventListener("scroll", handleScroll, true);
 }, [activeTab]);
