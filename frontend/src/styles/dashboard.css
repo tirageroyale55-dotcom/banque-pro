@@ -88,7 +88,7 @@ cursor:pointer;
   left: 0;
   right: 0;
   height: 65px;
-  background: #0b5c5b; /* DOIT ÊTRE OPAQUE */
+  background:rgba(11,92,91,0.55);
   z-index: 1000; /* Devant la barre */
   display: flex;
   align-items: center;
