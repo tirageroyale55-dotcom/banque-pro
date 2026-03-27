@@ -94,7 +94,7 @@ backdrop-filter:blur(10px);
 
 padding-bottom:10px;
 
-z-index:999;
+z-index:99999;
 }
 .tabs{
 display:flex;
