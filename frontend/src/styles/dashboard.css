@@ -94,7 +94,7 @@ backdrop-filter:blur(10px);
 
 padding-bottom:10px;
 
-z-index:99999;
+z-index:1000;
 }
 .tabs{
 display:flex;
@@ -201,27 +201,33 @@ cursor:pointer;
 
 /* BALANCE BAR */
 
+/* BALANCE BAR */
 .balance-bar {
   position: fixed;
-  top: 135px; 
+  top: 135px; /* Position exacte sous les tabs */
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
-  z-index: 99999; /* On force le passage devant le Header et les Tabs */
   
-  /* État caché */
-  transform: translateY(-200%); 
+  /* CRUCIAL : Doit être inférieur au z-index des Tabs (999) */
+  z-index: 900; 
+  
+  /* On la cache juste derrière les onglets, pas trop haut */
+  transform: translateY(-100%); 
   opacity: 0;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  
+  /* Transition fluide (effet tiroir) */
+  transition: transform 0.3s ease-out, opacity 0.2s ease-out;
+  pointer-events: none;
 }
 
 .balance-bar.show {
-  /* État visible */
+  /* Elle descend à sa position normale */
   transform: translateY(0);
   opacity: 1;
+  pointer-events: auto;
 }
-
 
 
 

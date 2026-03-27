@@ -67,23 +67,25 @@ window.scrollTo(0,0)
 
 useEffect(() => {
   const handleScroll = (e) => {
-    // 1. On vérifie qu'on est sur le bon onglet
-    if (activeTab !== "accounts") return;
+  if (activeTab !== "accounts") return;
 
-    // 2. On récupère le scroll de n'importe quelle source (Div ou Window)
-    const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
-    
-    // 3. LOGIQUE SIMPLE : 
-    // Si on descend (scroll > last) -> on cache
-    // Si on remonte (scroll < last) ET qu'on n'est pas tout en haut (scroll > 50) -> on montre
-    if (scrollTop < lastScrollRef.current && scrollTop > 50) {
-      setShowBalanceBar(true);
-    } else {
-      setShowBalanceBar(false);
-    }
+  const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
+  
+  // 1. On définit quand la grosse carte disparaît (environ 200px)
+  const isCardOutOfView = scrollTop > 200;
+  
+  // 2. On définit la direction
+  const isScrollingUp = scrollTop < lastScrollRef.current;
 
-    lastScrollRef.current = scrollTop;
-  };
+  // 3. On montre la barre UNIQUEMENT si on remonte ET que la carte est déjà cachée
+  if (isScrollingUp && isCardOutOfView) {
+    setShowBalanceBar(true);
+  } else {
+    setShowBalanceBar(false);
+  }
+
+  lastScrollRef.current = scrollTop;
+};
 
   // On écoute PARTOUT (capture: true permet de capter le scroll des div enfants)
   window.addEventListener("scroll", handleScroll, true);
