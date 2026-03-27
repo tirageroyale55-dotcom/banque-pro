@@ -72,22 +72,25 @@ useEffect(() => {
   const handleScroll = (e) => {
     if (activeTab !== "accounts") return;
 
-    // Détection du scroll ultra-large (Div ou Window)
     const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
     
-    // DIRECTION & SEUIL
-    // On montre la barre si on remonte (scroll < last) 
-    // ET si on a assez scrollé pour que la carte disparaisse (> 160)
-    if (scrollTop < lastScrollRef.current && scrollTop > 160) {
-      setShowBalanceBar(true);
-    } else {
-      setShowBalanceBar(false);
-    }
+    // SEUIL : La barre commence à apparaître après 180px de scroll
+    const startShowing = 180;
+    const endShowing = 250; // Totalement visible à 250px
 
-    lastScrollRef.current = scrollTop;
+    if (scrollTop > startShowing) {
+      // Calcul du pourcentage d'apparition (entre 0 et 1)
+      const progress = Math.min((scrollTop - startShowing) / (endShowing - startShowing), 1);
+      
+      // On fait varier la position de -60px à 0px et l'opacité de 0 à 1
+      setScrollOffset(-60 + (60 * progress));
+      setOpacity(progress);
+    } else {
+      setScrollOffset(-60);
+      setOpacity(0);
+    }
   };
 
-  // Le "true" ici est capital pour que ça marche sur mobile et desktop
   window.addEventListener("scroll", handleScroll, true);
   return () => window.removeEventListener("scroll", handleScroll, true);
 }, [activeTab]);
