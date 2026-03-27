@@ -23,6 +23,9 @@ const [showBalanceBar, setShowBalanceBar] = useState(false);
 const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
 const [card,setCard] = useState(null);
 
+const [scrollOffset, setScrollOffset] = useState(-60); // Cachée par défaut
+const [opacity, setOpacity] = useState(0);
+
 const navigate = useNavigate();
 
 const lastScrollRef = useRef(0);
@@ -67,32 +70,29 @@ window.scrollTo(0,0)
 
 useEffect(() => {
   const handleScroll = (e) => {
-  if (activeTab !== "accounts") return;
+    if (activeTab !== "accounts") return;
 
-  const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
-  
-  // 1. On définit quand la grosse carte disparaît (environ 200px)
-  const isCardOutOfView = scrollTop > 200;
-  
-  // 2. On définit la direction
-  const isScrollingUp = scrollTop < lastScrollRef.current;
+    const scrollTop = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
+    
+    // SEUIL : La barre commence à apparaître après 180px de scroll
+    const startShowing = 180;
+    const endShowing = 250; // Totalement visible à 250px
 
-  // 3. On montre la barre UNIQUEMENT si on remonte ET que la carte est déjà cachée
-  if (isScrollingUp && isCardOutOfView) {
-    setShowBalanceBar(true);
-  } else {
-    setShowBalanceBar(false);
-  }
-
-  lastScrollRef.current = scrollTop;
-};
-
-  // On écoute PARTOUT (capture: true permet de capter le scroll des div enfants)
-  window.addEventListener("scroll", handleScroll, true);
-
-  return () => {
-    window.removeEventListener("scroll", handleScroll, true);
+    if (scrollTop > startShowing) {
+      // Calcul du pourcentage d'apparition (entre 0 et 1)
+      const progress = Math.min((scrollTop - startShowing) / (endShowing - startShowing), 1);
+      
+      // On fait varier la position de -60px à 0px et l'opacité de 0 à 1
+      setScrollOffset(-60 + (60 * progress));
+      setOpacity(progress);
+    } else {
+      setScrollOffset(-60);
+      setOpacity(0);
+    }
   };
+
+  window.addEventListener("scroll", handleScroll, true);
+  return () => window.removeEventListener("scroll", handleScroll, true);
 }, [activeTab]);
 
 if (!data) return null;
@@ -112,9 +112,10 @@ activeTab={activeTab}
 setActiveTab={setActiveTab}
 />
 
-<BalanceBar
-balance={data.balance}
-visible={showBalanceBar}
+<BalanceBar 
+  balance={data.balance} 
+  offset={scrollOffset} 
+  opacity={opacity} 
 />
 
 <div className="page-content" ref={contentRef}>

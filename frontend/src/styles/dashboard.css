@@ -201,26 +201,22 @@ cursor:pointer;
 
 /* BALANCE BAR */
 
-/* BALANCE BAR */
 .balance-bar {
   position: fixed;
-  top: 155px; /* Position exacte sous les tabs */
+  top: 135px; /* Juste sous les tabs */
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   
-  /* CRUCIAL : Doit être inférieur au z-index des Tabs (999) */
+  /* Doit être inférieur aux Tabs pour sortir de "derrière" */
   z-index: 900; 
   
-  /* On la cache juste derrière les onglets, pas trop haut */
-  transform: translateY(-100%); 
-  opacity: 0;
-  
-  /* Transition fluide (effet tiroir) */
-  transition: transform 0.3s ease-out, opacity 0.2s ease-out;
-  pointer-events: none;
+  /* On enlève les transitions CSS pour que ce soit le JS qui pilote en temps réel */
+  transition: none; 
+  pointer-events: auto;
 }
+
 
 .balance-bar.show {
   /* Elle descend à sa position normale */
@@ -229,7 +225,14 @@ cursor:pointer;
   pointer-events: auto;
 }
 
-
+.balance-content {
+  background: rgba(15, 109, 108, 0.98);
+  backdrop-filter: blur(10px);
+  padding: 10px 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.1);
+}
 
 .balance-content span {
   font-size:13px;
