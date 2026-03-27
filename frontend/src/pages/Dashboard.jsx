@@ -73,20 +73,23 @@ window.scrollTo(0,0)
 
 useEffect(() => {
   const handleScroll = () => {
-    if (activeTab !== "accounts") return;
-
     const bar = document.querySelector('.balance-bar');
-    // On cherche la carte solde qui est dans Accounts.jsx
+    if (!bar) return;
+
+    // VERROU : Si on n'est pas sur "accounts", on cache la barre et on arrête tout
+    if (activeTab !== "accounts") {
+      bar.classList.remove('show');
+      return;
+    }
+
     const accountCard = document.querySelector('.account-card');
-    
-    if (!bar || !accountCard) return;
+    if (!accountCard) return;
 
-    // On récupère la position du bas de la carte verte
+    // Détection de la position de la carte verte
     const cardBottom = accountCard.getBoundingClientRect().bottom;
-    // On récupère la position du bas des onglets (Tabs)
-    const tabsBottom = 135; 
+    const tabsBottom = 135; // La limite sous tes onglets
 
-    // LOGIQUE : Si le bas de la carte passe au-dessus de la limite des onglets
+    // La barre s'affiche uniquement si la carte a disparu
     if (cardBottom < tabsBottom) {
       bar.classList.add('show');
     } else {
@@ -94,10 +97,14 @@ useEffect(() => {
     }
   };
 
-  // Ajout de l'écouteur sur la fenêtre
+  // On écoute le scroll
   window.addEventListener("scroll", handleScroll, true);
+  
+  // Appels immédiats pour vérifier l'état lors du changement d'onglet
+  handleScroll();
+
   return () => window.removeEventListener("scroll", handleScroll, true);
-}, [activeTab]);
+}, [activeTab]); // Se déclenche à chaque fois que tu cliques sur un bouton/onglet
 
 if (!data) return null;
 
