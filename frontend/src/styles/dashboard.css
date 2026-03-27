@@ -203,37 +203,36 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 142px; /* Sous les tabs */
+  top: 142px; 
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   
-  /* FORCE L'AFFICHAGE AU DESSUS DU CONTENU */
-  z-index: 9999 !important; 
+  /* Monte le Z-INDEX au maximum */
+  z-index: 99999 !important; 
   
-  /* Animation propre */
+  /* Initialement caché (plus haut) */
+  transform: translateY(-100px); 
   opacity: 0;
-  transform: translateY(-20px);
-  transition: all 0.3s ease-in-out;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
 }
 
 .balance-bar.show {
-  opacity: 1 !important;
-  transform: translateY(0) !important;
+  /* On le fait descendre */
+  transform: translateY(0);
+  opacity: 1;
   pointer-events: auto;
 }
 
-/* IMPORTANT : Pour que la barre ne soit pas cachée PAR le contenu des transactions */
-.page-content {
-  position: relative;
-  z-index: 1; /* Très bas */
-}
-
-.tabs-wrapper, .header {
-  z-index: 10000 !important; /* Très haut */
-  background: #0b5c5b;
+/* IMPORTANT : Pour le mode Desktop */
+@media (min-width: 1000px) {
+  .balance-bar {
+    /* En desktop, la barre doit être centrée dans la zone de droite, pas sur tout l'écran */
+    left: 240px; /* Largeur de ta sidebar */
+    top: 145px;
+  }
 }
 
 
