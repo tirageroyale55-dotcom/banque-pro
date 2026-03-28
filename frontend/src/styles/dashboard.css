@@ -201,27 +201,28 @@ cursor:pointer;
 
 /* BALANCE BAR */
 
+
 .balance-bar {
   position: fixed;
-  top: 135px; /* Aligné sous tes onglets */
+  top: 145px; /* Ajuste selon ton header + tabs */
   left: 0;
   right: 0;
-  height: 55px;
-  background: #0b5c5b; /* Même couleur que ton Header/Tabs */
+  height: 60px;
+  background: #0b5c5b; /* Couleur BPER */
   z-index: 900;
   
   /* Alignement à gauche chirurgical */
   display: flex;
   align-items: center;
   padding-left: 20px; 
-
-  /* Bordure fine pour le côté Premium */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   
-  /* Animation : elle descend de derrière les onglets */
+  /* Séparation fine */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  /* Animation */
   transform: translateY(-100%);
   opacity: 0;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s linear;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
   pointer-events: none;
 }
 
@@ -234,23 +235,21 @@ cursor:pointer;
 .balance-content {
   display: flex;
   flex-direction: column;
-  line-height: 1.2;
+  text-align: left; /* Aligné à gauche */
 }
 
-/* Label "Solde disponible" petit et discret */
 .balance-content span {
-  font-size: 10px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 500;
 }
 
-/* Le montant en gras, aligné à gauche */
 .balance-content strong {
-  font-size: 18px;
+  font-size: 19px;
   color: #ffffff;
   font-weight: 600;
+  margin-top: -2px;
 }
 
 /* BOTTOM NAV */

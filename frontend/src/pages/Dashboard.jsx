@@ -67,35 +67,44 @@ setShowBalanceBar(false)
 window.scrollTo(0,0)
 },[activeTab])
 
-
-
 useEffect(() => {
   const bar = document.querySelector('.balance-bar');
   
-  // Si on change d'onglet et que ce n'est pas "accounts", on cache TOUT de suite
+  // SÉCURITÉ : Si on n'est pas sur accounts, on cache DIRECTEMENT la barre
   if (activeTab !== "accounts") {
     if (bar) bar.classList.remove('show');
-    return; 
+    return; // On arrête tout ici
   }
 
   const handleScroll = () => {
+    // On revérifie à l'intérieur du scroll par sécurité
+    if (activeTab !== "accounts") return;
+
     const accountCard = document.querySelector('.account-card');
     if (!bar || !accountCard) return;
 
-    // Calcul de la position de la carte solde
+    // Détection de la position de la carte solde
     const cardRect = accountCard.getBoundingClientRect();
-    
-    // La barre sort dès que le haut de la carte touche le bas des onglets (135px)
-    if (cardRect.top < 135) {
+    const triggerPoint = 135; // Hauteur des Tabs
+
+    // Si le haut de la carte dépasse les onglets, on montre la barre
+    if (cardRect.top < triggerPoint) {
       bar.classList.add('show');
     } else {
       bar.classList.remove('show');
     }
   };
 
+  // On écoute le scroll
   window.addEventListener("scroll", handleScroll, true);
-  return () => window.removeEventListener("scroll", handleScroll, true);
-}, [activeTab]); // Se déclenche à chaque changement d'onglet
+  
+  // NETTOYAGE : Quand on change d'onglet ou qu'on quitte la page
+  return () => {
+    window.removeEventListener("scroll", handleScroll, true);
+    if (bar) bar.classList.remove('show');
+  };
+}, [activeTab]); // TRÈS IMPORTANT : Le useEffect redémarre quand l'onglet change
+
 
 if (!data) return null;
 
