@@ -83,7 +83,7 @@ useEffect(() => {
     if (!bar || !accountCard) return;
 
     const cardRect = accountCard.getBoundingClientRect();
-    const triggerPoint = 135; 
+    const triggerPoint = 145; 
 
     if (cardRect.top < triggerPoint) {
       bar.classList.add('show');
