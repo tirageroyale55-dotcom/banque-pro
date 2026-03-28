@@ -70,20 +70,23 @@ window.scrollTo(0,0)
 
 
 useEffect(() => {
-  const handleScroll = () => {
-    if (activeTab !== "accounts") return;
+  const bar = document.querySelector('.balance-bar');
+  
+  // Si on change d'onglet et que ce n'est pas "accounts", on cache TOUT de suite
+  if (activeTab !== "accounts") {
+    if (bar) bar.classList.remove('show');
+    return; 
+  }
 
-    const bar = document.querySelector('.balance-bar');
+  const handleScroll = () => {
     const accountCard = document.querySelector('.account-card');
-    
     if (!bar || !accountCard) return;
 
-    // Récupère la position du haut de la carte solde
+    // Calcul de la position de la carte solde
     const cardRect = accountCard.getBoundingClientRect();
     
-    // Si le HAUT de la carte solde remonte au niveau des TABS (135px)
-    // la barre doit sortir pour prendre le relais
-    if (cardRect.top < 130) {
+    // La barre sort dès que le haut de la carte touche le bas des onglets (135px)
+    if (cardRect.top < 135) {
       bar.classList.add('show');
     } else {
       bar.classList.remove('show');
@@ -92,7 +95,7 @@ useEffect(() => {
 
   window.addEventListener("scroll", handleScroll, true);
   return () => window.removeEventListener("scroll", handleScroll, true);
-}, [activeTab]);
+}, [activeTab]); // Se déclenche à chaque changement d'onglet
 
 if (!data) return null;
 
