@@ -68,26 +68,23 @@ window.scrollTo(0,0)
 },[activeTab])
 
 useEffect(() => {
-  const bar = document.querySelector('.balance-bar');
-  
-  // SÉCURITÉ : Si on n'est pas sur accounts, on cache DIRECTEMENT la barre
-  if (activeTab !== "accounts") {
+  // On ne fait rien si les données ne sont pas encore chargées
+  if (!data || activeTab !== "accounts") {
+    const bar = document.querySelector('.balance-bar');
     if (bar) bar.classList.remove('show');
-    return; // On arrête tout ici
+    return;
   }
 
   const handleScroll = () => {
-    // On revérifie à l'intérieur du scroll par sécurité
-    if (activeTab !== "accounts") return;
-
+    const bar = document.querySelector('.balance-bar');
     const accountCard = document.querySelector('.account-card');
+    
+    // Si la carte n'est pas encore là (chargement API), on sort
     if (!bar || !accountCard) return;
 
-    // Détection de la position de la carte solde
     const cardRect = accountCard.getBoundingClientRect();
-    const triggerPoint = 135; // Hauteur des Tabs
+    const triggerPoint = 135; 
 
-    // Si le haut de la carte dépasse les onglets, on montre la barre
     if (cardRect.top < triggerPoint) {
       bar.classList.add('show');
     } else {
@@ -95,15 +92,16 @@ useEffect(() => {
     }
   };
 
-  // On écoute le scroll
+  // On attache l'évenement
   window.addEventListener("scroll", handleScroll, true);
   
-  // NETTOYAGE : Quand on change d'onglet ou qu'on quitte la page
+  // On l'exécute une fois au montage pour vérifier la position actuelle
+  handleScroll();
+
   return () => {
     window.removeEventListener("scroll", handleScroll, true);
-    if (bar) bar.classList.remove('show');
   };
-}, [activeTab]); // TRÈS IMPORTANT : Le useEffect redémarre quand l'onglet change
+}, [activeTab, data]); // <--- AJOUTE 'data' ICI
 
 
 if (!data) return null;
