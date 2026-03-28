@@ -203,53 +203,67 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 135px; /* Doit être exactement sous tes Tabs */
+  top: 135px; /* Ajuste selon la hauteur de tes Tabs */
   left: 0;
   right: 0;
-  height: 50px;
-  background: #0b5c5b;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 900; /* Derrière les Tabs */
+  z-index: 900;
   
-  /* Départ : Cachée 100% derrière les tabs */
-  transform: translateY(-100%);
+  /* Fond semi-transparent avec flou (Effet Pro) */
+  background: rgba(11, 92, 91, 0.85); 
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px);
+  
+  /* Bordure fine en bas pour séparer du contenu */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  /* Ombre subtile pour donner de la profondeur */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  /* Animation de sortie */
+  transform: translateY(-110%);
   opacity: 0;
-  
-  /* Transition ultra-nerveuse */
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.1s linear;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
 }
 
 .balance-bar.show {
-  /* Sortie immédiate */
   transform: translateY(0);
   opacity: 1;
 }
 
-
-
+/* Le contenu à l'intérieur de la barre */
 .balance-content {
-  background: rgba(15, 109, 108, 0.98);
-  backdrop-filter: blur(10px);
-  padding: 10px 20px;
-  border-radius: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
 }
 
 .balance-content span {
-  font-size:13px;
-  opacity:0.8;
-  margin-right:6px; /* réduit l’écart avec le solde */
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  font-weight: 500;
 }
 
 .balance-content strong {
-  font-size:16px;
-  font-weight:600;
-  margin-left:0; /* pas d’espace supplémentaire */
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: -2px;
 }
 /* BOTTOM NAV */
+
+.tabs-wrapper {
+  background: #0b5c5b !important; /* Solide, pas de rgba ici */
+  z-index: 1000;
+  position: fixed;
+  top: 70px;
+  width: 100%;
+}
 
 .bottom-nav{
   position: fixed;
