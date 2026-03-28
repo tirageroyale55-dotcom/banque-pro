@@ -257,13 +257,6 @@ cursor:pointer;
 }
 /* BOTTOM NAV */
 
-.tabs-wrapper {
-  background: #0b5c5b !important; /* Solide, pas de rgba ici */
-  z-index: 1000;
-  position: fixed;
-  top: 70px;
-  width: 100%;
-}
 
 .bottom-nav{
   position: fixed;
