@@ -133,7 +133,7 @@ padding-bottom:120px;
 
 /* Remplace l'ancien .content par celui-ci */
 .content {
-  padding: 20px 15px; /* 20px haut/bas, 32px gauche/droite (au lieu de 20px) */
+  padding: 15px 10px; /* 20px haut/bas, 32px gauche/droite (au lieu de 20px) */
   background: transparent;
   display: flex;
   flex-direction: column;
