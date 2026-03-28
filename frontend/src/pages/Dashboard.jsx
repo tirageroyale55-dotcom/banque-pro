@@ -69,32 +69,21 @@ window.scrollTo(0,0)
 
 
 
-// 1. Force la disparition au changement d'onglet
 useEffect(() => {
-  const bar = document.querySelector('.balance-bar');
-  if (bar) {
-    bar.classList.remove('show'); // On cache la barre immédiatement
-  }
-  window.scrollTo(0, 0); // On remonte en haut pour la nouvelle page
-}, [activeTab]);
-
-// 2. Ton scroll habituel (corrigé pour être ultra-réactif)
-useEffect(() => {
-  const handleScroll = (e) => {
-    // CONDITION CRUCIALE : On ne fait strictement RIEN si on n'est pas sur "accounts"
+  const handleScroll = () => {
     if (activeTab !== "accounts") return;
 
-    const st = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
     const bar = document.querySelector('.balance-bar');
     const accountCard = document.querySelector('.account-card');
     
     if (!bar || !accountCard) return;
 
-    const cardBottom = accountCard.getBoundingClientRect().bottom;
-    const tabsBottom = 135; 
-
-    // Apparition seulement quand la carte disparaît
-    if (cardBottom < tabsBottom) {
+    // Récupère la position du haut de la carte solde
+    const cardRect = accountCard.getBoundingClientRect();
+    
+    // Si le HAUT de la carte solde remonte au niveau des TABS (135px)
+    // la barre doit sortir pour prendre le relais
+    if (cardRect.top < 130) {
       bar.classList.add('show');
     } else {
       bar.classList.remove('show');
