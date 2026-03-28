@@ -22,8 +22,6 @@ const [activeTab, setActiveTab] = useState("accounts");
 const [showBalanceBar, setShowBalanceBar] = useState(false);
 const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
 const [card,setCard] = useState(null);
-// Crée une ref pour la barre en haut de ton composant
-const balanceBarRef = useRef(null);
 
 const [scrollOffset, setScrollOffset] = useState(-60); // Cachée par défaut
 const [opacity, setOpacity] = useState(0);
@@ -71,40 +69,38 @@ window.scrollTo(0,0)
 
 
 
+// 1. Force la disparition au changement d'onglet
+useEffect(() => {
+  const bar = document.querySelector('.balance-bar');
+  if (bar) {
+    bar.classList.remove('show'); // On cache la barre immédiatement
+  }
+  window.scrollTo(0, 0); // On remonte en haut pour la nouvelle page
+}, [activeTab]);
+
+// 2. Ton scroll habituel (corrigé pour être ultra-réactif)
 useEffect(() => {
   const handleScroll = (e) => {
+    // CONDITION CRUCIALE : On ne fait strictement RIEN si on n'est pas sur "accounts"
     if (activeTab !== "accounts") return;
 
-    // Récupération du scroll (compatible tout support)
     const st = e.target.scrollTop || window.scrollY || document.documentElement.scrollTop;
-    const bar = document.querySelector('.balance-bar'); // On cible l'élément directement
+    const bar = document.querySelector('.balance-bar');
+    const accountCard = document.querySelector('.account-card');
     
-    if (!bar) return;
+    if (!bar || !accountCard) return;
 
-    // LOGIQUE : 
-    // 1. Si on est en haut (zone de la grosse carte), on cache de force.
-    if (st < 180) {
-      bar.style.transform = "translateY(-100%)";
-      bar.style.opacity = "0";
-      lastScrollRef.current = st;
-      return;
+    const cardBottom = accountCard.getBoundingClientRect().bottom;
+    const tabsBottom = 135; 
+
+    // Apparition seulement quand la carte disparaît
+    if (cardBottom < tabsBottom) {
+      bar.classList.add('show');
+    } else {
+      bar.classList.remove('show');
     }
-
-    // 2. Si on remonte (scroll up), on fait sortir la barre INSTANTANÉMENT
-    if (st < lastScrollRef.current) {
-      bar.style.transform = "translateY(0)";
-      bar.style.opacity = "1";
-    } 
-    // 3. Si on descend (scroll down), on la cache INSTANTANÉMENT
-    else {
-      bar.style.transform = "translateY(-100%)";
-      bar.style.opacity = "0";
-    }
-
-    lastScrollRef.current = st;
   };
 
-  // Le secret : 'true' pour intercepter le scroll même dans les sous-divs
   window.addEventListener("scroll", handleScroll, true);
   return () => window.removeEventListener("scroll", handleScroll, true);
 }, [activeTab]);
