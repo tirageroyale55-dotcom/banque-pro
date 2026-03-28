@@ -131,11 +131,14 @@ padding-bottom:120px;
 
 /* CONTENT */
 
-.content{
-padding:20px;
-background:transparent;
+/* Remplace l'ancien .content par celui-ci */
+.content {
+  padding: 20px 32px; /* 20px haut/bas, 32px gauche/droite (au lieu de 20px) */
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Ajoute un peu d'espace entre les blocs pour faire plus pro */
 }
-
 
 
 
