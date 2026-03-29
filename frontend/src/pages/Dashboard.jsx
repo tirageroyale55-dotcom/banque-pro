@@ -26,8 +26,6 @@ const [card,setCard] = useState(null);
 const [scrollOffset, setScrollOffset] = useState(-60); // Cachée par défaut
 const [opacity, setOpacity] = useState(0);
 
-const [isHeaderHidden, setIsHeaderHidden] = useState(false);
-
 const navigate = useNavigate();
 
 const lastScrollRef = useRef(0);
@@ -70,28 +68,40 @@ window.scrollTo(0,0)
 },[activeTab])
 
 useEffect(() => {
+  // On ne fait rien si les données ne sont pas encore chargées
   if (!data || activeTab !== "accounts") {
-    setIsHeaderHidden(false); // Toujours montrer le header sur les autres pages
+    const bar = document.querySelector('.balance-bar');
+    if (bar) bar.classList.remove('show');
     return;
   }
 
   const handleScroll = () => {
+    const bar = document.querySelector('.balance-bar');
     const accountCard = document.querySelector('.account-card');
-    if (!accountCard) return;
+    
+    // Si la carte n'est pas encore là (chargement API), on sort
+    if (!bar || !accountCard) return;
 
     const cardRect = accountCard.getBoundingClientRect();
-    
-    // Si la carte solde remonte trop haut (sous les tabs)
-    if (cardRect.top < 135) {
-      setIsHeaderHidden(true);  // CACHE le Header
+    const triggerPoint = 135; 
+
+    if (cardRect.top < triggerPoint) {
+      bar.classList.add('show');
     } else {
-      setIsHeaderHidden(false); // MONTRE le Header
+      bar.classList.remove('show');
     }
   };
 
+  // On attache l'évenement
   window.addEventListener("scroll", handleScroll, true);
-  return () => window.removeEventListener("scroll", handleScroll, true);
-}, [activeTab, data]);
+  
+  // On l'exécute une fois au montage pour vérifier la position actuelle
+  handleScroll();
+
+  return () => {
+    window.removeEventListener("scroll", handleScroll, true);
+  };
+}, [activeTab, data]); // <--- AJOUTE 'data' ICI
 
 
 if (!data) return null;
@@ -104,8 +114,7 @@ return (
 
 <div className={isDesktop ? "desktop-content" : ""}>
 
-{/* Dans ton Dashboard.jsx */}
-<Header data={data} isHidden={isHeaderHidden} />
+<Header data={data} />
 
 <Tabs
 activeTab={activeTab}
