@@ -42,24 +42,41 @@ position:relative;
 /* HEADER */
 
 
-.header{
-position:fixed;
-top:0;
-left:0;
-right:0;
-height:70px;
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-padding:0 20px;
-
-background:rgba(11,92,91,0.55);
-backdrop-filter:blur(10px);
-
-z-index:1000;
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: #0b5c5b; /* Couleur solide impérative */
+  z-index: 1000;
+  
+  /* Transition fluide pour l'effet Pro */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
 }
+
+/* La classe qui s'active au scroll */
+.header.hidden {
+  transform: translateY(-100%); /* Pousse le header hors de l'écran */
+  opacity: 0;
+  pointer-events: none; /* Désactive les clics quand il est caché */
+}
+
+/* IMPORTANT : Tes Tabs doivent aussi remonter pour boucher le trou du Header */
+.tabs-wrapper {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Si le header est caché, les tabs remontent de 70px */
+.header.hidden ~ .tabs-wrapper {
+  transform: translateY(-70px);
+}
+
+/* La balance bar doit aussi remonter de 70px pour rester collée aux tabs */
+.header.hidden ~ .balance-bar {
+  transform: translateY(-70px); 
+}
+/* Note: ajuste le transform de .balance-bar.show en conséquence */
 
 .avatar{
 width:48px;
