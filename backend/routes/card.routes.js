@@ -23,7 +23,9 @@ last4:card.last4,
 holder:user.prenom + " " + user.nom,
 exp_month:card.exp_month,
 exp_year:card.exp_year,
-cvv:card.cvv
+cvv:card.cvv,
+
+status: card.status
 
 });
 
