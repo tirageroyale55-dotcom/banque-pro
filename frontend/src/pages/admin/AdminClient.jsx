@@ -28,30 +28,45 @@ api("/admin/client/"+id)
 
 const toggleAccount = async () => {
 
+try{
+
 const isBlocked = selected.account.status === "BLOCKED";
 
 await api(
 "/admin/account/" + (isBlocked ? "activate" : "block") + "/" + selected.account._id,
-{method:"POST"}
+"POST"
 );
 
 loadClient(selected.user._id);
 
+}catch(err){
+console.error(err);
+alert("Erreur compte ❌");
+}
+
 };
 
 const toggleCard = async () => {
+
+try{
 
 const status = selected.card.status;
 
 let action = "activate";
 
 if(status === "active") action = "block";
-if(status === "blocked") action = "activate";
-if(status === "inactive") action = "activate";
 
-await api("/admin/card/"+action+"/"+selected.card._id,{method:"POST"});
+await api(
+"/admin/card/"+action+"/"+selected.card._id,
+"POST"
+);
 
 loadClient(selected.user._id);
+
+}catch(err){
+console.error(err);
+alert("Erreur carte ❌");
+}
 
 };
 
