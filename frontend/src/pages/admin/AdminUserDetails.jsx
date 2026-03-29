@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../services/api";
 import { useParams, useNavigate } from "react-router-dom";
-import "../../styles/admin.css";
 
 export default function AdminUserDetails() {
   const { id } = useParams();
