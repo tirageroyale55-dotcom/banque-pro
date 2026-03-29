@@ -1,313 +1,265 @@
 
- /* BACKGROUND GLOBAL */
-html, body {
+/* =========================================
+   1. RESET & UNIFICATION (Indispensable)
+   ========================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  width: 100%;
   height: 100%;
+  background-color: #0b5c5b !important; /* Ta couleur fixe */
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: white;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-html,
-body,
-#root{
-margin:0;
-padding:0;
-
-background:#0b5c5b !important;
-
-min-height:100%;
-
-font-family:"Inter",sans-serif;
-color:white;
+/* Force les inputs à ne pas changer de style sur iPhone */
+input, select, button {
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: inherit;
 }
 
-/* BASE */
-
-html,body{
-margin:0;
-padding:0;
-background:#0b5c5b;
-font-family:"Inter",sans-serif;
-color:white;
-overflow-x:hidden;
-}
-
-/* APP */
-.bank-app{
-background:#0b5c5b;
-min-height:100vh;
-position:relative;
-}
-
-
-
-
-/* HEADER */
-
-
-.header{
-position:fixed;
-top:0;
-left:0;
-right:0;
-height:70px;
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-padding:0 20px;
-
-background:rgba(11,92,91,0.55);
-backdrop-filter:blur(10px);
-
-z-index:1000;
-}
-
-.avatar{
-width:48px;
-height:48px;
-background:#d1d5db;
-border-radius:14px;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:700;
-color:#0b5c5b;
-}
-
-.header-icons{
-display:flex;
-gap:16px;
-cursor:pointer;
-}
-
-
-/* TABS */
-
-.tabs-wrapper{
-position:fixed;
-
-top:70px;
-left:0;
-right:0;
-
-background:rgba(11,92,91,0.55);
-backdrop-filter:blur(10px);
-
-padding-bottom:10px;
-
-z-index:1000;
-}
-.tabs{
-display:flex;
-gap:10px;
-padding:12px 20px;
-}
-
-.tab{
-display:flex;
-align-items:center;
-gap:6px;
-background:#0f6d6c;
-padding:10px 16px;
-border-radius:20px;
-border:none;
-color:white;
-cursor:pointer;
-font-size:14px;
-}
-
-.tab.active{
-background:white;
-color:#0b5c5b;
-font-weight:600;
-}
-
-/* PAGE CONTENT */
-
-.page-content{
-margin-top:145px;
-padding-bottom:120px;
-}
-
-
-/* CONTENT */
-
-/* Remplace l'ancien .content par celui-ci */
-.content {
-  padding: 20px 10px; /* 20px haut/bas, 32px gauche/droite (au lieu de 20px) */
-  background: transparent;
+/* =========================================
+   2. STRUCTURE APP
+   ========================================= */
+.bank-app {
+  background: #0b5c5b;
+  min-height: 100vh;
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Ajoute un peu d'espace entre les blocs pour faire plus pro */
 }
 
-
-
-/* ACCOUNT CARD */
-
-.account-card{
-background:#e5e7eb;
-color:#0b5c5b;
-
-border-radius:30px;
-
-padding:24px;
-
-box-shadow:0 10px 25px rgba(0,0,0,0.15);
-
-margin-bottom:20px;
+/* HEADER : Gère l'encoche iPhone */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(70px + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) 32px 0 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0b5c5b; /* Couleur solide pour homogénéité */
+  z-index: 1001;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.account-title{
-font-size:14px;
-opacity:0.7;
-margin-bottom:8px;
+.avatar {
+  width: 44px;
+  height: 44px;
+  background: #d1d5db;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #0b5c5b;
 }
 
-.balance{
-font-size:42px;
-font-weight:700;
-margin-bottom:4px;
+/* TABS : Toujours sous le header */
+.tabs-wrapper {
+  position: fixed;
+  top: calc(70px + env(safe-area-inset-top, 0px));
+  left: 0;
+  right: 0;
+  background: #0b5c5b;
+  padding-bottom: 10px;
+  z-index: 1000;
 }
 
-.balance-date{
-font-size:14px;
-opacity:0.7;
-margin-bottom:12px;
+.tabs {
+  display: flex;
+  gap: 10px;
+  padding: 12px 32px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-.owner{
-font-size:14px;
-font-weight:600;
+/* Cache la scrollbar des tabs */
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: none;
+  color: white;
+  white-space: nowrap;
+  font-size: 14px;
+  transition: all 0.2s ease;
 }
 
-.iban{
-font-size:13px;
-opacity:0.7;
+.tab.active {
+  background: white;
+  color: #0b5c5b;
+  font-weight: 600;
 }
 
-/* ACTIONS RAPIDES */
-
-.quick-actions{
-display:flex;
-justify-content:space-around;
-margin-top:18px;
+/* =========================================
+   3. CONTENU DES PAGES
+   ========================================= */
+.page-content {
+  margin-top: 160px; /* Espace pour Header + Tabs */
+  padding-bottom: 120px;
+  width: 100%;
 }
 
-.action{
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:6px;
-font-size:13px;
-cursor:pointer;
+.content {
+  padding: 0 32px; /* Marges larges pro */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* BALANCE BAR */
+/* ACCOUNT CARD : Grosse carte solde */
+.account-card {
+  background: #e5e7eb;
+  color: #0b5c5b;
+  border-radius: 28px;
+  padding: 26px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
 
+.balance {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
 
+.iban {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-top: 10px;
+  font-family: monospace;
+}
+
+/* =========================================
+   4. BARRE DE SOLDE (STYLE BPER)
+   ========================================= */
 .balance-bar {
   position: fixed;
-  top: 150px; /* Ajuste selon ton header + tabs */
+  top: calc(135px + env(safe-area-inset-top, 0px));
   left: 0;
   right: 0;
   height: 60px;
-  background: #0b5c5b; /* Couleur BPER */
-  z-index: 900;
-  
-  /* Alignement à gauche chirurgical */
+  background: #0b5c5b;
+  z-index: 999;
   display: flex;
   align-items: center;
-  padding-left: 20px; 
-  
-  /* Séparation fine */
+  padding-left: 32px; /* Aligné avec le contenu */
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-  /* Animation */
   transform: translateY(-100%);
   opacity: 0;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
-  pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
 }
 
 .balance-bar.show {
   transform: translateY(0);
   opacity: 1;
-  pointer-events: auto;
-}
-
-.balance-content {
-  display: flex;
-  flex-direction: column;
-  text-align: left; /* Aligné à gauche */
 }
 
 .balance-content span {
-  font-size: 11px;
+  font-size: 10px;
   color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .balance-content strong {
-  font-size: 19px;
-  color: #ffffff;
-  font-weight: 600;
-  margin-top: -2px;
+  font-size: 18px;
+  display: block;
 }
 
-/* BOTTOM NAV */
+/* =========================================
+   5. TRANSACTIONS & CHARTS
+   ========================================= */
+.transactions {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 20px;
+  color: #1f2937;
+}
 
-.bottom-nav{
+.transaction {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.amount.plus { color: #16a34a; }
+.amount.minus { color: #dc2626; }
+
+.charts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.chart {
+  background: white;
+  border-radius: 20px;
+  padding: 15px;
+}
+
+/* =========================================
+   6. BOTTOM NAV (Safe Area Fix)
+   ========================================= */
+.bottom-nav {
   position: fixed;
-  bottom: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   left: 20px;
   right: 20px;
-
   height: 75px;
-
-  background:#e5e7eb;
-  border-radius:30px;
-
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-
-  box-shadow:0 10px 30px rgba(0,0,0,0.2);
-
-  z-index: 9999;          /* 🔥 important */
-  transform: translateZ(0); /* 🔥 fix scroll mobile */
+  background: #e5e7eb;
+  border-radius: 30px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  z-index: 10000;
 }
 
-.nav-item{
-background:none;
-border:none;
-
-display:flex;
-flex-direction:column;
-align-items:center;
-
-font-size:12px;
-color:#0b5c5b;
-
-cursor:pointer;
+.nav-item {
+  background: none;
+  border: none;
+  color: #0b5c5b;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.6;
 }
 
-.nav-item.active{
-color:#10a37f;
+.nav-item.active {
+  opacity: 1;
+  font-weight: 700;
 }
 
-/* MOBILE */
-
-@media (max-width:768px){
-
-.tabs{
-overflow-x:auto;
-}
-
-.tab{
-white-space:nowrap;
-}
-
+/* =========================================
+   7. DESKTOP ADAPTATION
+   ========================================= */
+@media (min-width: 1000px) {
+  .content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .charts {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 
