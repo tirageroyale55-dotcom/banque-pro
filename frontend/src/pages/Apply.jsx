@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import Select from "react-select";
 import countryList from "react-select-country-list";
 import PhoneInput from "react-phone-input-2";
-
+import "react-phone-input-2/lib/style.css";
 import ReactCountryFlag from "react-country-flag";
 
 export default function Apply() {
