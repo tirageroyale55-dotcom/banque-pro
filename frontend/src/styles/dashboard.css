@@ -207,7 +207,7 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 132px; /* Ajuste selon ton header + tabs */
+  top: 135px; /* Ajuste selon ton header + tabs */
   left: 0;
   right: 0;
   height: 60px;
@@ -720,8 +720,8 @@ top:80px;
 .cards-section{
 margin-top:24px;
 background:rgba(255,255,255,0.03);
-border-radius:100px;
-padding:20px;
+border-radius:20px;
+padding:200px;
 }
 .cards-title{
 margin-bottom:16px;
