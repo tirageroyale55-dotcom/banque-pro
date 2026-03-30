@@ -28,6 +28,7 @@ api("/admin/client/"+id)
 
 const toggleAccount = async () => {
 
+    console.log("CLICK BLOCK");
 try{
 
 const isBlocked = selected.account.status === "BLOCKED";

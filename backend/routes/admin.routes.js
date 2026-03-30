@@ -58,6 +58,8 @@ res.json({message:"Carte bloquée"});
 
 router.post("/account/block/:id", auth, role("ADMIN"), async (req,res)=>{
 
+  console.log("BLOCK ROUTE HIT"); // 🔥
+  
 const account = await Account.findById(req.params.id);
 const user = await User.findById(account.user);
 
