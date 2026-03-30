@@ -2276,14 +2276,7 @@ a{text-decoration:none;color:inherit}
   margin-top: 30px;
 }
 
-.btn-accept {
-  background: #2e7d32;
-  color: white;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  flex: 1;
-}
+
 
 .btn-reject {
   background: #c62828;
