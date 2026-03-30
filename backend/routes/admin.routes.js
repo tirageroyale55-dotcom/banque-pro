@@ -59,10 +59,14 @@ res.json({message:"Carte bloquée"});
 router.post("/account/block/:id", auth, role("ADMIN"), async (req,res)=>{
 
 const account = await Account.findById(req.params.id);
+const user = await User.findById(account.user);
 
+// 🔥 AJOUT ICI
 account.status = "BLOCKED";
+user.status = "BLOCKED";
 
 await account.save();
+await user.save();
 
 res.json({message:"Compte bloqué"});
 
@@ -71,10 +75,14 @@ res.json({message:"Compte bloqué"});
 router.post("/account/activate/:id", auth, role("ADMIN"), async (req,res)=>{
 
 const account = await Account.findById(req.params.id);
+const user = await User.findById(account.user);
 
+// 🔥 AJOUT ICI
 account.status = "ACTIVE";
+user.status = "ACTIVE";
 
 await account.save();
+await user.save();
 
 res.json({message:"Compte activé"});
 
