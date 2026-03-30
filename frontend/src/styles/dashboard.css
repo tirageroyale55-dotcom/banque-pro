@@ -207,7 +207,7 @@ cursor:pointer;
 
 .balance-bar {
   position: fixed;
-  top: 145px; /* Ajuste selon ton header + tabs */
+  top: 130px; /* Ajuste selon ton header + tabs */
   left: 0;
   right: 0;
   height: 60px;
