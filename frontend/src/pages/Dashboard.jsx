@@ -33,11 +33,15 @@ const contentRef = useRef(null);
 
 useEffect(()=>{
 
+if(activeTab === "cards"){
+
 api("/client/card")
 .then(setCard)
 .catch(()=>console.log("Erreur carte"));
 
-},[]);
+}
+
+},[activeTab]);
 
 useEffect(() => {
 
