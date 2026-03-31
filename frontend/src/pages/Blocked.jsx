@@ -3,44 +3,50 @@ import { useEffect, useState } from "react";
 
 export default function Blocked() {
   const navigate = useNavigate();
-  const [active, setActive] = useState(false);
+  const [seconds, setSeconds] = useState(30);
 
   useEffect(() => {
-    setTimeout(() => setActive(true), 100);
+    const interval = setInterval(() => {
+      setSeconds((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (seconds <= 0) {
+      navigate("/");
+    }
+  }, [seconds, navigate]);
 
   return (
     <div className="blocked-screen">
 
-      {/* PARTICULES / ENERGIE */}
-      <div className="energy-bg"></div>
+      <div className="blocked-card">
 
-<div className="alert-avatar">
-  😣
-</div>
-
-      <div className={`blocked-card ${active ? "show" : ""}`}>
-
-        <div className="blocked-icon-zone">
-          <div className="blocked-ring"></div>
-          <div className="blocked-lock">🔐</div>
+        <div className="blocked-icon">
+          🔒
         </div>
 
         <h1>Compte bloqué</h1>
 
         <p className="blocked-main">
-          Pour des raisons de sécurité, l’accès à votre espace est suspendu.
+          Pour des raisons de sécurité, l’accès à votre espace client est suspendu.
         </p>
 
         <p className="blocked-sub">
-          Merci de contacter le support pour plus d’informations.
+          Merci de contacter le support pour obtenir plus d’informations.
         </p>
+
+        <div className="blocked-timer">
+          Retour à l’accueil dans <strong>{seconds}s</strong>
+        </div>
 
         <button
           className="blocked-btn"
-          onClick={() => navigate("/contact")}
+          onClick={() => navigate("/")}
         >
-          Contacter le support
+          Retour immédiat
         </button>
 
       </div>
