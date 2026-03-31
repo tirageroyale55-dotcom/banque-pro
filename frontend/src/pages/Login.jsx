@@ -68,16 +68,17 @@ export default function Login() {
       }
 
     } catch (err) {
-      const newAttempts = attempts + 1;
-      setAttempts(newAttempts);
 
-      if (err.response?.status === 403) {
-        setError("Compte temporairement bloqué");
-      } else {
-        setError("Code PIN incorrect");
-      }
-      setPin("");
-    }
+  const newAttempts = attempts + 1;
+  setAttempts(newAttempts);
+
+  const message =
+    err.response?.data?.message || "Erreur de connexion";
+
+  setError(message);
+
+  setPin("");
+}
   };
 
   // ===== AUTOMATIQUE : dès 5 chiffres, submit =====
