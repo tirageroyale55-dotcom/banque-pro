@@ -729,7 +729,27 @@ font-size:18px;
 font-weight:600;
 }
 
+/* slider horizontal */
 
+.cards-slider{
+
+display:flex;
+gap:22px;
+
+overflow-x:auto;
+overflow-y:hidden;
+
+padding-bottom:10px;
+
+scroll-snap-type:x mandatory;
+scroll-behavior:smooth;
+}
+
+/* cacher scrollbar */
+
+.cards-slider::-webkit-scrollbar{
+display:none;
+}
 
 /* slide */
 
@@ -749,7 +769,7 @@ height:240px;
 
 border-radius:18px;
 
-border:2px dashed rgba(255,255,255,0.25);
+border:2px dashed #f80808ea;
 
 display:flex;
 align-items:center;
