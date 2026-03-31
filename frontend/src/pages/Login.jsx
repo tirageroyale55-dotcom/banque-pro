@@ -69,13 +69,15 @@ export default function Login() {
 
     } catch (err) {
 
-  const newAttempts = attempts + 1;
-  setAttempts(newAttempts);
+  const message = err.message || "Erreur";
 
-  const message = err.message || "Erreur de connexion";
+  // 🚨 SI BLOQUÉ → REDIRECTION
+  if (err.status === 403 && message.includes("bloqué")) {
+    navigate("/blocked");
+    return;
+  }
 
   setError(message);
-
   setPin("");
 }
   };

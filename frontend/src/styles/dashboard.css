@@ -498,6 +498,61 @@ font-weight:600;
 
 
 
+
+
+
+
+.blocked-page {
+  height: 100vh;
+  background: linear-gradient(135deg, #8b0000, #ff3b3b);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.blocked-card {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  text-align: center;
+  max-width: 400px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.blocked-card h1 {
+  color: #c00000;
+  margin-bottom: 20px;
+}
+
+.blocked-card p {
+  color: #444;
+  margin-bottom: 10px;
+}
+
+.blocked-card button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  background: #c00000;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* =========================
    CARTE BPER
 ========================= */

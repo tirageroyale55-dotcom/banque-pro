@@ -29,6 +29,8 @@ import Help from "./pages/Help";
 import Accounts from "./pages/Accounts";
 import Cards from "./pages/Cards";
 import Financing from "./pages/Financing";
+import Blocked from "./pages/Blocked";
+
 
 /* ADMIN PAGES */
 
@@ -53,6 +55,8 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/welcome" element={<Welcome />} />
 
+
+<Route path="/blocked" element={<Blocked />} />
         <Route path="/forgot-id" element={<ForgotId />} />
         <Route path="/forgot-pin" element={<ForgotPin />} />
         <Route path="/reset-password" element={<ResetPassword />} />
