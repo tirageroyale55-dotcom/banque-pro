@@ -191,6 +191,14 @@ exports.login = async (req, res) => {
       });
     }
 
+    // 🚨 🔥 BLOQUAGE ADMIN (AVANT PIN)
+if (user.status === "BLOCKED") {
+  return res.status(403).json({
+    message: "Votre compte est bloqué. Merci de contacter le support client."
+  });
+}
+
+
     // 4️⃣ Vérifie statut
     if (user.status !== "ACTIVE" || !user.emailVerified) {
       return res.status(403).json({
