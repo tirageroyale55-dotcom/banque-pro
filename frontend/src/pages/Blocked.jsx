@@ -1,25 +1,31 @@
 import { useNavigate } from "react-router-dom";
 
 export default function Blocked() {
-
   const navigate = useNavigate();
 
   return (
-    <div className="blocked-page">
+    <div className="blocked-wrapper">
 
-      <div className="blocked-card">
+      <div className="blocked-box">
 
-        <h1>⛔ Compte bloqué</h1>
+        <div className="blocked-header">
+          <span className="blocked-icon">⛔</span>
+          <h2>Accès indisponible</h2>
+        </div>
 
-        <p>
-          Votre compte est actuellement bloqué pour des raisons de sécurité.
+        <p className="blocked-text">
+          Pour des raisons de sécurité, l’accès à votre espace est actuellement suspendu.
         </p>
 
-        <p>
-          Merci de contacter le support client afin de rétablir l’accès.
+        <p className="blocked-subtext">
+          Nous vous invitons à contacter votre conseiller ou le support client
+          afin d’obtenir plus d’informations.
         </p>
 
-        <button onClick={() => navigate("/contact")}>
+        <button
+          className="blocked-btn"
+          onClick={() => navigate("/contact")}
+        >
           Contacter le support
         </button>
 
