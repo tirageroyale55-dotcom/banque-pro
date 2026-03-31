@@ -3,39 +3,37 @@ import { useEffect, useState } from "react";
 
 export default function Blocked() {
   const navigate = useNavigate();
-
-  const [animate, setAnimate] = useState(false);
-  const [freeze, setFreeze] = useState(false);
+  const [active, setActive] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setAnimate(true), 100);
-
-    // 🔥 STOP animation après 2s
-    setTimeout(() => setFreeze(true), 2000);
+    setTimeout(() => setActive(true), 100);
   }, []);
 
   return (
     <div className="blocked-screen">
 
-      <div className={`blocked-card ${animate ? "show" : ""}`}>
+      {/* PARTICULES / ENERGIE */}
+      <div className="energy-bg"></div>
 
-        <div className={`blocked-icon-zone ${freeze ? "freeze" : ""}`}>
+      <div className={`blocked-card ${active ? "show" : ""}`}>
+
+        <div className="blocked-icon-zone">
           <div className="blocked-ring"></div>
-          <div className="blocked-lock">🔒</div>
+          <div className="blocked-lock">🔐</div>
         </div>
 
         <h1>Compte bloqué</h1>
 
-        <p className="blocked-text">
-          L’accès à votre espace client a été suspendu pour des raisons de sécurité.
+        <p className="blocked-main">
+          Pour des raisons de sécurité, l’accès à votre espace est suspendu.
         </p>
 
         <p className="blocked-sub">
-          Merci de contacter le support afin de rétablir votre accès.
+          Merci de contacter le support pour plus d’informations.
         </p>
 
         <button
-          className="blocked-btn-red"
+          className="blocked-btn"
           onClick={() => navigate("/contact")}
         >
           Contacter le support
