@@ -3,34 +3,34 @@ import { useEffect, useState } from "react";
 
 export default function Blocked() {
   const navigate = useNavigate();
-  const [show, setShow] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setShow(true), 150);
+    setTimeout(() => setVisible(true), 150);
   }, []);
 
   return (
     <div className="blocked-screen">
 
-      <div className={`blocked-container ${show ? "show" : ""}`}>
+      <div className={`blocked-card ${visible ? "active" : ""}`}>
 
-        <div className="blocked-icon-wrap">
-          <div className="blocked-pulse"></div>
-          <div className="blocked-icon">🔒</div>
+        <div className="blocked-icon-zone">
+          <div className="blocked-ring"></div>
+          <div className="blocked-lock">🔒</div>
         </div>
 
-        <h1>Accès suspendu</h1>
+        <h1>Compte bloqué</h1>
 
-        <p className="blocked-main">
-          Pour des raisons de sécurité, l’accès à votre espace client est temporairement suspendu.
+        <p className="blocked-text">
+          L’accès à votre espace client a été suspendu pour des raisons de sécurité.
         </p>
 
         <p className="blocked-sub">
-          Nous vous invitons à contacter le support afin de rétablir votre accès.
+          Merci de contacter le support afin de rétablir votre accès.
         </p>
 
         <button
-          className="blocked-action"
+          className="blocked-btn-red"
           onClick={() => navigate("/contact")}
         >
           Contacter le support
