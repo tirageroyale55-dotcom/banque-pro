@@ -504,7 +504,7 @@ font-weight:600;
 
 .blocked-wrapper {
   height: 100vh;
-  background: #f5f7fa;
+  
   display: flex;
   align-items: center;
   justify-content: center;
