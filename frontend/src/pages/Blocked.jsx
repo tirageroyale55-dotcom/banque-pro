@@ -3,44 +3,59 @@ import { useEffect, useState } from "react";
 
 export default function Blocked() {
   const navigate = useNavigate();
-  const [seconds, setSeconds] = useState(30);
+
+  const DURATION = 30; // secondes
+  const [timeLeft, setTimeLeft] = useState(DURATION);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setSeconds((prev) => prev - 1);
+      setTimeLeft((t) => {
+        if (t <= 1) {
+          clearInterval(interval);
+          navigate("/");
+          return 0;
+        }
+        return t - 1;
+      });
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (seconds <= 0) {
-      navigate("/");
-    }
-  }, [seconds, navigate]);
+  const progress = ((DURATION - timeLeft) / DURATION) * 100;
 
   return (
     <div className="blocked-screen">
 
-      <div className="blocked-card">
+      {/* 🔴 PROGRESS BAR */}
+      <div className="top-progress">
+        <div
+          className="top-progress-fill"
+          style={{ width: `${progress}%` }}
+        ></div>
+      </div>
 
-        <div className="blocked-icon">
-          🔒
+      <div className="blocked-card show">
+
+        <div className="blocked-icon-zone">
+          <div className="blocked-ring"></div>
+          <div className="blocked-lock">🔒</div>
         </div>
 
         <h1>Compte bloqué</h1>
 
         <p className="blocked-main">
-          Pour des raisons de sécurité, l’accès à votre espace client est suspendu.
+          Pour des raisons de sécurité, l’accès à votre espace est suspendu.
         </p>
 
         <p className="blocked-sub">
-          Merci de contacter le support pour obtenir plus d’informations.
+          Vous serez redirigé automatiquement vers l’accueil.
         </p>
 
-        <div className="blocked-timer">
-          Retour à l’accueil dans <strong>{seconds}s</strong>
-        </div>
+        {/* ⏱ TEXTE PRO */}
+        <p className="blocked-timer">
+          Retour à l’accueil dans <strong>{timeLeft}s</strong>
+        </p>
 
         <button
           className="blocked-btn"
