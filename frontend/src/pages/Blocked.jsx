@@ -4,9 +4,6 @@ import { useEffect, useState } from "react";
 export default function Blocked() {
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
-  
-  const DURATION = 30; // secondes
-  const [timeLeft, setTimeLeft] = useState(DURATION);
 
   useEffect(() => {
     setTimeout(() => setVisible(true), 150);
