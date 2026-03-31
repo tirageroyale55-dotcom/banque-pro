@@ -72,8 +72,7 @@ export default function Login() {
   const newAttempts = attempts + 1;
   setAttempts(newAttempts);
 
-  const message =
-    err.response?.data?.message || "Erreur de connexion";
+  const message = err.message || "Erreur de connexion";
 
   setError(message);
 

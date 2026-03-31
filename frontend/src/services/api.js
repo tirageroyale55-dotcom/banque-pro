@@ -19,14 +19,17 @@ export async function api(path, method = "GET", body) {
   }
 
   if (!res.ok) {
-    // 🔥 on récupère TOUS les formats possibles
     const message =
       data.message ||
       data.error ||
       data.msg ||
       "Erreur serveur";
 
-    throw new Error(message);
+    // ✅ IMPORTANT
+    throw {
+      status: res.status,
+      message: message
+    };
   }
 
   return data;
