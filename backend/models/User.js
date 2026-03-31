@@ -8,10 +8,10 @@ const UserSchema = new mongoose.Schema(
   // STATUT
   // ======================
   status: {
-    type: String,
-    enum: ["PENDING", "ACTIVE", "REJECTED"],
-    default: "PENDING"
-  },
+  type: String,
+  enum: ["PENDING", "ACTIVE", "REJECTED", "BLOCKED"], // ✅ AJOUT ICI
+  default: "PENDING"
+},
 
   // ======================
   // IDENTITÉ
