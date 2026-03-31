@@ -729,27 +729,7 @@ font-size:18px;
 font-weight:600;
 }
 
-/* slider horizontal */
 
-.cards-slider{
-
-display:flex;
-gap:22px;
-
-overflow-x:auto;
-overflow-y:hidden;
-
-padding-bottom:10px;
-
-scroll-snap-type:x mandatory;
-scroll-behavior:smooth;
-}
-
-/* cacher scrollbar */
-
-.cards-slider::-webkit-scrollbar{
-display:none;
-}
 
 /* slide */
 
