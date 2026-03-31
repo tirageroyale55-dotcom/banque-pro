@@ -502,14 +502,7 @@ font-weight:600;
 
 
 
-.blocked-screen {
-  height: 100vh;
-  background: radial-gradient(circle at top, #1a1c22, #0d0f14);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
+
 
 /* CARD */
 .blocked-card {
@@ -622,34 +615,7 @@ font-weight:600;
 
 
 
-/* BARRE TOP */
-.top-progress {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: rgba(255,255,255,0.05);
-  overflow: hidden;
-}
 
-.top-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #ff3b3b, #900000);
-  width: 0%;
-  transition: width 1s linear;
-}
-
-.blocked-timer {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #9ca3af;
-}
-
-.blocked-timer strong {
-  color: #ff4d4d;
-  font-weight: 600;
-}
 
 
 
