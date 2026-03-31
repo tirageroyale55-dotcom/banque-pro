@@ -686,7 +686,7 @@ padding:10px;
 border-radius:4px;
 }
 
-@media (max-width:480px){
+@media (max-width:600px){
 
 .card-3d{
 width:390px;
