@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../services/api";
-import "../styles/AdminClient.css"; // Voir le CSS plus bas
+import "./AdminClient.css"; // Voir le CSS plus bas
 
 export default function AdminClient() {
   const [clients, setClients] = useState([]);
