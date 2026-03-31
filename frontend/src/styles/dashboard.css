@@ -504,119 +504,142 @@ font-weight:600;
 
 .blocked-screen {
   height: 100vh;
-  background: radial-gradient(circle at top, #1a1c22, #0d0f14);
+  background: radial-gradient(circle at top, #14161c, #0b0d12);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  gap: 40px;
 }
 
-/* CARD */
-.blocked-card {
-  width: 100%;
-  max-width: 420px;
-  background: rgba(255,255,255,0.03);
-  backdrop-filter: blur(12px);
-  border-radius: 20px;
-  padding: 40px;
-  text-align: center;
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 25px 80px rgba(0,0,0,0.6);
+/* 💳 CARTE */
+.card-preview {
+  width: 320px;
+  height: 190px;
+  border-radius: 18px;
+  padding: 20px;
+  background: linear-gradient(135deg, #1a4fd8, #0f2f7a);
+  color: white;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
 
   opacity: 0;
-  transform: translateY(30px) scale(0.96);
-  transition: all 0.6s cubic-bezier(.23,1.02,.64,1);
+  transform: translateY(-20px) scale(0.95);
+  transition: all 0.6s ease;
 }
 
-.blocked-card.active {
+.card-preview.show {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
 
-/* ICON ZONE */
-.blocked-icon-zone {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 25px;
+/* CHIP */
+.card-chip {
+  width: 40px;
+  height: 30px;
+  background: gold;
+  border-radius: 6px;
+  margin-bottom: 20px;
 }
 
-/* RING ANIMATION */
-.blocked-ring {
+/* TEXTE */
+.card-number {
+  letter-spacing: 3px;
+  margin-bottom: 20px;
+}
+
+.card-name {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* 🚫 OVERLAY BLOQUÉ */
+.card-blocked-overlay {
   position: absolute;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: rgba(255, 60, 60, 0.15);
-  animation: pulseRed 2s infinite;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@keyframes pulseRed {
-  0% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  70% {
-    transform: scale(1.7);
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
+.card-blocked-overlay span {
+  color: #ff4d4d;
+  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: 2px;
+  border: 2px solid #ff4d4d;
+  padding: 8px 14px;
+  border-radius: 6px;
 }
 
-/* LOCK ICON */
-.blocked-lock {
-  position: relative;
-  z-index: 2;
-  font-size: 34px;
-  background: linear-gradient(135deg, #ff3b3b, #b00020);
+/* 🧾 CARD MESSAGE */
+.blocked-card {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(10px);
+  padding: 35px;
+  border-radius: 18px;
+  text-align: center;
   color: white;
-  width: 80px;
-  height: 80px;
+
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
+
+.blocked-card.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 🔒 LOCK */
+.lock-wrap {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 20px;
+}
+
+.lock-ring {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 60, 60, 0.2);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.lock-icon {
+  position: relative;
+  font-size: 30px;
+  background: #ff3b3b;
+  width: 70px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  box-shadow: 0 0 25px rgba(255, 50, 50, 0.5);
 }
 
-/* TEXT */
-.blocked-card h1 {
-  color: #ffffff;
-  font-size: 22px;
-  margin-bottom: 15px;
-}
-
-.blocked-text {
-  color: #d1d5db;
-  font-size: 15px;
-  margin-bottom: 10px;
-  line-height: 1.5;
-}
-
-.blocked-sub {
-  color: #9ca3af;
-  font-size: 14px;
-  margin-bottom: 25px;
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  70% { transform: scale(1.6); opacity: 0; }
+  100% { opacity: 0; }
 }
 
 /* BUTTON */
-.blocked-btn-red {
+.blocked-card button {
+  margin-top: 20px;
+  padding: 13px;
   width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #ff3b3b, #b00020);
-  color: white;
   border: none;
   border-radius: 10px;
-  font-size: 14px;
+  background: linear-gradient(135deg, #ff3b3b, #b00020);
+  color: white;
   cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.blocked-btn-red:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 50, 50, 0.4);
 }
 
 

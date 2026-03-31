@@ -3,36 +3,42 @@ import { useEffect, useState } from "react";
 
 export default function Blocked() {
   const navigate = useNavigate();
-  const [visible, setVisible] = useState(false);
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setVisible(true), 150);
+    setTimeout(() => setShow(true), 150);
   }, []);
 
   return (
     <div className="blocked-screen">
 
-      <div className={`blocked-card ${visible ? "active" : ""}`}>
+      {/* 💳 CARTE BANCAIRE */}
+      <div className={`card-preview ${show ? "show" : ""}`}>
+        <div className="card-chip"></div>
+        <div className="card-number">**** **** **** 4589</div>
+        <div className="card-name">CLIENT PREMIUM</div>
 
-        <div className="blocked-icon-zone">
-          <div className="blocked-ring"></div>
-          <div className="blocked-lock">🔒</div>
+        {/* OVERLAY BLOQUÉ */}
+        <div className="card-blocked-overlay">
+          <span>CARTE BLOQUÉE</span>
+        </div>
+      </div>
+
+      {/* 🚫 MESSAGE */}
+      <div className={`blocked-card ${show ? "show" : ""}`}>
+
+        <div className="lock-wrap">
+          <div className="lock-ring"></div>
+          <div className="lock-icon">🔒</div>
         </div>
 
         <h1>Compte bloqué</h1>
 
-        <p className="blocked-text">
-          L’accès à votre espace client a été suspendu pour des raisons de sécurité.
+        <p>
+          Pour des raisons de sécurité, l’accès à votre espace client est suspendu.
         </p>
 
-        <p className="blocked-sub">
-          Merci de contacter le support afin de rétablir votre accès.
-        </p>
-
-        <button
-          className="blocked-btn-red"
-          onClick={() => navigate("/contact")}
-        >
+        <button onClick={() => navigate("/contact")}>
           Contacter le support
         </button>
 
