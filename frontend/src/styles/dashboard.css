@@ -502,70 +502,117 @@ font-weight:600;
 
 
 
-.blocked-wrapper {
+.blocked-screen {
   height: 100vh;
-  
+  background: radial-gradient(circle at top, #eef2f7, #dfe6ef);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  overflow: hidden;
 }
 
-.blocked-box {
+/* CARD */
+.blocked-container {
   width: 100%;
   max-width: 420px;
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 35px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-  border-top: 5px solid #d32f2f;
+  background: white;
+  padding: 40px;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+  transition: all 0.5s ease;
 }
 
-.blocked-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
+.blocked-container.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ICON */
+.blocked-icon-wrap {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 20px;
 }
 
 .blocked-icon {
+  position: relative;
+  z-index: 2;
+  font-size: 30px;
+  background: #1a4fd8;
+  color: white;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* ANIMATION PULSE */
+.blocked-pulse {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  background: rgba(26,79,216,0.2);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* TEXT */
+.blocked-container h1 {
   font-size: 22px;
-}
-
-.blocked-header h2 {
-  font-size: 20px;
   color: #1c1c1c;
-  margin: 0;
+  margin-bottom: 15px;
 }
 
-.blocked-text {
+.blocked-main {
   font-size: 15px;
   color: #333;
   margin-bottom: 10px;
   line-height: 1.5;
 }
 
-.blocked-subtext {
+.blocked-sub {
   font-size: 14px;
-  color: #666;
+  color: #777;
   margin-bottom: 25px;
-  line-height: 1.5;
 }
 
-.blocked-btn {
+/* BUTTON */
+.blocked-action {
   width: 100%;
-  padding: 12px;
+  padding: 13px;
   background: #1a4fd8;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.25s ease;
 }
 
-.blocked-btn:hover {
+.blocked-action:hover {
   background: #163bb5;
+  transform: translateY(-1px);
 }
 
 
