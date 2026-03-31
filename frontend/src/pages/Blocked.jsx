@@ -15,6 +15,10 @@ export default function Blocked() {
       {/* PARTICULES / ENERGIE */}
       <div className="energy-bg"></div>
 
+<div className="alert-avatar">
+  😣
+</div>
+
       <div className={`blocked-card ${active ? "show" : ""}`}>
 
         <div className="blocked-icon-zone">
