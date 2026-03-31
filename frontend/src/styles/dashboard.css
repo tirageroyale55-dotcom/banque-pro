@@ -502,7 +502,14 @@ font-weight:600;
 
 
 
-
+.blocked-screen {
+  height: 100vh;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
 
 /* CARD */
 .blocked-card {
