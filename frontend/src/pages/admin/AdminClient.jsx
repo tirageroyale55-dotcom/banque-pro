@@ -264,16 +264,19 @@ export default function AdminClient() {
                 <h3><i className="fas fa-exchange-alt"></i> Historique des flux</h3>
                 <table className="master-table">
                   <thead><tr><th>Date</th><th>Libellé</th><th>Type</th><th>Montant</th></tr></thead>
-                  <tbody>
-                    {selected.transactions.map(t => (
-                      <tr key={t._id}>
-                        <td>{new Date(t.createdAt).toLocaleDateString()}</td>
-                        <td>{t.label}</td>
-                        <td className={t.type}>{t.type}</td>
-                        <td className={t.type === "CREDIT" ? "txt-green" : "txt-red"}>{t.type === "CREDIT" ? "+" : "-"}{t.amount} €</td>
-                      </tr>
-                    ))}
-                  </tbody>
+                  
+<tbody>
+  {selected.transactions.map(t => (
+    <tr key={t._id}>
+      <td data-label="Date">{new Date(t.createdAt).toLocaleDateString()}</td>
+      <td data-label="Libellé">{t.label}</td>
+      <td data-label="Type" className={t.type}>{t.type}</td>
+      <td data-label="Montant" className={t.type === "CREDIT" ? "txt-green" : "txt-red"}>
+        {t.type === "CREDIT" ? "+" : "-"}{t.amount} €
+      </td>
+    </tr>
+  ))}
+</tbody>
                 </table>
               </section>
             </div>
