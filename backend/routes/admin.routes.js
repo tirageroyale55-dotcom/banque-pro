@@ -155,26 +155,29 @@ router.get("/client-full/:id", auth, role("ADMIN"), async (req, res) => {
   }
 });
 
-// Route pour MODIFIER les informations
+// Route pour MODIFIER TOUTES les informations d'un utilisateur
 router.put("/client-update/:id", auth, role("ADMIN"), async (req, res) => {
   try {
-    const { nom, prenom, email, balance } = req.body;
-    
-    // Update User
-    await User.findByIdAndUpdate(req.params.id, { nom, prenom, email });
-    
-    // Update Solde si compte existe
-    if (balance !== undefined) {
-      await Account.findOneAndUpdate({ user: req.params.id }, { balance });
+    const { userData, accountData } = req.body;
+
+    // Mise à jour de l'utilisateur avec toutes les données reçues
+    // On utilise { new: true } pour renvoyer le document mis à jour
+    await User.findByIdAndUpdate(req.params.id, userData, { new: true });
+
+    // Mise à jour du solde du compte si fourni
+    if (accountData && accountData.balance !== undefined) {
+      await Account.findOneAndUpdate(
+        { user: req.params.id },
+        { balance: accountData.balance }
+      );
     }
 
-    res.json({ message: "Mise à jour réussie" });
+    res.json({ message: "Dossier client mis à jour avec succès" });
   } catch (err) {
-    res.status(500).json({ message: "Erreur lors de la modification" });
+    console.error(err);
+    res.status(500).json({ message: "Erreur lors de la modification complète" });
   }
 });
-
-module.exports = router;
 
 module.exports = router;
 

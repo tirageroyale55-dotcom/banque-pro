@@ -6,7 +6,9 @@ export default function AdminClient() {
   const [clients, setClients] = useState([]);
   const [selected, setSelected] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ nom: "", prenom: "", email: "", balance: 0 });
+  
+  // État local pour le formulaire (copie du modèle User + solde)
+  const [editForm, setEditForm] = useState({});
 
   useEffect(() => {
     loadClients();
@@ -20,10 +22,9 @@ export default function AdminClient() {
     try {
       const data = await api("/admin/client-full/" + id);
       setSelected(data);
+      // On initialise le formulaire avec TOUTES les données du user
       setEditForm({
-        nom: data.user.nom,
-        prenom: data.user.prenom,
-        email: data.user.email,
+        ...data.user,
         balance: data.account?.balance || 0
       });
       setIsEditing(false);
@@ -32,32 +33,30 @@ export default function AdminClient() {
     }
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleUpdate = async () => {
     try {
-      await api("/admin/client-update/" + selected.user._id, "PUT", editForm);
-      alert("Données mises à jour !");
+      // On sépare la balance du reste des données User pour le backend
+      const { balance, ...userData } = editForm;
+      await api("/admin/client-update/" + selected.user._id, "PUT", {
+        userData,
+        accountData: { balance }
+      });
+      alert("Dossier mis à jour ! ✅");
       loadFullDetails(selected.user._id);
     } catch (err) {
-      alert("Erreur lors de la modification");
+      alert("Erreur lors de la sauvegarde ❌");
     }
   };
 
-  const toggleAccount = async () => {
-    const action = selected.account.status === "BLOCKED" ? "activate" : "block";
-    await api(`/admin/account/${action}/${selected.account._id}`, "POST");
-    loadFullDetails(selected.user._id);
-  };
-
-  const toggleCard = async () => {
-    const action = selected.card.status === "active" ? "block" : "activate";
-    await api(`/admin/card/${action}/${selected.card._id}`, "POST");
-    loadFullDetails(selected.user._id);
-  };
-
   return (
-    <div className="admin-client-wrapper"> {/* Classe isolante */}
+    <div className="admin-client-wrapper">
       <div className="admin-sidebar">
-        <h2 className="admin-title">Clients</h2>
+        <h2 className="admin-title">Gestion Clients</h2>
         <div className="admin-list-scroll">
           {clients.map(c => (
             <div 
@@ -65,7 +64,10 @@ export default function AdminClient() {
               className={`admin-item-card ${selected?.user._id === c._id ? 'active' : ''}`}
               onClick={() => loadFullDetails(c._id)}
             >
-              <p>{c.nom} {c.prenom}</p>
+              <div>
+                <b>{c.nom.toUpperCase()} {c.prenom}</b>
+                <p style={{fontSize: '0.8em', margin: 0}}>{c.email}</p>
+              </div>
               <span className={`status-dot ${c.status}`}></span>
             </div>
           ))}
@@ -76,59 +78,82 @@ export default function AdminClient() {
         {selected ? (
           <div className="admin-detail-view">
             <div className="admin-header-actions">
-              <h1>Dossier : {selected.user.nom}</h1>
-              <button className="btn-edit-mode" onClick={() => setIsEditing(!isEditing)}>
-                {isEditing ? "Annuler" : "Modifier Infos"}
-              </button>
+              <h1>Client : {selected.user.personalId || "En attente"}</h1>
+              <div className="admin-btns-top">
+                <button className="btn-edit-mode" onClick={() => setIsEditing(!isEditing)}>
+                  {isEditing ? "Annuler" : "Modifier Dossier"}
+                </button>
+                {isEditing && <button className="btn-save-top" onClick={handleUpdate}>Sauvegarder</button>}
+              </div>
             </div>
 
             <div className="admin-grid">
-              {/* Infos Personnelles */}
+              {/* SECTION 1 : IDENTITÉ */}
               <div className="admin-box">
-                <h3>Identité</h3>
-                {isEditing ? (
-                  <div className="admin-form">
-                    <input type="text" value={editForm.nom} onChange={e => setEditForm({...editForm, nom: e.target.value})} />
-                    <input type="text" value={editForm.prenom} onChange={e => setEditForm({...editForm, prenom: e.target.value})} />
-                    <input type="email" value={editForm.email} onChange={e => setEditForm({...editForm, email: e.target.value})} />
-                  </div>
-                ) : (
-                  <div className="admin-info-text">
-                    <p><b>Email:</b> {selected.user.email}</p>
-                    <p><b>Status:</b> {selected.user.status}</p>
-                    <p><b>Tél:</b> {selected.user.telephone}</p>
-                  </div>
-                )}
+                <h3><i className="fas fa-id-card"></i> Identité</h3>
+                <div className="admin-form">
+                  <label>Civilité</label>
+                  <select name="civilite" value={editForm.civilite} onChange={handleInputChange} disabled={!isEditing}>
+                    <option value="M">M.</option>
+                    <option value="Mme">Mme</option>
+                  </select>
+
+                  <label>Nom</label>
+                  <input name="nom" value={editForm.nom} onChange={handleInputChange} readOnly={!isEditing} />
+                  
+                  <label>Prénom</label>
+                  <input name="prenom" value={editForm.prenom} onChange={handleInputChange} readOnly={!isEditing} />
+
+                  <label>Date de Naissance</label>
+                  <input name="dateNaissance" value={editForm.dateNaissance} onChange={handleInputChange} readOnly={!isEditing} />
+                  
+                  <label>Nationalité</label>
+                  <input name="nationalite" value={editForm.nationalite} onChange={handleInputChange} readOnly={!isEditing} />
+                </div>
               </div>
 
-              {/* Compte Bancaire */}
+              {/* SECTION 2 : CONTACT & ADRESSE */}
               <div className="admin-box">
-                <h3>Compte & Solde</h3>
-                <p className="admin-iban">{selected.account?.iban || "Pas d'IBAN"}</p>
-                {isEditing ? (
-                  <input type="number" value={editForm.balance} onChange={e => setEditForm({...editForm, balance: e.target.value})} />
-                ) : (
-                  <p className="admin-balance">{selected.account?.balance} €</p>
-                )}
-                <button className={`btn-status ${selected.account?.status}`} onClick={toggleAccount}>
-                  {selected.account?.status === "BLOCKED" ? "Débloquer Compte" : "Bloquer Compte"}
-                </button>
+                <h3><i className="fas fa-map-marker-alt"></i> Contact & Adresse</h3>
+                <div className="admin-form">
+                  <label>Email</label>
+                  <input name="email" value={editForm.email} onChange={handleInputChange} readOnly={!isEditing} />
+                  
+                  <label>Téléphone</label>
+                  <input name="telephone" value={editForm.telephone} onChange={handleInputChange} readOnly={!isEditing} />
+
+                  <label>Adresse</label>
+                  <input name="adresse" value={editForm.adresse} onChange={handleInputChange} readOnly={!isEditing} />
+                  
+                  <label>Ville / CP</label>
+                  <div style={{display:'flex', gap:'5px'}}>
+                    <input name="codePostal" value={editForm.codePostal} onChange={handleInputChange} readOnly={!isEditing} style={{width:'30%'}} />
+                    <input name="ville" value={editForm.ville} onChange={handleInputChange} readOnly={!isEditing} />
+                  </div>
+                </div>
               </div>
-              
-              {/* Carte */}
+
+              {/* SECTION 3 : FINANCIER & COMPTE */}
               <div className="admin-box">
-                <h3>Carte Bancaire</h3>
-                <p>Numéro : **** {selected.card?.last4}</p>
-                <p>Statut : <span className={`card-status-${selected.card?.status}`}>{selected.card?.status}</span></p>
-                <button className="btn-card-action" onClick={toggleCard}>Changer Statut</button>
+                <h3><i className="fas fa-wallet"></i> Situation Financière</h3>
+                <div className="admin-form">
+                  <label>Profession</label>
+                  <input name="situationProfessionnelle" value={editForm.situationProfessionnelle} onChange={handleInputChange} readOnly={!isEditing} />
+                  
+                  <label>Revenus Mensuels (€)</label>
+                  <input type="number" name="revenusMensuels" value={editForm.revenusMensuels} onChange={handleInputChange} readOnly={!isEditing} />
+
+                  <label>Solde Compte BPER (€)</label>
+                  <input type="number" name="balance" value={editForm.balance} onChange={handleInputChange} readOnly={!isEditing} className="highlight-input" />
+                  
+                  <p className="admin-iban-display"><b>IBAN:</b> {selected.account?.iban || "Non assigné"}</p>
+                </div>
               </div>
             </div>
 
-            {isEditing && <button className="btn-save-changes" onClick={handleUpdate}>Enregistrer</button>}
-
-            {/* Transactions */}
+            {/* TRANSACTIONS RECENTES */}
             <div className="admin-transactions">
-              <h3>Historique des flux</h3>
+              <h3>Dernières Transactions</h3>
               <table className="admin-table">
                 <thead>
                   <tr>
@@ -138,7 +163,7 @@ export default function AdminClient() {
                   </tr>
                 </thead>
                 <tbody>
-                  {selected.transactions.map(t => (
+                  {selected.transactions.length > 0 ? selected.transactions.map(t => (
                     <tr key={t._id}>
                       <td>{new Date(t.createdAt).toLocaleDateString()}</td>
                       <td>{t.label}</td>
@@ -146,13 +171,13 @@ export default function AdminClient() {
                         {t.type === "CREDIT" ? "+" : "-"}{t.amount} €
                       </td>
                     </tr>
-                  ))}
+                  )) : <tr><td colSpan="3">Aucune transaction</td></tr>}
                 </tbody>
               </table>
             </div>
           </div>
         ) : (
-          <div className="admin-empty">Sélectionnez un client dans la liste de gauche.</div>
+          <div className="admin-empty">Sélectionnez un client pour gérer son dossier complet.</div>
         )}
       </div>
     </div>

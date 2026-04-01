@@ -106,3 +106,68 @@
     border-radius: 4px;
     cursor: pointer;
 }
+
+
+/* Styles additionnels dans le wrapper pour ne pas polluer l'application */
+.admin-client-wrapper .admin-form label {
+    display: block;
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 10px;
+    margin-bottom: 2px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.admin-client-wrapper .admin-form input, 
+.admin-client-wrapper .admin-form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fdfdfd;
+    font-size: 0.9rem;
+    transition: border 0.2s;
+}
+
+.admin-client-wrapper .admin-form input[readonly] {
+    background: #f5f5f5;
+    border-color: #eee;
+    color: #555;
+    cursor: default;
+}
+
+.admin-client-wrapper .highlight-input {
+    border: 2px solid #003366 !important;
+    font-weight: bold;
+    color: #003366 !important;
+}
+
+.admin-client-wrapper .btn-save-top {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.admin-client-wrapper .admin-header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
+}
+
+.admin-iban-display {
+    margin-top: 15px;
+    padding: 10px;
+    background: #eef2f7;
+    border-radius: 5px;
+    font-family: monospace;
+    font-size: 0.85rem;
+}
