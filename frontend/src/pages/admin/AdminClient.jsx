@@ -58,6 +58,7 @@ export default function AdminClient() {
             </div>
 
             <div className="master-grid">
+              
               {/* BLOC 1: DOSSIER COMPLET UTILISATEUR (USER.JS) */}
 <section className="data-card user-full-dossier">
   <div className="section-header">
@@ -66,17 +67,43 @@ export default function AdminClient() {
   </div>
 
   <div className="master-grid-sub">
-    {/* SOUS-SECTION : IDENTITÉ LIGNE PAR LIGNE */}
+    {/* SOUS-SECTION : ÉTAT CIVIL */}
     <div className="sub-section">
       <h4><i className="fas fa-user"></i> État Civil</h4>
       <div className="field-list">
-        <div className="item"><label>Civilité :</label> <p>{selected.user.civilite}</p></div>
-        <div className="item"><label>Nom :</label> <p>{selected.user.nom}</p></div>
-        <div className="item"><label>Prénom :</label> <p>{selected.user.prenom}</p></div>
-        <div className="item"><label>Né(e) le :</label> <p>{selected.user.dateNaissance}</p></div>
-        <div className="item"><label>À :</label> <p>{selected.user.lieuNaissance}</p></div>
-        <div className="item"><label>Nationalité :</label> <p>{selected.user.nationalite}</p></div>
-        <div className="item"><label>Résidence Fiscale :</label> <p>{selected.user.residenceFiscale || "N/A"}</p></div>
+        <div className="item">
+          <label>Civilité :</label> 
+          {isEditing ? (
+            <select value={formData.userData.civilite} onChange={e => setFormData({...formData, userData: {...formData.userData, civilite: e.target.value}})}>
+              <option value="M">M</option>
+              <option value="Mme">Mme</option>
+            </select>
+          ) : <p>{selected.user.civilite}</p>}
+        </div>
+        <div className="item">
+          <label>Nom :</label> 
+          {isEditing ? <input value={formData.userData.nom} onChange={e => setFormData({...formData, userData: {...formData.userData, nom: e.target.value}})} /> : <p>{selected.user.nom}</p>}
+        </div>
+        <div className="item">
+          <label>Prénom :</label> 
+          {isEditing ? <input value={formData.userData.prenom} onChange={e => setFormData({...formData, userData: {...formData.userData, prenom: e.target.value}})} /> : <p>{selected.user.prenom}</p>}
+        </div>
+        <div className="item">
+          <label>Né(e) le :</label> 
+          {isEditing ? <input type="date" value={formData.userData.dateNaissance} onChange={e => setFormData({...formData, userData: {...formData.userData, dateNaissance: e.target.value}})} /> : <p>{selected.user.dateNaissance}</p>}
+        </div>
+        <div className="item">
+          <label>À :</label> 
+          {isEditing ? <input value={formData.userData.lieuNaissance} onChange={e => setFormData({...formData, userData: {...formData.userData, lieuNaissance: e.target.value}})} /> : <p>{selected.user.lieuNaissance}</p>}
+        </div>
+        <div className="item">
+          <label>Nationalité :</label> 
+          {isEditing ? <input value={formData.userData.nationalite} onChange={e => setFormData({...formData, userData: {...formData.userData, nationalite: e.target.value}})} /> : <p>{selected.user.nationalite}</p>}
+        </div>
+        <div className="item">
+          <label>Résidence Fiscale :</label> 
+          {isEditing ? <input value={formData.userData.residenceFiscale} onChange={e => setFormData({...formData, userData: {...formData.userData, residenceFiscale: e.target.value}})} /> : <p>{selected.user.residenceFiscale || "N/A"}</p>}
+        </div>
       </div>
     </div>
 
@@ -84,11 +111,30 @@ export default function AdminClient() {
     <div className="sub-section">
       <h4><i className="fas fa-map-marker-alt"></i> Coordonnées & Localisation</h4>
       <div className="field-list">
-        <div className="item"><label>Email :</label> <p>{selected.user.email} {selected.user.emailVerified ? "✅" : "❌"}</p></div>
-        <div className="item"><label>Téléphone :</label> <p>{selected.user.telephone}</p></div>
-        <div className="item"><label>Adresse :</label> <p>{selected.user.adresse}</p></div>
-        <div className="item"><label>Ville :</label> <p>{selected.user.codePostal} {selected.user.ville}</p></div>
-        <div className="item"><label>Pays :</label> <p>{selected.user.pays}</p></div>
+        <div className="item">
+          <label>Email :</label> 
+          {isEditing ? <input value={formData.userData.email} onChange={e => setFormData({...formData, userData: {...formData.userData, email: e.target.value}})} /> : <p>{selected.user.email}</p>}
+        </div>
+        <div className="item">
+          <label>Téléphone :</label> 
+          {isEditing ? <input value={formData.userData.telephone} onChange={e => setFormData({...formData, userData: {...formData.userData, telephone: e.target.value}})} /> : <p>{selected.user.telephone}</p>}
+        </div>
+        <div className="item">
+          <label>Adresse :</label> 
+          {isEditing ? <input value={formData.userData.adresse} onChange={e => setFormData({...formData, userData: {...formData.userData, adresse: e.target.value}})} /> : <p>{selected.user.adresse}</p>}
+        </div>
+        <div className="item">
+          <label>Code Postal :</label> 
+          {isEditing ? <input value={formData.userData.codePostal} onChange={e => setFormData({...formData, userData: {...formData.userData, codePostal: e.target.value}})} /> : <p>{selected.user.codePostal}</p>}
+        </div>
+        <div className="item">
+          <label>Ville :</label> 
+          {isEditing ? <input value={formData.userData.ville} onChange={e => setFormData({...formData, userData: {...formData.userData, ville: e.target.value}})} /> : <p>{selected.user.ville}</p>}
+        </div>
+        <div className="item">
+          <label>Pays :</label> 
+          {isEditing ? <input value={formData.userData.pays} onChange={e => setFormData({...formData, userData: {...formData.userData, pays: e.target.value}})} /> : <p>{selected.user.pays}</p>}
+        </div>
       </div>
     </div>
 
@@ -96,24 +142,42 @@ export default function AdminClient() {
     <div className="sub-section">
       <h4><i className="fas fa-briefcase"></i> Profil Professionnel & Financier</h4>
       <div className="field-list">
-        <div className="item"><label>Situation Pro :</label> <p>{selected.user.situationProfessionnelle}</p></div>
-        <div className="item"><label>Source Revenus :</label> <p>{selected.user.sourceRevenus}</p></div>
-        <div className="item"><label>Revenus Mensuels :</label> <p className="txt-bold">{selected.user.revenusMensuels} €</p></div>
-        <div className="item"><label>Contrat Accepté :</label> <p>{selected.user.acceptContrat ? "OUI ✅" : "NON ❌"}</p></div>
+        <div className="item">
+          <label>Situation Pro :</label> 
+          {isEditing ? <input value={formData.userData.situationProfessionnelle} onChange={e => setFormData({...formData, userData: {...formData.userData, situationProfessionnelle: e.target.value}})} /> : <p>{selected.user.situationProfessionnelle}</p>}
+        </div>
+        <div className="item">
+          <label>Source Revenus :</label> 
+          {isEditing ? <input value={formData.userData.sourceRevenus} onChange={e => setFormData({...formData, userData: {...formData.userData, sourceRevenus: e.target.value}})} /> : <p>{selected.user.sourceRevenus}</p>}
+        </div>
+        <div className="item">
+          <label>Revenus Mensuels :</label> 
+          {isEditing ? <input type="number" value={formData.userData.revenusMensuels} onChange={e => setFormData({...formData, userData: {...formData.userData, revenusMensuels: e.target.value}})} /> : <p className="txt-bold">{selected.user.revenusMensuels} €</p>}
+        </div>
       </div>
     </div>
 
-    {/* SOUS-SECTION : SÉCURITÉ & IDS */}
+    {/* SOUS-SECTION : SÉCURITÉ ADMIN (NON ÉDITABLE POUR SÉCURITÉ) */}
     <div className="sub-section">
       <h4><i className="fas fa-shield-alt"></i> Sécurité Admin</h4>
       <div className="field-list">
         <div className="item"><label>Personal ID :</label> <p className="mono">{selected.user.personalId}</p></div>
-        <div className="item"><label>Tentatives Login :</label> <p>{selected.user.loginAttempts}</p></div>
         <div className="item"><label>Rôle :</label> <p>{selected.user.role}</p></div>
-        <div className="item"><label>Créé le :</label> <p>{new Date(selected.user.createdAt).toLocaleString()}</p></div>
+        <div className="item"><label>Statut Dossier :</label> 
+          {isEditing ? (
+            <select value={formData.userData.status} onChange={e => setFormData({...formData, userData: {...formData.userData, status: e.target.value}})}>
+              <option value="PENDING">PENDING</option>
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="REJECTED">REJECTED</option>
+              <option value="BLOCKED">BLOCKED</option>
+            </select>
+          ) : <p>{selected.user.status}</p>}
+        </div>
       </div>
     </div>
   </div>
+
+  
 
   {/* SECTION DOCUMENTS : VISUALISATION ET TÉLÉCHARGEMENT */}
   <div className="documents-grid">
