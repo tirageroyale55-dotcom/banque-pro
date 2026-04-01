@@ -221,3 +221,157 @@
   border-color: #1a237e;
   box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.1);
 }
+
+
+
+
+
+
+/* ============================================================
+   RESPONSIVE MOBILE - ADMIN MASTER
+   ============================================================ */
+
+@media (max-width: 992px) {
+  /* 1. On passe d'un affichage côte à côte à un affichage vertical */
+  .admin-master-container {
+    flex-direction: column;
+    height: auto;
+    position: relative;
+  }
+
+  /* 2. Sidebar devient une barre de sélection horizontale ou un menu réduit */
+  .master-sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 2px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+
+  .sidebar-brand {
+    padding: 15px;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  .client-list {
+    display: flex;
+    overflow-x: auto; /* Scroll horizontal pour la liste des clients sur mobile */
+    padding: 10px;
+    background: #fff;
+    gap: 10px;
+  }
+
+  .client-row {
+    flex: 0 0 160px; /* Largeur fixe pour les cartes clients en haut */
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .client-row.active {
+    border-left: none;
+    border-bottom: 4px solid #1a237e;
+  }
+
+  /* 3. Zone de contenu principal */
+  .master-content {
+    padding: 10px;
+  }
+
+  .profile-scroll {
+    padding: 10px;
+  }
+
+  /* 4. En-tête collant avec boutons */
+  .sticky-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+    padding: 15px;
+  }
+
+  .sticky-header h2 {
+    font-size: 18px;
+  }
+
+  .btn-group {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* 5. Grilles de données : 1 seule colonne sur mobile */
+  .master-grid, 
+  .master-grid-sub {
+    grid-template-columns: 1fr !important; /* Force une seule colonne */
+    gap: 15px;
+  }
+
+  .full-width {
+    grid-column: span 1;
+  }
+
+  /* 6. Ajustement des champs (Labels au dessus des valeurs) */
+  .field-list .item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+  }
+
+  .admin-master-container .field-list input,
+  .admin-master-container .field-list select {
+    width: 100% !important; /* Les inputs prennent toute la largeur */
+    height: 40px; /* Plus facile à cliquer au doigt */
+  }
+
+  /* 7. Documents (Images côte à côte ou plein écran) */
+  .doc-items-container {
+    flex-direction: column;
+  }
+
+  .doc-card-admin {
+    width: 100%;
+  }
+
+  .img-container {
+    height: 200px; /* Plus grand pour mieux voir sur mobile */
+  }
+
+  /* 8. Table des Transactions (Scroll horizontal obligatoire) */
+  .tx-history {
+    overflow-x: auto;
+    padding: 10px;
+  }
+
+  .master-table {
+    min-width: 600px; /* Empêche l'écrasement du tableau */
+  }
+
+  /* 9. Boutons d'action en bas de carte */
+  .actions-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-status, .btn-card-toggle {
+    width: 100%;
+    padding: 15px; /* Plus gros pour le tactile */
+  }
+}
+
+/* Optimisation pour les très petits écrans (iPhone SE, etc.) */
+@media (max-width: 480px) {
+  .sidebar-brand {
+    font-size: 14px;
+  }
+  
+  .balance-text {
+    font-size: 20px;
+  }
+}
