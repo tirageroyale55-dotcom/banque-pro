@@ -108,40 +108,37 @@ res.status(500).json({message:"Erreur serveur"})
 
 
 
-// admin.routes.js
 
-// Nouvelle route de mise à jour complète
-router.put("/update-full/:id", auth, role("ADMIN"), async (req, res) => {
+
+
+
+// GET : Récupérer l'intégralité du dossier (User + Account + Card + Transactions)
+router.get("/client-master-data/:id", auth, role("ADMIN"), async (req, res) => {
   try {
-    const { userData, accountData, cardData } = req.body;
+    const user = await User.findById(req.params.id);
+    const account = await Account.findOne({ user: user._id });
+    const card = await Card.findOne({ user: user._id });
+    const transactions = account ? await Transaction.find({ account: account._id }).sort({ createdAt: -1 }) : [];
 
-    // 1. Mise à jour User
-    if (userData) {
-      await User.findByIdAndUpdate(req.params.id, userData);
-    }
-
-    // 2. Mise à jour Compte (Solde, IBAN, Status)
-    if (accountData) {
-      await Account.findOneAndUpdate({ user: req.params.id }, accountData);
-    }
-
-    // 3. Mise à jour Carte (Numéro, CVV, Expiration, Status)
-    if (cardData) {
-      await Card.findOneAndUpdate({ user: req.params.id }, cardData);
-    }
-
-    res.json({ message: "Mise à jour réussie" });
+    res.json({ user, account, card, transactions });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Erreur lors de la modification" });
+    res.status(500).json({ message: "Erreur lors de la récupération totale" });
   }
 });
 
-// Route pour récupérer les transactions (à ajouter si pas présente)
-router.get("/transactions/:accountId", auth, role("ADMIN"), async (req, res) => {
-  const Transaction = require("../models/Transaction");
-  const list = await Transaction.find({ account: req.params.accountId }).sort({ createdAt: -1 });
-  res.json(list);
+// PUT : Mise à jour universelle (tous les champs envoyés sont mis à jour)
+router.put("/client-master-update/:id", auth, role("ADMIN"), async (req, res) => {
+  try {
+    const { userData, accountData, cardData } = req.body;
+    if (userData) await User.findByIdAndUpdate(req.params.id, userData);
+    if (accountData) await Account.findOneAndUpdate({ user: req.params.id }, accountData);
+    if (cardData) await Card.findOneAndUpdate({ user: req.params.id }, cardData);
+    
+    res.json({ message: "Mise à jour globale réussie" });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la mise à jour" });
+  }
 });
+
 module.exports = router;
 

@@ -1,84 +1,57 @@
-/* Utilisation d'un wrapper parent pour ne pas toucher aux autres pages */
-.admin-pro-container {
+.admin-master-container {
   display: flex;
   height: 100vh;
-  background: #f0f2f5;
-  color: #333;
-  font-family: 'Segoe UI', Roboto, sans-serif;
+  background-color: #f4f7f6;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #2c3e50;
+  position: absolute; top: 0; left: 0; width: 100%; z-index: 9999;
 }
 
-/* Barre latérale */
-.client-list-sidebar {
-  width: 300px;
-  background: #fff;
-  border-right: 1px solid #ddd;
-  overflow-y: auto;
-}
-.sidebar-header {
-  padding: 20px;
-  background: #1a237e;
-  color: #fff;
-  font-weight: bold;
-}
-.client-item {
-  padding: 15px;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-}
-.client-item.active { background: #e8eaf6; border-left: 4px solid #1a237e; }
-.client-item small.ACTIVE { color: green; font-weight: bold; }
-.client-item small.PENDING { color: orange; }
+/* Sidebar */
+.master-sidebar { width: 300px; background: #fff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; }
+.sidebar-brand { padding: 25px; font-weight: 900; font-size: 20px; color: #1a237e; border-bottom: 1px solid #f0f0f0; }
+.client-list { flex: 1; overflow-y: auto; }
+.client-row { padding: 15px 25px; border-bottom: 1px solid #f9f9f9; cursor: pointer; transition: 0.2s; }
+.client-row:hover { background: #f0f4ff; }
+.client-row.active { background: #e8eaf6; border-left: 5px solid #1a237e; }
 
-/* Contenu Principal */
-.client-details-main { flex: 1; padding: 25px; overflow-y: auto; }
-.pro-details-wrapper { max-width: 1100px; margin: 0 auto; }
+/* Main Content */
+.master-content { flex: 1; overflow-y: auto; background: #f8f9fa; }
+.profile-scroll { padding: 30px; max-width: 1200px; margin: 0 auto; }
+.sticky-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 
-.details-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+/* Grid & Cards */
+.master-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.full-width { grid-column: span 2; }
+.data-card { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+.data-card h3 { margin-top: 0; margin-bottom: 20px; color: #1a237e; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
 
-.details-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
+/* Form Elements */
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.item label { display: block; font-size: 11px; color: #95a5a6; text-transform: uppercase; margin-bottom: 5px; }
+.item p { font-weight: 600; margin: 0; font-size: 14px; }
+.input-row { display: flex; gap: 5px; }
+.input-row input { padding: 8px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
 
-.info-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
+/* Docs Preview */
+.docs-preview { display: flex; gap: 10px; margin-top: 20px; }
+.doc-box { flex: 1; background: #f9f9f9; padding: 10px; border-radius: 8px; text-align: center; }
+.doc-box img { max-width: 100%; height: 80px; object-fit: contain; border-radius: 5px; margin-top: 5px; }
+.doc-box.signature img { height: 60px; filter: grayscale(1); }
 
-.info-card h3 { border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-bottom: 15px; }
+/* Status Colors */
+.status-tag.PENDING { background: #fff3e0; color: #ef6c00; padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+.status-tag.ACTIVE { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 12px; }
 
-.input-group { margin-bottom: 15px; }
-.input-group label { display: block; font-size: 12px; color: #777; margin-bottom: 5px; }
-.flex-row { display: flex; gap: 10px; }
-.flex-row input, .flex-row select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; }
+/* Buttons */
+.btn-save { background: #2e7d32; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+.btn-edit { background: #1a237e; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; }
+.btn-status.ACTIVE { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+.btn-status.BLOCKED { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
 
-.balance { font-size: 24px; font-weight: bold; color: #1a237e; }
-
-/* Boutons de statut */
-.btn-status {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 10px;
-}
-.btn-status.ACTIVE, .btn-status.active { background: #ffebee; color: #c62828; } /* Bouton bloquer */
-.btn-status.BLOCKED, .btn-status.blocked { background: #e8f5e9; color: #2e7d32; } /* Bouton activer */
-
-/* Transactions */
-.tx-history { margin-top: 30px; background: #fff; padding: 20px; border-radius: 8px; }
-.tx-history table { width: 100%; border-collapse: collapse; }
-.tx-history th { text-align: left; padding: 10px; background: #f8f9fa; }
-.tx-history td { padding: 10px; border-bottom: 1px solid #eee; }
-.CREDIT { color: green; font-weight: bold; }
-.DEBIT { color: red; font-weight: bold; }
-
-.btn-edit { background: #5c6bc0; color: white; border: none; padding: 8px 15px; border-radius: 4px; }
-.btn-save { background: #43a047; color: white; border: none; padding: 8px 15px; border-radius: 4px; margin-left: 10px; }
+/* Table */
+.master-table { width: 100%; border-collapse: collapse; }
+.master-table th { text-align: left; background: #f8f9fa; padding: 12px; font-size: 13px; }
+.master-table td { padding: 12px; border-bottom: 1px solid #f1f1f1; font-size: 13px; }
+.txt-green { color: #2e7d32; font-weight: bold; }
+.txt-red { color: #c62828; font-weight: bold; }
