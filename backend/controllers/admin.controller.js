@@ -4,6 +4,9 @@ const Account = require("../models/Account");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
+const Card = require("../models/Card");
+const Transaction = require("../models/Transaction");
+
 const {
   generatePersonalId,
   generateIBAN,
@@ -158,5 +161,52 @@ exports.sendResetLink = async (req, res) => {
   } catch (err) {
     console.error("RESET ERROR:", err);
     res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+
+
+
+
+
+
+
+
+// RÉCUPÉRER TOUT LE DOSSIER
+exports.getClientFull = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "Client introuvable" });
+
+    const account = await Account.findOne({ user: user._id });
+    const card = await Card.findOne({ user: user._id });
+    const transactions = account 
+      ? await Transaction.find({ account: account._id }).sort({ createdAt: -1 }) 
+      : [];
+
+    res.json({ user, account, card, transactions });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+// METTRE À JOUR TOUT LE DOSSIER (Identité, Compte, Carte)
+exports.updateClientFull = async (req, res) => {
+  try {
+    const { userData, accountData, cardData } = req.body;
+
+    // Mise à jour User (Identité, Revenus, etc.)
+    if (userData) await User.findByIdAndUpdate(req.params.id, userData);
+
+    // Mise à jour Compte (Solde, IBAN, Status)
+    if (accountData) await Account.findOneAndUpdate({ user: req.params.id }, accountData);
+
+    // Mise à jour Carte (Numéros, CVV, Status)
+    if (cardData) await Card.findOneAndUpdate({ user: req.params.id }, cardData);
+
+    res.json({ message: "Mise à jour réussie avec succès" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur lors de la modification" });
   }
 };

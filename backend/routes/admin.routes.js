@@ -6,7 +6,7 @@ const User = require("../models/User");
 const Card = require("../models/Card");
 const Account = require("../models/Account");
 
-const Transaction = require("../models/Transaction");
+const adminCtrl = require("../controllers/admin.controller");
 
 const {
   validateUser,
@@ -135,45 +135,12 @@ res.status(500).json({message:"Erreur serveur"})
 })
 
 
+// NOUVELLES ROUTES (NETTOYÉES)
+// Récupérer tout
+router.get("/client-full/:id", auth, role("ADMIN"), adminCtrl.getClientFull);
 
-
-// Route pour obtenir le dossier complet (tous les champs du modèle User)
-router.get("/client-full/:id", auth, role("ADMIN"), async (req, res) => {
-  try {
-    // On récupère l'utilisateur avec TOUS ses champs
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "Client introuvable" });
-
-    const account = await Account.findOne({ user: user._id });
-    const card = await Card.findOne({ user: user._id });
-    const transactions = account 
-      ? await Transaction.find({ account: account._id }).sort({ createdAt: -1 }) 
-      : [];
-
-    res.json({ user, account, card, transactions });
-  } catch (err) {
-    res.status(500).json({ message: "Erreur serveur" });
-  }
-});
-
-// Route pour modifier n'importe quel champ du profil ou le solde
-router.put("/client-update/:id", auth, role("ADMIN"), async (req, res) => {
-  try {
-    const { userData, balance } = req.body;
-    
-    // Mise à jour des infos User (nom, prenom, adresse, revenus, etc.)
-    await User.findByIdAndUpdate(req.params.id, userData);
-    
-    // Mise à jour du solde du compte
-    if (balance !== undefined) {
-      await Account.findOneAndUpdate({ user: req.params.id }, { balance });
-    }
-
-    res.json({ message: "Mise à jour réussie" });
-  } catch (err) {
-    res.status(500).json({ message: "Erreur lors de la modification" });
-  }
-});
+// Modifier tout
+router.put("/client-update-full/:id", auth, role("ADMIN"), adminCtrl.updateClientFull);
 
 module.exports = router;
 
