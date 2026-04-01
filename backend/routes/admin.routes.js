@@ -137,9 +137,10 @@ res.status(500).json({message:"Erreur serveur"})
 
 
 
-// Route pour obtenir TOUT le dossier client
+// Route pour obtenir le dossier complet (tous les champs du modèle User)
 router.get("/client-full/:id", auth, role("ADMIN"), async (req, res) => {
   try {
+    // On récupère l'utilisateur avec TOUS ses champs
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "Client introuvable" });
 
@@ -155,27 +156,22 @@ router.get("/client-full/:id", auth, role("ADMIN"), async (req, res) => {
   }
 });
 
-// Route pour MODIFIER TOUTES les informations d'un utilisateur
+// Route pour modifier n'importe quel champ du profil ou le solde
 router.put("/client-update/:id", auth, role("ADMIN"), async (req, res) => {
   try {
-    const { userData, accountData } = req.body;
-
-    // Mise à jour de l'utilisateur avec toutes les données reçues
-    // On utilise { new: true } pour renvoyer le document mis à jour
-    await User.findByIdAndUpdate(req.params.id, userData, { new: true });
-
-    // Mise à jour du solde du compte si fourni
-    if (accountData && accountData.balance !== undefined) {
-      await Account.findOneAndUpdate(
-        { user: req.params.id },
-        { balance: accountData.balance }
-      );
+    const { userData, balance } = req.body;
+    
+    // Mise à jour des infos User (nom, prenom, adresse, revenus, etc.)
+    await User.findByIdAndUpdate(req.params.id, userData);
+    
+    // Mise à jour du solde du compte
+    if (balance !== undefined) {
+      await Account.findOneAndUpdate({ user: req.params.id }, { balance });
     }
 
-    res.json({ message: "Dossier client mis à jour avec succès" });
+    res.json({ message: "Mise à jour réussie" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Erreur lors de la modification complète" });
+    res.status(500).json({ message: "Erreur lors de la modification" });
   }
 });
 
