@@ -1,106 +1,108 @@
-/* Ce style ne s'appliquera QU'À l'intérieur de .bper-admin-wrapper */
-
-.bper-admin-wrapper {
-  display: flex;
-  height: 100vh;
-  background: #f4f7f6;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
+/* ISOLATION TOTALE - N'affecte pas les autres fichiers */
+.admin-client-wrapper {
+    display: flex;
+    height: 100vh;
+    background-color: #f8f9fa;
+    color: #333;
+    font-family: 'Inter', sans-serif;
+    position: fixed; /* Évite les conflits de scroll */
+    top: 0; left: 0; right: 0; bottom: 0;
 }
 
-.bper-admin-wrapper .sidebar-admin {
-  width: 320px;
-  background: #ffffff;
-  border-right: 1px solid #e0e0e0;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
+.admin-sidebar {
+    width: 300px;
+    background: #ffffff;
+    border-right: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
 }
 
-.bper-admin-wrapper .admin-title {
-  padding: 20px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #003366;
-  border-bottom: 1px solid #eee;
+.admin-title {
+    padding: 20px;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #eee;
+    color: #003366;
 }
 
-.bper-admin-wrapper .client-item-admin {
-  padding: 15px 20px;
-  border-bottom: 1px solid #f9f9f9;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.admin-item-card {
+    padding: 15px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.bper-admin-wrapper .client-item-admin:hover {
-  background: #f0f7ff;
+.admin-item-card:hover { background: #f0f7ff; }
+.admin-item-card.active { background: #e3f2fd; border-left: 4px solid #003366; }
+
+.admin-main-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
 }
 
-.bper-admin-wrapper .client-item-admin.active-client {
-  background: #eef4ff;
-  border-left: 4px solid #00a8e8;
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
 }
 
-.bper-admin-wrapper .main-admin-content {
-  flex: 1;
-  padding: 30px;
-  overflow-y: auto;
+.admin-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* Grille de détails */
-.bper-admin-wrapper .admin-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+.admin-box h3 { margin-bottom: 15px; font-size: 1rem; color: #666; }
+
+.admin-form input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
-.bper-admin-wrapper .admin-card-info {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+.btn-status.ACTIVE { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; padding: 8px; border-radius: 5px; cursor: pointer; }
+.btn-status.BLOCKED { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; padding: 8px; border-radius: 5px; cursor: pointer; }
+
+.admin-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-.bper-admin-wrapper .admin-card-info h3 {
-  margin-top: 0;
-  color: #003366;
-  font-size: 1rem;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
+.admin-table th, .admin-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
 }
 
-/* Boutons spécifiques admin */
-.bper-admin-wrapper .btn-admin-action {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
-  margin-top: 10px;
-  transition: opacity 0.2s;
+.txt-green { color: #2e7d32; font-weight: bold; }
+.txt-red { color: #c62828; font-weight: bold; }
+
+.btn-save-changes {
+    margin-top: 20px;
+    background: #003366;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
-.bper-admin-wrapper .btn-block { background: #ff4757; color: white; }
-.bper-admin-wrapper .btn-activate { background: #2ed573; color: white; }
-
-/* Table des transactions */
-.bper-admin-wrapper .admin-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  margin-top: 20px;
-}
-
-.bper-admin-wrapper .admin-table th {
-  background: #f8f9fa;
-  padding: 12px;
-  text-align: left;
-  font-size: 0.85rem;
-}
-
-.bper-admin-wrapper .admin-table td {
-  padding: 12px;
-  border-bottom: 1px solid #eee;
-  font-size: 0.9rem;
+.btn-edit-mode {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
 }

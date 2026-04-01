@@ -5,6 +5,7 @@ const { rejectUser } = require("../controllers/admin.controller");
 const User = require("../models/User");
 const Card = require("../models/Card");
 const Account = require("../models/Account");
+
 const Transaction = require("../models/Transaction");
 
 const {
@@ -136,21 +137,17 @@ res.status(500).json({message:"Erreur serveur"})
 
 
 
-
-// 1. Récupérer TOUT le profil (User + Account + Card + Transactions)
+// Route pour obtenir TOUT le dossier client
 router.get("/client-full/:id", auth, role("ADMIN"), async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "Utilisateur introuvable" });
+    if (!user) return res.status(404).json({ message: "Client introuvable" });
 
     const account = await Account.findOne({ user: user._id });
     const card = await Card.findOne({ user: user._id });
-    
-    // Récupérer les transactions si le compte existe
-    let transactions = [];
-    if (account) {
-      transactions = await Transaction.find({ account: account._id }).sort({ createdAt: -1 });
-    }
+    const transactions = account 
+      ? await Transaction.find({ account: account._id }).sort({ createdAt: -1 }) 
+      : [];
 
     res.json({ user, account, card, transactions });
   } catch (err) {
@@ -158,24 +155,26 @@ router.get("/client-full/:id", auth, role("ADMIN"), async (req, res) => {
   }
 });
 
-// 2. Mettre à jour les infos du client (Modifier Nom, Email, Solde, etc.)
+// Route pour MODIFIER les informations
 router.put("/client-update/:id", auth, role("ADMIN"), async (req, res) => {
   try {
-    const { userData, accountData } = req.body;
-
-    // Mise à jour User
-    await User.findByIdAndUpdate(req.params.id, userData);
-
-    // Mise à jour Account (ex: solde)
-    if (accountData) {
-      await Account.findOneAndUpdate({ user: req.params.id }, accountData);
+    const { nom, prenom, email, balance } = req.body;
+    
+    // Update User
+    await User.findByIdAndUpdate(req.params.id, { nom, prenom, email });
+    
+    // Update Solde si compte existe
+    if (balance !== undefined) {
+      await Account.findOneAndUpdate({ user: req.params.id }, { balance });
     }
 
-    res.json({ message: "Données mises à jour avec succès" });
+    res.json({ message: "Mise à jour réussie" });
   } catch (err) {
-    res.status(500).json({ message: "Erreur lors de la mise à jour" });
+    res.status(500).json({ message: "Erreur lors de la modification" });
   }
 });
+
+module.exports = router;
 
 module.exports = router;
 
