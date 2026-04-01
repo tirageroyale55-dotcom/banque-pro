@@ -1,4 +1,60 @@
+.admin-master-container {
+  display: flex;
+  height: 100vh;
+  background-color: #f4f7f6;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #2c3e50;
+  position: absolute; top: 0; left: 0; width: 100%; z-index: 9999;
+}
 
+/* Sidebar */
+.master-sidebar { width: 300px; background: #fff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; }
+.sidebar-brand { padding: 25px; font-weight: 900; font-size: 20px; color: #1a237e; border-bottom: 1px solid #f0f0f0; }
+.client-list { flex: 1; overflow-y: auto; }
+.client-row { padding: 15px 25px; border-bottom: 1px solid #f9f9f9; cursor: pointer; transition: 0.2s; }
+.client-row:hover { background: #f0f4ff; }
+.client-row.active { background: #e8eaf6; border-left: 5px solid #1a237e; }
+
+/* Main Content */
+.master-content { flex: 1; overflow-y: auto; background: #f8f9fa; }
+.profile-scroll { padding: 30px; max-width: 1200px; margin: 0 auto; }
+.sticky-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+
+/* Grid & Cards */
+.master-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.full-width { grid-column: span 2; }
+.data-card { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+.data-card h3 { margin-top: 0; margin-bottom: 20px; color: #1a237e; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+
+/* Form Elements */
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.item label { display: block; font-size: 11px; color: #95a5a6; text-transform: uppercase; margin-bottom: 5px; }
+.item p { font-weight: 600; margin: 0; font-size: 14px; }
+.input-row { display: flex; gap: 5px; }
+.input-row input { padding: 8px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
+
+/* Docs Preview */
+.docs-preview { display: flex; gap: 10px; margin-top: 20px; }
+.doc-box { flex: 1; background: #f9f9f9; padding: 10px; border-radius: 8px; text-align: center; }
+.doc-box img { max-width: 100%; height: 80px; object-fit: contain; border-radius: 5px; margin-top: 5px; }
+.doc-box.signature img { height: 60px; filter: grayscale(1); }
+
+/* Status Colors */
+.status-tag.PENDING { background: #fff3e0; color: #ef6c00; padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+.status-tag.ACTIVE { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+
+/* Buttons */
+.btn-save { background: #2e7d32; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+.btn-edit { background: #1a237e; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-right: 10px; }
+.btn-status.ACTIVE { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+.btn-status.BLOCKED { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+
+/* Table */
+.master-table { width: 100%; border-collapse: collapse; }
+.master-table th { text-align: left; background: #f8f9fa; padding: 12px; font-size: 13px; }
+.master-table td { padding: 12px; border-bottom: 1px solid #f1f1f1; font-size: 13px; }
+.txt-green { color: #2e7d32; font-weight: bold; }
+.txt-red { color: #c62828; font-weight: bold; }
 
 
 /* Container de la section User */
