@@ -211,6 +211,7 @@ if (user.status === "BLOCKED") {
 const pinValid = await bcrypt.compare(pin.trim(), user.pinHash);
 if (!pinValid) {
   user.loginAttempts = (user.loginAttempts || 0) + 1;
+  const remaining = 5 - user.loginAttempts; // Calcul des tentatives restantes
 
   // 🔴 Blocage après 5 tentatives : On change le statut en "BLOCKED"
   if (user.loginAttempts >= 5) {
@@ -224,7 +225,11 @@ if (!pinValid) {
   }
 
   await user.save();
-  return res.status(401).json({ message: "Code PIN incorrect" });
+  
+  // On renvoie un message précis avec le nombre d'essais restants
+  return res.status(401).json({ 
+    message: `Code PIN incorrect. Attention, il vous reste ${remaining} tentative${remaining > 1 ? 's' : ''} avant le blocage de votre compte.` 
+  });
 }
 
     // 6️⃣ Si succès → reset tentatives

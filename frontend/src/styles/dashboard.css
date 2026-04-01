@@ -1349,3 +1349,24 @@ box-shadow:0 2px 10px rgba(0,0,0,.1);
     width: 100%;
   }
 }
+
+
+
+/* Style de base pour l'erreur */
+.form-error {
+  background: #fff5f5;
+  color: #c0392b;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid #c0392b;
+  font-size: 13px;
+  margin: 15px 0;
+  line-height: 1.4;
+}
+
+/* Style spécifique pour l'ALERTE (Orange) quand il reste des tentatives */
+.form-error.warning-mode {
+  background: #fff9e6; /* Jaune très clair */
+  color: #d35400;      /* Orange foncé */
+  border-left: 4px solid #f39c12; /* Orange vif */
+}

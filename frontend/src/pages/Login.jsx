@@ -138,7 +138,13 @@ export default function Login() {
               ))}
             </div>
 
-            {error && <p className="form-error">{error}</p>}
+            {/* Affichage de l'erreur avec style dynamique pour les tentatives */}
+{error && (
+  <p className={`form-error ${error.includes("Attention") ? "warning-mode" : ""}`}>
+    {error.includes("Attention") && <span style={{marginRight: '5px'}}>⚠️</span>}
+    {error}
+  </p>
+)}
 
             {error && (
               <p className="login-link" onClick={() => navigate("/forgot-pin")}>
