@@ -27,32 +27,32 @@ export default function ResetPassword() {
 
   // ===== STEP 1 =====
   const handleCheckId = async (e) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  setError("");
 
-    try {
-  const res = await api("/auth/check-id", "POST", { personalId });
+  try {
+    const res = await api("/auth/check-id", "POST", { personalId });
 
-  if (!res.exists) {
-    const newAttempts = attempts + 1;
-    setAttempts(newAttempts);
-    setError("Identifiant non trouvé");
-    if (newAttempts >= 3) return navigate("/");
-    return;
+    if (!res.exists) {
+      const newAttempts = attempts + 1;
+      setAttempts(newAttempts);
+      setError("Identifiant non trouvé");
+      if (newAttempts >= 3) return navigate("/");
+      return;
+    }
+
+    // 🔥 LA CORRECTION EST ICI :
+    // Si le compte est BLOCKED, on ne bloque l'utilisateur QUE S'IL N'A PAS DE TOKEN
+    if (res.status === "BLOCKED" && !token) {
+      setError("Votre compte est bloqué. Veuillez utiliser le lien de réinitialisation envoyé par l'administrateur.");
+      return;
+    }
+
+    setStep(2); // Si on a un token ou si le compte n'est pas bloqué, on passe à la suite
+  } catch {
+    setError("Erreur serveur");
   }
-
-  // 🔥 Ajout de la vérification du statut bloqué
-  if (res.status === "BLOCKED") {
-    setError("Votre compte est bloqué. Veuillez utiliser le lien de réinitialisation envoyé par l'administrateur.");
-    return;
-  }
-
-  setStep(2);
-} catch {
-  setError("Erreur serveur");
-}
-  };
-
+};
   // ===== STEP 2 =====
   const handlePasswordNext = (e) => {
     e.preventDefault();
