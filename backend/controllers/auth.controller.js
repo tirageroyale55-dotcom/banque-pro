@@ -215,7 +215,7 @@ if (!pinValid) {
   // 🔴 Blocage après 5 tentatives : On change le statut en "BLOCKED"
   if (user.loginAttempts >= 5) {
     user.status = "BLOCKED"; // 🔥 On synchronise avec le statut User
-    user.lockedUntil = Date.now() + 30 * 60 * 1000; // 30 minutes de sécurité
+    user.lockedUntil = null;
     await user.save();
 
     return res.status(403).json({
