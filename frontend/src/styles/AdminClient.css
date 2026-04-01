@@ -228,150 +228,141 @@
 
 
 /* ============================================================
-   RESPONSIVE MOBILE - ADMIN MASTER
+   DESIGN MOBILE TYPE "APP NATIVE" - ULTRA PRO
    ============================================================ */
 
-@media (max-width: 992px) {
-  /* 1. On passe d'un affichage côte à côte à un affichage vertical */
+@media (max-width: 768px) {
   .admin-master-container {
     flex-direction: column;
-    height: auto;
-    position: relative;
+    background: #f0f2f5; /* Fond gris clair type iOS */
   }
 
-  /* 2. Sidebar devient une barre de sélection horizontale ou un menu réduit */
+  /* Liste des clients en haut : Style bulles horizontales */
   .master-sidebar {
     width: 100%;
     height: auto;
-    border-right: none;
-    border-bottom: 2px solid #e0e0e0;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    background: #1a237e;
+    padding-bottom: 10px;
   }
-
-  .sidebar-brand {
-    padding: 15px;
-    text-align: center;
-    font-size: 16px;
-  }
-
+  .sidebar-brand { color: #fff; padding: 15px; font-size: 14px; text-align: center; border: none; }
+  
   .client-list {
     display: flex;
-    overflow-x: auto; /* Scroll horizontal pour la liste des clients sur mobile */
-    padding: 10px;
-    background: #fff;
+    padding: 0 15px;
     gap: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
-
   .client-row {
-    flex: 0 0 160px; /* Largeur fixe pour les cartes clients en haut */
-    padding: 10px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    text-align: center;
+    flex: 0 0 auto;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px; /* Style pilule */
+    padding: 8px 15px;
+    color: #fff;
+    min-width: 120px;
   }
+  .client-row b { font-size: 12px; }
+  .client-row .status-tag { display: none; } /* On cache le tag pour gagner de la place */
+  .client-row.active { background: #fff; color: #1a237e; }
 
-  .client-row.active {
-    border-left: none;
-    border-bottom: 4px solid #1a237e;
-  }
+  /* Contenu principal */
+  .master-content { padding: 10px; }
+  .profile-scroll { padding: 0; }
 
-  /* 3. Zone de contenu principal */
-  .master-content {
-    padding: 10px;
-  }
-
-  .profile-scroll {
-    padding: 10px;
-  }
-
-  /* 4. En-tête collant avec boutons */
+  /* Header avec boutons flottants */
   .sticky-header {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
+    margin: 10px 0;
+    border-radius: 12px;
+    flex-direction: row; /* On garde l'alignement horizontal */
     padding: 15px;
+    justify-content: space-between;
+  }
+  .sticky-header h2 { font-size: 15px; max-width: 50%; }
+
+  /* Cartes de données version "Mobile Card" */
+  .master-grid { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
   }
 
-  .sticky-header h2 {
-    font-size: 18px;
+  .data-card {
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: none !important; /* On enlève les bordures lourdes */
   }
 
-  .btn-group {
-    width: 100%;
-    display: flex;
-    justify-content: center;
+  /* Champs : Alignement vertical optimisé */
+  .master-grid-sub { 
+    display: block; /* On casse la grille */
   }
-
-  /* 5. Grilles de données : 1 seule colonne sur mobile */
-  .master-grid, 
-  .master-grid-sub {
-    grid-template-columns: 1fr !important; /* Force une seule colonne */
-    gap: 15px;
-  }
-
-  .full-width {
-    grid-column: span 1;
-  }
-
-  /* 6. Ajustement des champs (Labels au dessus des valeurs) */
+  .sub-section { margin-bottom: 20px; }
+  
   .field-list .item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    padding: 10px 0;
-    border-bottom: 1px solid #f5f5f5;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
   }
+  .field-list label { font-size: 11px; font-weight: 600; color: #8e8e93; }
+  .field-list p { font-size: 13px; color: #1c1c1e; text-align: right; }
 
+  /* Mode Édition Mobile */
   .admin-master-container .field-list input,
   .admin-master-container .field-list select {
-    width: 100% !important; /* Les inputs prennent toute la largeur */
-    height: 40px; /* Plus facile à cliquer au doigt */
+    width: 60% !important;
+    font-size: 14px;
+    height: 35px;
+    border-radius: 8px;
+    background: #f2f2f7;
+    border: none;
   }
 
-  /* 7. Documents (Images côte à côte ou plein écran) */
+  /* Documents : Grille 1x1 */
   .doc-items-container {
-    flex-direction: column;
-  }
-
-  .doc-card-admin {
-    width: 100%;
-  }
-
-  .img-container {
-    height: 200px; /* Plus grand pour mieux voir sur mobile */
-  }
-
-  /* 8. Table des Transactions (Scroll horizontal obligatoire) */
-  .tx-history {
-    overflow-x: auto;
-    padding: 10px;
-  }
-
-  .master-table {
-    min-width: 600px; /* Empêche l'écrasement du tableau */
-  }
-
-  /* 9. Boutons d'action en bas de carte */
-  .actions-footer {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 10px;
   }
+  .doc-card-admin { background: #fff; border: 1px solid #eee; }
+  .img-container { height: 180px; }
 
+  /* Transactions : Style Liste et non Tableau */
+  .master-table thead { display: none; } /* On cache les titres de colonnes */
+  .master-table tr {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    background: #fff;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+  }
+  .master-table td {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border: none;
+  }
+  .master-table td:before {
+    content: attr(data-label); /* Utilise l'attribut data-label si présent */
+    font-weight: bold;
+    color: #8e8e93;
+    font-size: 11px;
+  }
+
+  /* Boutons d'action : Style Large "Full Width" */
   .btn-status, .btn-card-toggle {
     width: 100%;
-    padding: 15px; /* Plus gros pour le tactile */
-  }
-}
-
-/* Optimisation pour les très petits écrans (iPhone SE, etc.) */
-@media (max-width: 480px) {
-  .sidebar-brand {
+    margin-top: 15px;
+    height: 48px;
+    border-radius: 10px;
     font-size: 14px;
-  }
-  
-  .balance-text {
-    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 }
