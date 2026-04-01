@@ -58,38 +58,112 @@ export default function AdminClient() {
             </div>
 
             <div className="master-grid">
-              {/* BLOC 1: IDENTITÉ (USER.JS) */}
-              <section className="data-card">
-                <h3><i className="fas fa-id-card"></i> Identité & Documents</h3>
-                <div className="field-grid">
-                  <div className="item">
-                    <label>Civilité / Nom / Prénom</label>
-                    {isEditing ? (
-                      <div className="input-row">
-                        <select value={formData.userData.civilite} onChange={e => setFormData({...formData, userData: {...formData.userData, civilite: e.target.value}})}><option>M</option><option>Mme</option></select>
-                        <input value={formData.userData.nom} onChange={e => setFormData({...formData, userData: {...formData.userData, nom: e.target.value}})} />
-                        <input value={formData.userData.prenom} onChange={e => setFormData({...formData, userData: {...formData.userData, prenom: e.target.value}})} />
-                      </div>
-                    ) : <p>{selected.user.civilite} {selected.user.nom} {selected.user.prenom}</p>}
-                  </div>
-                  <div className="item"><label>Date & Lieu de Naissance</label><p>{selected.user.dateNaissance} à {selected.user.lieuNaissance}</p></div>
-                  <div className="item"><label>Nationalité</label><p>{selected.user.nationalite}</p></div>
-                  <div className="item">
-                    <label>Contact (Email/Tel)</label>
-                    {isEditing ? (
-                      <div className="input-row">
-                         <input value={formData.userData.email} onChange={e => setFormData({...formData, userData: {...formData.userData, email: e.target.value}})} />
-                         <input value={formData.userData.telephone} onChange={e => setFormData({...formData, userData: {...formData.userData, telephone: e.target.value}})} />
-                      </div>
-                    ) : <p>{selected.user.email} <br/> {selected.user.telephone}</p>}
-                  </div>
-                </div>
-                <div className="docs-preview">
-                   <div className="doc-box"><span>Recto</span><img src={selected.user.pieceIdentiteRecto} alt="Recto" /></div>
-                   <div className="doc-box"><span>Verso</span><img src={selected.user.pieceIdentiteVerso} alt="Verso" /></div>
-                   <div className="doc-box signature"><span>Signature</span><img src={selected.user.signature} alt="Signature" /></div>
-                </div>
-              </section>
+              {/* BLOC 1: DOSSIER COMPLET UTILISATEUR (USER.JS) */}
+<section className="data-card user-full-dossier">
+  <div className="section-header">
+    <h3><i className="fas fa-id-card"></i> Dossier Complet Identité & Documents</h3>
+    <span className={`status-badge ${selected.user.status}`}>{selected.user.status}</span>
+  </div>
+
+  <div className="master-grid-sub">
+    {/* SOUS-SECTION : IDENTITÉ LIGNE PAR LIGNE */}
+    <div className="sub-section">
+      <h4><i className="fas fa-user"></i> État Civil</h4>
+      <div className="field-list">
+        <div className="item"><label>Civilité :</label> <p>{selected.user.civilite}</p></div>
+        <div className="item"><label>Nom :</label> <p>{selected.user.nom}</p></div>
+        <div className="item"><label>Prénom :</label> <p>{selected.user.prenom}</p></div>
+        <div className="item"><label>Né(e) le :</label> <p>{selected.user.dateNaissance}</p></div>
+        <div className="item"><label>À :</label> <p>{selected.user.lieuNaissance}</p></div>
+        <div className="item"><label>Nationalité :</label> <p>{selected.user.nationalite}</p></div>
+        <div className="item"><label>Résidence Fiscale :</label> <p>{selected.user.residenceFiscale || "N/A"}</p></div>
+      </div>
+    </div>
+
+    {/* SOUS-SECTION : CONTACT & ADRESSE */}
+    <div className="sub-section">
+      <h4><i className="fas fa-map-marker-alt"></i> Coordonnées & Localisation</h4>
+      <div className="field-list">
+        <div className="item"><label>Email :</label> <p>{selected.user.email} {selected.user.emailVerified ? "✅" : "❌"}</p></div>
+        <div className="item"><label>Téléphone :</label> <p>{selected.user.telephone}</p></div>
+        <div className="item"><label>Adresse :</label> <p>{selected.user.adresse}</p></div>
+        <div className="item"><label>Ville :</label> <p>{selected.user.codePostal} {selected.user.ville}</p></div>
+        <div className="item"><label>Pays :</label> <p>{selected.user.pays}</p></div>
+      </div>
+    </div>
+
+    {/* SOUS-SECTION : FINANCIER */}
+    <div className="sub-section">
+      <h4><i className="fas fa-briefcase"></i> Profil Professionnel & Financier</h4>
+      <div className="field-list">
+        <div className="item"><label>Situation Pro :</label> <p>{selected.user.situationProfessionnelle}</p></div>
+        <div className="item"><label>Source Revenus :</label> <p>{selected.user.sourceRevenus}</p></div>
+        <div className="item"><label>Revenus Mensuels :</label> <p className="txt-bold">{selected.user.revenusMensuels} €</p></div>
+        <div className="item"><label>Contrat Accepté :</label> <p>{selected.user.acceptContrat ? "OUI ✅" : "NON ❌"}</p></div>
+      </div>
+    </div>
+
+    {/* SOUS-SECTION : SÉCURITÉ & IDS */}
+    <div className="sub-section">
+      <h4><i className="fas fa-shield-alt"></i> Sécurité Admin</h4>
+      <div className="field-list">
+        <div className="item"><label>Personal ID :</label> <p className="mono">{selected.user.personalId}</p></div>
+        <div className="item"><label>Tentatives Login :</label> <p>{selected.user.loginAttempts}</p></div>
+        <div className="item"><label>Rôle :</label> <p>{selected.user.role}</p></div>
+        <div className="item"><label>Créé le :</label> <p>{new Date(selected.user.createdAt).toLocaleString()}</p></div>
+      </div>
+    </div>
+  </div>
+
+  {/* SECTION DOCUMENTS : VISUALISATION ET TÉLÉCHARGEMENT */}
+  <div className="documents-grid">
+    <h4><i className="fas fa-file-download"></i> Pièces Justificatives</h4>
+    <div className="doc-items-container">
+      
+      {/* Recto */}
+      <div className="doc-card-admin">
+        <p>Pièce d'Identité (Recto)</p>
+        <div className="img-container">
+          {selected.user.pieceIdentiteRecto ? <img src={selected.user.pieceIdentiteRecto} alt="Recto" /> : "Aucun fichier"}
+        </div>
+        {selected.user.pieceIdentiteRecto && (
+          <div className="doc-actions">
+            <a href={selected.user.pieceIdentiteRecto} target="_blank" rel="noreferrer" className="btn-view">Voir</a>
+            <a href={selected.user.pieceIdentiteRecto} download={`recto_${selected.user.nom}`} className="btn-download">Télécharger</a>
+          </div>
+        )}
+      </div>
+
+      {/* Verso */}
+      <div className="doc-card-admin">
+        <p>Pièce d'Identité (Verso)</p>
+        <div className="img-container">
+          {selected.user.pieceIdentiteVerso ? <img src={selected.user.pieceIdentiteVerso} alt="Verso" /> : "Aucun fichier"}
+        </div>
+        {selected.user.pieceIdentiteVerso && (
+          <div className="doc-actions">
+            <a href={selected.user.pieceIdentiteVerso} target="_blank" rel="noreferrer" className="btn-view">Voir</a>
+            <a href={selected.user.pieceIdentiteVerso} download={`verso_${selected.user.nom}`} className="btn-download">Télécharger</a>
+          </div>
+        )}
+      </div>
+
+      {/* Signature */}
+      <div className="doc-card-admin signature-card">
+        <p>Signature Numérique</p>
+        <div className="img-container">
+          {selected.user.signature ? <img src={selected.user.signature} alt="Signature" className="sig-img" /> : "Aucune signature"}
+        </div>
+        {selected.user.signature && (
+          <div className="doc-actions">
+            <a href={selected.user.signature} download={`signature_${selected.user.nom}`} className="btn-download">Télécharger la signature</a>
+          </div>
+        )}
+      </div>
+
+    </div>
+  </div>
+</section>
 
               {/* BLOC 2: COMPTE (ACCOUNT.JS) */}
               <section className="data-card account-card">
