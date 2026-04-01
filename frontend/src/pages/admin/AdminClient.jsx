@@ -162,6 +162,27 @@ export default function AdminClient() {
       <h4><i className="fas fa-shield-alt"></i> Sécurité Admin</h4>
       <div className="field-list">
         <div className="item"><label>Personal ID :</label> <p className="mono">{selected.user.personalId}</p></div>
+
+        <div className="item">
+      <label>Date d'inscription :</label> 
+      <p>
+        {selected.user.createdAt 
+          ? new Date(selected.user.createdAt).toLocaleDateString('fr-FR', {
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          : "Date inconnue"}
+      </p>
+    </div>
+
+    <div className="item">
+      <label>Dernière modification :</label> 
+      <p>{new Date(selected.user.updatedAt).toLocaleDateString('fr-FR')}</p>
+    </div>
+    
         <div className="item"><label>Rôle :</label> <p>{selected.user.role}</p></div>
         <div className="item"><label>Statut Dossier :</label> 
           {isEditing ? (
