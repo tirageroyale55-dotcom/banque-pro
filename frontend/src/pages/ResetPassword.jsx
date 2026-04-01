@@ -31,20 +31,26 @@ export default function ResetPassword() {
     setError("");
 
     try {
-      const res = await api("/auth/check-id", "POST", { personalId });
+  const res = await api("/auth/check-id", "POST", { personalId });
 
-      if (!res.exists) {
-        const newAttempts = attempts + 1;
-        setAttempts(newAttempts);
-        setError("Identifiant non trouvé");
-        if (newAttempts >= 3) return navigate("/");
-        return;
-      }
+  if (!res.exists) {
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
+    setError("Identifiant non trouvé");
+    if (newAttempts >= 3) return navigate("/");
+    return;
+  }
 
-      setStep(2);
-    } catch {
-      setError("Erreur serveur");
-    }
+  // 🔥 Ajout de la vérification du statut bloqué
+  if (res.status === "BLOCKED") {
+    setError("Votre compte est bloqué. Veuillez utiliser le lien de réinitialisation envoyé par l'administrateur.");
+    return;
+  }
+
+  setStep(2);
+} catch {
+  setError("Erreur serveur");
+}
   };
 
   // ===== STEP 2 =====

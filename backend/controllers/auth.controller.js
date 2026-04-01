@@ -207,27 +207,25 @@ if (user.status === "BLOCKED") {
     }
 
     // 5️⃣ Vérification PIN
-    const pinValid = await bcrypt.compare(pin.trim(), user.pinHash);
-    if (!pinValid) {
-      user.loginAttempts = (user.loginAttempts || 0) + 1;
+    // 5️⃣ Vérification PIN
+const pinValid = await bcrypt.compare(pin.trim(), user.pinHash);
+if (!pinValid) {
+  user.loginAttempts = (user.loginAttempts || 0) + 1;
 
-      // 🔴 Blocage après 5 tentatives
-      if (user.loginAttempts >= 5) {
-        user.lockedUntil = Date.now() + 30 * 60 * 1000; // 30 minutes
-        await user.save();
+  // 🔴 Blocage après 5 tentatives : On change le statut en "BLOCKED"
+  if (user.loginAttempts >= 5) {
+    user.status = "BLOCKED"; // 🔥 On synchronise avec le statut User
+    user.lockedUntil = Date.now() + 30 * 60 * 1000; // 30 minutes de sécurité
+    await user.save();
 
-        return res.status(403).json({
-          message:
-            "Compte temporairement bloqué. Contactez l'administrateur."
-        });
-      }
+    return res.status(403).json({
+      message: "Compte bloqué pour des raisons de sécurité. Contactez l'administrateur."
+    });
+  }
 
-      await user.save();
-
-      return res.status(401).json({
-        message: "Code PIN incorrect"
-      });
-    }
+  await user.save();
+  return res.status(401).json({ message: "Code PIN incorrect" });
+}
 
     // 6️⃣ Si succès → reset tentatives
     user.loginAttempts = 0;
@@ -459,13 +457,21 @@ exports.resetPassword = async (req, res) => {
     console.log("PIN CLEAN:", cleanPin);
     console.log("USER:", user.personalId);
 
-    // Hash
-    user.passwordHash = await bcrypt.hash(password, 10);
-    user.pinHash = await bcrypt.hash(cleanPin, 10);
+    // ... (code existant pour le hash)
+user.passwordHash = await bcrypt.hash(password, 10);
+user.pinHash = await bcrypt.hash(cleanPin, 10);
 
-    // Nettoyage token
-    user.resetToken = undefined;
-    user.resetExpires = undefined;
+// 🔥 RÉACTIVATION AUTOMATIQUE ICI
+user.status = "ACTIVE";           // Le compte redevient actif
+user.loginAttempts = 0;           // On remet les erreurs à zéro
+user.lockedUntil = null;          // On enlève le verrou de temps
+user.emailVerified = true;        // On s'assure qu'il est vérifié
+
+// Nettoyage token
+user.resetToken = undefined;
+user.resetExpires = undefined;
+
+await user.save();
 
     await user.save();
 
