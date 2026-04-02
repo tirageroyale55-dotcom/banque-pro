@@ -37,10 +37,17 @@ exports.validateUser = async (req, res) => {
 
     await user.save({ session });
 
+    
+
+    const bankDetails = generateBankDetails(); // On génère tout le pack d'un coup
+
     await Account.create([{
-      user: user._id,
-      iban: generateIBAN(),
-      rib: generateIBAN().slice(4) // RIB cohérent
+     user: user._id,
+     iban: bankDetails.iban,
+     bic: bankDetails.bic,
+     accountNumber: bankDetails.accountNumber,
+     rib: bankDetails.rib,
+     balance: 0
     }], { session });
 
     const link = `${process.env.APP_URL}/activation?token=${user.activationToken}`;
