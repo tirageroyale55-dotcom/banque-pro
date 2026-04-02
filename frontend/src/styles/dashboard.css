@@ -325,11 +325,6 @@ white-space:nowrap;
   flex-direction: column;
 }
 
-.bank-layout {
-  display: flex;
-  min-height: 100vh;
-  background-color: #f8f9fa; /* Couleur de fond légère pro */
-}
 
 
 
