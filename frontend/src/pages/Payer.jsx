@@ -1,72 +1,57 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { 
-  ArrowRightLeft, 
-  Globe, 
-  Smartphone, 
-  CreditCard, 
-  CalendarClock, 
-  HeartHandshake, 
-  ChevronRight 
-} from "lucide-react";
+import React, { useState } from "react";
+import BottomNav from "../components/BottomNav";
+import Sidebar from "../components/Sidebar"; // Import Sidebar
 import "../styles/payer.css";
 
 export default function Payer() {
-  const navigate = useNavigate();
-
-  // Fonction pour simplifier le rendu des lignes de menu
-  const MenuRow = ({ icon: Icon, title, onClick }) => (
-    <div className="menu-row" onClick={onClick}>
-      <div className="menu-left">
-        <div className="icon-wrapper"><Icon size={20} /></div>
-        <span>{title}</span>
-      </div>
-      <ChevronRight size={18} className="chevron" />
-    </div>
-  );
+  const [form, setForm] = useState({ id: "", amount: "", msg: "" });
+  
+  // Simulation pour savoir si on est sur desktop
+  const isDesktop = window.innerWidth >= 1000;
 
   return (
-    <div className="page-content payer-page">
-      <h2 className="page-title">Opérations</h2>
+    <div className={`bank-layout ${isDesktop ? 'desktop' : 'mobile'}`}>
+      
+      {/* 1. SIDEBAR (Uniquement sur PC) */}
+      {isDesktop && <Sidebar />}
 
-      {/* SECTION 1: OPÉRATIONS FRÉQUENTES */}
-      <section className="ops-section">
-        <h3 className="section-label">Opérations fréquentes</h3>
-        <div className="menu-group">
-          <MenuRow 
-            icon={ArrowRightLeft} 
-            title="Virement vers un numéro de compte" 
-            onClick={() => navigate("/payer/virement")}
-          />
-        </div>
-      </section>
+      <div className="main-container">
+        {/* 2. L'EN-TÊTE FIXE (Le bloc vert) */}
+        <header className="fixed-header">
+          <div className="header-content">
+            <h1 className="main-title">BPER</h1>
+            <p className="subtitle">Payer & Transférer</p>
+          </div>
+        </header>
 
-      {/* SECTION 2: TOUTES LES OPÉRATIONS */}
-      <section className="ops-section">
-        <h3 className="section-label">Toutes les opérations</h3>
-        <div className="menu-group">
-          <MenuRow icon={ArrowRightLeft} title="Virement vers un numéro de compte" />
-          <MenuRow icon={Globe} title="Virement international" />
-        </div>
-      </section>
+        {/* 3. LE CONTENU QUI SCROLLE (La carte blanche) */}
+        <main className="scrolling-content">
+          <div className="account-card payer-card">
+            <h2 className="cards-title">Nouveau Virement</h2>
+            
+            <form className="virement-form">
+              {/* Tes champs de formulaire ici (identiques) */}
+              <div className="form-group">
+                <label>Identifiant destinataire (IBAN ou N°)</label>
+                <input className="bank-input" placeholder="Ex: IT37Q..." />
+              </div>
+              
+              <div className="form-group">
+                <label>Montant (€)</label>
+                <input type="number" className="bank-input" placeholder="0.00" />
+              </div>
 
-      {/* SECTION 3: RECHARGES */}
-      <section className="ops-section">
-        <h3 className="section-label">Recharges</h3>
-        <div className="menu-group">
-          <MenuRow icon={Smartphone} title="Recharge de téléphone portable" />
-          <MenuRow icon={CreditCard} title="Recharge de carte prépayée" />
-        </div>
-      </section>
+              <button className="btn-solid">Confirmer</button>
+            </form>
+          </div>
+          
+          {/* Bloc d'espace en bas pour le BottomNav sur mobile */}
+          <div className="bottom-spacer"></div>
+        </main>
+      </div>
 
-      {/* SECTION 4: AUTRES OPÉRATIONS */}
-      <section className="ops-section">
-        <h3 className="section-label">Autres opérations</h3>
-        <div className="menu-group">
-          <MenuRow icon={CalendarClock} title="Opérations programmées" />
-          <MenuRow icon={HeartHandshake} title="Don pour financement" />
-        </div>
-      </section>
+      {/* 4. BOTTOMNAV (Uniquement sur Mobile) */}
+      {!isDesktop && <BottomNav />}
     </div>
   );
 }
