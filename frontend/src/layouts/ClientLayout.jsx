@@ -18,9 +18,6 @@ export default function ClientLayout() {
       {/* 1. Sur PC : On affiche la Sidebar à gauche */}
       {isDesktop && <Sidebar />}
       
-      {/* 1. L'écart en haut (Header de sécurité) */}
-      <div className="top-spacer" style={{ height: '20px', flexShrink: 0 }}></div>
-      <main className="main-scroll-area"></main>
       <div className={isDesktop ? "desktop-content" : "mobile-content"}>
         {/* 2. L'Outlet : C'est ici que tes pages (Dashboard, Payer...) s'affichent */}
         <Outlet />
