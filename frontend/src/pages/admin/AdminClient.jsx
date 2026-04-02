@@ -182,7 +182,7 @@ export default function AdminClient() {
       <label>Dernière modification :</label> 
       <p>{new Date(selected.user.updatedAt).toLocaleDateString('fr-FR')}</p>
     </div>
-    
+
         <div className="item"><label>Rôle :</label> <p>{selected.user.role}</p></div>
         <div className="item"><label>Statut Dossier :</label> 
           {isEditing ? (
@@ -251,19 +251,59 @@ export default function AdminClient() {
 </section>
 
               {/* BLOC 2: COMPTE (ACCOUNT.JS) */}
-              <section className="data-card account-card">
-                <h3><i className="fas fa-university"></i> Informations Compte</h3>
-                <div className="field-grid">
-                  <div className="item"><label>IBAN</label>{isEditing ? <input value={formData.accountData?.iban} onChange={e => setFormData({...formData, accountData: {...formData.accountData, iban: e.target.value}})} /> : <p className="mono">{selected.account?.iban}</p>}</div>
-                  <div className="item"><label>Solde (€)</label>{isEditing ? <input type="number" value={formData.accountData?.balance} onChange={e => setFormData({...formData, accountData: {...formData.accountData, balance: e.target.value}})} /> : <p className="balance-text">{selected.account?.balance} €</p>}</div>
-                </div>
-                <div className="actions-footer">
-                  <p>Statut : <b>{selected.account?.status}</b></p>
-                  <button className={`btn-status ${selected.account?.status}`} onClick={() => runAction(`/admin/account/${selected.account?.status === "ACTIVE" ? "block" : "activate"}/${selected.account?._id}`)}>
-                    {selected.account?.status === "ACTIVE" ? "Bloquer Compte" : "Activer Compte"}
-                  </button>
-                </div>
-              </section>
+<section className="data-card account-card">
+  <h3><i className="fas fa-university"></i> Informations Compte</h3>
+  
+  <div className="field-grid">
+    {/* Ligne 1 : IBAN et BIC */}
+    <div className="item">
+      <label>IBAN</label>
+      {isEditing ? 
+        <input value={formData.accountData?.iban} onChange={e => setFormData({...formData, accountData: {...formData.accountData, iban: e.target.value}})} /> 
+        : <p className="mono">{selected.account?.iban}</p>
+      }
+    </div>
+    <div className="item">
+      <label>Code BIC / SWIFT</label>
+      {isEditing ? 
+        <input value={formData.accountData?.bic} onChange={e => setFormData({...formData, accountData: {...formData.accountData, bic: e.target.value}})} /> 
+        : <p className="mono">{selected.account?.bic}</p>
+      }
+    </div>
+
+    {/* Ligne 2 : Numéro de Compte et RIB/BBAN */}
+    <div className="item">
+      <label>N° de Compte</label>
+      {isEditing ? 
+        <input value={formData.accountData?.accountNumber} onChange={e => setFormData({...formData, accountData: {...formData.accountData, accountNumber: e.target.value}})} /> 
+        : <p className="mono">{selected.account?.accountNumber}</p>
+      }
+    </div>
+    <div className="item">
+      <label>RIB (BBAN)</label>
+      {isEditing ? 
+        <input value={formData.accountData?.rib} onChange={e => setFormData({...formData, accountData: {...formData.accountData, rib: e.target.value}})} /> 
+        : <p className="mono">{selected.account?.rib}</p>
+      }
+    </div>
+
+    {/* Ligne 3 : Solde */}
+    <div className="item">
+      <label>Solde (€)</label>
+      {isEditing ? 
+        <input type="number" value={formData.accountData?.balance} onChange={e => setFormData({...formData, accountData: {...formData.accountData, balance: e.target.value}})} /> 
+        : <p className="balance-text">{selected.account?.balance} €</p>
+      }
+    </div>
+  </div>
+
+  <div className="actions-footer">
+    <p>Statut : <b>{selected.account?.status}</b></p>
+    <button className={`btn-status ${selected.account?.status}`} onClick={() => runAction(`/admin/account/${selected.account?.status === "ACTIVE" ? "block" : "activate"}/${selected.account?._id}`)}>
+      {selected.account?.status === "ACTIVE" ? "Bloquer Compte" : "Activer Compte"}
+    </button>
+  </div>
+</section>
 
               {/* BLOC 3: CARTE (CARD.JS) */}
               <section className="data-card card-card">
