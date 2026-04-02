@@ -6,8 +6,8 @@ const nodemailer = require("nodemailer");
 
 const {
   generatePersonalId,
-  generateIBAN,
-  generateActivationToken
+  generateActivationToken,
+  generateBankDetails 
 } = require("../utils/generate");
 const { sendActivationEmail } = require("../utils/mailer");
 
