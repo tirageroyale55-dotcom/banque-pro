@@ -112,10 +112,10 @@ html, body {
   flex: 1; /* Prend tout l'espace restant */
   overflow-y: auto; /* Autorise le scroll interne uniquement ici */
   background-color: #f4f7f8; /* Fond gris clair des pages */
-  border-top-left-radius: 20px; /* Petit arrondi pro en haut */
-  border-top-right-radius: 20px;
+  border-top-left-radius: 5px; /* Petit arrondi pro en haut */
+  border-top-right-radius: 5px;
   position: relative;
-  z-index: 10;
+  z-index: 0;
   
   /* Pour cacher ce qu'il y a derrière quand on scrolle */
   display: flex;
