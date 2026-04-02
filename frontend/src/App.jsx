@@ -30,7 +30,7 @@ import Accounts from "./pages/Accounts";
 import Cards from "./pages/Cards";
 import Financing from "./pages/Financing";
 import Blocked from "./pages/Blocked";
-
+import Payer from "./pages/Payer"; // <--- AJOUTE CETTE LIGNE
 
 /* ADMIN PAGES */
 
