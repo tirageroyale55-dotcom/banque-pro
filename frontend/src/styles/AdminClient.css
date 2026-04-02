@@ -27,7 +27,7 @@
 .data-card h3 { margin-top: 0; margin-bottom: 20px; color: #1a237e; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
 
 /* Form Elements */
-.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
 .item label { display: block; font-size: 11px; color: #95a5a6; text-transform: uppercase; margin-bottom: 5px; }
 .item p { font-weight: 600; margin: 0; font-size: 14px; }
 .input-row { display: flex; gap: 5px; }
