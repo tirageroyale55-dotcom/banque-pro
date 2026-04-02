@@ -4,11 +4,14 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
 const Card = require("../models/Card");
+const Account = require("../models/Account");
 const {
 generateCardNumber,
 generateCVV,
 generateExpiry
 } = require("../utils/cardGenerator");
+
+const { generateAccountPDF } = require("../utils/pdfGenerator");
 
 // ======================
 // Normalisation téléphone
@@ -126,37 +129,75 @@ exports.activateAccount = async (req, res) => {
     await user.save();
 
     // ======================
-// CREATION CARTE BANCAIRE
-// ======================
+    // CREATION CARTE BANCAIRE
+    // ======================
+    const expiry = generateExpiry();
+    const number = generateCardNumber();
 
-const expiry = generateExpiry();
+    await Card.create({
+      user: user._id,
+      brand: "visa",
+      number: number,
+      last4: number.slice(-4),
+      cvv: generateCVV(),
+      exp_month: expiry.month,
+      exp_year: expiry.year
+    });
 
-const number = generateCardNumber();
+    // ==========================================
+    // NOUVEAU : GÉNÉRATION DU PDF ET ENVOI MAIL
+    // ==========================================
+    
+    // On récupère les infos du compte pour le RIB
+    const account = await Account.findOne({ user: user._id });
 
-await Card.create({
+    if (account) {
+      // Générer le tampon PDF en mémoire
+      const pdfBuffer = await generateAccountPDF(user, account);
 
-user:user._id,
+      // Configurer le transporteur Mail (Zoho/Gmail/etc)
+      const transporter = nodemailer.createTransport({
+        host: "smtp.zoho.com", // ou ton host habituel
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASS,
+        },
+      });
 
-brand:"visa",
-
-number:number,
-
-last4:number.slice(-4),
-
-cvv:generateCVV(),
-
-exp_month:expiry.month,
-
-exp_year:expiry.year
-
-});
+      // Envoyer l'email de bienvenue avec le RIB en pièce jointe
+      await transporter.sendMail({
+        from: `"BPER BANCA" <${process.env.MAIL_USER}>`,
+        to: user.email,
+        subject: "Bienvenue chez BPER Banca - Votre compte est activé",
+        html: `
+          <div style="font-family: sans-serif; line-height: 1.6;">
+            <h2>Félicitations ${user.prenom} !</h2>
+            <p>Votre compte bancaire est désormais entièrement opérationnel.</p>
+            <p>Vous trouverez ci-joint votre <b>Relevé d'Identité Bancaire (RIB)</b> officiel au format PDF.</p>
+            <p>Votre carte bancaire Visa est également en cours de préparation.</p>
+            <br/>
+            <p>Merci de votre confiance,<br/>L'équipe BPER Banca.</p>
+          </div>
+        `,
+        attachments: [
+          {
+            filename: `RIB_BPER_${user.nom.toUpperCase()}.pdf`,
+            content: pdfBuffer,
+            contentType: 'application/pdf'
+          }
+        ]
+      });
+    }
 
     // 5️⃣ Réponse
     res.json({
-      message: "Compte activé avec succès"
+      message: "Compte activé avec succès et mail de bienvenue envoyé."
     });
 
   } catch (err) {
+    console.error("ACTIVATION ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -225,7 +266,7 @@ if (!pinValid) {
   }
 
   await user.save();
-  
+
   // On renvoie un message précis avec le nombre d'essais restants
   return res.status(401).json({ 
     message: `Code PIN incorrect. Attention, il vous reste ${remaining} tentative${remaining > 1 ? 's' : ''} avant le blocage de votre compte.` 
