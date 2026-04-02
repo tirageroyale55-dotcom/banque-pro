@@ -331,11 +331,6 @@ white-space:nowrap;
   background-color: #f8f9fa; /* Couleur de fond légère pro */
 }
 
-.desktop-content {
-  flex: 1;
-  margin-left: 260px; /* Si ta Sidebar fait 260px de large */
-  padding: 20px;
-}
 
 
 
