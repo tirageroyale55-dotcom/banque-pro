@@ -43,17 +43,15 @@ api("/client/card")
 
 },[activeTab]);
 
-// Remplace ton premier useEffect par celui-ci
 useEffect(() => {
-  // On ne vide pas data si on l'a déjà (évite le flash blanc)
-  api("/client/dashboard")
-    .then(res => {
-      setData(res);
-    })
-    .catch(() => {
-      localStorage.removeItem("token");
-      navigate("/login");
-    });
+
+api("/client/dashboard")
+.then(setData)
+.catch(() => {
+localStorage.removeItem("token");
+navigate("/login");
+});
+
 }, []);
 
 useEffect(()=>{

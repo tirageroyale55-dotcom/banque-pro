@@ -30,8 +30,11 @@ import Accounts from "./pages/Accounts";
 import Cards from "./pages/Cards";
 import Financing from "./pages/Financing";
 import Blocked from "./pages/Blocked";
-import Payer from "./pages/Payer"; // <--- AJOUTE CETTE LIGNE
 
+import Payer from "./pages/Payer"; 
+import Produits from "./pages/Produits";
+import Lifestyle from "./pages/Lifestyle";
+import Aide from "./pages/Aide";
 /* ADMIN PAGES */
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -111,6 +114,9 @@ export default function App() {
 
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/payer" element={<Payer />} />
+          <Route path="/produits" element={<Produits />} />
+          <Route path="/lifestyle" element={<Lifestyle />} />
+          <Route path="/aide" element={<Aide />} />
           <Route path="/accounts" element={<Accounts />} />
           <Route path="/cards" element={<Cards />} />
           <Route path="/financing" element={<Financing />} />
