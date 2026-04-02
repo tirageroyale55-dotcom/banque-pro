@@ -317,12 +317,12 @@ white-space:nowrap;
 
 
 
-/* Empêche le contenu d'être caché par le menu du bas */
-.mobile-content {
-  padding-bottom: 90px; /* Hauteur de ton BottomNav + une petite marge */
-  min-height: 100vh;
+
+
+.bank-layout {
   display: flex;
-  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f8f9fa; /* Couleur de fond légère pro */
 }
 
 
