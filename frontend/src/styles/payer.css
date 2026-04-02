@@ -1,0 +1,90 @@
+.payer-page {
+  background-color: #f4f7f8; /* Fond gris très léger BPER */
+  min-height: 100vh;
+  padding: 20px 15px 100px 15px;
+}
+
+.page-title {
+  color: #005a64; /* Bleu canard BPER */
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+.section-label {
+  color: #666;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin: 20px 0 10px 5px;
+  letter-spacing: 0.5px;
+}
+
+.menu-group {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.menu-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.menu-row:last-child {
+  border-bottom: none;
+}
+
+.menu-row:active {
+  background-color: #e6f0f1;
+}
+
+.menu-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.icon-wrapper {
+  color: #005a64;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-left span {
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.chevron {
+  color: #ccc;
+}
+
+
+
+
+
+.bank-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* 📏 Exactement la hauteur de l'écran */
+  width: 100vw;
+  position: relative;
+  background-color: #f4f7f8;
+}
+
+.mobile-content {
+  flex: 1; /* Prend tout l'espace entre le haut et le BottomNav */
+  overflow-y: auto; /* ✅ Seul ce bloc a le droit de scroller si le contenu est long */
+  -webkit-overflow-scrolling: touch; /* Scroll fluide sur iPhone */
+  
+  padding-bottom: 20px;
+}
