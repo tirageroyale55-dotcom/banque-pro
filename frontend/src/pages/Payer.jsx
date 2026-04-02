@@ -1,50 +1,72 @@
-import { useState } from "react";
-import { api } from "../services/api";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { 
+  ArrowRightLeft, 
+  Globe, 
+  Smartphone, 
+  CreditCard, 
+  CalendarClock, 
+  HeartHandshake, 
+  ChevronRight 
+} from "lucide-react";
+import "../styles/payer.css";
 
 export default function Payer() {
-  const [form, setForm] = useState({ id: "", amount: "", msg: "" });
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // Fonction pour simplifier le rendu des lignes de menu
+  const MenuRow = ({ icon: Icon, title, onClick }) => (
+    <div className="menu-row" onClick={onClick}>
+      <div className="menu-left">
+        <div className="icon-wrapper"><Icon size={20} /></div>
+        <span>{title}</span>
+      </div>
+      <ChevronRight size={18} className="chevron" />
+    </div>
+  );
 
   return (
-    <div className="page-content" style={{ paddingBottom: "100px" }}>
-      <header className="section-header">
-        <h2 className="cards-title">Payer</h2>
-        <p className="subtitle">Envoyez de l'argent instantanément</p>
-      </header>
+    <div className="page-content payer-page">
+      <h2 className="page-title">Opérations</h2>
 
-      <div className="account-card" style={{ marginTop: "20px" }}>
-        <div className="virement-form">
-          <label className="input-label">Bénéficiaire (IBAN ou N° Compte)</label>
-          <input 
-            className="bank-input" 
-            placeholder="IT37Q 05387..."
-            value={form.id}
-            onChange={e => setForm({...form, id: e.target.value})}
+      {/* SECTION 1: OPÉRATIONS FRÉQUENTES */}
+      <section className="ops-section">
+        <h3 className="section-label">Opérations fréquentes</h3>
+        <div className="menu-group">
+          <MenuRow 
+            icon={ArrowRightLeft} 
+            title="Virement vers un numéro de compte" 
+            onClick={() => navigate("/payer/virement")}
           />
-
-          <label className="input-label" style={{ marginTop: "20px" }}>Montant (€)</label>
-          <input 
-            type="number"
-            className="bank-input" 
-            placeholder="0.00"
-            style={{ fontSize: "24px", fontWeight: "bold" }}
-            value={form.amount}
-            onChange={e => setForm({...form, amount: e.target.value})}
-          />
-
-          <button className="btn-solid" style={{ width: "100%", marginTop: "30px" }}>
-            Confirmer le virement
-          </button>
         </div>
-      </div>
+      </section>
 
-      {/* Petit rappel de sécurité style BPER */}
-      <div className="info-box" style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
-        <span style={{ color: "#005a64" }}>🛡️</span>
-        <p style={{ fontSize: "12px", color: "#666" }}>
-          Les fonds seront transférés immédiatement après validation. Assurez-vous des coordonnées du destinataire.
-        </p>
-      </div>
+      {/* SECTION 2: TOUTES LES OPÉRATIONS */}
+      <section className="ops-section">
+        <h3 className="section-label">Toutes les opérations</h3>
+        <div className="menu-group">
+          <MenuRow icon={ArrowRightLeft} title="Virement vers un numéro de compte" />
+          <MenuRow icon={Globe} title="Virement international" />
+        </div>
+      </section>
+
+      {/* SECTION 3: RECHARGES */}
+      <section className="ops-section">
+        <h3 className="section-label">Recharges</h3>
+        <div className="menu-group">
+          <MenuRow icon={Smartphone} title="Recharge de téléphone portable" />
+          <MenuRow icon={CreditCard} title="Recharge de carte prépayée" />
+        </div>
+      </section>
+
+      {/* SECTION 4: AUTRES OPÉRATIONS */}
+      <section className="ops-section">
+        <h3 className="section-label">Autres opérations</h3>
+        <div className="menu-group">
+          <MenuRow icon={CalendarClock} title="Opérations programmées" />
+          <MenuRow icon={HeartHandshake} title="Don pour financement" />
+        </div>
+      </section>
     </div>
   );
 }
