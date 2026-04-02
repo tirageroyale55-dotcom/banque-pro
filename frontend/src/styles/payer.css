@@ -1,3 +1,27 @@
+/* Bloque la racine */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* Empêche le rebond élastique sur iPhone/Chrome */
+  position: fixed; 
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+/* Le conteneur principal */
+.bank-layout {
+  display: flex;
+  flex-direction: column; /* Organise de haut en bas */
+  height: 100vh;
+  width: 100%;
+  background-color: #005a64; /* La couleur foncée BPER en fond de sécurité */
+}
+
 .payer-page {
   background-color: #f4f7f8; /* Fond gris très léger BPER */
   min-height: 100vh;
