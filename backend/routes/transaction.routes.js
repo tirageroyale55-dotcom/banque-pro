@@ -3,7 +3,8 @@ const auth = require("../middleware/auth.middleware");
 const {
   creditAccount,
   debitAccount,
-  getTransactions
+  getTransactions,
+  transferMoney
 } = require("../controllers/transaction.controller");
 
 router.post("/credit", auth, creditAccount);
