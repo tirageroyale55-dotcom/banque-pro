@@ -3,7 +3,7 @@
 .payer-page {
   background-color: #f4f7f8; /* Fond gris très léger BPER */
   min-height: 100vh;
-  padding: 20px 15px 100px 15px;
+  padding: 20px ;
 }
 
 .page-title {
@@ -81,7 +81,7 @@
   overflow-y: auto; /* ✅ Seul ce bloc a le droit de scroller si le contenu est long */
   -webkit-overflow-scrolling: touch; /* Scroll fluide sur iPhone */
   background-color: #f4f7f8;
-  
+  padding-bottom: 20px;
 }
 
 
