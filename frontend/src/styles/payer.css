@@ -1,7 +1,10 @@
 
 
-
-
+.payer-page {
+  background-color: #f4f7f8; /* Fond gris très léger BPER */
+  min-height: 100vh;
+  padding: 20px 15px 100px 15px;
+}
 
 .page-title {
   color: #005a64; /* Bleu canard BPER */
@@ -73,7 +76,13 @@
 
 
 
-
+.mobile-content {
+  flex: 1; /* Prend tout l'espace entre le haut et le BottomNav */
+  overflow-y: auto; /* ✅ Seul ce bloc a le droit de scroller si le contenu est long */
+  -webkit-overflow-scrolling: touch; /* Scroll fluide sur iPhone */
+  background-color: #f4f7f8;
+  padding-bottom: 0%;
+}
 
 
 
