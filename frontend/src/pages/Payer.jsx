@@ -1,92 +1,85 @@
 import { useState } from "react";
 import { api } from "../services/api";
-import BottomNav from "../components/BottomNav";
-import Header from "../components/Header";
-import "../styles/dashboard.css"; // Réutilise tes styles pour la cohérence
+import "../styles/dashboard.css";
 
 export default function Payer() {
+  const [form, setForm] = useState({ id: "", amount: "", msg: "" });
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({ identifier: "", amount: "", reason: "" });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleTransfer = async (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
-
     try {
-      await api("/client/transfer", "POST", {
-        recipientIdentifier: form.identifier,
+      await api("/transaction/transfer", "POST", {
+        recipientIdentifier: form.id,
         amount: form.amount,
-        reason: form.reason
+        label: form.msg
       });
-      setStep(3); // Succès
+      setStep(2); // Succès
     } catch (err) {
-      setError(err.message || "Destinataire introuvable dans le réseau");
-    } finally {
-      setLoading(false);
+      setError(err.message);
     }
   };
 
-  return (
-    <div className="bank-app">
-      <div className="page-content" style={{ paddingBottom: "100px" }}>
-        <h2 className="cards-title">Virement Instantané</h2>
-
-        <div className="account-card" style={{ margin: "20px" }}>
-          {step === 1 && (
-            <form onSubmit={(e) => { e.preventDefault(); setStep(2); }}>
-              <label>IBAN ou N° de compte du destinataire</label>
-              <input 
-                className="bank-input"
-                placeholder="Ex: IT37Q..." 
-                value={form.identifier}
-                onChange={e => setForm({...form, identifier: e.target.value})}
-                required
-              />
-              <button className="btn-solid" style={{ marginTop: "20px", width: "100%" }}>Vérifier</button>
-            </form>
-          )}
-
-          {step === 2 && (
-            <form onSubmit={handleTransfer}>
-              <p>Vers : <b>{form.identifier}</b></p>
-              <label>Montant (€)</label>
-              <input 
-                type="number" 
-                className="bank-input"
-                value={form.amount}
-                onChange={e => setForm({...form, amount: e.target.value})}
-                required
-              />
-              <label>Motif (optionnel)</label>
-              <input 
-                className="bank-input"
-                value={form.reason}
-                onChange={e => setForm({...form, reason: e.target.value})}
-              />
-              
-              {error && <p className="form-error" style={{ color: "red" }}>{error}</p>}
-              
-              <button disabled={loading} className="btn-solid" style={{ marginTop: "20px", width: "100%" }}>
-                {loading ? "Traitement..." : "Confirmer le virement"}
-              </button>
-              <button type="button" onClick={() => setStep(1)} className="btn-light">Retour</button>
-            </form>
-          )}
-
-          {step === 3 && (
-            <div style={{ textAlign: "center", padding: "20px" }}>
-              <div style={{ fontSize: "50px", color: "#005a64" }}>✓</div>
-              <h3>Virement envoyé</h3>
-              <p>Le compte {form.identifier} a été crédité.</p>
-              <button onClick={() => window.location.reload()} className="btn-solid">Nouveau virement</button>
-            </div>
-          )}
-        </div>
+  if (step === 2) return (
+    <div className="page-content" style={{textAlign:'center', paddingTop:'50px'}}>
+      <div className="account-card">
+        <h2 style={{color: '#005a64'}}>✓ Virement réussi</h2>
+        <p>L'argent a été transféré instantanément.</p>
+        <button className="btn-solid" onClick={() => window.location.reload()}>Nouveau virement</button>
       </div>
-      <BottomNav />
+    </div>
+  );
+
+  return (
+    <div className="page-content">
+      <h2 className="cards-title">Payer / Virement</h2>
+      
+      <div className="account-card">
+        <form onSubmit={handleSend}>
+          <div className="item">
+            <label>IBAN ou N° de compte destinataire</label>
+            <input 
+              className="bank-input" 
+              placeholder="IT37Q..."
+              value={form.id}
+              onChange={e => setForm({...form, id: e.target.value})}
+              required
+            />
+          </div>
+
+          <div className="item" style={{marginTop:'15px'}}>
+            <label>Montant (€)</label>
+            <input 
+              type="number" 
+              className="bank-input"
+              value={form.amount}
+              onChange={e => setForm({...form, amount: e.target.value})}
+              required
+            />
+          </div>
+
+          <div className="item" style={{marginTop:'15px'}}>
+            <label>Motif de l'opération</label>
+            <input 
+              className="bank-input"
+              value={form.msg}
+              onChange={e => setForm({...form, msg: e.target.value})}
+            />
+          </div>
+
+          {error && <p className="form-error" style={{marginTop:'15px'}}>{error}</p>}
+
+          <button className="btn-solid" style={{width:'100%', marginTop:'20px'}}>
+            Confirmer le virement
+          </button>
+        </form>
+      </div>
+
+      <div className="account-card" style={{marginTop:'20px', opacity: 0.7}}>
+        <h3>Aide</h3>
+        <p style={{fontSize:'12px'}}>Seuls les virements vers les comptes du réseau BPER sont autorisés pour le moment.</p>
+      </div>
     </div>
   );
 }

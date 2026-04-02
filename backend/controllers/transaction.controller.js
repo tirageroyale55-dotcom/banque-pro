@@ -1,66 +1,5 @@
-const mongoose = require("mongoose");
 const Account = require("../models/Account");
-const Transaction = require("../models/Transaction"); // Assure-toi d'avoir ce modèle
-
-exports.transferMoney = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
-  try {
-    const { recipientIdentifier, amount, reason } = req.body;
-    const senderId = req.user.id; // Récupéré via ton middleware auth
-
-    // 1. Chercher le compte expéditeur
-    const senderAccount = await Account.findOne({ user: senderId }).session(session);
-    if (senderAccount.balance < amount) {
-      throw new Error("Solde insuffisant");
-    }
-
-    // 2. CHERCHE LE DESTINATAIRE (IBAN ou Numéro de compte)
-    // C'est ici que la magie opère : on refuse si pas dans la base
-    const recipientAccount = await Account.findOne({
-      $or: [
-        { iban: recipientIdentifier },
-        { accountNumber: recipientIdentifier }
-      ]
-    }).session(session);
-
-    if (!recipientAccount) {
-      return res.status(404).json({ 
-        message: "Destinataire introuvable. Ce compte n'appartient pas au réseau BPER." 
-      });
-    }
-
-    if (senderAccount._id.equals(recipientAccount._id)) {
-      throw new Error("Opération impossible vers le même compte");
-    }
-
-    // 3. Mouvement de fonds
-    senderAccount.balance -= Number(amount);
-    recipientAccount.balance += Number(amount);
-
-    await senderAccount.save({ session });
-    await recipientAccount.save({ session });
-
-    // 4. Historique
-    await Transaction.create([{
-      sender: senderId,
-      recipient: recipientAccount.user,
-      amount,
-      reason: reason || "Virement Instantané",
-      type: "TRANSFER"
-    }], { session });
-
-    await session.commitTransaction();
-    res.json({ message: "Virement effectué avec succès !" });
-
-  } catch (err) {
-    await session.abortTransaction();
-    res.status(400).json({ message: err.message });
-  } finally {
-    session.endSession();
-  }
-};
+const Transaction = require("../models/Transaction");
 
 /**
  * Créditer le compte (ex: dépôt)
@@ -118,4 +57,59 @@ exports.getTransactions = async (req, res) => {
     .sort({ createdAt: -1 });
 
   res.json(transactions);
+};
+
+
+
+
+// Ajoute ceci à la fin de ton fichier actuel
+exports.transferMoney = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { recipientIdentifier, amount, label } = req.body;
+    const amountNum = Number(amount);
+
+    if (amountNum <= 0) throw new Error("Montant invalide");
+
+    // 1. Compte expéditeur
+    const senderAcc = await Account.findOne({ user: req.user.id }).session(session);
+    if (senderAcc.balance < amountNum) throw new Error("Solde insuffisant");
+
+    // 2. Compte destinataire (Vérification stricte IBAN ou N° Compte)
+    const recipientAcc = await Account.findOne({
+      $or: [{ iban: recipientIdentifier }, { accountNumber: recipientIdentifier }]
+    }).session(session);
+
+    if (!recipientAcc) {
+      throw new Error("Destinataire introuvable dans le réseau BPER");
+    }
+
+    if (senderAcc._id.equals(recipientAcc._id)) {
+      throw new Error("Opération impossible vers le même compte");
+    }
+
+    // 3. Mouvement d'argent
+    senderAcc.balance -= amountNum;
+    recipientAcc.balance += amountNum;
+
+    await senderAcc.save({ session });
+    await recipientAcc.save({ session });
+
+    // 4. Historique (un débit pour l'un, un crédit pour l'autre)
+    await Transaction.create([
+      { account: senderAcc._id, type: "DEBIT", amount: amountNum, label: `VIR vers ${recipientIdentifier} - ${label || ''}` },
+      { account: recipientAcc._id, type: "CREDIT", amount: amountNum, label: `VIR de ${senderAcc.iban} - ${label || ''}` }
+    ], { session });
+
+    await session.commitTransaction();
+    res.json({ message: "Virement instantané réussi" });
+
+  } catch (err) {
+    await session.abortTransaction();
+    res.status(400).json({ message: err.message });
+  } finally {
+    session.endSession();
+  }
 };

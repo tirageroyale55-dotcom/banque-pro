@@ -10,5 +10,8 @@ router.post("/credit", auth, creditAccount);
 router.post("/debit", auth, debitAccount);
 router.get("/", auth, getTransactions);
 
+// ... tes imports
+router.post("/transfer", auth, transferMoney); // <-- AJOUTE ÇA
+// ...
 
 module.exports = router;
