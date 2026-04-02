@@ -105,3 +105,27 @@ html, body {
   background-color: #f4f7f8;
   padding-bottom: 20px;
 }
+
+
+
+.main-scroll-area {
+  flex: 1; /* Prend tout l'espace restant */
+  overflow-y: auto; /* Autorise le scroll interne uniquement ici */
+  background-color: #f4f7f8; /* Fond gris clair des pages */
+  border-top-left-radius: 20px; /* Petit arrondi pro en haut */
+  border-top-right-radius: 20px;
+  position: relative;
+  z-index: 10;
+  
+  /* Pour cacher ce qu'il y a derrière quand on scrolle */
+  display: flex;
+  flex-direction: column;
+}
+
+/* On s'assure que chaque page envoyée dans l'Outlet occupe bien l'espace */
+.page-content {
+  width: 100%;
+  min-height: 101%; /* Force un petit scroll interne fluide */
+  padding: 20px;
+  box-sizing: border-box;
+}
