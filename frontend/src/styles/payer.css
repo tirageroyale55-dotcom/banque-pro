@@ -1,82 +1,69 @@
-/* --- Structure Globale --- */
-.bank-layout {
-  display: flex;
+.payer-page {
+  background-color: #f4f7f8; /* Fond gris très léger BPER */
   min-height: 100vh;
-  background-color: #f4f7f8; /* Fond gris très clair */
+  padding: 20px 15px 100px 15px;
 }
 
-.main-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  position: relative;
+.page-title {
+  color: #005a64; /* Bleu canard BPER */
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 25px;
 }
 
-/* --- L'EN-TÊTE FIXE (Parallaxe) --- */
-.fixed-header {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  height: 25vh; /* 25% de la hauteur de l'écran sur mobile */
-  background-color: #005a64; /* Bleu canard BPER */
-  z-index: 1; /* Derrière le contenu */
+.section-label {
+  color: #666;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin: 20px 0 10px 5px;
+  letter-spacing: 0.5px;
+}
+
+.menu-group {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.menu-row {
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  justify-content: space-between;
+  padding: 18px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-.header-content {
-  color: white;
+.menu-row:last-child {
+  border-bottom: none;
 }
 
-.main-title { font-size: 28px; font-weight: 800; margin: 0; }
-.subtitle { opacity: 0.8; font-size: 14px; }
-
-/* --- LE CONTENU DÉFILANT (Sticky) --- */
-.scrolling-content {
-  position: relative;
-  z-index: 2; /* Devant l'en-tête */
-  margin-top: -50px; /* Fait chevaucher la carte sur le vert */
-  background-color: transparent; /* Fond transparent pour voir le vert glisser */
-  overflow-y: auto; /* Zone de scroll */
+.menu-row:active {
+  background-color: #e6f0f1;
 }
 
-/* La carte blanche qui glisse */
-.payer-card {
-  background: white;
-  border-radius: 30px 30px 0 0; /* Bords arrondis hauts uniquement (comme la vidéo) */
-  box-shadow: 0 -5px 15px rgba(0,0,0,0.08); /* Ombre douce vers le haut */
-  padding: 30px 20px;
-  min-height: 80vh; /* S'assure que la carte est longue pour scroller */
+.menu-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-.cards-title {
+.icon-wrapper {
   color: #005a64;
-  margin-bottom: 25px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Espacement pour le BottomNav sur mobile */
-.bottom-spacer {
-  height: 90px;
+.menu-left span {
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
 }
 
-/* --- ADAPTATION ORDINATEUR (Desktop) --- */
-@media (min-width: 1000px) {
-  .desktop .fixed-header {
-    position: relative; /* Pas de sticky sur PC */
-    height: 120px; /* Moins haut */
-    margin-left: 260px; /* Espace pour la Sidebar */
-  }
-
-  .desktop .scrolling-content {
-    margin-top: 20px; /* Plus de chevauchement sur PC */
-    margin-left: 260px;
-  }
-
-  .desktop .payer-card {
-    border-radius: 12px; /* Bords arrondis normaux sur PC */
-    margin: 0 30px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  }
+.chevron {
+  color: #ccc;
 }
