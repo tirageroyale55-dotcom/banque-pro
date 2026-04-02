@@ -1,27 +1,30 @@
-import React from "react";
 import { Outlet } from "react-router-dom";
+import { useState, useEffect } from "react";
 import BottomNav from "../components/BottomNav";
-// Importe ton composant Header s'il est séparé
-import Header from "../components/Header"; 
-import "../styles/layout.css"; // Nouveau fichier CSS pour le layout
+import Sidebar from "../components/Sidebar";
 
 export default function ClientLayout() {
+  // Détecter si on est sur ordinateur (Desktop) ou mobile
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <div className="main-app-container">
-      {/* 1. EN-TÊTE FIXE EN HAUT */}
-      <header className="app-header-fixed">
-        <Header /> {/* Ton Header vert avec le logo, etc. */}
-      </header>
+    <div className="bank-layout">
+      {/* 1. Sur PC : On affiche la Sidebar à gauche */}
+      {isDesktop && <Sidebar />}
 
-      {/* 2. ZONE DE CONTENU QUI DÉFILE */}
-      <main className="app-content-scrollable">
+      <div className={isDesktop ? "desktop-content" : "mobile-content"}>
+        {/* 2. L'Outlet : C'est ici que tes pages (Dashboard, Payer...) s'affichent */}
         <Outlet />
-      </main>
+      </div>
 
-      {/* 3. MENU DU BAS FIXE EN BAS */}
-      <footer className="app-nav-fixed">
-        <BottomNav />
-      </footer>
+      {/* 3. Sur Mobile : On affiche TOUJOURS le menu du bas */}
+      {!isDesktop && <BottomNav />}
     </div>
   );
 }

@@ -1,11 +1,22 @@
 import React from "react";
-import { ArrowRightLeft, Globe, Smartphone, CreditCard, CalendarClock, HeartHandshake, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { 
+  ArrowRightLeft, 
+  Globe, 
+  Smartphone, 
+  CreditCard, 
+  CalendarClock, 
+  HeartHandshake, 
+  ChevronRight 
+} from "lucide-react";
 import "../styles/payer.css";
 
 export default function Payer() {
-  // Le composant pour une ligne de menu (identique à ton dessin)
-  const MenuRow = ({ icon: Icon, title }) => (
-    <div className="menu-row">
+  const navigate = useNavigate();
+
+  // Fonction pour simplifier le rendu des lignes de menu
+  const MenuRow = ({ icon: Icon, title, onClick }) => (
+    <div className="menu-row" onClick={onClick}>
       <div className="menu-left">
         <div className="icon-wrapper"><Icon size={20} /></div>
         <span>{title}</span>
@@ -15,35 +26,47 @@ export default function Payer() {
   );
 
   return (
-    <div className="virement-menu-container">
-      <h2 className="page-title-bper">Opérations</h2>
+    <div className="page-content payer-page">
+      <h2 className="page-title">Opérations</h2>
 
-      {/* SECTION 1 */}
-      <h3 className="section-label-bper">Opérations fréquentes</h3>
-      <div className="menu-group-bper">
-        <MenuRow icon={ArrowRightLeft} title="Virement vers un numéro de compte" />
-      </div>
+      {/* SECTION 1: OPÉRATIONS FRÉQUENTES */}
+      <section className="ops-section">
+        <h3 className="section-label">Opérations fréquentes</h3>
+        <div className="menu-group">
+          <MenuRow 
+            icon={ArrowRightLeft} 
+            title="Virement vers un numéro de compte" 
+            onClick={() => navigate("/payer/virement")}
+          />
+        </div>
+      </section>
 
-      {/* SECTION 2 */}
-      <h3 className="section-label-bper">Toutes les opérations</h3>
-      <div className="menu-group-bper">
-        <MenuRow icon={ArrowRightLeft} title="Virement vers un numéro de compte" />
-        <MenuRow icon={Globe} title="Virement international" />
-      </div>
+      {/* SECTION 2: TOUTES LES OPÉRATIONS */}
+      <section className="ops-section">
+        <h3 className="section-label">Toutes les opérations</h3>
+        <div className="menu-group">
+          <MenuRow icon={ArrowRightLeft} title="Virement vers un numéro de compte" />
+          <MenuRow icon={Globe} title="Virement international" />
+        </div>
+      </section>
 
-      {/* SECTION 3 */}
-      <h3 className="section-label-bper">Recharges</h3>
-      <div className="menu-group-bper">
-        <MenuRow icon={Smartphone} title="Recharge de téléphone portable" />
-        <MenuRow icon={CreditCard} title="Recharge de carte prépayée" />
-      </div>
+      {/* SECTION 3: RECHARGES */}
+      <section className="ops-section">
+        <h3 className="section-label">Recharges</h3>
+        <div className="menu-group">
+          <MenuRow icon={Smartphone} title="Recharge de téléphone portable" />
+          <MenuRow icon={CreditCard} title="Recharge de carte prépayée" />
+        </div>
+      </section>
 
-      {/* SECTION 4 */}
-      <h3 className="section-label-bper">Autres opérations</h3>
-      <div className="menu-group-bper">
-        <MenuRow icon={CalendarClock} title="Opérations programmées" />
-        <MenuRow icon={HeartHandshake} title="Don pour financement" />
-      </div>
+      {/* SECTION 4: AUTRES OPÉRATIONS */}
+      <section className="ops-section">
+        <h3 className="section-label">Autres opérations</h3>
+        <div className="menu-group">
+          <MenuRow icon={CalendarClock} title="Opérations programmées" />
+          <MenuRow icon={HeartHandshake} title="Don pour financement" />
+        </div>
+      </section>
     </div>
   );
 }
