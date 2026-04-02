@@ -72,3 +72,12 @@
 
 
 
+
+
+.mobile-content {
+  flex: 1; /* Prend tout l'espace entre le haut et le BottomNav */
+  overflow-y: auto; /* ✅ Seul ce bloc a le droit de scroller si le contenu est long */
+  -webkit-overflow-scrolling: touch; /* Scroll fluide sur iPhone */
+  background-color: #f4f7f8;
+  padding-bottom: 20px;
+}
