@@ -19,7 +19,7 @@
 
 /* On s'assure que le body ne montre pas de vert */
 body {
-  background-color: #f4f7f8 !important;
+  background-color: hsl(195, 77%, 66%) !important;
   overscroll-behavior: none; /* Empêche l'effet de rebond élastique sur mobile */
 }
 
