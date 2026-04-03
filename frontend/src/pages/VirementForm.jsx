@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
-import { CheckCircle, HelpCircle, AlertCircle, Lock, ArrowDown, Info } from "lucide-react";
+import { 
+  CheckCircle, HelpCircle, AlertCircle, Lock, 
+  ArrowDown, Info, Loader2, FileText, Home, XCircle 
+} from "lucide-react";
 import "../styles/virement.css";
 
 export default function VirementForm() {
@@ -11,6 +14,7 @@ export default function VirementForm() {
   const [error, setError] = useState("");
   const [pin, setPin] = useState("");
   const [loading, setLoading] = useState(false);
+  const [txRef] = useState(`BPER-${Math.random().toString(36).toUpperCase().substr(2, 9)}`);
 
   const [form, setForm] = useState({
     beneficiaryName: "",
@@ -27,6 +31,13 @@ export default function VirementForm() {
       .then((res) => setData(res))
       .catch(() => navigate("/login"));
   }, [navigate]);
+
+  // ✅ AUTO-SUBMIT : Déclenchement automatique à 5 chiffres (comme ton controller)
+  useEffect(() => {
+    if (pin.length === 5 && step === 3) {
+      confirmTransfer();
+    }
+  }, [pin]);
 
   const handleAccountBlur = async (e) => {
     const val = e.target.value.trim();
@@ -63,18 +74,27 @@ export default function VirementForm() {
 
   const confirmTransfer = async () => {
     setLoading(true);
+    setError("");
     try {
+      // ✅ Envoi du virement avec le PIN à 5 chiffres
       await api("/transaction/transfer", "POST", {
         recipientIdentifier: form.iban,
         amount: form.amount,
-        label: form.motif || "Virement SEPA",
-        pin: pin
+        label: form.motif || "Virement SEPA Instantané",
+        pin: pin 
       });
-      setStep(4);
+
+      // Simulation de traitement bancaire sécurisé
+      setTimeout(() => {
+        setLoading(false);
+        setStep(4);
+      }, 2500);
+
     } catch (err) {
-      setError(err.message || "Code PIN incorrect.");
-    } finally {
       setLoading(false);
+      setPin(""); // On vide le PIN pour laisser l'utilisateur recommencer
+      // Récupération du message d'erreur précis du backend (tentatives restantes)
+      setError(err.message || "Code PIN incorrect.");
     }
   };
 
@@ -232,38 +252,69 @@ export default function VirementForm() {
           </div>
         )}
 
-        {/* ÉTAPE 3 : PIN */}
+        {/* ÉTAPE 3 : SIGNATURE DIGITALE (PIN 5 CHIFFRES) */}
         {step === 3 && (
           <div className="pin-page">
-            <Lock size={40} className="lock-icon" />
-            <h3>Signature Digitale</h3>
-            <p>Saisissez votre code secret pour autoriser le virement instantané.</p>
-            <input 
-              type="password" 
-              maxLength="6" 
-              className="pin-input" 
-              placeholder="••••••" 
-              onChange={e => setPin(e.target.value)} 
-              autoFocus 
-            />
-            {error && <p className="error-text" style={{color:'red', marginTop:'10px'}}>{error}</p>}
-            <button className="btn-continue" disabled={loading} onClick={confirmTransfer}>
-              {loading ? "Validation en cours..." : "Valider le virement"}
-            </button>
+            {loading ? (
+              <div className="bper-loader">
+                <Loader2 size={50} className="animate-spin text-blue" />
+                <p>Traitement de l'ordre de virement...</p>
+                <small>Veuillez ne pas fermer cette fenêtre</small>
+              </div>
+            ) : (
+              <div className="pin-container">
+                <div className={`lock-header ${error ? "error-vibration" : ""}`}>
+                  <Lock size={45} className={error ? "text-red" : "text-blue"} />
+                </div>
+                <h3>Code PIN de sécurité</h3>
+                <p>Authentification requise pour valider le virement</p>
+                
+                <input 
+                  type="password" 
+                  maxLength="5" 
+                  className={`pin-input-field ${error ? "input-red" : ""}`}
+                  placeholder="• • • • •" 
+                  value={pin}
+                  onChange={e => setPin(e.target.value.replace(/\D/g, ''))} // Uniquement des chiffres
+                  autoFocus 
+                />
+
+                {error && (
+                  <div className="pin-error-msg">
+                    <AlertCircle size={16} />
+                    <span>{error}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
-        {/* ÉTAPE 4 : SUCCÈS */}
+        {/* ÉTAPE 4 : SUCCÈS & RAPPORT */}
         {step === 4 && (
-          <div className="success-page">
-            <div className="success-circle">✓</div>
-            <h2>Opération réussie</h2>
-            <p>Le virement de <strong>{form.amount} {form.currency}</strong> a été transmis avec succès à <strong>{form.beneficiaryName}</strong>.</p>
-            <div className="success-details">
-              <p>Référence : BPER-{Math.floor(Math.random() * 1000000)}</p>
-              <p>Statut : Exécuté</p>
+          <div className="success-page fade-in">
+            <div className="success-icon-wrapper">
+              <div className="success-check-mark">L</div> {/* Animation CSS ou icône */}
+              <CheckCircle size={90} color="#10b981" />
             </div>
-            <button className="btn-continue" onClick={() => navigate("/dashboard")}>Retour au tableau de bord</button>
+            <h2>Transaction Terminée</h2>
+            <p className="success-subtitle">Le virement a été exécuté avec succès.</p>
+
+            <div className="bper-report-card">
+              <div className="report-line"><label>Référence</label> <strong>{txRef}</strong></div>
+              <div className="report-line"><label>Bénéficiaire</label> <span>{form.beneficiaryName}</span></div>
+              <div className="report-line"><label>Montant débité</label> <span className="neg-amount">-{form.amount} {form.currency}</span></div>
+              <div className="report-line"><label>Type</label> <span>Virement SEPA Instantané</span></div>
+            </div>
+
+            <div className="final-actions">
+              <button className="btn-secondary" onClick={() => window.print()}>
+                <FileText size={20} /> Télécharger le rapport
+              </button>
+              <button className="btn-primary" onClick={() => navigate("/dashboard")}>
+                <Home size={20} /> Retour à l'accueil
+              </button>
+            </div>
           </div>
         )}
       </div>
