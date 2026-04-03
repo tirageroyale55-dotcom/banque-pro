@@ -3,67 +3,78 @@ const Account = require("../models/Account");
 const Transaction = require("../models/Transaction");
 
 /**
- * Créditer le compte (ex: dépôt)
+ * Créditer le compte
  */
 exports.creditAccount = async (req, res) => {
-  const { amount, label } = req.body;
+  try {
+    const { amount, label } = req.body;
+    const account = await Account.findOne({ user: req.user.id });
+    
+    if (!account) return res.status(404).json({ message: "Compte introuvable" });
 
-  const account = await Account.findOne({ user: req.user.id });
+    account.balance += Number(amount);
+    await account.save();
 
-  account.balance += amount;
-  await account.save();
+    await Transaction.create({
+      account: account._id,
+      type: "CREDIT",
+      amount: Number(amount),
+      label: label || "Dépôt"
+    });
 
-  await Transaction.create({
-    account: account._id,
-    type: "CREDIT",
-    amount,
-    label
-  });
-
-  res.json({ message: "Compte crédité", balance: account.balance });
+    res.json({ message: "Compte crédité", balance: account.balance });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors du crédit" });
+  }
 };
 
 /**
- * Débiter le compte (ex: retrait)
+ * Débiter le compte
  */
 exports.debitAccount = async (req, res) => {
-  const { amount, label } = req.body;
+  try {
+    const { amount, label } = req.body;
+    const account = await Account.findOne({ user: req.user.id });
 
-  const account = await Account.findOne({ user: req.user.id });
+    if (!account) return res.status(404).json({ message: "Compte introuvable" });
+    if (account.balance < amount) return res.status(400).json({ message: "Solde insuffisant" });
 
-  if (account.balance < amount) {
-    return res.status(400).json({ message: "Solde insuffisant" });
+    account.balance -= Number(amount);
+    await account.save();
+
+    await Transaction.create({
+      account: account._id,
+      type: "DEBIT",
+      amount: Number(amount),
+      label: label || "Retrait"
+    });
+
+    res.json({ message: "Compte débité", balance: account.balance });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors du débit" });
   }
-
-  account.balance -= amount;
-  await account.save();
-
-  await Transaction.create({
-    account: account._id,
-    type: "DEBIT",
-    amount,
-    label
-  });
-
-  res.json({ message: "Compte débité", balance: account.balance });
 };
 
 /**
  * Historique complet
  */
 exports.getTransactions = async (req, res) => {
-  const account = await Account.findOne({ user: req.user.id });
+  try {
+    const account = await Account.findOne({ user: req.user.id });
+    if (!account) return res.status(404).json({ message: "Compte introuvable" });
 
-  const transactions = await Transaction.find({ account: account._id })
-    .sort({ createdAt: -1 });
+    const transactions = await Transaction.find({ account: account._id })
+      .sort({ createdAt: -1 });
 
-  res.json(transactions);
+    res.json(transactions);
+  } catch (err) {
+    res.status(500).json({ message: "Erreur historique" });
+  }
 };
 
-
-
-
-// Ajoute ceci à la fin de ton fichier actuel
+/**
+ * VIREMENT INSTANTANÉ (Transactionnel)
+ */
 exports.transferMoney = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -74,38 +85,31 @@ exports.transferMoney = async (req, res) => {
 
     if (amountNum <= 0) throw new Error("Montant invalide");
 
-    // 1. Compte expéditeur
     const senderAcc = await Account.findOne({ user: req.user.id }).session(session);
+    if (!senderAcc) throw new Error("Votre compte est introuvable");
     if (senderAcc.balance < amountNum) throw new Error("Solde insuffisant");
 
-    // 2. Compte destinataire (Vérification stricte IBAN ou N° Compte)
+    // Recherche par IBAN ou Numéro de compte
     const recipientAcc = await Account.findOne({
       $or: [{ iban: recipientIdentifier }, { accountNumber: recipientIdentifier }]
     }).session(session);
 
-    if (!recipientAcc) {
-      throw new Error("Destinataire introuvable dans le réseau BPER");
-    }
+    if (!recipientAcc) throw new Error("Destinataire introuvable dans le réseau BPER");
+    if (senderAcc._id.equals(recipientAcc._id)) throw new Error("Opération impossible vers le même compte");
 
-    if (senderAcc._id.equals(recipientAcc._id)) {
-      throw new Error("Opération impossible vers le même compte");
-    }
-
-    // 3. Mouvement d'argent
     senderAcc.balance -= amountNum;
     recipientAcc.balance += amountNum;
 
     await senderAcc.save({ session });
     await recipientAcc.save({ session });
 
-    // 4. Historique (un débit pour l'un, un crédit pour l'autre)
     await Transaction.create([
       { account: senderAcc._id, type: "DEBIT", amount: amountNum, label: `VIR vers ${recipientIdentifier} - ${label || ''}` },
       { account: recipientAcc._id, type: "CREDIT", amount: amountNum, label: `VIR de ${senderAcc.iban} - ${label || ''}` }
     ], { session });
 
     await session.commitTransaction();
-    res.json({ message: "Virement instantané réussi" });
+    res.json({ message: "Virement instantané réussi", balance: senderAcc.balance });
 
   } catch (err) {
     await session.abortTransaction();
@@ -115,16 +119,25 @@ exports.transferMoney = async (req, res) => {
   }
 };
 
-
-
+/**
+ * VERIFICATION BENEFICIAIRE (Pour auto-remplissage)
+ */
 exports.checkRecipient = async (req, res) => {
   try {
     const { accountNumber } = req.query;
+    // On cherche le compte
     const account = await Account.findOne({ accountNumber });
-    if (!account) return res.status(404).json({ message: "Numéro de compte incorrect ou introuvable" });
     
-    res.json({ iban: account.iban, bic: account.bic, name: "Bénéficiaire trouvé" });
+    if (!account) {
+      return res.status(404).json({ message: "Numéro de compte incorrect ou introuvable" });
+    }
+    
+    res.json({ 
+      iban: account.iban, 
+      bic: account.bic, 
+      name: "Compte vérifié BPER" 
+    });
   } catch (err) {
-    res.status(500).json({ message: "Erreur serveur" });
+    res.status(500).json({ message: "Erreur lors de la vérification" });
   }
 };
