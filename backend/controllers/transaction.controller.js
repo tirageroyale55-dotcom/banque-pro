@@ -1,6 +1,8 @@
-const mongoose = require("mongoose");
-const Account = require("../models/Account");
-const Transaction = require("../models/Transaction");
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs'); // Pour comparer le PIN
+const User = require('../models/User'); // Vérifie bien le chemin vers ton modèle User
+const Account = require('../models/Account'); // Pour manipuler les comptes
+const Transaction = require('../models/Transaction'); // Pour l'historique
 
 /**
  * Créditer le compte
@@ -85,36 +87,43 @@ exports.transferMoney = async (req, res) => {
     const { recipientIdentifier, amount, label, pin } = req.body;
     const userId = req.user.id;
 
-    // 1. Vérification du PIN (doit correspondre au PIN de l'utilisateur connecté)
+    // 1. On récupère l'utilisateur pour vérifier son PIN
     const user = await User.findById(userId);
+    if (!user) throw new Error("Utilisateur introuvable.");
+
+    // 2. Vérification du PIN (5 chiffres comme convenu)
     const pinValid = await bcrypt.compare(pin.trim(), user.pinHash);
     if (!pinValid) {
       throw new Error("Code PIN de sécurité incorrect.");
     }
 
-    // 2. Trouver les comptes
+    // 3. Identification des comptes (Expéditeur et Destinataire)
     const senderAccount = await Account.findOne({ user: userId }).session(session);
     const recipientAccount = await Account.findOne({
-      $or: [{ accountNumber: recipientIdentifier }, { iban: recipientIdentifier }]
+      $or: [
+        { accountNumber: recipientIdentifier }, 
+        { iban: recipientIdentifier }
+      ]
     }).session(session);
 
-    if (!recipientAccount) throw new Error("Bénéficiaire introuvable.");
-    if (senderAccount.balance < amount) throw new Error("Solde insuffisant.");
+    if (!recipientAccount) throw new Error("Bénéficiaire introuvable sur le réseau BPER.");
+    if (senderAccount.balance < Number(amount)) throw new Error("Solde insuffisant pour cette transaction.");
+    if (Number(amount) <= 0) throw new Error("Montant invalide.");
 
-    // 3. Effectuer le transfert (Update au lieu de create pour éviter le bug Vercel/Mongoose)
+    // 4. Calcul des nouveaux soldes
     senderAccount.balance -= Number(amount);
     recipientAccount.balance += Number(amount);
 
+    // Sauvegarde sécurisée via session
     await senderAccount.save({ session });
     await recipientAccount.save({ session });
 
-    // 4. Créer l'historique (C'est ici que l'erreur 'create' arrivait)
-    // Utilise .save() sur un nouvel objet au lieu de Transaction.create()
+    // 5. Création de l'enregistrement de transaction
     const newTransaction = new Transaction({
       senderAccount: senderAccount._id,
       recipientAccount: recipientAccount._id,
       amount: Number(amount),
-      label: label || "Virement SEPA",
+      label: label || "Virement SEPA Instantané",
       type: "TRANSFER",
       status: "COMPLETED",
       reference: `BPER-${Math.random().toString(36).toUpperCase().substr(2, 9)}`
@@ -122,16 +131,21 @@ exports.transferMoney = async (req, res) => {
 
     await newTransaction.save({ session });
 
-    // Tout est bon, on valide
+    // Validation finale de la transaction MongoDB
     await session.commitTransaction();
     session.endSession();
 
-    res.json({ message: "Virement effectué avec succès", reference: newTransaction.reference });
+    res.json({ 
+      message: "Virement effectué", 
+      reference: newTransaction.reference 
+    });
 
   } catch (err) {
-    // En cas d'erreur, on annule tout (Rollback)
+    // En cas de pépin, on annule tout l'argent reste à sa place
     await session.abortTransaction();
     session.endSession();
+    
+    // On renvoie le message d'erreur au frontend (VirementForm.jsx)
     res.status(400).json({ message: err.message });
   }
 };
