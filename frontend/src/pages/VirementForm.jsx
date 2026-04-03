@@ -29,27 +29,32 @@ export default function VirementForm() {
   }, [navigate]);
 
   // ✅ CORRECTION : Vérification robuste du bénéficiaire
+  // ... (haut du fichier identique)
+
   const handleAccountBlur = async () => {
-    const num = form.accountNumber.trim();
-    if (num.length > 5) {
+    // On utilise directement la valeur du state 'form'
+    const val = form.accountNumber.trim();
+    
+    if (val.length > 3) { // On baisse le seuil pour tester plus facilement
       try {
-        // On passe explicitement le numéro au backend
-        const res = await api(`/transaction/check-recipient?accountNumber=${num}`);
+        setError(""); // On reset l'erreur avant de chercher
+        const res = await api(`/transaction/check-recipient?accountNumber=${val}`);
         
         if (res && res.iban) {
           setForm(prev => ({ 
             ...prev, 
             iban: res.iban, 
-            bic: res.bic || "BPERITM1XXX" 
+            bic: res.bic 
           }));
-          setError(""); 
         }
       } catch (err) {
-        setError("Destinataire introuvable dans le réseau BPER.");
+        setError("Destinataire introuvable ou numéro incorrect.");
         setForm(prev => ({ ...prev, iban: "", bic: "" }));
       }
     }
   };
+
+  
 
   const nextStep = () => {
     setError("");
@@ -139,13 +144,13 @@ export default function VirementForm() {
                 onChange={e => setForm({...form, beneficiaryName: e.target.value})} 
               />
               <input 
-                type="text" 
-                className="bper-input" 
-                placeholder="Numéro de compte*" 
-                value={form.accountNumber}
-                onBlur={handleAccountBlur} 
-                onChange={e => setForm({...form, accountNumber: e.target.value})} 
-              />
+    type="text" 
+    className="bper-input" 
+    placeholder="Numéro de compte*" 
+    value={form.accountNumber} // TRÈS IMPORTANT
+    onChange={(e) => setForm({ ...form, accountNumber: e.target.value })} 
+    onBlur={handleAccountBlur} // Déclenché quand on clique ailleurs
+  />
               <input 
                 type="text" 
                 className="bper-input read-only" 
