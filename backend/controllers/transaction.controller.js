@@ -124,20 +124,34 @@ exports.transferMoney = async (req, res) => {
  */
 exports.checkRecipient = async (req, res) => {
   try {
+    // 1. Extraction et nettoyage
     const { accountNumber } = req.query;
-    // On cherche le compte
-    const account = await Account.findOne({ accountNumber });
+
+    if (!accountNumber) {
+      return res.status(400).json({ message: "Numéro de compte requis" });
+    }
+
+    // 2. Recherche avec trim() pour éviter les erreurs d'espaces
+    const cleanAccountNumber = accountNumber.trim();
     
+    // On cherche le compte dans la collection Account
+    const account = await Account.findOne({ accountNumber: cleanAccountNumber });
+
     if (!account) {
+      // Log pour debug (visible uniquement dans ton terminal serveur)
+      console.log(`Recherche échouée pour le numéro : [${cleanAccountNumber}]`);
       return res.status(404).json({ message: "Numéro de compte incorrect ou introuvable" });
     }
-    
+
+    // 3. Réponse avec les données nécessaires au formulaire
     res.json({ 
       iban: account.iban, 
-      bic: account.bic, 
+      bic: account.bic || "BPERITM1XXX", 
       name: "Compte vérifié BPER" 
     });
+
   } catch (err) {
+    console.error("Erreur checkRecipient:", err);
     res.status(500).json({ message: "Erreur lors de la vérification" });
   }
 };
