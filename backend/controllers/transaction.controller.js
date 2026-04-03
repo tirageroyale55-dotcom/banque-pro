@@ -146,8 +146,8 @@ exports.checkRecipient = async (req, res) => {
     // 3. Réponse avec les données nécessaires au formulaire
     res.json({ 
       iban: account.iban, 
-      bic: account.bic || "BPERITM1XXX", 
-      name: "Compte vérifié BPER" 
+      bic: account.bic || "BPERITM1XXX" 
+      
     });
 
   } catch (err) {
