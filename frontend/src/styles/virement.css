@@ -1,0 +1,111 @@
+.virement-wrapper {
+  background-color: #f4f7f8;
+  min-height: 100vh;
+  padding-bottom: 50px;
+}
+
+.virement-header {
+  background: white;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.btn-annuler {
+  color: #005a64;
+  border: none;
+  background: none;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress-bar {
+  height: 6px;
+  background: #005a64;
+  flex: 1;
+  border-radius: 10px;
+}
+
+.step-text {
+  font-size: 12px;
+  color: #666;
+}
+
+.virement-content {
+  padding: 15px;
+}
+
+.security-box {
+  background: #e6f0f1;
+  padding: 12px;
+  border-radius: 8px;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.security-box p {
+  font-size: 13px;
+  color: #004a52;
+}
+
+.details-link {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.section-title {
+  display: block;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.account-selector-box {
+  background: white;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.bper-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.btn-continue {
+  background: #005a64;
+  color: white;
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.next-step-hint {
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+  margin-top: 10px;
+}
