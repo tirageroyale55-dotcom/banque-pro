@@ -7,7 +7,7 @@ import "../styles/virement.css";
 export default function VirementForm() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [userData, setUserData] = useState(null);
+  const [data, setData] = useState(null); // Contient user + account
   const [error, setError] = useState("");
   const [pin, setPin] = useState("");
 
@@ -22,10 +22,14 @@ export default function VirementForm() {
   });
 
   useEffect(() => {
-    api("/client/dashboard").then(setUserData).catch(() => navigate("/login"));
-  }, []);
+    // On récupère les infos globales du client
+    api("/client/dashboard")
+      .then((res) => {
+        setData(res);
+      })
+      .catch(() => navigate("/login"));
+  }, [navigate]);
 
-  // Recherche automatique du bénéficiaire
   const handleAccountBlur = async () => {
     if (form.accountNumber.length > 5) {
       try {
@@ -40,12 +44,12 @@ export default function VirementForm() {
   };
 
   const nextStep = () => {
-    if (parseFloat(form.amount) > userData.balance) {
+    if (parseFloat(form.amount) > data.account.balance) {
       setError("Solde insuffisant");
       return;
     }
-    if (!form.iban || !form.amount) {
-      setError("Veuillez remplir tous les champs obligatoires");
+    if (!form.iban || !form.amount || !form.beneficiaryName) {
+      setError("Veuillez remplir tous les champs obligatoires (*)");
       return;
     }
     setError("");
@@ -54,23 +58,23 @@ export default function VirementForm() {
 
   const confirmTransfer = async () => {
     try {
+      setError("");
       await api("/transaction/transfer", "POST", { 
         recipientIdentifier: form.iban, 
         amount: form.amount, 
         label: form.motif,
-        pin: pin // Ton backend devra vérifier le PIN
+        pin: pin 
       });
-      setStep(4); // Succès
+      setStep(4); 
     } catch (err) {
-      setError("Code PIN incorrect ou erreur de transaction");
+      setError(err.message || "Code PIN incorrect ou erreur système");
     }
   };
 
-  if (!userData) return null;
+  if (!data) return <div className="loading">Chargement sécurisé...</div>;
 
   return (
     <div className="virement-wrapper">
-      {/* HEADER PROGRESSIF */}
       <header className="virement-header">
         <div className="header-top">
           <button className="btn-annuler" onClick={() => navigate("/payer")}>
@@ -87,32 +91,34 @@ export default function VirementForm() {
 
       <div className="virement-content">
         
-        {/* ÉTAPE 1 : SAISIE */}
         {step === 1 && (
           <>
             <div className="security-box">
-              <CheckCircle size={20} />
-              <p>Remplissez les informations selon les normes de sécurité <b>BPER</b>.</p>
+              <CheckCircle size={20} color="#005a64" />
+              <p>Opération sécurisée. Vérifiez bien les coordonnées du bénéficiaire avant de confirmer.</p>
             </div>
 
             <div className="form-section">
-              <label className="section-title">Au nom de</label>
+              <label className="section-title">Au nom de (Expéditeur)</label>
               <div className="account-selector-box highlight">
-                <span className="account-name">COMPTE DE DÉPÔT</span>
-                <p className="acc-num">{userData.accountNumber}</p>
+                <div className="user-info-row">
+                  <span className="user-fullname">{data.user.nom} {data.user.prenom}</span>
+                  <span className="account-tag">COMPTE COURANT</span>
+                </div>
+                <p className="acc-num">{data.account.accountNumber}</p>
                 <div className="account-details">
                   <span className="label-gray">Solde disponible :</span>
-                  <span className="amount-bold">{userData.balance.toLocaleString()} €</span>
+                  <span className="amount-bold">{data.account.balance.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €</span>
                 </div>
               </div>
             </div>
 
             <div className="form-section">
               <label className="section-title">Bénéficiaire</label>
-              <input type="text" className="bper-input" placeholder="Nom et prénom*" value={form.beneficiaryName} onChange={e => setForm({...form, beneficiaryName: e.target.value})} />
-              <input type="text" className="bper-input" placeholder="Numéro de compte" onBlur={handleAccountBlur} onChange={e => setForm({...form, accountNumber: e.target.value})} />
-              <input type="text" className="bper-input read-only" placeholder="IBAN" value={form.iban} readOnly />
-              <input type="text" className="bper-input read-only" placeholder="Code BIC (SWIFT)" value={form.bic} readOnly />
+              <input type="text" className="bper-input" placeholder="Nom et prénom du bénéficiaire*" value={form.beneficiaryName} onChange={e => setForm({...form, beneficiaryName: e.target.value})} />
+              <input type="text" className="bper-input" placeholder="N° de compte du destinataire" onBlur={handleAccountBlur} onChange={e => setForm({...form, accountNumber: e.target.value})} />
+              <input type="text" className="bper-input read-only" placeholder="IBAN (Auto-rempli)" value={form.iban} readOnly />
+              <input type="text" className="bper-input read-only" placeholder="BIC (Auto-rempli)" value={form.bic} readOnly />
             </div>
 
             <div className="form-section">
@@ -122,54 +128,60 @@ export default function VirementForm() {
                   <option value="EUR">EUR (€)</option>
                   <option value="USD">USD ($)</option>
                 </select>
-                <input type="number" className="bper-input" placeholder="Montant" onChange={e => setForm({...form, amount: e.target.value})} />
+                <input type="number" className="bper-input" placeholder="0,00" onChange={e => setForm({...form, amount: e.target.value})} />
               </div>
-              <input type="text" className="bper-input" placeholder="Motif (Optionnel)" onChange={e => setForm({...form, motif: e.target.value})} />
+              <input type="text" className="bper-input" placeholder="Motif du virement" onChange={e => setForm({...form, motif: e.target.value})} />
             </div>
 
             {error && <div className="error-msg"><AlertCircle size={16}/> {error}</div>}
-            <button className="btn-continue" onClick={nextStep}>Continuer</button>
+            <button className="btn-continue" onClick={nextStep}>Continuer vers le récapitulatif</button>
           </>
         )}
 
-        {/* ÉTAPE 2 : RÉCAPITULATIF */}
         {step === 2 && (
           <div className="recap-page">
-            <h3>Vérifiez les informations</h3>
+            <h3>Vérifiez votre virement</h3>
             <div className="recap-card">
-              <div className="recap-item"><label>Bénéficiaire</label> <span>{form.beneficiaryName}</span></div>
-              <div className="recap-item"><label>IBAN</label> <span>{form.iban}</span></div>
+              <div className="recap-item"><label>De</label> <span>{data.user.nom} {data.user.prenom}</span></div>
+              <div className="recap-item"><label>Vers</label> <span>{form.beneficiaryName}</span></div>
+              <div className="recap-item"><label>IBAN</label> <span className="small-text">{form.iban}</span></div>
               <div className="recap-item"><label>Montant</label> <span className="heavy">{form.amount} {form.currency}</span></div>
-              <div className="recap-item"><label>Date</label> <span>Instantané</span></div>
+              <div className="recap-item"><label>Type</label> <span>Virement instantané</span></div>
             </div>
-            <div className="nb-box">NB: Ce virement est instantané et irrévocable.</div>
-            <button className="btn-continue" onClick={nextStep}>Confirmer et continuer</button>
-            <button className="btn-back" onClick={() => setStep(1)}>Modifier</button>
+            <div className="nb-box">NB : Les fonds seront transférés immédiatement après la signature.</div>
+            <button className="btn-continue" onClick={nextStep}>Signer le virement</button>
+            <button className="btn-back" onClick={() => setStep(1)}>Modifier les infos</button>
           </div>
         )}
 
-        {/* ÉTAPE 3 : CODE PIN */}
         {step === 3 && (
           <div className="pin-page">
-            <Lock size={40} className="lock-icon" />
-            <h3>Confirmation sécurisée</h3>
-            <p>Veuillez saisir votre code PIN à 6 chiffres pour valider l'envoi de <b>{form.amount} €</b>.</p>
-            <input type="password" maxLength="6" className="pin-input" placeholder="••••••" onChange={e => setPin(e.target.value)} />
-            {error && <p className="error-text">{error}</p>}
-            <button className="btn-continue" onClick={confirmTransfer}>Valider le virement</button>
+            <Lock size={40} className="lock-icon" color="#005a64" />
+            <h3>Signature numérique</h3>
+            <p>Saisissez votre code PIN secret pour confirmer le virement de <b>{form.amount} {form.currency}</b>.</p>
+            <input 
+              type="password" 
+              maxLength="6" 
+              className="pin-input" 
+              placeholder="••••••" 
+              autoFocus
+              onChange={e => setPin(e.target.value)} 
+            />
+            {error && <div className="error-msg" style={{marginTop: '10px'}}>{error}</div>}
+            <button className="btn-continue" onClick={confirmTransfer}>Confirmer l'envoi</button>
           </div>
         )}
 
-        {/* ÉTAPE FINALE : SUCCÈS */}
         {step === 4 && (
           <div className="success-page">
-            <div className="success-icon">✓</div>
-            <h2>Virement effectué avec succès</h2>
-            <p>Le compte de {form.beneficiaryName} sera crédité instantanément.</p>
-            <button className="btn-continue" onClick={() => navigate("/dashboard")}>Retour à l'accueil</button>
+            <div className="success-icon-wrapper">
+              <CheckCircle size={80} color="#fff" fill="#005a64" />
+            </div>
+            <h2>Virement effectué !</h2>
+            <p>La somme de <b>{form.amount} {form.currency}</b> a été envoyée avec succès à {form.beneficiaryName}.</p>
+            <button className="btn-continue" onClick={() => navigate("/dashboard")}>Retour au tableau de bord</button>
           </div>
         )}
-
       </div>
     </div>
   );

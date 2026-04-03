@@ -273,3 +273,20 @@ html, body {
   font-size: 13px;
   font-weight: 600;
 }
+
+/* Cache le BottomNav uniquement quand on est sur cette page */
+:has(.virement-wrapper) ~ .bottom-nav {
+  display: none !important;
+}
+
+/* Si ton navigateur ne supporte pas :has, on utilise une méthode radicale */
+.virement-wrapper {
+  position: fixed; /* Couvre tout l'écran */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999; /* Passe devant le BottomNav */
+  background-color: #f4f7f8;
+  overflow-y: auto;
+}
