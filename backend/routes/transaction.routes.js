@@ -4,7 +4,8 @@ const {
   creditAccount,
   debitAccount,
   getTransactions,
-  transferMoney
+  transferMoney,
+  checkRecipient
 } = require("../controllers/transaction.controller");
 
 router.post("/credit", auth, creditAccount);
