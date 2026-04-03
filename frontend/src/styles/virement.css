@@ -399,14 +399,178 @@ html, body {
 
 
 
-.error-vibration {
-  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-  color: #d32f2f;
+/* --- CONTENEUR SUCCÈS (VUE INITIALE) --- */
+.success-confirmation {
+  text-align: center;
+  padding: 40px 20px;
+  animation: fadeIn 0.5s ease-out;
 }
 
-@keyframes shake {
-  10%, 90% { transform: translate3d(-1px, 0, 0); }
-  20%, 80% { transform: translate3d(2px, 0, 0); }
-  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-  40%, 60% { transform: translate3d(4px, 0, 0); }
+.icon-success-anim {
+  margin-bottom: 20px;
+  filter: drop-shadow(0 4px 10px rgba(34, 197, 94, 0.2));
+}
+
+.bper-title-success {
+  color: #1a1a1a;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.bper-subtitle {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.mini-card-summary {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 350px;
+  margin: 0 auto 30px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.summary-item label { color: #94a3b8; font-size: 12px; text-transform: uppercase; }
+.summary-item span { font-weight: 600; color: #1e293b; }
+.amount-text { color: #ef4444; font-size: 18px; }
+
+/* --- LE RAPPORT OFFICIEL (STYLE PAPIER) --- */
+.bper-official-report {
+  background: #fff;
+  color: #000;
+  padding: 40px;
+  border-radius: 0;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  border: 1px solid #eee;
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid #0047bb; /* Bleu BPER */
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+.report-meta h3 {
+  color: #0047bb;
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.report-meta p { font-size: 12px; color: #666; margin-top: 5px; }
+
+.report-greeting {
+  margin-bottom: 30px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.report-block {
+  margin-bottom: 25px;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+}
+
+.block-title {
+  background: #f8f9fa;
+  padding: 8px 15px;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #444;
+  border-bottom: 1px solid #f0f0f0;
+  text-transform: uppercase;
+}
+
+.block-content { padding: 15px; }
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.lbl { color: #777; width: 40%; }
+.mono { font-family: 'Courier New', monospace; font-weight: 600; }
+.font-bold { 
+  font-weight: 800; 
+  border-top: 1px dashed #eee; 
+  padding-top: 10px; /* ✅ Correction ici */
+  margin-top: 10px; 
+}
+
+.report-footer-note {
+  margin-top: 40px;
+  font-size: 11px;
+  color: #999;
+  font-style: italic;
+  text-align: center;
+}
+
+/* --- BOUTONS D'ACTION --- */
+.success-actions-grid, .report-actions-footer {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.btn-view-report, .btn-print, .btn-home-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-view-report { background: #0047bb; color: white; border: none; }
+.btn-print { background: #f1f5f9; color: #1e293b; border: 1px solid #e2e8f0; }
+.btn-home-primary { background: #10b981; color: white; border: none; }
+
+/* --- GESTION DE L'IMPRESSION (PRINT) --- */
+@media print {
+  .no-print, .virement-header, .report-actions-footer, .success-actions-grid, button {
+    display: none !important;
+  }
+  
+  body { background: white !important; }
+  
+  .virement-wrapper, .virement-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .bper-official-report {
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import { 
   CheckCircle, HelpCircle, AlertCircle, Lock, 
-  ArrowDown, Info, Loader2, FileText, Home, XCircle 
+  ArrowDown, Info, Loader2, FileText, Home, XCircle, Download, Printer, Eye
 } from "lucide-react";
 import "../styles/virement.css";
 
@@ -14,6 +14,7 @@ export default function VirementForm() {
   const [error, setError] = useState("");
   const [pin, setPin] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showReport, setShowReport] = useState(false); // Nouvel état pour voir le rapport
   const [txRef] = useState(`BPER-${Math.random().toString(36).toUpperCase().substr(2, 9)}`);
 
   const [form, setForm] = useState({
@@ -72,28 +73,23 @@ export default function VirementForm() {
     setStep(step + 1);
   };
 
-  const confirmTransfer = async () => {
+const confirmTransfer = async () => {
     setLoading(true);
     setError("");
     try {
-      // ✅ Envoi du virement avec le PIN à 5 chiffres
       await api("/transaction/transfer", "POST", {
         recipientIdentifier: form.iban,
         amount: form.amount,
         label: form.motif || "Virement SEPA Instantané",
         pin: pin 
       });
-
-      // Simulation de traitement bancaire sécurisé
       setTimeout(() => {
         setLoading(false);
         setStep(4);
       }, 2000);
-
     } catch (err) {
       setLoading(false);
-      setPin(""); // On vide le PIN pour laisser l'utilisateur recommencer
-      // Récupération du message d'erreur précis du backend (tentatives restantes)
+      setPin("");
       setError(err.message || "Code PIN incorrect.");
     }
   };
@@ -102,9 +98,11 @@ export default function VirementForm() {
 
   const userNom = data.user ? data.user.nom : data.lastname;
   const userPrenom = data.user ? data.user.prenom : data.firstname;
+  const userIban = data.account ? data.account.iban : "IT60 ************ 9901"; // Fallback IBAN
+  const userBic = "BPERITM1XXX"; // BIC standard BPER
   const accNum = data.account ? data.account.accountNumber : "Compte Courant";
   const displayBalance = data.account ? data.account.balance : data.balance;
-  const today = new Date().toLocaleDateString('fr-FR');
+  const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
   return (
     <div className="virement-wrapper">
@@ -290,31 +288,99 @@ export default function VirementForm() {
           </div>
         )}
 
-        {/* ÉTAPE 4 : SUCCÈS & RAPPORT */}
+        {/* ÉTAPE 4 : SUCCÈS & RAPPORT DÉTAILLÉ */}
         {step === 4 && (
-          <div className="success-page fade-in">
-            <div className="success-icon-wrapper">
-              <div className="success-check-mark">L</div> {/* Animation CSS ou icône */}
-              <CheckCircle size={90} color="#10b981" />
-            </div>
-            <h2>Transaction Terminée</h2>
-            <p className="success-subtitle">Le virement a été exécuté avec succès.</p>
+          <div className={`success-view ${showReport ? 'viewing-report' : ''}`}>
+            {!showReport ? (
+              <div className="success-confirmation fade-in">
+                <div className="status-badge">
+                  <CheckCircle size={80} className="icon-success-anim" />
+                </div>
+                <h2 className="bper-title-success">Ordre de virement transmis</h2>
+                <p className="bper-subtitle">Votre demande a été enregistrée avec succès par le réseau BPER Banca.</p>
+                
+                <div className="mini-card-summary">
+                  <div className="summary-item"><label>Référence</label> <span>{txRef}</span></div>
+                  <div className="summary-item"><label>Montant</label> <span className="amount-text">-{form.amount} {form.currency}</span></div>
+                </div>
 
-            <div className="bper-report-card">
-              <div className="report-line"><label>Référence</label> <strong>{txRef}</strong></div>
-              <div className="report-line"><label>Bénéficiaire</label> <span>{form.beneficiaryName}</span></div>
-              <div className="report-line"><label>Montant débité</label> <span className="neg-amount">-{form.amount} {form.currency}</span></div>
-              <div className="report-line"><label>Type</label> <span>Virement SEPA Instantané</span></div>
-            </div>
+                <div className="success-actions-grid">
+                  <button className="btn-view-report" onClick={() => setShowReport(true)}>
+                    <Eye size={18} /> Voir le rapport complet
+                  </button>
+                  <button className="btn-home-primary" onClick={() => navigate("/dashboard")}>
+                    <Home size={18} /> Retour à l'accueil
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bper-official-report fade-in">
+                <div className="report-header">
+                  <img src="/logo-bper.png" alt="BPER" className="report-logo" />
+                  <div className="report-meta">
+                    <h3>AVIS D'EXÉCUTION DE VIREMENT</h3>
+                    <p>Référence : {txRef}</p>
+                  </div>
+                </div>
 
-            <div className="final-actions">
-              <button className="btn-secondary" onClick={() => window.print()}>
-                <FileText size={20} /> Télécharger le rapport
-              </button>
-              <button className="btn-primary" onClick={() => navigate("/dashboard")}>
-                <Home size={20} /> Retour à l'accueil
-              </button>
-            </div>
+                <div className="report-greeting">
+                  <p>Cher client(e) <strong>{userNom} {userPrenom}</strong>,</p>
+                  <p>Nous vous confirmons l'exécution de l'opération effectuée ce jour via nos services digitaux.</p>
+                </div>
+
+                <div className="report-sections">
+                  {/* EXPÉDITEUR */}
+                  <div className="report-block">
+                    <h4 className="block-title">DONNEUR D'ORDRE</h4>
+                    <div className="block-content">
+                      <div className="row"><span className="lbl">Nom :</span> <span>{userNom} {userPrenom}</span></div>
+                      <div className="row"><span className="lbl">Compte N° :</span> <span>{accNum}</span></div>
+                      <div className="row"><span className="lbl">IBAN :</span> <span className="mono">{userIban}</span></div>
+                      <div className="row"><span className="lbl">Code BIC :</span> <span>{userBic}</span></div>
+                    </div>
+                  </div>
+
+                  <div className="report-block">
+                    <h4 className="block-title">BÉNÉFICIAIRE</h4>
+                    <div className="block-content">
+                      <div className="row"><span className="lbl">Nom :</span> <span>{form.beneficiaryName}</span></div>
+                      <div className="row"><span className="lbl">Compte N° :</span> <span>{form.accountNumber}</span></div>
+                      <div className="row"><span className="lbl">IBAN :</span> <span className="mono">{form.iban}</span></div>
+                      <div className="row"><span className="lbl">Code BIC :</span> <span>{form.bic}</span></div>
+                    </div>
+                  </div>
+
+                  <div className="report-block">
+                    <h4 className="block-title">DÉTAILS DE LA TRANSACTION</h4>
+                    <div className="block-content">
+                      <div className="row"><span className="lbl">Date de l'opération :</span> <span>{today}</span></div>
+                      <div className="row"><span className="lbl">Date de valeur :</span> <span>Instantané</span></div>
+                      <div className="row"><span className="lbl">Montant du virement :</span> <span>{form.amount} {form.currency}</span></div>
+                      <div className="row"><span className="lbl">Frais appliqués :</span> <span>0,00 EUR</span></div>
+                      <div className="row font-bold"><span className="lbl">Total débité :</span> <span>{form.amount} {form.currency}</span></div>
+                      <div className="row"><span className="lbl">Motif :</span> <span>{form.motif || "Virement sortant"}</span></div>
+                      <div className="row"><span className="lbl">Type de virement :</span> <span>SEPA Instantané (Réseau BPER)</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="report-footer-note">
+                  <p>Document généré électroniquement. Ce document constitue une preuve de la transmission de l'ordre de virement sous réserve de provision suffisante.</p>
+                </div>
+
+                <div className="report-actions-footer no-print">
+                  <button className="btn-print" onClick={() => window.print()}>
+                    <Printer size={18} /> Imprimer le reçu
+                  </button>
+                  <button className="btn-download">
+                    <Download size={18} /> Télécharger (PDF)
+                  </button>
+                  <button className="btn-close-report" onClick={() => setShowReport(false)}>
+                    Fermer le rapport
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
