@@ -1,6 +1,10 @@
 
 
-
+.payer-page {
+  background-color: #f4f7f8; /* Fond gris très léger BPER */
+  min-height: 100vh;
+  padding: 20px 15px 100px 15px;
+}
 
 .page-title {
   color: #005a64; /* Bleu canard BPER */
@@ -9,14 +13,7 @@
   margin-bottom: 25px;
 }
 
-.section-label {
-  color: #666;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  margin: 20px 0 10px 5px;
-  letter-spacing: 0.5px;
-}
+
 
 .menu-group {
   background: white;
