@@ -1,9 +1,26 @@
 
 
-.payer-page {
-  background-color: #f4f7f8; /* Fond gris très léger BPER */
+/* Ce conteneur bloque tout ce qui se passe derrière */
+.payer-full-container {
+  background-color: #f4f7f8; /* Le gris clair de BPER */
   min-height: 100vh;
-  padding: 20px 15px 100px 15px;
+  width: 100%;
+  position: absolute; /* Force la position */
+  top: 0;
+  left: 0;
+  z-index: 5; /* Passe au dessus du "vide" */
+}
+
+.payer-page {
+  background-color: #f4f7f8;
+  max-width: 1000px; /* Pour le confort sur desktop */
+  margin: 0 auto;
+}
+
+/* On s'assure que le body ne montre pas de vert */
+body {
+  background-color: #f4f7f8 !important;
+  overscroll-behavior: none; /* Empêche l'effet de rebond élastique sur mobile */
 }
 
 .page-title {

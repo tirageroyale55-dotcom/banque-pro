@@ -1,4 +1,18 @@
 
+html, body {
+  /* On change le fond vert qui dépasse par le gris clair de BPER */
+  background-color: #f4f7f8 !important; 
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* Empêche le rebond élastique sur iOS */
+}
+
+#root {
+  background-color: #f4f7f8;
+  height: 100%;
+}
+
 
 body {
   margin: 0;
@@ -8,16 +22,3 @@ body {
   
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden; /* ⛔ Empêche le scroll de toute la page */
-  position: fixed;  /* ⛔ Bloque la page sur iOS/Safari */
-}
-
-#root {
-  height: 100%;
-  width: 100%;
-}

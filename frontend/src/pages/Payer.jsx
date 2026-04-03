@@ -26,47 +26,54 @@ export default function Payer() {
   );
 
   return (
-    <div className="page-content payer-page">
-      <h2 className="page-title">Opérations</h2>
+    /* 1️⃣ On ajoute un wrapper "payer-full-container" qui va boucher le trou derrière */
+    <div className="payer-full-container">
+      
+      <div className="page-content payer-page">
+        <h2 className="page-title">Opérations</h2>
 
-      {/* SECTION 1: OPÉRATIONS FRÉQUENTES */}
-      <section className="ops-section">
-        <h3 className="section-label">Opérations fréquentes</h3>
-        <div className="menu-group">
-          <MenuRow 
-            icon={ArrowRightLeft} 
-            title="Virement vers un numéro de compte" 
-            onClick={() => navigate("/payer/virement")}
-          />
-        </div>
-      </section>
+        {/* SECTION 1: OPÉRATIONS FRÉQUENTES */}
+        <section className="ops-section">
+          <h3 className="section-label">Opérations fréquentes</h3>
+          <div className="menu-group">
+            <MenuRow 
+              icon={ArrowRightLeft} 
+              title="Virement vers un numéro de compte" 
+              onClick={() => navigate("/payer/virement")}
+            />
+          </div>
+        </section>
 
-      {/* SECTION 2: TOUTES LES OPÉRATIONS */}
-      <section className="ops-section">
-        <h3 className="section-label">Toutes les opérations</h3>
-        <div className="menu-group">
-          <MenuRow icon={ArrowRightLeft} title="Virement vers un numéro de compte" />
-          <MenuRow icon={Globe} title="Virement international" />
-        </div>
-      </section>
+        {/* SECTION 2: TOUTES LES OPÉRATIONS */}
+        <section className="ops-section">
+          <h3 className="section-label">Toutes les opérations</h3>
+          <div className="menu-group">
+            <MenuRow icon={ArrowRightLeft} title="Virement vers un numéro de compte" />
+            <MenuRow icon={Globe} title="Virement international" />
+          </div>
+        </section>
 
-      {/* SECTION 3: RECHARGES */}
-      <section className="ops-section">
-        <h3 className="section-label">Recharges</h3>
-        <div className="menu-group">
-          <MenuRow icon={Smartphone} title="Recharge de téléphone portable" />
-          <MenuRow icon={CreditCard} title="Recharge de carte prépayée" />
-        </div>
-      </section>
+        {/* SECTION 3: RECHARGES */}
+        <section className="ops-section">
+          <h3 className="section-label">Recharges</h3>
+          <div className="menu-group">
+            <MenuRow icon={Smartphone} title="Recharge de téléphone portable" />
+            <MenuRow icon={CreditCard} title="Recharge de carte prépayée" />
+          </div>
+        </section>
 
-      {/* SECTION 4: AUTRES OPÉRATIONS */}
-      <section className="ops-section">
-        <h3 className="section-label">Autres opérations</h3>
-        <div className="menu-group">
-          <MenuRow icon={CalendarClock} title="Opérations programmées" />
-          <MenuRow icon={HeartHandshake} title="Don pour financement" />
-        </div>
-      </section>
+        {/* SECTION 4: AUTRES OPÉRATIONS */}
+        <section className="ops-section">
+          <h3 className="section-label">Autres opérations</h3>
+          <div className="menu-group">
+            <MenuRow icon={CalendarClock} title="Opérations programmées" />
+            <MenuRow icon={HeartHandshake} title="Don pour financement" />
+          </div>
+        </section>
+        
+        {/* Espace vide en bas pour ne pas être caché par le BottomNav */}
+        <div style={{ height: "100px" }}></div>
+      </div>
     </div>
   );
 }
