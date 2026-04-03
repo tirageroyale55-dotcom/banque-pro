@@ -49,7 +49,6 @@ html, body {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  padding: 0;
 }
 
 .progress-container {
@@ -58,30 +57,27 @@ html, body {
   gap: 12px;
 }
 
-.progress-bar-bg {
+.progress-bar {
   flex: 1;
   height: 6px;
   background: #eee;
   border-radius: 10px;
+  position: relative;
   overflow: hidden;
 }
 
-.progress-bar {
+.progress-bar::after {
+  content: "";
+  position: absolute;
+  left: 0;
   height: 100%;
   background: #005a64;
-  transition: width 0.4s ease-in-out;
+  transition: width 0.4s ease;
 }
 
-/* États de la barre */
-.step-1 { width: 33%; }
-.step-2 { width: 66%; }
-.step-3 { width: 100%; }
-
-.step-text {
-  font-size: 11px;
-  color: #888;
-  font-weight: 600;
-}
+.step-1::after { width: 33%; }
+.step-2::after { width: 66%; }
+.step-3::after { width: 100%; }
 
 /* --- ZONE DE CONTENU SCROLLABLE --- */
 .virement-content {
@@ -218,33 +214,90 @@ html, body {
   font-weight: 600;
 }
 
-/* --- ÉTAPE 2 : RÉCAPITULATIF --- */
-.recap-card {
+/* --- ÉTAPE 2 : RÉCAPITULATIF (NOUVEAU) --- */
+.recap-title {
+  font-size: 18px;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.recap-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.group-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #999;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.recap-card-info {
   background: white;
   border-radius: 12px;
-  padding: 20px;
+  padding: 15px;
   border: 1px solid #eee;
 }
 
-.recap-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid #f9f9f9;
+.recap-card-info.highlight {
+  border-left: 4px solid #005a64;
 }
 
-.recap-item label { color: #888; font-size: 13px; }
-.recap-item span { font-weight: 600; color: #333; }
-.recap-item span.heavy { color: #005a64; font-size: 18px; }
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 14px;
+}
 
-.nb-box {
-  background: #fff8e1;
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  color: #856404;
+.info-row:last-child { border: none; }
+.info-row label { color: #888; }
+.info-row span { font-weight: 600; color: #333; text-align: right; }
+.info-row strong { color: #005a64; }
+.info-row .mono { font-family: monospace; font-size: 13px; }
+.heavy-amount { font-size: 18px; color: #005a64 !important; font-weight: 800 !important; }
+.free-tag { color: #2e7d32 !important; }
+
+.recap-divider {
+  display: flex;
+  justify-content: center;
+  color: #005a64;
+  margin: -5px 0;
+}
+
+.notice-box {
+  background: #fff4e5;
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  gap: 10px;
   margin: 20px 0;
-  border: 1px solid #ffeeba;
+  border: 1px solid #ffe2b9;
+}
+
+.notice-box p { margin: 0; font-size: 12px; color: #663c00; line-height: 1.4; }
+
+/* --- ÉTAPE 3 : PIN --- */
+.pin-page { text-align: center; padding-top: 40px; }
+.lock-icon { color: #005a64; margin-bottom: 20px; }
+
+.pin-input {
+  display: block;
+  margin: 30px auto;
+  width: 220px;
+  text-align: center;
+  font-size: 35px;
+  letter-spacing: 12px;
+  border: none;
+  border-bottom: 2px solid #005a64;
+  background: transparent;
+  outline: none;
 }
 
 /* --- ÉTAPE 3 : PIN --- */
