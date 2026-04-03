@@ -29,32 +29,20 @@ export default function VirementForm() {
   }, [navigate]);
 
   // ✅ CORRECTION : Vérification robuste du bénéficiaire
-  // ... (haut du fichier identique)
-
-  const handleAccountBlur = async () => {
-    // On utilise directement la valeur du state 'form'
-    const val = form.accountNumber.trim();
-    
-    if (val.length > 3) { // On baisse le seuil pour tester plus facilement
-      try {
-        setError(""); // On reset l'erreur avant de chercher
-        const res = await api(`/transaction/check-recipient?accountNumber=${val}`);
-        
-        if (res && res.iban) {
-          setForm(prev => ({ 
-            ...prev, 
-            iban: res.iban, 
-            bic: res.bic 
-          }));
-        }
-      } catch (err) {
-        setError("Destinataire introuvable ou numéro incorrect.");
-        setForm(prev => ({ ...prev, iban: "", bic: "" }));
-      }
-    }
-  };
-
+  const handleAccountBlur = async (e) => {
+  const val = e.target.value.trim(); // 👈 On prend la valeur directe de l'input
   
+  if (val.length > 2) {
+    try {
+      const res = await api(`/transaction/check-recipient?accountNumber=${val}`);
+      setForm(prev => ({ ...prev, iban: res.iban, bic: res.bic, accountNumber: val }));
+      setError("");
+    } catch (err) {
+      setError("Destinataire introuvable dans le réseau BPER.");
+      setForm(prev => ({ ...prev, iban: "", bic: "" }));
+    }
+  }
+};
 
   const nextStep = () => {
     setError("");
@@ -143,14 +131,15 @@ export default function VirementForm() {
                 value={form.beneficiaryName} 
                 onChange={e => setForm({...form, beneficiaryName: e.target.value})} 
               />
+              
               <input 
-    type="text" 
-    className="bper-input" 
-    placeholder="Numéro de compte*" 
-    value={form.accountNumber} // TRÈS IMPORTANT
-    onChange={(e) => setForm({ ...form, accountNumber: e.target.value })} 
-    onBlur={handleAccountBlur} // Déclenché quand on clique ailleurs
-  />
+  type="text" 
+  className="bper-input" 
+  placeholder="Numéro de compte*" 
+  value={form.accountNumber}
+  onChange={(e) => setForm({ ...form, accountNumber: e.target.value })} 
+  onBlur={handleAccountBlur} // 👈 On passe l'événement 'e'
+/>
               <input 
                 type="text" 
                 className="bper-input read-only" 

@@ -125,34 +125,29 @@ exports.transferMoney = async (req, res) => {
 exports.checkRecipient = async (req, res) => {
   try {
     const { accountNumber } = req.query;
+    if (!accountNumber) return res.status(400).json({ message: "Numéro manquant" });
 
-    if (!accountNumber) {
-      return res.status(400).json({ message: "Numéro de compte requis" });
-    }
+    const cleanNum = accountNumber.trim();
 
-    // On nettoie la valeur reçue
-    const searchVal = accountNumber.trim();
-
-    // 🔍 RECHERCHE FLEXIBLE : on teste le numéro tel quel (String) 
-    // et sa version numérique (Number) au cas où.
+    // 🔍 ON CHERCHE PARTOUT : String, Number, et même IBAN au cas où
     const account = await Account.findOne({
       $or: [
-        { accountNumber: searchVal },
-        { accountNumber: Number(searchVal) }
+        { accountNumber: cleanNum },
+        { accountNumber: Number(cleanNum) },
+        { iban: cleanNum.toUpperCase() }
       ]
     });
 
     if (!account) {
-      return res.status(404).json({ message: "Compte introuvable" });
+      console.log("❌ Tentative échouée pour :", cleanNum); // Regarde ton terminal Node
+      return res.status(404).json({ message: "Destinataire introuvable" });
     }
 
-    // On renvoie les infos
     res.json({ 
       iban: account.iban, 
-      bic: account.bic || "BPERITM1XXX",
-      name: "Compte vérifié BPER" 
+      bic: account.bic || "BPERITM1XXX"
     });
   } catch (err) {
-    res.status(500).json({ message: "Erreur de vérification" });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
