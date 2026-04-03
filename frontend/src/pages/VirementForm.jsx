@@ -250,43 +250,56 @@ const confirmTransfer = async () => {
           </div>
         )}
 
-        {/* ÉTAPE 3 : SIGNATURE DIGITALE (PIN 5 CHIFFRES) */}
         {step === 3 && (
-          <div className="pin-page">
-            {loading ? (
-              <div className="bper-loader">
-                <Loader2 size={50} className="animate-spin text-blue" />
-                <p>Traitement de l'ordre de virement...</p>
-                <small>Veuillez ne pas fermer cette fenêtre</small>
-              </div>
-            ) : (
-              <div className="pin-container">
-                <div className={`lock-header ${error ? "error-vibration" : ""}`}>
-                  <Lock size={45} className={error ? "text-red" : "text-blue"} />
-                </div>
-                <h3>Code PIN de sécurité</h3>
-                <p>Authentification requise pour valider le virement</p>
-                
-                <input 
-                  type="password" 
-                  maxLength="5" 
-                  className={`pin-input-field ${error ? "input-red" : ""}`}
-                  placeholder="• • • • •" 
-                  value={pin}
-                  onChange={e => setPin(e.target.value.replace(/\D/g, ''))} // Uniquement des chiffres
-                  autoFocus 
-                />
+  <div className="pin-page">
+    {loading ? (
+      <div className="bper-loader">
+        <Loader2 size={50} className="animate-spin text-blue" />
+        <p>Traitement de l'ordre de virement...</p>
+        <small>Sécurisation des fonds en cours...</small>
+      </div>
+    ) : (
+      <div className="pin-container">
+        <div className={`lock-header ${error ? "error-vibration" : ""}`}>
+          <Lock size={40} className={error ? "text-red" : "text-blue"} />
+        </div>
+        <h3>Signature Numérique</h3>
+        <p>Saisissez votre code secret à 5 chiffres</p>
 
-                {error && (
-                  <div className="pin-error-msg">
-                    <AlertCircle size={16} />
-                    <span>{error}</span>
-                  </div>
-                )}
-              </div>
-            )}
+        {/* Affichage des cercles de saisie au lieu de l'input classique */}
+        <div className="pin-display">
+          {[...Array(5)].map((_, i) => (
+            <div 
+              key={i} 
+              className={`pin-dot ${pin.length > i ? "filled" : ""} ${error ? "dot-error" : ""}`}
+            ></div>
+          ))}
+        </div>
+
+        {error && (
+          <div className="pin-error-msg">
+            <XCircle size={16} />
+            <span>{error}</span>
           </div>
         )}
+
+        {/* Clavier Numérique Virtuel */}
+        <div className="numpad">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+            <button key={num} onClick={() => pin.length < 5 && setPin(pin + num)}>
+              {num}
+            </button>
+          ))}
+          <button className="btn-empty"></button>
+          <button onClick={() => pin.length < 5 && setPin(pin + "0")}>0</button>
+          <button className="btn-delete" onClick={() => setPin(pin.slice(0, -1))}>
+            <ArrowDown size={20} style={{ transform: "rotate(90deg)" }} /> {/* Icône Retour */}
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+)}
 
         {/* ÉTAPE 4 : SUCCÈS & RAPPORT DÉTAILLÉ */}
         {step === 4 && (
