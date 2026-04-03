@@ -114,3 +114,17 @@ exports.transferMoney = async (req, res) => {
     session.endSession();
   }
 };
+
+
+
+exports.checkRecipient = async (req, res) => {
+  try {
+    const { accountNumber } = req.query;
+    const account = await Account.findOne({ accountNumber });
+    if (!account) return res.status(404).json({ message: "Numéro de compte incorrect ou introuvable" });
+    
+    res.json({ iban: account.iban, bic: account.bic, name: "Bénéficiaire trouvé" });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
