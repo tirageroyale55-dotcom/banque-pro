@@ -88,7 +88,7 @@ export default function VirementForm() {
       setTimeout(() => {
         setLoading(false);
         setStep(4);
-      }, 2500);
+      }, 2000);
 
     } catch (err) {
       setLoading(false);

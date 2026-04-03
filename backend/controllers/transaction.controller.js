@@ -75,47 +75,64 @@ exports.getTransactions = async (req, res) => {
 /**
  * VIREMENT INSTANTANÉ (Transactionnel)
  */
+
+
 exports.transferMoney = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    const { recipientIdentifier, amount, label } = req.body;
-    const amountNum = Number(amount);
+    const { recipientIdentifier, amount, label, pin } = req.body;
+    const userId = req.user.id;
 
-    if (amountNum <= 0) throw new Error("Montant invalide");
+    // 1. Vérification du PIN (doit correspondre au PIN de l'utilisateur connecté)
+    const user = await User.findById(userId);
+    const pinValid = await bcrypt.compare(pin.trim(), user.pinHash);
+    if (!pinValid) {
+      throw new Error("Code PIN de sécurité incorrect.");
+    }
 
-    const senderAcc = await Account.findOne({ user: req.user.id }).session(session);
-    if (!senderAcc) throw new Error("Votre compte est introuvable");
-    if (senderAcc.balance < amountNum) throw new Error("Solde insuffisant");
-
-    // Recherche par IBAN ou Numéro de compte
-    const recipientAcc = await Account.findOne({
-      $or: [{ iban: recipientIdentifier }, { accountNumber: recipientIdentifier }]
+    // 2. Trouver les comptes
+    const senderAccount = await Account.findOne({ user: userId }).session(session);
+    const recipientAccount = await Account.findOne({
+      $or: [{ accountNumber: recipientIdentifier }, { iban: recipientIdentifier }]
     }).session(session);
 
-    if (!recipientAcc) throw new Error("Destinataire introuvable dans le réseau BPER");
-    if (senderAcc._id.equals(recipientAcc._id)) throw new Error("Opération impossible vers le même compte");
+    if (!recipientAccount) throw new Error("Bénéficiaire introuvable.");
+    if (senderAccount.balance < amount) throw new Error("Solde insuffisant.");
 
-    senderAcc.balance -= amountNum;
-    recipientAcc.balance += amountNum;
+    // 3. Effectuer le transfert (Update au lieu de create pour éviter le bug Vercel/Mongoose)
+    senderAccount.balance -= Number(amount);
+    recipientAccount.balance += Number(amount);
 
-    await senderAcc.save({ session });
-    await recipientAcc.save({ session });
+    await senderAccount.save({ session });
+    await recipientAccount.save({ session });
 
-    await Transaction.create([
-      { account: senderAcc._id, type: "DEBIT", amount: amountNum, label: `VIR vers ${recipientIdentifier} - ${label || ''}` },
-      { account: recipientAcc._id, type: "CREDIT", amount: amountNum, label: `VIR de ${senderAcc.iban} - ${label || ''}` }
-    ], { session });
+    // 4. Créer l'historique (C'est ici que l'erreur 'create' arrivait)
+    // Utilise .save() sur un nouvel objet au lieu de Transaction.create()
+    const newTransaction = new Transaction({
+      senderAccount: senderAccount._id,
+      recipientAccount: recipientAccount._id,
+      amount: Number(amount),
+      label: label || "Virement SEPA",
+      type: "TRANSFER",
+      status: "COMPLETED",
+      reference: `BPER-${Math.random().toString(36).toUpperCase().substr(2, 9)}`
+    });
 
+    await newTransaction.save({ session });
+
+    // Tout est bon, on valide
     await session.commitTransaction();
-    res.json({ message: "Virement instantané réussi", balance: senderAcc.balance });
+    session.endSession();
+
+    res.json({ message: "Virement effectué avec succès", reference: newTransaction.reference });
 
   } catch (err) {
+    // En cas d'erreur, on annule tout (Rollback)
     await session.abortTransaction();
-    res.status(400).json({ message: err.message });
-  } finally {
     session.endSession();
+    res.status(400).json({ message: err.message });
   }
 };
 
