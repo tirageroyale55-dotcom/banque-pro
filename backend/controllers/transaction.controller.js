@@ -99,6 +99,10 @@ exports.transferMoney = async (req, res) => {
     }).session(session);
 
     if (!recipientAccount) throw new Error("Bénéficiaire introuvable.");
+    // ❌ EMPECHER L'AUTO-VIREMENT (Sécurité BPER)
+    if (senderAccount._id.toString() === recipientAccount._id.toString()) {
+      throw new Error("Opération impossible : le compte de destination ne peut pas être le même que le compte d'origine.");
+    }
     if (senderAccount.balance < Number(amount)) throw new Error("Solde insuffisant.");
 
     // 3. Mise à jour des soldes
