@@ -125,29 +125,33 @@ exports.transferMoney = async (req, res) => {
 exports.checkRecipient = async (req, res) => {
   try {
     const { accountNumber } = req.query;
-    if (!accountNumber) return res.status(400).json({ message: "Numéro manquant" });
+    console.log("🔍 Vérification reçue pour :", accountNumber); // 👈 REGARDE TON TERMINAL NODE
 
-    const cleanNum = accountNumber.trim();
+    if (!accountNumber) {
+      return res.status(400).json({ message: "Numéro manquant" });
+    }
 
-    // 🔍 ON CHERCHE PARTOUT : String, Number, et même IBAN au cas où
+    // Recherche flexible (String ou Number)
     const account = await Account.findOne({
       $or: [
-        { accountNumber: cleanNum },
-        { accountNumber: Number(cleanNum) },
-        { iban: cleanNum.toUpperCase() }
+        { accountNumber: accountNumber.trim() },
+        { accountNumber: Number(accountNumber.trim()) }
       ]
     });
 
     if (!account) {
-      console.log("❌ Tentative échouée pour :", cleanNum); // Regarde ton terminal Node
-      return res.status(404).json({ message: "Destinataire introuvable" });
+      console.log("❌ Aucun compte trouvé pour ce numéro.");
+      return res.status(404).json({ message: "Introuvable" });
     }
 
+    console.log("✅ Compte trouvé :", account.iban);
     res.json({ 
       iban: account.iban, 
-      bic: account.bic || "BPERITM1XXX"
+      bic: account.bic || "BPERITM1XXX" 
     });
+
   } catch (err) {
-    res.status(500).json({ message: "Erreur serveur" });
+    console.error("🔥 Erreur serveur :", err);
+    res.status(500).json({ message: "Erreur interne" });
   }
 };

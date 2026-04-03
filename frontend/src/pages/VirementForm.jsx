@@ -30,15 +30,24 @@ export default function VirementForm() {
 
   // ✅ CORRECTION : Vérification robuste du bénéficiaire
   const handleAccountBlur = async (e) => {
-  const val = e.target.value.trim(); // 👈 On prend la valeur directe de l'input
+  const val = e.target.value.trim();
   
-  if (val.length > 2) {
+  if (val.length > 3) {
     try {
-      const res = await api(`/transaction/check-recipient?accountNumber=${val}`);
-      setForm(prev => ({ ...prev, iban: res.iban, bic: res.bic, accountNumber: val }));
-      setError("");
+      // ⚠️ On s'assure que l'API envoie bien le Token (le middleware 'auth' en a besoin)
+      const res = await api(`/transaction/check-recipient?accountNumber=${val}`, "GET");
+      
+      if (res && res.iban) {
+        setForm(prev => ({ 
+          ...prev, 
+          iban: res.iban, 
+          bic: res.bic || "BPERITM1XXX" 
+        }));
+        setError(""); // On efface l'erreur si trouvé
+      }
     } catch (err) {
-      setError("Destinataire introuvable dans le réseau BPER.");
+      // Si le serveur répond 404, on affiche l'erreur
+      setError("Numéro de compte inconnu dans le réseau BPER.");
       setForm(prev => ({ ...prev, iban: "", bic: "" }));
     }
   }
