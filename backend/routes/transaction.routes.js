@@ -13,8 +13,7 @@ router.post("/credit", auth, creditAccount);
 router.post("/debit", auth, debitAccount);
 router.get("/", auth, getTransactions);
 
-router.post("/transfer", protect, transferMoney);
-router.post("/transfer-international", protect, transferInternational);
+router.post("/transfer-international", auth, transferInternational);
 
 router.post("/transfer", auth, transferMoney); 
 router.get("/check-recipient", auth, checkRecipient);
