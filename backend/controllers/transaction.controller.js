@@ -150,6 +150,34 @@ exports.transferMoney = async (req, res) => {
   }
 };
 
+
+
+exports.transferInternational = async (req, res) => {
+    try {
+        const { iban, amount, pin } = req.body;
+        const userId = req.user.id;
+
+        // 1. Vérifier si l'IBAN existe dans la base des bénéficiaires autorisés
+        // On cherche si cet IBAN appartient à un utilisateur existant dans ta DB
+        const recipientAccount = await Account.findOne({ iban: iban });
+
+        if (!recipientAccount) {
+            // ❌ Si l'IBAN n'est pas trouvé, on renvoie l'erreur personnalisée
+            return res.status(403).json({ 
+                message: "Virement non effectué : L'IBAN destinataire n'est pas répertorié dans notre base de données sécurisée. Veuillez contacter l'administrateur BPER pour l'enregistrement du bénéficiaire." 
+            });
+        }
+
+        // 2. Si trouvé, continuer la logique habituelle (Vérifier PIN, Solde, etc.)
+        // ... (ton code de transfert ici)
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
+
+
+
 /**
  * VERIFICATION BENEFICIAIRE (Pour auto-remplissage)
  */

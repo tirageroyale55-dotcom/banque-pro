@@ -54,10 +54,15 @@ export default function Payer() {
               onClick={() => navigate("/payer/virement")}
             />
           </div>
-          <div className="menu-group">
-            
-            <MenuRow icon={Globe} title="Virement international" />
-          </div>
+          {/* Dans la SECTION 2 de Payer.jsx */}
+
+        <div className="menu-group">
+         <MenuRow 
+          icon={Globe} 
+          title="Virement international" 
+          onClick={() => navigate("/payer/virement-international")} // ✅ Correction ici
+         />
+        </div>
         </section>
 
         {/* SECTION 3: RECHARGES */}
