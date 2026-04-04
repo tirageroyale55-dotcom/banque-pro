@@ -48,6 +48,13 @@ export default function Payer() {
         <section className="ops-section">
           <h3 className="section-label">Toutes les opérations</h3>
           <div className="menu-group">
+            <MenuRow 
+              icon={ArrowRightLeft} 
+              title="Virement vers un numéro de compte" 
+              onClick={() => navigate("/payer/virement")}
+            />
+          </div>
+          <div className="menu-group">
             <MenuRow icon={ArrowRightLeft} title="Virement vers un numéro de compte" />
             <MenuRow icon={Globe} title="Virement international" />
           </div>
