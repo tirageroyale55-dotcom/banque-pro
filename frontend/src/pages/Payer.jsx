@@ -55,7 +55,7 @@ export default function Payer() {
             />
           </div>
           <div className="menu-group">
-            <MenuRow icon={ArrowRightLeft} title="Virement vers un numéro de compte" />
+            
             <MenuRow icon={Globe} title="Virement international" />
           </div>
         </section>
