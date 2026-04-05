@@ -18,7 +18,7 @@ export default function VirementInternational() {
   const [txRef] = useState(`SWIFT-${Math.random().toString(36).toUpperCase().substr(2, 9)}`);
   
   const [isInstant, setIsInstant] = useState(false);
-  const [isRecurring, setIsRecurring] = useState(true); // ✅ Activé par défaut
+  const [isRecurring, setIsRecurring] = useState(true); // Activé par défaut
   const [executionDate, setExecutionDate] = useState("");
   const [isInternal, setIsInternal] = useState(false);
 
@@ -54,16 +54,15 @@ export default function VirementInternational() {
     }
   }, [pin]);
 
-  // LOGIQUE DU BOUTON INSTANTANÉ
   const toggleInstant = () => {
     const newInstantState = !isInstant;
     setIsInstant(newInstantState);
     if (newInstantState) {
       setExecutionDate(new Date().toISOString().split('T')[0]);
-      setIsRecurring(false); // ✅ Désactive la récurrence si l'instantané est choisi
+      setIsRecurring(false);
     } else {
       setExecutionDate(getStandardDate());
-      setIsRecurring(true); // ✅ Réactive la récurrence par défaut si on quitte l'instantané
+      setIsRecurring(true);
     }
   };
 
@@ -85,23 +84,15 @@ export default function VirementInternational() {
     setAttemptedNext(true);
     const { beneficiaryName, iban, bic, bankName, amount, motif } = form;
     const userBalance = Number(data.account?.balance || data.balance || 0);
-    const transferAmount = Number(amount);
 
     if (!beneficiaryName || !iban || !bic || !bankName || !amount || !motif) {
       setError("Information manquante : Tous les champs sont obligatoires pour la conformité SWIFT.");
       return false;
     }
-
-    if (transferAmount > userBalance) {
+    if (Number(amount) > userBalance) {
       setError("Solde insuffisant : Le montant du virement dépasse votre plafond disponible.");
       return false;
     }
-
-    if (transferAmount <= 0) {
-      setError("Erreur : Le montant doit être supérieur à 0.");
-      return false;
-    }
-
     setError("");
     setStep(2);
   };
@@ -161,46 +152,16 @@ export default function VirementInternational() {
 
             <div className="bper-card-section">
               <h3 className="section-label">DÉTAILS DU BÉNÉFICIAIRE</h3>
-              <input 
-                type="text" 
-                className={`bper-input ${isInvalid("beneficiaryName") ? "border-red" : ""}`} 
-                placeholder="Nom du bénéficiaire *" 
-                value={form.beneficiaryName} 
-                onChange={e => setForm({...form, beneficiaryName: e.target.value})} 
-              />
-              <input 
-                type="text" 
-                className={`bper-input mono ${isInvalid("iban") ? "border-red" : ""}`} 
-                placeholder="IBAN *" 
-                value={form.iban} 
-                onChange={e => handleIbanInput(e.target.value)} 
-              />
+              <input type="text" className={`bper-input ${isInvalid("beneficiaryName") ? "border-red" : ""}`} placeholder="Nom du bénéficiaire *" value={form.beneficiaryName} onChange={e => setForm({...form, beneficiaryName: e.target.value})} />
+              <input type="text" className={`bper-input mono ${isInvalid("iban") ? "border-red" : ""}`} placeholder="IBAN *" value={form.iban} onChange={e => handleIbanInput(e.target.value)} />
               
               <div className="dual-input">
-                <input 
-                  type="text" 
-                  className={`bper-input ${isInvalid("bic") ? "border-red" : ""}`} 
-                  placeholder="Code BIC / SWIFT *" 
-                  value={form.bic} 
-                  onChange={e => setForm({...form, bic: e.target.value.toUpperCase()})}
-                />
-                <input 
-                  type="text" 
-                  className={`bper-input ${isInvalid("bankName") ? "border-red" : ""}`} 
-                  placeholder="Nom de la banque *" 
-                  value={form.bankName} 
-                  onChange={e => setForm({...form, bankName: e.target.value})}
-                />
+                <input type="text" className={`bper-input ${isInvalid("bic") ? "border-red" : ""}`} placeholder="Code BIC / SWIFT *" value={form.bic} onChange={e => setForm({...form, bic: e.target.value.toUpperCase()})} />
+                <input type="text" className={`bper-input ${isInvalid("bankName") ? "border-red" : ""}`} placeholder="Nom de la banque *" value={form.bankName} onChange={e => setForm({...form, bankName: e.target.value})} />
               </div>
               
               <div className="dual-input">
-                <input 
-                    type="number" 
-                    className={`bper-input font-bold ${isInvalid("amount") || Number(form.amount) > userBalance ? "border-red" : ""}`} 
-                    placeholder="Montant *" 
-                    value={form.amount} 
-                    onChange={e => setForm({...form, amount: e.target.value})} 
-                />
+                <input type="number" className={`bper-input font-bold ${isInvalid("amount") || Number(form.amount) > userBalance ? "border-red" : ""}`} placeholder="Montant *" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} />
                 <select className="bper-input currency-select" value={form.currency} onChange={e => setForm({...form, currency: e.target.value})}>
                   <option>EUR</option><option>USD</option><option>GBP</option>
                 </select>
@@ -208,47 +169,49 @@ export default function VirementInternational() {
               <input type="text" className={`bper-input ${isInvalid("motif") ? "border-red" : ""}`} placeholder="Motif du virement (Obligatoire) *" value={form.motif} onChange={e => setForm({...form, motif: e.target.value})} />
             </div>
 
-            {/* OPTION INSTANTANÉ */}
+            {/* VIREMENT INSTANTANÉ AVEC TES TEXTES ET ICONES */}
             <div className={`bper-option-box ${!isInternal ? 'disabled-opt' : ''}`}>
               <div className="option-header">
-                <div className="opt-title"><Zap size={20} className="icon-zap" /><div><strong>Virement instantané</strong><p className="opt-desc">Crédit immédiat sur le compte du bénéficiaire.</p></div></div>
+                <div className="opt-title"><Zap size={20} className="icon-zap" /><div><strong>Virement instantané</strong><p className="opt-desc">La banque du Bénéficiaire vous permet d'activer cette modalité.</p></div></div>
                 <label className="bper-switch">
                   <input type="checkbox" disabled={!isInternal} checked={isInstant} onChange={toggleInstant} />
                   <span className="slider round"></span>
                 </label>
               </div>
+              {!isInternal && (
+                <div className="bper-warning-msg">
+                  <AlertTriangle size={14} />
+                  <span>Il est possible d'envoyer des virements instantanés uniquement dans l'espace SEPA.</span>
+                </div>
+              )}
             </div>
 
-            {/* OPTION RÉCURRENTE - ACTIVÉE PAR DÉFAUT */}
+            {/* OPÉRATION RÉCURRENTE AVEC TES TEXTES ET ICONES */}
             <div className={`bper-option-box ${isInstant ? 'disabled-opt' : ''}`}>
               <div className="option-header">
-                <div className="opt-title"><Calendar size={20} className="icon-bank" /><div><strong>Opération récurrente</strong><p className="opt-desc">Configuration d'un paiement automatique périodique.</p></div></div>
+                <div className="opt-title"><Calendar size={20} className="icon-bank" /><div><strong>Opération récurrente</strong><p className="opt-desc">Vous permet de configurer un paiement automatique avec fréquence temporelle.</p></div></div>
                 <label className="bper-switch">
                   <input type="checkbox" disabled={isInstant} checked={isRecurring} onChange={() => setIsRecurring(!isRecurring)} />
                   <span className="slider round"></span>
                 </label>
               </div>
+              <div className={`bper-status-msg ${isRecurring ? 'status-ok' : 'status-warn'}`}>
+                {isRecurring ? <><CheckCircle size={14} /> <span>Il est possible de mettre en place un virement étranger récurrent.</span></> : <><AlertTriangle size={14} /> <span>Il n'est pas possible de mettre en place un virement étranger récurrent sans activation.</span></>}
+              </div>
             </div>
 
             <div className="form-section">
-              <label className="section-title">Date d'exécution</label>
-              <input 
-                type="date" 
-                className="bper-input" 
-                value={executionDate} 
-                readOnly={isInstant} 
-                min={isInstant ? executionDate : getStandardDate()}
-                onChange={(e) => setExecutionDate(e.target.value)} 
-              />
+              <label className="section-title">Date d'exécution (Minimum 48H)</label>
+              <input type="date" className="bper-input" value={executionDate} readOnly={isInstant} min={isInstant ? executionDate : getStandardDate()} onChange={(e) => setExecutionDate(e.target.value)} />
             </div>
 
             {error && <div className="error-alert-box"><XCircle size={16}/> {error}</div>}
 
             <button className="btn-continue-bper" onClick={validateStep1}>Continuer <ArrowRight size={18} /></button>
+            <p className="footer-step-hint">Prochaine étape : Continuation</p>
           </div>
         )}
 
-        {/* ÉTAPES SUIVANTES IDENTIQUES */}
         {step === 2 && (
           <div className="recap-page fade-in">
             <h3 className="recap-title">Vérification de l'ordre</h3>
@@ -257,7 +220,6 @@ export default function VirementInternational() {
                 <div className="info-row"><label>IBAN :</label> <span className="mono">{form.iban}</span></div>
                 <div className="info-row"><label>Banque :</label> <span>{form.bankName}</span></div>
                 <div className="info-row"><label>Montant :</label> <span className="heavy-amount">{form.amount} {form.currency}</span></div>
-                <div className="info-row"><label>Type :</label> <span>{isInstant ? "Instantané" : "Standard (Récurrent)"}</span></div>
             </div>
             <button className="btn-continue" onClick={() => setStep(3)}>Signer numériquement</button>
             <button className="btn-back" onClick={() => setStep(1)}>Modifier</button>
