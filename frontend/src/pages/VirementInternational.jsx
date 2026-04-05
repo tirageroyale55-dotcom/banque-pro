@@ -32,7 +32,6 @@ export default function VirementInternational() {
     motif: ""
   });
 
-  // Date par défaut (J+2)
   const getStandardDate = () => {
     const d = new Date();
     d.setDate(d.getDate() + 2);
@@ -59,13 +58,10 @@ export default function VirementInternational() {
   const toggleInstant = () => {
     const newInstantState = !isInstant;
     setIsInstant(newInstantState);
-
     if (newInstantState) {
-      // Si activé : Date d'aujourd'hui + Désactive/Bloque la récurrence
       setExecutionDate(new Date().toISOString().split('T')[0]);
       setIsRecurring(false);
     } else {
-      // Si désactivé : Retour à la date standard J+2
       setExecutionDate(getStandardDate());
     }
   };
@@ -73,24 +69,39 @@ export default function VirementInternational() {
   const handleIbanInput = (value) => {
     const val = value.toUpperCase().replace(/\s/g, '');
     setForm({ ...form, iban: val });
-    
-    if (val.startsWith("IT")) {
-        setIsInternal(true);
-    } else {
-        setIsInternal(false);
-        setIsInstant(false); // Reset si l'IBAN change pour un pays non compatible
-        if (!isInstant) setExecutionDate(getStandardDate());
+    if (val.startsWith("IT")) setIsInternal(true);
+    else {
+      setIsInternal(false);
+      setIsInstant(false);
+      if (!isInstant) setExecutionDate(getStandardDate());
     }
   };
 
+  // VÉRIFICATION DU SOLDE ET VALIDATION
   const validateStep1 = () => {
     setAttemptedNext(true);
     const { beneficiaryName, iban, bic, bankName, amount, motif } = form;
-    
+    const userBalance = Number(data.account?.balance || data.balance || 0);
+    const transferAmount = Number(amount);
+
+    // 1. Vérification des champs vides
     if (!beneficiaryName || !iban || !bic || !bankName || !amount || !motif) {
       setError("Information manquante : Tous les champs sont obligatoires pour la conformité SWIFT.");
       return false;
     }
+
+    // 2. Vérification du solde (Refus si montant > solde)
+    if (transferAmount > userBalance) {
+      setError("Solde insuffisant : Le montant du virement dépasse votre plafond disponible.");
+      return false;
+    }
+
+    // 3. Vérification montant positif
+    if (transferAmount <= 0) {
+      setError("Erreur : Le montant doit être supérieur à 0.");
+      return false;
+    }
+
     setError("");
     setStep(2);
   };
@@ -111,6 +122,7 @@ export default function VirementInternational() {
   if (!data) return <div className="loading-screen">Chargement du terminal de paiement...</div>;
 
   const isInvalid = (field) => attemptedNext && !form[field];
+  const userBalance = Number(data.account?.balance || data.balance || 0);
 
   return (
     <div className="virement-wrapper">
@@ -140,7 +152,9 @@ export default function VirementInternational() {
                     <small>Solde disponible :</small>
                 </div>
                 <div className="acc-balance">
-                    <strong>{Number(data.account?.balance || data.balance).toFixed(2)} €</strong>
+                    <strong className={Number(form.amount) > userBalance ? "text-red" : ""}>
+                        {userBalance.toFixed(2)} €
+                    </strong>
                 </div>
               </div>
             </div>
@@ -180,15 +194,22 @@ export default function VirementInternational() {
               </div>
               
               <div className="dual-input">
-                <input type="number" className={`bper-input font-bold ${isInvalid("amount") ? "border-red" : ""}`} placeholder="Montant *" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} />
+                <input 
+                    type="number" 
+                    className={`bper-input font-bold ${isInvalid("amount") || Number(form.amount) > userBalance ? "border-red" : ""}`} 
+                    placeholder="Montant *" 
+                    value={form.amount} 
+                    onChange={e => setForm({...form, amount: e.target.value})} 
+                />
                 <select className="bper-input currency-select" value={form.currency} onChange={e => setForm({...form, currency: e.target.value})}>
                   <option>EUR</option><option>USD</option><option>GBP</option>
                 </select>
               </div>
+              {Number(form.amount) > userBalance && <p className="error-small">Le montant dépasse votre solde disponible.</p>}
+
               <input type="text" className={`bper-input ${isInvalid("motif") ? "border-red" : ""}`} placeholder="Motif du virement (Obligatoire) *" value={form.motif} onChange={e => setForm({...form, motif: e.target.value})} />
             </div>
 
-            {/* OPTION INSTANTANÉ */}
             <div className={`bper-option-box ${!isInternal ? 'disabled-opt' : ''}`}>
               <div className="option-header">
                 <div className="opt-title"><Zap size={20} className="icon-zap" /><div><strong>Virement instantané</strong><p className="opt-desc">Crédit immédiat sur le compte du bénéficiaire.</p></div></div>
@@ -197,15 +218,8 @@ export default function VirementInternational() {
                   <span className="slider round"></span>
                 </label>
               </div>
-              {!isInternal && (
-                <div className="bper-warning-msg">
-                  <AlertTriangle size={14} />
-                  <span>Uniquement disponible dans l'espace SEPA.</span>
-                </div>
-              )}
             </div>
 
-            {/* OPTION RÉCURRENTE - BLOQUÉE SI INSTANTANÉ */}
             <div className={`bper-option-box ${isInstant ? 'disabled-opt' : ''}`}>
               <div className="option-header">
                 <div className="opt-title"><Calendar size={20} className="icon-bank" /><div><strong>Opération récurrente</strong><p className="opt-desc">Configuration d'un paiement automatique périodique.</p></div></div>
@@ -214,7 +228,6 @@ export default function VirementInternational() {
                   <span className="slider round"></span>
                 </label>
               </div>
-              {isInstant && <div className="bper-info-msg">Indisponible en mode instantané.</div>}
             </div>
 
             <div className="form-section">
@@ -223,11 +236,10 @@ export default function VirementInternational() {
                 type="date" 
                 className="bper-input" 
                 value={executionDate} 
-                readOnly={isInstant} // Empêche de changer la date si c'est instantané
+                readOnly={isInstant} 
                 min={isInstant ? executionDate : getStandardDate()}
                 onChange={(e) => setExecutionDate(e.target.value)} 
               />
-              {isInstant && <small className="text-blue">Mode instantané : Exécution immédiate aujourd'hui.</small>}
             </div>
 
             {error && <div className="error-alert-box"><XCircle size={16}/> {error}</div>}
@@ -236,7 +248,7 @@ export default function VirementInternational() {
           </div>
         )}
 
-        {/* ... Étapes 2, 3 et 4 identiques au code précédent ... */}
+        {/* Étape 2 (Recap), 3 (Pin) et 4 (Success) restent identiques */}
         {step === 2 && (
           <div className="recap-page fade-in">
             <h3 className="recap-title">Vérification de l'ordre</h3>
