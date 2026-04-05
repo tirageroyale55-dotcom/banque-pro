@@ -32,18 +32,6 @@ export default function VirementInternational() {
     motif: ""
   });
 
-  // Base de données interne pour l'auto-complétion immédiate
-  const bankDirectory = {
-    "FR": { bank: "BANQUE DE FRANCE", bic: "BDFRFRPP" },
-    "IT": { bank: "BPER BANCA S.P.A.", bic: "BPERIT22" },
-    "DE": { bank: "DEUTSCHE BANK AG", bic: "DEUTDEFF" },
-    "BE": { bank: "KBC BANK NV", bic: "KREDREBB" },
-    "ES": { bank: "BANCO SANTANDER", bic: "BSANESMM" },
-    "CH": { bank: "UBS SWITZERLAND AG", bic: "UBSWCHZH" },
-    "GB": { bank: "BARCLAYS BANK PLC", bic: "BARCGB22" },
-    "US": { bank: "JP MORGAN CHASE", bic: "CHASUS33" }
-  };
-
   useEffect(() => {
     const minDate = new Date();
     minDate.setDate(minDate.getDate() + 2);
@@ -62,24 +50,14 @@ export default function VirementInternational() {
     }
   }, [pin]);
 
-  // LOGIQUE D'AUTO-COMPLÉTION
+  // LOGIQUE DE SAISIE SIMPLE (SANS AUTO-COMPLÉTION)
   const handleIbanInput = (value) => {
     const val = value.toUpperCase().replace(/\s/g, '');
-    const countryCode = val.substring(0, 2);
+    setForm({ ...form, iban: val });
     
-    let updatedForm = { ...form, iban: val };
-
-    // Si on détecte un pays dans notre base, on remplit automatiquement
-    if (bankDirectory[countryCode]) {
-      updatedForm.bankName = bankDirectory[countryCode].bank;
-      updatedForm.bic = bankDirectory[countryCode].bic;
-      
-      // Activation des options si c'est la banque locale (Italie/BPER)
-      if (countryCode === "IT") setIsInternal(true);
-      else setIsInternal(false);
-    }
-
-    setForm(updatedForm);
+    // Détection uniquement pour l'activation visuelle de l'option instantanée
+    if (val.startsWith("IT")) setIsInternal(true);
+    else setIsInternal(false);
   };
 
   const validateStep1 = () => {
@@ -196,12 +174,12 @@ export default function VirementInternational() {
                 </label>
               </div>
             {!isInternal && (
-        <div className="bper-warning-msg">
-          <AlertTriangle size={14} />
-          <span>Il est possible d'envoyer des virements instantanés uniquement dans l'espace SEPA.</span>
-        </div>
-      )}
-    </div>
+              <div className="bper-warning-msg">
+                <AlertTriangle size={14} />
+                <span>Il est possible d'envoyer des virements instantanés uniquement dans l'espace SEPA.</span>
+              </div>
+            )}
+            </div>
 
             <div className="bper-option-box">
               <div className="option-header">
