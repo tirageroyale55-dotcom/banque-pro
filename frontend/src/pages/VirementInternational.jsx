@@ -131,16 +131,17 @@ export default function VirementInternational() {
               <p>Les virements hors zone SEPA sont soumis aux contrôles de la réglementation bancaire internationale.</p>
             </div>
 
-            <div className="bper-card-section">
-              <h3 className="section-label">DE (COMPTE À DÉBITER)</h3>
-              <div className="account-preview-box">
-                <div className="acc-info">
-                  <span className="acc-owner">{userNom} {userPrenom}</span>
-                  <span className="acc-number">N° Compte: {accNum}</span>
+            <div className="form-section">
+              <label className="section-title">De (Compte à débiter)</label>
+              <div className="account-selector-box highlight">
+                <div className="user-info-row">
+                  <span className="user-fullname">{userNom} {userPrenom}</span>
+                  <span className="account-tag">PRINCIPAL</span>
                 </div>
-                <div className="acc-balance">
-                  <label>Solde disponible :</label>
-                  <strong>{Number(displayBalance).toFixed(2)} €</strong>
+                <p className="acc-num">{accNum}</p>
+                <div className="account-details">
+                  <span className="label-gray">Solde disponible :</span>
+                  <span className="amount-bold">{Number(displayBalance).toFixed(2)} €</span>
                 </div>
               </div>
             </div>

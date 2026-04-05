@@ -758,7 +758,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 .btn-continue-bper {
   width: 100%;
-  background: #0047bb;
+  background: #005a64;
   color: white;
   border: none;
   padding: 15px;
