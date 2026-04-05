@@ -4,7 +4,7 @@ import { api } from "../services/api";
 import { extractIBAN, isValidIBAN } from "ibantools"; 
 import { 
   Globe, CheckCircle, Lock, Loader2, XCircle, Info, Zap, 
-  Calendar, AlertTriangle, ArrowRight, Home 
+  Calendar, AlertTriangle, ArrowRight, Home
 } from "lucide-react";
 import "../styles/virement.css";
 
@@ -33,6 +33,7 @@ export default function VirementInternational() {
     motif: ""
   });
 
+  // Calcul automatique de la date de valeur (J+2)
   useEffect(() => {
     const minDate = new Date();
     minDate.setDate(minDate.getDate() + 2);
@@ -45,30 +46,34 @@ export default function VirementInternational() {
       .catch(() => navigate("/login"));
   }, [navigate]);
 
-  // LOGIQUE UNIVERSELLE : EXTRACTION DU BIC DEPUIS L'IBAN
-  const handleIbanInput = (value) => {
+  // AUTO-REMPLISSAGE DES CHAMPS VIA L'IBAN
+  const handleIbanAnalysis = (value) => {
     const cleanIban = value.toUpperCase().replace(/\s/g, '');
     let updatedForm = { ...form, iban: cleanIban };
 
     if (isValidIBAN(cleanIban)) {
-      const ibanInfo = extractIBAN(cleanIban);
-      const country = cleanIban.substring(0, 2);
+      const ibanData = extractIBAN(cleanIban);
+      const countryCode = cleanIban.substring(0, 2);
       
-      // La plupart des BIC commencent par le Bank Code (4 à 6 caractères)
-      // On extrait le bank_code fourni par ibantools ou on le slice manuellement
-      const extractedBankCode = ibanInfo.bank_code || cleanIban.substring(4, 8);
-      
-      // Génération du BIC SWIFT Probable : [BANK CODE] + [COUNTRY CODE] + "BBXXX"
-      // C'est la structure standard ISO pour un BIC à 8 caractères
-      const generatedBic = `${extractedBankCode}${country}BB111`.substring(0, 8);
-      
-      updatedForm.bic = generatedBic;
-      
-      // Si c'est un IBAN italien, on active les options locales BPER
-      setIsInternal(country === "IT");
+      // Extraction du code banque (Bank Code)
+      const bankCode = ibanData.bank_code || "SWFT";
+
+      // Remplissage automatique des champs "bloqués"
+      updatedForm.bic = `${bankCode}${countryCode}BBXXX`.substring(0, 8);
+      updatedForm.bankName = `BANQUE CORRESPONDANTE (${countryCode} - ID:${bankCode})`;
+
+      // Logique d'activation Instantanée (Italie = Zone BPER Interne)
+      if (countryCode === "IT") {
+        setIsInternal(true);
+      } else {
+        setIsInternal(false);
+        setIsInstant(false);
+      }
       setError("");
     } else {
+      // Réinitialisation si l'IBAN devient invalide pendant la saisie
       updatedForm.bic = "";
+      updatedForm.bankName = "";
       setIsInternal(false);
     }
     setForm(updatedForm);
@@ -78,9 +83,8 @@ export default function VirementInternational() {
     setAttemptedNext(true);
     const { beneficiaryName, iban, bic, bankName, amount, motif } = form;
     
-    // Validation stricte de tous les champs
     if (!beneficiaryName || !iban || !bic || !bankName || !amount || !motif || !isValidIBAN(iban)) {
-      setError("Information manquante : Tous les champs marqués en rouge sont obligatoires.");
+      setError("Action requise : Veuillez compléter tous les champs obligatoires en rouge.");
       return false;
     }
     setError("");
@@ -91,21 +95,22 @@ export default function VirementInternational() {
     setLoading(true);
     setError("");
     try {
-      await api("/transaction/transfer-international", "POST", { ...form, pin, executionDate });
+      await api("/transaction/transfer-international", "POST", { ...form, pin, executionDate, isInstant });
       setTimeout(() => { setLoading(false); setStep(4); }, 2500);
     } catch (err) {
       setLoading(false);
       setPin("");
-      setError(err.message.includes("base") ? "Accès refusé : Bénéficiaire non présent dans le registre de sécurité." : err.message);
+      setError(err.message.includes("base") ? "Transfert bloqué : IBAN non certifié par BPER." : err.message);
     }
   };
 
-  if (!data) return <div className="loading-screen">Sécurisation du canal SWIFT...</div>;
+  if (!data) return <div className="loading-screen">Initialisation des protocoles...</div>;
 
-  const isInvalid = (field) => {
-    if (!attemptedNext) return false;
-    if (field === "iban") return !isValidIBAN(form.iban);
-    return !form[field];
+  // Détection des erreurs pour l'affichage rouge
+  const checkError = (field) => {
+    if (!attemptedNext) return "";
+    if (field === 'iban' && !isValidIBAN(form.iban)) return "border-red";
+    return !form[field] ? "border-red" : "";
   };
 
   return (
@@ -113,7 +118,7 @@ export default function VirementInternational() {
       <header className="virement-header">
         <div className="header-top">
           <button className="btn-annuler" onClick={() => navigate("/payer")}>
-            {step === 4 ? "Terminer" : "Annuler"}
+            {step === 4 ? "Fermer" : "Annuler"}
           </button>
           <span className="header-title">Virement International</span>
           <Globe size={20} className="text-blue" />
@@ -125,92 +130,73 @@ export default function VirementInternational() {
           <div className="fade-in">
             <div className="bper-legal-alert">
               <Info size={18} />
-              <p>Rappel : Les virements transfrontaliers sont soumis aux contrôles de conformité KYC et AML.</p>
+              <p>Rappel : Les virements hors zone SEPA sont soumis aux délais de compensation interbancaire internationaux.</p>
             </div>
 
             <div className="bper-card-section">
-              <h3 className="section-label">COORDONNÉES DU BÉNÉFICIAIRE</h3>
-              
-              {/* NOM DU BÉNÉFICIAIRE */}
+              <h3 className="section-label">COMPTE DE RÈGLEMENT</h3>
+              <div className="account-preview-box">
+                <div className="acc-info">
+                    <span>{data.user?.nom} {data.user?.prenom}</span>
+                    <small>Compte : {data.account?.accountNumber}</small>
+                </div>
+                <div className="acc-balance">
+                    <label>Solde :</label>
+                    <strong>{Number(data.account?.balance).toFixed(2)} €</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="bper-card-section">
+              <h3 className="section-label">DÉTAILS DU BÉNÉFICIAIRE</h3>
               <input 
                 type="text" 
-                className={`bper-input ${isInvalid("beneficiaryName") ? "border-red" : ""}`} 
-                placeholder="Nom complet du bénéficiaire *" 
+                className={`bper-input ${checkError("beneficiaryName")}`} 
+                placeholder="Nom du bénéficiaire *" 
                 value={form.beneficiaryName} 
                 onChange={e => setForm({...form, beneficiaryName: e.target.value})} 
               />
-
-              {/* IBAN : DECLENCHE LE BIC AUTOMATIQUE */}
               <input 
                 type="text" 
-                className={`bper-input mono ${isInvalid("iban") ? "border-red" : ""}`} 
-                placeholder="IBAN (International) *" 
+                className={`bper-input mono ${checkError("iban")}`} 
+                placeholder="Saisissez l'IBAN (Auto-détection) *" 
                 value={form.iban} 
-                onChange={e => handleIbanInput(e.target.value)} 
+                onChange={e => handleIbanAnalysis(e.target.value)} 
               />
               
-              {/* BIC AUTOMATIQUE ET NOM DE BANQUE MANUEL */}
               <div className="dual-input">
-                <input 
-                    type="text" 
-                    className={`bper-input bg-locked ${isInvalid("bic") ? "border-red" : ""}`} 
-                    placeholder="Code BIC (Détecté) *" 
-                    value={form.bic} 
-                    readOnly 
-                />
-                <input 
-                    type="text" 
-                    className={`bper-input ${isInvalid("bankName") ? "border-red" : ""}`} 
-                    placeholder="Nom de la banque *" 
-                    value={form.bankName} 
-                    onChange={e => setForm({...form, bankName: e.target.value})} 
-                />
+                <input type="text" className={`bper-input bg-locked ${checkError("bic")}`} placeholder="BIC (Auto) *" value={form.bic} readOnly />
+                <input type="text" className={`bper-input bg-locked ${checkError("bankName")}`} placeholder="Banque (Auto) *" value={form.bankName} readOnly />
               </div>
               
-              {/* MONTANT ET DEVISE */}
               <div className="dual-input">
-                <input 
-                  type="number" 
-                  className={`bper-input font-bold ${isInvalid("amount") ? "border-red" : ""}`} 
-                  placeholder="Montant *" 
-                  value={form.amount} 
-                  onChange={e => setForm({...form, amount: e.target.value})} 
-                />
+                <input type="number" className={`bper-input font-bold ${checkError("amount")}`} placeholder="Montant *" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} />
                 <select className="bper-input currency-select" value={form.currency} onChange={e => setForm({...form, currency: e.target.value})}>
-                  <option>EUR</option><option>USD</option><option>GBP</option><option>CHF</option>
+                  <option>EUR</option><option>USD</option>
                 </select>
               </div>
-
-              {/* MOTIF OBLIGATOIRE */}
-              <input 
-                type="text" 
-                className={`bper-input ${isInvalid("motif") ? "border-red" : ""}`} 
-                placeholder="Motif de l'opération (Obligatoire) *" 
-                value={form.motif} 
-                onChange={e => setForm({...form, motif: e.target.value})} 
-              />
+              <input type="text" className={`bper-input ${checkError("motif")}`} placeholder="Motif du transfert *" value={form.motif} onChange={e => setForm({...form, motif: e.target.value})} />
             </div>
 
-            {/* OPTIONS DE PAIEMENT */}
             <div className={`bper-option-box ${!isInternal ? 'disabled-opt' : ''}`}>
               <div className="option-header">
                 <div className="opt-title">
                   <Zap size={20} className="icon-zap" />
-                  <div><strong>Virement instantané</strong><p className="opt-desc">Disponible uniquement pour les banques compatibles SEPA.</p></div>
+                  <div><strong>Virement instantané</strong><p className="opt-desc">Traitement en temps réel (si éligible).</p></div>
                 </div>
                 <label className="bper-switch">
                   <input type="checkbox" disabled={!isInternal} checked={isInstant} onChange={() => setIsInstant(!isInstant)} />
                   <span className="slider round"></span>
                 </label>
               </div>
-              {!isInternal && <div className="bper-warning-msg"><AlertTriangle size={14} /><span>L'IBAN saisi ne permet pas le règlement instantané.</span></div>}
+              {!isInternal && <div className="bper-warning-msg"><AlertTriangle size={14} /><span>Option restreinte à la zone SEPA.</span></div>}
             </div>
 
             <div className="bper-option-box">
               <div className="option-header">
                 <div className="opt-title">
                   <Calendar size={20} className="icon-bank" />
-                  <div><strong>Opération récurrente</strong><p className="opt-desc">Programmer un virement permanent.</p></div>
+                  <div><strong>Opération récurrente</strong><p className="opt-desc">Programmer ce virement périodiquement.</p></div>
                 </div>
                 <label className="bper-switch">
                   <input type="checkbox" checked={isRecurring} onChange={() => setIsRecurring(!isRecurring)} />
@@ -218,20 +204,13 @@ export default function VirementInternational() {
                 </label>
               </div>
               <div className={`bper-status-msg ${isRecurring ? 'status-ok' : 'status-warn'}`}>
-                {isRecurring ? <><CheckCircle size={14} /> <span>Il est possible de mettre en place un virement étranger récurrent.</span></> : <><AlertTriangle size={14} /> <span>Il n'est pas possible de mettre en place un virement étranger récurrent.</span></>}
+                {isRecurring ? <><CheckCircle size={14} /> <span>Virement récurrent autorisé pour ce compte.</span></> : <><AlertTriangle size={14} /> <span>Option de récurrence non activée.</span></>}
               </div>
             </div>
 
-            {/* DATE DE VALEUR */}
             <div className="form-section">
-              <label className="section-title">Date d'exécution (Délai min. 48H)</label>
-              <input 
-                type="date" 
-                className="bper-input" 
-                value={executionDate} 
-                min={new Date(Date.now() + 172800000).toISOString().split('T')[0]} 
-                onChange={(e) => setExecutionDate(e.target.value)} 
-              />
+              <label className="section-title">Date de crédit (Délai standard 48H)</label>
+              <input type="date" className="bper-input" value={executionDate} min={new Date(Date.now() + 172800000).toISOString().split('T')[0]} onChange={(e) => setExecutionDate(e.target.value)} />
             </div>
 
             {error && <div className="error-alert-box"><XCircle size={16}/> {error}</div>}
@@ -245,34 +224,32 @@ export default function VirementInternational() {
         {/* ÉTAPE 2 : RÉCAPITULATIF */}
         {step === 2 && (
           <div className="recap-page fade-in">
-            <h3 className="recap-title">Confirmation de l'ordre de transfert</h3>
+            <h3 className="recap-title">Vérification des données SWIFT</h3>
             <div className="recap-container">
                 <div className="info-row"><label>Bénéficiaire :</label> <span>{form.beneficiaryName}</span></div>
-                <div className="info-row"><label>IBAN :</label> <span className="mono">{form.iban}</span></div>
-                <div className="info-row"><label>BIC / SWIFT :</label> <span>{form.bic}</span></div>
                 <div className="info-row"><label>Banque :</label> <span>{form.bankName}</span></div>
-                <div className="info-row"><label>Montant :</label> <span className="heavy-amount">{form.amount} {form.currency}</span></div>
+                <div className="info-row"><label>Montant total :</label> <span className="heavy-amount">{form.amount} {form.currency}</span></div>
                 <div className="info-row"><label>Date de valeur :</label> <span>{executionDate}</span></div>
             </div>
-            <button className="btn-continue" onClick={() => setStep(3)}>Signer numériquement</button>
+            <button className="btn-continue" onClick={() => setStep(3)}>Valider l'ordre de transfert</button>
             <button className="btn-back" onClick={() => setStep(1)}>Modifier</button>
           </div>
         )}
 
-        {/* ÉTAPE 3 : PIN CODE */}
+        {/* ÉTAPE 3 : PIN */}
         {step === 3 && (
           <div className="pin-page">
             {loading ? (
               <div className="bper-loader">
                 <Loader2 size={50} className="animate-spin text-blue" />
-                <p>Validation des protocoles SWIFT...</p>
+                <p>Signature électronique en cours...</p>
               </div>
             ) : (
               <div className="pin-container">
-                <div className={`lock-header ${error ? "error-vibration" : ""}`}><Lock size={40} className={error ? "text-red" : "text-blue"} /></div>
-                <h3>Signature BPER Secure</h3>
+                <div className={`lock-header ${error ? "error-vibration" : ""}`}><Lock size={40} className="text-blue" /></div>
+                <h3>Sécurité BPER Banca</h3>
                 <div className="pin-display">
-                  {[...Array(5)].map((_, i) => (<div key={i} className={`pin-dot ${pin.length > i ? "filled" : ""} ${error ? "dot-error" : ""}`}></div>))}
+                  {[...Array(5)].map((_, i) => (<div key={i} className={`pin-dot ${pin.length > i ? "filled" : ""}`}></div>))}
                 </div>
                 <div className="numpad">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (<button key={n} onClick={() => pin.length < 5 && setPin(pin + n)}>{n}</button>))}
@@ -286,12 +263,12 @@ export default function VirementInternational() {
           </div>
         )}
 
-        {/* ÉTAPE 4 : RÉUSSITE */}
+        {/* ÉTAPE 4 : SUCCÈS */}
         {step === 4 && (
           <div className="success-page fade-in">
              <CheckCircle size={80} color="#10b981" />
-             <h2>Ordre de virement transmis</h2>
-             <p className="bper-subtitle">Votre demande est en cours de traitement. Référence : {txRef}</p>
+             <h2>Virement International Transmis</h2>
+             <p>Référence SWIFT : {txRef}</p>
              <button className="btn-home-primary" onClick={() => navigate("/dashboard")}><Home size={18} /> Retour</button>
           </div>
         )}
