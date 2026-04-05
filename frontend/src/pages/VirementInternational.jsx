@@ -147,22 +147,58 @@ export default function VirementInternational() {
             </div>
 
             <div className="bper-card-section">
-              <h3 className="section-label">BÉNÉFICIAIRE & DESTINATION</h3>
-              <input type="text" className="bper-input" placeholder="Nom complet du bénéficiaire" onChange={e => setForm({...form, beneficiaryName: e.target.value})} />
-              <input type="text" className="bper-input mono" placeholder="IBAN International" onBlur={(e) => handleIbanCheck(e.target.value)} onChange={e => setForm({...form, iban: e.target.value.toUpperCase()})} />
-              <div className="dual-input">
-                <input type="text" className="bper-input" placeholder="Code BIC / SWIFT" onChange={e => setForm({...form, bic: e.target.value.toUpperCase()})} />
-                <input type="text" className="bper-input" placeholder="Banque de destination" onChange={e => setForm({...form, bankName: e.target.value})} />
-              </div>
-              <div className="dual-input">
-                <input type="number" className="bper-input font-bold" placeholder="Montant 0.00" onChange={e => setForm({...form, amount: e.target.value})} />
-                <select className="bper-input currency-select" value={form.currency} onChange={e => setForm({...form, currency: e.target.value})}>
-                  <option value="EUR">EUR (€)</option>
-                  <option value="USD">USD ($)</option>
-                  <option value="GBP">GBP (£)</option>
-                </select>
-              </div>
-            </div>
+  <h3 className="section-label">BÉNÉFICIAIRE & DESTINATION</h3>
+  
+  <input 
+    type="text" 
+    className="bper-input" 
+    placeholder="Nom complet du bénéficiaire *" 
+    value={form.beneficiaryName}
+    onChange={e => setForm({...form, beneficiaryName: e.target.value})} 
+  />
+  
+  <input 
+    type="text" 
+    className="bper-input mono" 
+    placeholder="IBAN International *" 
+    value={form.iban}
+    onBlur={(e) => handleIbanCheck(e.target.value)} 
+    onChange={e => setForm({...form, iban: e.target.value.toUpperCase()})} 
+  />
+  
+  <div className="dual-input">
+    <input 
+      type="text" 
+      className="bper-input" 
+      placeholder="Code BIC / SWIFT *" 
+      value={form.bic}
+      onChange={e => setForm({...form, bic: e.target.value.toUpperCase()})} 
+    />
+    <input 
+      type="text" 
+      className="bper-input" 
+      placeholder="Banque de destination *" 
+      value={form.bankName}
+      onChange={e => setForm({...form, bankName: e.target.value})} 
+    />
+  </div>
+  
+  <div className="dual-input">
+    <input 
+      type="number" 
+      className="bper-input font-bold" 
+      placeholder="Montant 0.00 *" 
+      value={form.amount}
+      onChange={e => setForm({...form, amount: e.target.value})} 
+    />
+    <select className="bper-input currency-select" value={form.currency} onChange={e => setForm({...form, currency: e.target.value})}>
+      <option value="EUR">EUR (€)</option>
+      <option value="USD">USD ($)</option>
+      <option value="GBP">GBP (£)</option>
+    </select>
+  </div>
+</div>
+
 
             {/* OPTION : VIREMENT INSTANTANÉ */}
             <div className={`bper-option-box ${!isInternal ? 'disabled-opt' : ''}`}>
@@ -222,12 +258,40 @@ export default function VirementInternational() {
               />
             </div>
 
-            <input type="text" className="bper-input" placeholder="Motif du transfert" onChange={e => setForm({...form, motif: e.target.value})} />
+            <input 
+  type="text" 
+  className="bper-input" 
+  placeholder="Motif du transfert (Obligatoire) *" 
+  value={form.motif}
+  onChange={e => setForm({...form, motif: e.target.value})} 
+/>
 
-            <button className="btn-continue-bper" onClick={() => setStep(2)}>
-              Continuer <ArrowRight size={18} />
-            </button>
-            <p className="footer-step-hint">Prochaine étape : continuation</p>
+            {/* Dans le bloc {step === 1 && ( ... )} */}
+
+<button 
+  className="btn-continue-bper" 
+  onClick={() => {
+    // Vérification de tous les champs obligatoires
+    if (
+      !form.beneficiaryName || 
+      !form.iban || 
+      !form.bic || 
+      !form.bankName || 
+      !form.amount || 
+      !form.motif ||
+      form.amount <= 0
+    ) {
+      alert("⚠️ Tous les champs du formulaire sont obligatoires pour un virement international (SWIFT). Veuillez vérifier les informations du bénéficiaire, le montant et le motif.");
+      return;
+    }
+    setStep(2);
+  }}
+>
+  Continuer <ArrowRight size={18} />
+</button>
+<p className="footer-step-hint">Prochaine étape : continuation</p>
+
+            
           </div>
         )}
 
