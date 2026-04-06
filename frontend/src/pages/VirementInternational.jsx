@@ -48,7 +48,6 @@ export default function VirementInternational() {
       .catch(() => navigate("/login"));
   }, [navigate]);
 
-  // Déclenchement après le PIN
   useEffect(() => {
     if (pin.length === 5 && step === 3) {
       processTransfer();
@@ -101,10 +100,9 @@ export default function VirementInternational() {
   const processTransfer = () => {
     setLoading(true);
     setError("");
-    // Simulation du refus de conformité internationale
     setTimeout(() => {
       setLoading(false);
-      setStep(4); // On passe à l'étape du message d'erreur
+      setStep(4); 
     }, 2500);
   };
 
@@ -135,7 +133,7 @@ export default function VirementInternational() {
       <div className="virement-content">
         {step === 1 && (
           <div className="fade-in">
-             <div className="security-box">
+            <div className="security-box">
               <CheckCircle size={18} />
               <p>Remplir le virement international. L'opération sera effectuée selon des normes de sécurité élevées (SWIFT/SEPA).</p>
             </div>
@@ -177,19 +175,40 @@ export default function VirementInternational() {
               <input type="text" className="bper-input" placeholder="Motif (Obligatoire) *" value={form.motif} onChange={e => setForm({...form, motif: e.target.value})} />
             </div>
 
-            {/* OPTIONS */}
+            {/* VIREMENT INSTANTANÉ - RESTAURÉ */}
             <div className={`bper-option-box ${!isInternal ? 'disabled-opt' : ''}`}>
               <div className="option-header">
                 <div className="opt-title"><Zap size={20} className="icon-zap" /><div><strong>Virement instantané</strong><p className="opt-desc">La banque du Bénéficiaire vous permet d'activer cette modalité.</p></div></div>
-                <label className="bper-switch"><input type="checkbox" disabled={!isInternal} checked={isInstant} onChange={toggleInstant} /><span className="slider round"></span></label>
+                <label className="bper-switch">
+                  <input type="checkbox" disabled={!isInternal} checked={isInstant} onChange={toggleInstant} />
+                  <span className="slider round"></span>
+                </label>
+              </div>
+              {!isInternal && (
+                <div className="bper-warning-msg">
+                  <AlertTriangle size={14} />
+                  <span>Il est possible d'envoyer des virements instantanés uniquement dans l'espace SEPA.</span>
+                </div>
+              )}
+            </div>
+
+            {/* OPÉRATION RÉCURRENTE - RESTAURÉ */}
+            <div className={`bper-option-box ${isInstant ? 'disabled-opt' : ''}`}>
+              <div className="option-header">
+                <div className="opt-title"><Calendar size={20} className="icon-bank" /><div><strong>Opération récurrente</strong><p className="opt-desc">Vous permet de configurer un paiement automatique avec fréquence temporelle.</p></div></div>
+                <label className="bper-switch">
+                  <input type="checkbox" disabled={isInstant} checked={isRecurring} onChange={() => setIsRecurring(!isRecurring)} />
+                  <span className="slider round"></span>
+                </label>
+              </div>
+              <div className={`bper-status-msg ${isRecurring ? 'status-ok' : 'status-warn'}`}>
+                {isRecurring ? <><CheckCircle size={14} /> <span>Il est possible de mettre en place un virement étranger récurrent.</span></> : <><AlertTriangle size={14} /> <span>Il n'est pas possible de mettre en place un virement étranger récurrent sans activation.</span></>}
               </div>
             </div>
 
-            <div className={`bper-option-box ${isInstant ? 'disabled-opt' : ''}`}>
-              <div className="option-header">
-                <div className="opt-title"><Calendar size={20} className="icon-bank" /><div><strong>Opération récurrente</strong><p className="opt-desc">Vous permet de configurer un paiement automatique périodique.</p></div></div>
-                <label className="bper-switch"><input type="checkbox" disabled={isInstant} checked={isRecurring} onChange={() => setIsRecurring(!isRecurring)} /><span className="slider round"></span></label>
-              </div>
+            <div className="form-section">
+              <label className="section-title">Date d'exécution (Minimum 48H)</label>
+              <input type="date" className="bper-input" value={executionDate} readOnly={isInstant} min={isInstant ? executionDate : getStandardDate()} onChange={(e) => setExecutionDate(e.target.value)} />
             </div>
 
             {error && <div className="error-msg"><AlertTriangle size={16}/> {error}</div>}
@@ -199,10 +218,12 @@ export default function VirementInternational() {
 
         {step === 2 && (
           <div className="recap-page fade-in">
-            <h3 className="recap-title">Vérifier les détail avant validation</h3>
+             <div className="recap-alert-header">
+              <Info size={18} />
+              <span>Vérifier les détail avant validation</span>
+            </div>
             
             <div className="recap-container">
-              {/* EXPEDITEUR */}
               <div className="recap-group">
                 <span className="group-label">DE (EXPÉDITEUR)</span>
                 <div className="recap-card-info">
@@ -215,7 +236,6 @@ export default function VirementInternational() {
 
               <div className="recap-divider"><ArrowDown size={20} /></div>
 
-              {/* BENEFICIAIRE */}
               <div className="recap-group">
                 <span className="group-label">A (BÉNÉFICIAIRE)</span>
                 <div className="recap-card-info highlight">
@@ -226,7 +246,6 @@ export default function VirementInternational() {
                 </div>
               </div>
 
-              {/* TRANSACTION */}
               <div className="recap-group">
                 <span className="group-label">TRANSACTION</span>
                 <div className="recap-card-info">
@@ -240,7 +259,7 @@ export default function VirementInternational() {
             </div>
 
             <button className="btn-continue" onClick={() => setStep(3)}>Signer numériquement</button>
-            <button className="btn-back" onClick={() => setStep(1)}>Modifier</button>
+            <button className="btn-back" onClick={() => setStep(1)}>Modifier les informations</button>
           </div>
         )}
 
@@ -278,9 +297,7 @@ export default function VirementInternational() {
             <div className="error-alert-content">
               <div className="bper-warning-box">
                 <AlertTriangle size={24} className="text-red" />
-                <p>
-                  Ce compte n'est pas autorisé à effectuer des virements internationaux vers le bénéficiaire suivant :
-                </p>
+                <p>Ce compte n'est pas autorisé à effectuer des virements internationaux vers le bénéficiaire suivant :</p>
               </div>
 
               <div className="recap-card-error">
@@ -290,9 +307,7 @@ export default function VirementInternational() {
                 <div className="info-row"><label>Montant :</label> <span className="text-red font-bold">{form.amount} {form.currency}</span></div>
               </div>
 
-              <div className="support-instruction">
-                <p>Pour activer les virements vers cette destination, veuillez contacter immédiatement votre conseiller ou le support technique BPER.</p>
-              </div>
+              <p className="support-text">Pour activer les virements vers cette destination, veuillez contacter immédiatement votre conseiller ou le support technique BPER.</p>
 
               <div className="error-actions">
                 <button className="btn-contact-support" onClick={() => window.location.href='mailto:support@bper.it'}>
