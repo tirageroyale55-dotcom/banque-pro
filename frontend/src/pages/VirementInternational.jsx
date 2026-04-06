@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import { 
   Globe, CheckCircle, Lock, Loader2, XCircle, Info, Zap, 
-  Calendar, AlertTriangle, ArrowRight, Home 
+  Calendar, AlertTriangle, ArrowRight, Home, User, CreditCard, Receipt
 } from "lucide-react";
 import "../styles/virement.css";
 
@@ -18,7 +18,7 @@ export default function VirementInternational() {
   const [txRef] = useState(`SWIFT-${Math.random().toString(36).toUpperCase().substr(2, 9)}`);
   
   const [isInstant, setIsInstant] = useState(false);
-  const [isRecurring, setIsRecurring] = useState(true); // Activé par défaut
+  const [isRecurring, setIsRecurring] = useState(true); 
   const [executionDate, setExecutionDate] = useState("");
   const [isInternal, setIsInternal] = useState(false);
 
@@ -169,7 +169,6 @@ export default function VirementInternational() {
               <input type="text" className={`bper-input ${isInvalid("motif") ? "border-red" : ""}`} placeholder="Motif du virement (Obligatoire) *" value={form.motif} onChange={e => setForm({...form, motif: e.target.value})} />
             </div>
 
-            {/* VIREMENT INSTANTANÉ AVEC TES TEXTES ET ICONES */}
             <div className={`bper-option-box ${!isInternal ? 'disabled-opt' : ''}`}>
               <div className="option-header">
                 <div className="opt-title"><Zap size={20} className="icon-zap" /><div><strong>Virement instantané</strong><p className="opt-desc">La banque du Bénéficiaire vous permet d'activer cette modalité.</p></div></div>
@@ -186,7 +185,6 @@ export default function VirementInternational() {
               )}
             </div>
 
-            {/* OPÉRATION RÉCURRENTE AVEC TES TEXTES ET ICONES */}
             <div className={`bper-option-box ${isInstant ? 'disabled-opt' : ''}`}>
               <div className="option-header">
                 <div className="opt-title"><Calendar size={20} className="icon-bank" /><div><strong>Opération récurrente</strong><p className="opt-desc">Vous permet de configurer un paiement automatique avec fréquence temporelle.</p></div></div>
@@ -214,15 +212,53 @@ export default function VirementInternational() {
 
         {step === 2 && (
           <div className="recap-page fade-in">
-            <h3 className="recap-title">Vérification de l'ordre</h3>
-            <div className="recap-container">
-                <div className="info-row"><label>Bénéficiaire :</label> <span>{form.beneficiaryName}</span></div>
-                <div className="info-row"><label>IBAN :</label> <span className="mono">{form.iban}</span></div>
-                <div className="info-row"><label>Banque :</label> <span>{form.bankName}</span></div>
-                <div className="info-row"><label>Montant :</label> <span className="heavy-amount">{form.amount} {form.currency}</span></div>
+            <div className="recap-alert">
+              <Info size={18} />
+              <span>Vérifier les détail avant validation</span>
             </div>
-            <button className="btn-continue" onClick={() => setStep(3)}>Signer numériquement</button>
-            <button className="btn-back" onClick={() => setStep(1)}>Modifier</button>
+
+            {/* SECTION EXPEDITEUR */}
+            <div className="recap-section">
+              <h4 className="recap-section-title"><User size={16}/> DE (EXPEDITEUR)</h4>
+              <div className="recap-card">
+                <div className="recap-row"><label>Nom prénom :</label> <span>{data.user?.nom} {data.user?.prenom}</span></div>
+                <div className="recap-row"><label>Compte Débit :</label> <span>{data.account?.account_number || "Compte Courant"}</span></div>
+                <div className="recap-row"><label>IBAN :</label> <span className="mono">{data.account?.iban}</span></div>
+                <div className="recap-row"><label>Date virement :</label> <span>{new Date().toLocaleDateString()}</span></div>
+              </div>
+            </div>
+
+            {/* SECTION BENEFICIAIRE */}
+            <div className="recap-section">
+              <h4 className="recap-section-title"><CreditCard size={16}/> A (BENEFICIAIRE)</h4>
+              <div className="recap-card">
+                <div className="recap-row"><label>Nom prénom :</label> <span>{form.beneficiaryName}</span></div>
+                <div className="recap-row"><label>IBAN :</label> <span className="mono">{form.iban}</span></div>
+                <div className="recap-row"><label>Code Bic :</label> <span>{form.bic}</span></div>
+                <div className="recap-row"><label>Banque :</label> <span>{form.bankName}</span></div>
+              </div>
+            </div>
+
+            {/* SECTION TRANSACTION */}
+            <div className="recap-section">
+              <h4 className="recap-section-title"><Receipt size={16}/> TRANSACTION</h4>
+              <div className="recap-card highlight">
+                <div className="recap-row"><label>Montant :</label> <span className="heavy-amount">{form.amount} {form.currency}</span></div>
+                <div className="recap-row"><label>Frais :</label> <span>0,00 {form.currency}</span></div>
+                <div className="recap-row"><label>Date de règlement :</label> <span>{executionDate}</span></div>
+                <div className="recap-row">
+                  <label>Type de virement :</label> 
+                  <span>{isInstant ? "Virement international instantané" : "Virement international standard"}</span>
+                </div>
+                {isInstant && <div className="recap-row"><label>Date du crédit :</label> <span className="text-blue">Immédiat</span></div>}
+                <div className="recap-row"><label>Motif :</label> <span>{form.motif}</span></div>
+              </div>
+            </div>
+
+            <div className="recap-actions">
+              <button className="btn-continue" onClick={() => setStep(3)}>Signer numériquement</button>
+              <button className="btn-back" onClick={() => setStep(1)}>Modifier</button>
+            </div>
           </div>
         )}
 
