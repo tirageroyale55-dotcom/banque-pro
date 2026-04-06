@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import { 
   Globe, CheckCircle, Lock, Loader2, XCircle, Info, Zap, 
-  Calendar, AlertTriangle, ArrowRight, Home, ArrowDown, User, CreditCard, Receipt, HelpCircle, ShieldAlert, Headphones
+  Calendar, AlertTriangle, ArrowRight, Home, ArrowDown, User, CreditCard, Receipt, MessageCircle, HelpCircle
 } from "lucide-react";
 import "../styles/virement.css";
 
@@ -15,7 +15,6 @@ export default function VirementInternational() {
   const [pin, setPin] = useState("");
   const [loading, setLoading] = useState(false);
   const [attemptedNext, setAttemptedNext] = useState(false);
-  const [txRef] = useState(`SWIFT-${Math.random().toString(36).toUpperCase().substr(2, 9)}`);
   
   const [isInstant, setIsInstant] = useState(false);
   const [isRecurring, setIsRecurring] = useState(true); 
@@ -48,10 +47,9 @@ export default function VirementInternational() {
       .catch(() => navigate("/login"));
   }, [navigate]);
 
-  // Déclenchement après le PIN
   useEffect(() => {
     if (pin.length === 5 && step === 3) {
-      simulateFailure();
+      processTransfer();
     }
   }, [pin]);
 
@@ -87,23 +85,24 @@ export default function VirementInternational() {
     const userBalance = Number(data.account?.balance || data.balance || 0);
 
     if (!beneficiaryName || !iban || !bic || !bankName || !amount || !motif) {
-      setError("Information manquante : Tous les champs sont obligatoires pour la conformité SWIFT.");
+      setError("Information manquante : Tous les champs sont obligatoires.");
       return false;
     }
     if (Number(amount) > userBalance) {
-      setError("Solde insuffisant : Le montant du virement dépasse votre plafond disponible.");
+      setError("Solde insuffisant.");
       return false;
     }
     setError("");
     setStep(2);
   };
 
-  const simulateFailure = () => {
+  const processTransfer = async () => {
     setLoading(true);
-    // Simulation d'un temps de traitement bancaire avant l'erreur
+    setError("");
+    // Simulation du délai de vérification SWIFT avant l'échec automatique
     setTimeout(() => {
       setLoading(false);
-      setStep(4); // On passe à la page d'échec
+      setStep(4); // Passage à l'écran d'échec professionnel
     }, 3000);
   };
 
@@ -114,7 +113,6 @@ export default function VirementInternational() {
   const accNum = data.account ? data.account.accountNumber : "Compte Courant";
   const userIban = data.account ? data.account.iban : "IT60 ************ 9901";
   const displayBalance = data.account ? data.account.balance : data.balance;
-  const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   return (
     <div className="virement-wrapper">
@@ -133,7 +131,6 @@ export default function VirementInternational() {
       </header>
 
       <div className="virement-content">
-        {/* ÉTAPE 1 ET 2 : INCHANGÉES SELON TES INSTRUCTIONS */}
         {step === 1 && (
           <div className="fade-in">
             <div className="security-box">
@@ -178,6 +175,7 @@ export default function VirementInternational() {
               <input type="text" className="bper-input" placeholder="Motif (Obligatoire) *" value={form.motif} onChange={e => setForm({...form, motif: e.target.value})} />
             </div>
 
+            {/* OPTIONS */}
             <div className={`bper-option-box ${!isInternal ? 'disabled-opt' : ''}`}>
               <div className="option-header">
                 <div className="opt-title"><Zap size={20} className="icon-zap" /><div><strong>Virement instantané</strong><p className="opt-desc">La banque du Bénéficiaire vous permet d'activer cette modalité.</p></div></div>
@@ -198,67 +196,81 @@ export default function VirementInternational() {
               </div>
             </div>
 
-            {error && <div className="error-msg"><AlertCircle size={16}/> {error}</div>}
+            <div className="form-section">
+              <label className="section-title">Date d'exécution</label>
+              <input type="date" className="bper-input" value={executionDate} readOnly={isInstant} min={isInstant ? executionDate : getStandardDate()} onChange={(e) => setExecutionDate(e.target.value)} />
+            </div>
+
+            {error && <div className="error-msg"><AlertTriangle size={16}/> {error}</div>}
             <button className="btn-continue" onClick={validateStep1}>Continuer vers le récapitulatif</button>
           </div>
         )}
 
         {step === 2 && (
           <div className="recap-page fade-in">
-            <h3 className="recap-title">Vérifiez les détails avant validation</h3>
-            
+            <div className="recap-alert">
+              <Info size={18} />
+              <span>Vérifier les détail avant validation</span>
+            </div>
+
             <div className="recap-container">
+              {/* DE (EXPEDITEUR) */}
               <div className="recap-group">
-                <span className="group-label"><User size={14}/> DE (EXPÉDITEUR)</span>
+                <span className="group-label"><User size={14}/> DE (EXPEDITEUR)</span>
                 <div className="recap-card-info">
-                  <div className="info-row"><label>Nom :</label> <span>{userNom} {userPrenom}</span></div>
-                  <div className="info-row"><label>Compte Débit :</label> <span>{accNum}</span></div>
-                  <div className="info-row"><label>Date virement :</label> <span>{today}</span></div>
+                  <div className="recap-row"><label>Nom prénom :</label> <span>{userNom} {userPrenom}</span></div>
+                  <div className="recap-row"><label>Compte Débit :</label> <span>{accNum}</span></div>
+                  <div className="recap-row"><label>IBAN :</label> <span className="mono">{userIban}</span></div>
+                  <div className="recap-row"><label>Date virement :</label> <span>{new Date().toLocaleDateString()}</span></div>
                 </div>
               </div>
 
               <div className="recap-divider"><ArrowDown size={20} /></div>
 
+              {/* A (BENEFICIAIRE) */}
               <div className="recap-group">
-                <span className="group-label"><CreditCard size={14}/> À (BÉNÉFICIAIRE)</span>
+                <span className="group-label"><CreditCard size={14}/> A (BENEFICIAIRE)</span>
                 <div className="recap-card-info highlight">
-                  <div className="info-row"><label>Nom prénom :</label> <strong>{form.beneficiaryName}</strong></div>
-                  <div className="info-row"><label>IBAN :</label> <span className="mono">{form.iban}</span></div>
-                  <div className="info-row"><label>Code Bic :</label> <span>{form.bic}</span></div>
+                  <div className="recap-row"><label>Nom prénom :</label> <strong>{form.beneficiaryName}</strong></div>
+                  <div className="recap-row"><label>IBAN :</label> <span className="mono">{form.iban}</span></div>
+                  <div className="recap-row"><label>Code Bic :</label> <span>{form.bic}</span></div>
+                  <div className="recap-row"><label>Banque :</label> <span>{form.bankName}</span></div>
                 </div>
               </div>
 
+              {/* TRANSACTION */}
               <div className="recap-group">
                 <span className="group-label"><Receipt size={14}/> TRANSACTION</span>
                 <div className="recap-card-info">
-                  <div className="info-row"><label>Montant :</label> <span className="heavy-amount">{form.amount} {form.currency}</span></div>
-                  <div className="info-row"><label>Type :</label> <span>Virement international</span></div>
-                  <div className="info-row"><label>Motif :</label> <span>{form.motif}</span></div>
+                  <div className="recap-row"><label>Montant :</label> <span className="heavy-amount">{form.amount} {form.currency}</span></div>
+                  <div className="recap-row"><label>Frais :</label> <span>0,00 {form.currency}</span></div>
+                  <div className="recap-row"><label>Date de règlement :</label> <span>{executionDate}</span></div>
+                  <div className="recap-row"><label>Type de virement :</label> <span>{isInstant ? "International Instantané" : "International SWIFT"}</span></div>
+                  <div className="recap-row"><label>Motif :</label> <span>{form.motif}</span></div>
                 </div>
               </div>
             </div>
 
-            <button className="btn-continue" onClick={() => setStep(3)}>Confirmer et signer</button>
-            <button className="btn-back" onClick={() => setStep(1)}>Modifier les informations</button>
+            <div className="recap-actions">
+              <button className="btn-continue" onClick={() => setStep(3)}>Signer numériquement</button>
+              <button className="btn-back" onClick={() => setStep(1)}>Modifier</button>
+            </div>
           </div>
         )}
 
-        {/* ÉTAPE 3 : SIGNATURE PIN */}
         {step === 3 && (
           <div className="pin-page">
             {loading ? (
               <div className="bper-loader">
                 <Loader2 size={50} className="animate-spin text-blue" />
-                <p>Authentification de la transaction SWIFT...</p>
-                <small>Vérification des autorisations du compte...</small>
+                <p>Authentification de l'ordre en cours...</p>
+                <small>Contrôle de conformité SWIFT...</small>
               </div>
             ) : (
               <div className="pin-container">
-                <div className="lock-header">
-                  <Lock size={40} className="text-blue" />
-                </div>
+                <div className="lock-header"><Lock size={40} className="text-blue" /></div>
                 <h3>Signature BPER Secure</h3>
-                <p>Saisissez votre code secret pour valider l'envoi</p>
+                <p>Saisissez votre code à 5 chiffres</p>
                 <div className="pin-display">
                   {[...Array(5)].map((_, i) => (<div key={i} className={`pin-dot ${pin.length > i ? "filled" : ""}`}></div>))}
                 </div>
@@ -266,7 +278,7 @@ export default function VirementInternational() {
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (<button key={n} onClick={() => pin.length < 5 && setPin(pin + n)}>{n}</button>))}
                   <button className="btn-empty"></button>
                   <button onClick={() => pin.length < 5 && setPin(pin + "0")}>0</button>
-                  <button className="btn-delete" onClick={() => setPin(pin.slice(0, -1))}><ArrowDown size={20} style={{ transform: "rotate(90deg)" }} /></button>
+                  <button className="btn-delete" onClick={() => setPin(pin.slice(0, -1))}>X</button>
                 </div>
               </div>
             )}
@@ -276,46 +288,44 @@ export default function VirementInternational() {
         {/* ÉTAPE 4 : MESSAGE D'ÉCHEC PROFESSIONNEL */}
         {step === 4 && (
           <div className="failure-view fade-in">
-            <div className="failure-card">
-              <div className="failure-header">
-                <XCircle size={70} className="icon-failure-red" />
-                <h2 className="text-red">Transaction échouée</h2>
-              </div>
-              
-              <div className="failure-body">
-                <div className="alert-msg-professional">
-                  <ShieldAlert size={24} className="text-red" />
-                  <p>
-                    <strong>Alerte de sécurité :</strong> Ce compte n'est pas autorisé à effectuer des virements internationaux vers le destinataire suivant :
-                  </p>
-                </div>
-
-                <div className="restricted-details-box">
-                  <div className="res-row"><label>Bénéficiaire :</label> <span>{form.beneficiaryName}</span></div>
-                  <div className="res-row"><label>IBAN :</label> <span className="mono">{form.iban}</span></div>
-                  <div className="res-row"><label>Code BIC :</label> <span>{form.bic}</span></div>
-                  <div className="res-row"><label>Montant :</label> <span className="font-bold">{form.amount} {form.currency}</span></div>
-                </div>
-
-                <div className="activation-instruction">
-                  <p>Pour des raisons de conformité bancaire internationale, vous devez activer l'option <strong>"Transfert Transfrontalier Haute Sécurité"</strong> sur votre profil.</p>
-                  <p className="highlight-text">Vous pouvez l'activer immédiatement en contactant notre support technique ou votre conseiller dédié.</p>
-                </div>
-              </div>
-
-              <div className="failure-actions">
-                <button className="btn-support-contact" onClick={() => window.location.href = "mailto:support@bper.it"}>
-                  <Headphones size={20} /> Contacter le support client
-                </button>
-                <button className="btn-home-gray" onClick={() => navigate("/dashboard")}>
-                  <Home size={18} /> Retour au tableau de bord
-                </button>
-              </div>
+            <div className="status-badge-error">
+              <XCircle size={80} color="#e11d48" className="icon-error-anim" />
             </div>
             
-            <div className="error-ref-footer">
-              <small>Code erreur : ERR_SWIFT_AUTH_RESTRICTED | Réf : {txRef}</small>
+            <h2 className="text-red font-bold">Transaction échouée</h2>
+            
+            <div className="error-report-card">
+              <div className="report-header-error">
+                <AlertTriangle size={20} />
+                <span>Restriction de conformité internationale</span>
+              </div>
+              
+              <div className="report-body">
+                <p>Nous regrettons de vous informer que <strong>ce compte n'est pas autorisé</strong> à effectuer des virements internationaux vers le bénéficiaire suivant :</p>
+                
+                <div className="target-details-box">
+                  <div className="row"><label>Bénéficiaire :</label> <span>{form.beneficiaryName}</span></div>
+                  <div className="row"><label>IBAN :</label> <span className="mono">{form.iban}</span></div>
+                  <div className="row"><label>Code BIC :</label> <span>{form.bic}</span></div>
+                  <div className="row"><label>Montant :</label> <span className="font-bold">{form.amount} {form.currency}</span></div>
+                </div>
+
+                <p className="activation-hint">
+                  Pour des raisons de sécurité, les transferts vers cette zone géographique nécessitent une activation manuelle.
+                </p>
+              </div>
             </div>
+
+            <div className="failure-actions">
+              <button className="btn-support-contact" onClick={() => navigate("/support")}>
+                <MessageCircle size={18} /> Contacter le support client
+              </button>
+              <button className="btn-home-outline" onClick={() => navigate("/dashboard")}>
+                Retour à l'accueil
+              </button>
+            </div>
+            
+            <p className="footer-notice">Référence d'erreur : ERR-SWIFT-AUTH-772</p>
           </div>
         )}
       </div>
