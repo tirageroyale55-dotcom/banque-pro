@@ -175,7 +175,6 @@ export default function VirementInternational() {
               <input type="text" className="bper-input" placeholder="Motif (Obligatoire) *" value={form.motif} onChange={e => setForm({...form, motif: e.target.value})} />
             </div>
 
-            {/* VIREMENT INSTANTANÉ - RESTAURÉ */}
             <div className={`bper-option-box ${!isInternal ? 'disabled-opt' : ''}`}>
               <div className="option-header">
                 <div className="opt-title"><Zap size={20} className="icon-zap" /><div><strong>Virement instantané</strong><p className="opt-desc">La banque du Bénéficiaire vous permet d'activer cette modalité.</p></div></div>
@@ -192,7 +191,6 @@ export default function VirementInternational() {
               )}
             </div>
 
-            {/* OPÉRATION RÉCURRENTE - RESTAURÉ */}
             <div className={`bper-option-box ${isInstant ? 'disabled-opt' : ''}`}>
               <div className="option-header">
                 <div className="opt-title"><Calendar size={20} className="icon-bank" /><div><strong>Opération récurrente</strong><p className="opt-desc">Vous permet de configurer un paiement automatique avec fréquence temporelle.</p></div></div>
@@ -218,14 +216,12 @@ export default function VirementInternational() {
 
         {step === 2 && (
           <div className="recap-page fade-in">
-             <div className="recap-alert-header">
-              <Info size={18} />
-              <span>Vérifier les détail avant validation</span>
-            </div>
+            <h3 className="recap-title">Vérifiez les détails avant validation</h3>
             
             <div className="recap-container">
+              {/* EXPEDITEUR */}
               <div className="recap-group">
-                <span className="group-label">DE (EXPÉDITEUR)</span>
+                <span className="group-label"><User size={14} /> DE (EXPÉDITEUR)</span>
                 <div className="recap-card-info">
                   <div className="info-row"><label>Nom prénom :</label> <span>{userNom} {userPrenom}</span></div>
                   <div className="info-row"><label>Compte Débit :</label> <span>{accNum}</span></div>
@@ -236,8 +232,9 @@ export default function VirementInternational() {
 
               <div className="recap-divider"><ArrowDown size={20} /></div>
 
+              {/* BENEFICIAIRE */}
               <div className="recap-group">
-                <span className="group-label">A (BÉNÉFICIAIRE)</span>
+                <span className="group-label"><CreditCard size={14} /> A (BÉNÉFICIAIRE)</span>
                 <div className="recap-card-info highlight">
                   <div className="info-row"><label>Nom prénom :</label> <strong>{form.beneficiaryName}</strong></div>
                   <div className="info-row"><label>IBAN :</label> <span className="mono">{form.iban}</span></div>
@@ -246,8 +243,9 @@ export default function VirementInternational() {
                 </div>
               </div>
 
+              {/* TRANSACTION */}
               <div className="recap-group">
-                <span className="group-label">TRANSACTION</span>
+                <span className="group-label"><Receipt size={14} /> TRANSACTION</span>
                 <div className="recap-card-info">
                   <div className="info-row"><label>Montant :</label> <span className="heavy-amount">{form.amount} {form.currency}</span></div>
                   <div className="info-row"><label>Frais :</label> <span>0,00 {form.currency}</span></div>
@@ -258,7 +256,13 @@ export default function VirementInternational() {
               </div>
             </div>
 
-            <button className="btn-continue" onClick={() => setStep(3)}>Signer numériquement</button>
+            {/* MESSAGE NOTE / NB (COPIÉ DE VIREMENTFORM.JSX) */}
+            <div className="notice-box">
+              <Info size={16} />
+              <p><strong>NB:</strong> Cette transaction est soumise aux contrôles de conformité <strong>SWIFT</strong>. Veuillez bien vérifier les informations. Une fois validée, l'opération peut prendre 48h pour être traitée par le réseau intermédiaire.</p>
+            </div>
+
+            <button className="btn-continue" onClick={() => setStep(3)}>Confirmer et signer</button>
             <button className="btn-back" onClick={() => setStep(1)}>Modifier les informations</button>
           </div>
         )}
