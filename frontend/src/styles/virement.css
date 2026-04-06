@@ -778,3 +778,172 @@ input:checked + .slider:before { transform: translateX(22px); }
   color: #999;
   margin-top: 10px;
 }
+
+
+
+
+
+
+
+
+
+/* --- ÉTAPE 4 : ÉCHEC DE TRANSACTION PROFESSIONNEL --- */
+
+.error-view {
+  max-width: 550px;
+  margin: 20px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f1f1f1;
+}
+
+.error-card-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.icon-error-anim {
+  margin-bottom: 15px;
+  filter: drop-shadow(0 4px 6px rgba(225, 29, 72, 0.2));
+  animation: shake 0.5s ease-in-out;
+}
+
+.text-red {
+  color: #be123c; /* Rouge bancaire profond */
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+/* Encadré d'alerte spécifique */
+.bper-warning-box {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background-color: #fff1f2;
+  border-left: 4px solid #e11d48;
+  padding: 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.bper-warning-box p {
+  color: #9f1239;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Carte de détails du bénéficiaire rejeté */
+.recap-card-error {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.recap-card-error .info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.recap-card-error .info-row:last-child {
+  border-bottom: none;
+}
+
+.recap-card-error label {
+  color: #64748b;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.recap-card-error span {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.recap-card-error .mono {
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 1px;
+}
+
+.font-bold {
+  font-weight: 800;
+}
+
+/* Texte de support */
+.support-text {
+  color: #475569;
+  font-size: 0.9rem;
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+/* Actions */
+.error-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-contact-support {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #1e293b; /* Bleu nuit sérieux */
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-contact-support:hover {
+  background: #0f172a;
+}
+
+.btn-home-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: transparent;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-home-primary:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+/* Animation de secousse pour l'échec */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Mobile Adaptation */
+@media (max-width: 600px) {
+  .error-view {
+    margin: 10px;
+    padding: 20px;
+  }
+}
