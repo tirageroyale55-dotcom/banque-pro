@@ -947,3 +947,47 @@ input:checked + .slider:before { transform: translateX(22px); }
     padding: 20px;
   }
 }
+
+
+/* Animation de l'icône de l'étape 4 */
+.icon-error-anim {
+  display: block;
+  margin: 0 auto 20px;
+  animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Dessin de la croix interne */
+.icon-error-anim line {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  animation: drawCross 0.5s ease-out forwards 0.4s;
+}
+
+/* Pulsation d'alerte discrète en arrière-plan */
+.icon-error-anim circle {
+  animation: pulseRed 2s infinite 1s;
+  transform-origin: center;
+}
+
+@keyframes modalPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes drawCross {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes pulseRed {
+  0% { filter: drop-shadow(0 0 0px rgba(225, 29, 72, 0)); }
+  50% { filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.4)); }
+  100% { filter: drop-shadow(0 0 0px rgba(225, 29, 72, 0)); }
+}
+
+/* Style du texte d'erreur pour matcher le sérieux */
+.text-red {
+  color: #881337; /* Rouge bordeaux très pro */
+  font-family: "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 1px;
+  font-weight: 700;
+}

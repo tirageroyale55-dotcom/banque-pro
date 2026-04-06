@@ -313,40 +313,44 @@ export default function VirementInternational() {
           </div>
         )}
 
-        {/* ÉTAPE 4 : MESSAGE D'ECHEC PROFESSIONNEL */}
         {step === 4 && (
-          <div className="error-view fade-in">
-            <div className="error-card-header">
-              <XCircle size={80} color="#e11d48" className="icon-error-anim" />
-              <h2 className="text-red">Transaction échouée</h2>
-            </div>
-            
-            <div className="error-alert-content">
-              <div className="bper-warning-box">
-                <AlertTriangle size={24} className="text-red" />
-                <p>Ce compte n'est pas autorisé à effectuer des virements internationaux vers le bénéficiaire suivant :</p>
-              </div>
+  <div className="error-view fade-in">
+    <div className="error-card-header">
+      {/* L'icône Lucide avec ses propriétés de dessin */}
+      <XCircle size={90} strokeWidth={1.5} color="#be123c" className="icon-error-anim" />
+      <h2 className="text-red">Transaction Déclenchée</h2>
+    </div>
+    
+    <div className="error-alert-content">
+      <div className="bper-warning-box">
+        <AlertTriangle size={24} color="#be123c" />
+        <p>
+          <strong>Restriction de sécurité :</strong> Votre contrat actuel ne permet pas l'émission de flux internationaux vers cette destination ou ce type de compte bénéficiaire.
+        </p>
+      </div>
 
-              <div className="recap-card-error">
-                <div className="info-row"><label>Bénéficiaire :</label> <strong>{form.beneficiaryName}</strong></div>
-                <div className="info-row"><label>IBAN :</label> <span className="mono">{form.iban}</span></div>
-                <div className="info-row"><label>Code BIC :</label> <span>{form.bic}</span></div>
-                <div className="info-row"><label>Montant :</label> <span className="text-red font-bold">{form.amount} {form.currency}</span></div>
-              </div>
+      <div className="recap-card-error">
+        <div className="info-row"><label>Bénéficiaire :</label> <strong>{form.beneficiaryName}</strong></div>
+        <div className="info-row"><label>Identifiant IBAN :</label> <span className="mono">{form.iban}</span></div>
+        <div className="info-row"><label>Code SWIFT/BIC :</label> <span>{form.bic}</span></div>
+        <div className="info-row"><label>Montant débité :</label> <span className="text-red">{form.amount} {form.currency}</span></div>
+      </div>
 
-              <p className="support-text">Pour activer les virements vers cette destination, veuillez contacter immédiatement votre conseiller ou le support technique BPER.</p>
+      <p className="support-text">
+        Pour lever cette restriction ou modifier vos plafonds de transfert hors zone SEPA, veuillez contacter le service Habilitations ou votre conseiller de gestion.
+      </p>
 
-              <div className="error-actions">
-                <button className="btn-contact-support" onClick={() => window.location.href='mailto:support@bper.it'}>
-                  <PhoneCall size={18} /> Contacter le support
-                </button>
-                <button className="btn-home-primary" onClick={() => navigate("/dashboard")}>
-                  <Home size={18} /> Retour à l'accueil
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+      <div className="error-actions">
+        <button className="btn-contact-support" onClick={() => window.location.href='tel:+390594242'}>
+          <PhoneCall size={18} /> Contacter le Service Client
+        </button>
+        <button className="btn-home-primary" onClick={() => navigate("/dashboard")}>
+           Retour au tableau de bord
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </div>
     </div>
   );
