@@ -211,15 +211,15 @@ export default function VirementInternational() {
 
             {error && <div className="error-msg"><AlertTriangle size={16}/> {error}</div>}
             <button className="btn-continue" onClick={validateStep1}>Continuer vers le récapitulatif</button>
+            <p className="step-hint">Prochaine étape : Vérification des détails</p>
           </div>
         )}
 
         {step === 2 && (
           <div className="recap-page fade-in">
-            <h3 className="recap-title">Vérifiez les détails avant validation</h3>
+            <h3 className="recap-title">Vérifier les détail avant validation</h3>
             
             <div className="recap-container">
-              {/* EXPEDITEUR */}
               <div className="recap-group">
                 <span className="group-label"><User size={14} /> DE (EXPÉDITEUR)</span>
                 <div className="recap-card-info">
@@ -232,7 +232,6 @@ export default function VirementInternational() {
 
               <div className="recap-divider"><ArrowDown size={20} /></div>
 
-              {/* BENEFICIAIRE */}
               <div className="recap-group">
                 <span className="group-label"><CreditCard size={14} /> A (BÉNÉFICIAIRE)</span>
                 <div className="recap-card-info highlight">
@@ -243,7 +242,6 @@ export default function VirementInternational() {
                 </div>
               </div>
 
-              {/* TRANSACTION */}
               <div className="recap-group">
                 <span className="group-label"><Receipt size={14} /> TRANSACTION</span>
                 <div className="recap-card-info">
@@ -256,14 +254,18 @@ export default function VirementInternational() {
               </div>
             </div>
 
-            {/* MESSAGE NOTE / NB (COPIÉ DE VIREMENTFORM.JSX) */}
             <div className="notice-box">
               <Info size={16} />
-              <p><strong>NB:</strong> Cette transaction est soumise aux contrôles de conformité <strong>SWIFT</strong>. Veuillez bien vérifier les informations. Une fois validée, l'opération peut prendre 48h pour être traitée par le réseau intermédiaire.</p>
+              <p>
+                <strong>NB:</strong> {isInstant ? 
+                  "Ce transfert est configuré en mode instantané. Les fonds seront crédités immédiatement sur le compte du bénéficiaire après validation." : 
+                  "Cette transaction est soumise aux contrôles de conformité SWIFT. La date de valeur dépend des délais de traitement du réseau de compensation international."}
+              </p>
             </div>
 
             <button className="btn-continue" onClick={() => setStep(3)}>Confirmer et signer</button>
             <button className="btn-back" onClick={() => setStep(1)}>Modifier les informations</button>
+            <p className="step-hint">Dernière étape : Signature digitale (PIN)</p>
           </div>
         )}
 
@@ -278,6 +280,7 @@ export default function VirementInternational() {
               <div className="pin-container">
                 <div className="lock-header"><Lock size={40} className="text-blue" /></div>
                 <h3>Signature BPER Secure</h3>
+                <p>Saisissez votre code secret à 5 chiffres</p>
                 <div className="pin-display">
                   {[...Array(5)].map((_, i) => (<div key={i} className={`pin-dot ${pin.length > i ? "filled" : ""}`}></div>))}
                 </div>
