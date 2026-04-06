@@ -112,7 +112,6 @@ export default function VirementInternational() {
 
   if (!data) return <div className="loading-screen">Chargement du terminal de paiement...</div>;
 
-  const isInvalid = (field) => attemptedNext && !form[field];
   const userBalance = Number(data.account?.balance || data.balance || 0);
 
   return (
@@ -152,21 +151,21 @@ export default function VirementInternational() {
 
             <div className="bper-card-section">
               <h3 className="section-label">DÉTAILS DU BÉNÉFICIAIRE</h3>
-              <input type="text" className={`bper-input ${isInvalid("beneficiaryName") ? "border-red" : ""}`} placeholder="Nom du bénéficiaire *" value={form.beneficiaryName} onChange={e => setForm({...form, beneficiaryName: e.target.value})} />
-              <input type="text" className={`bper-input mono ${isInvalid("iban") ? "border-red" : ""}`} placeholder="IBAN *" value={form.iban} onChange={e => handleIbanInput(e.target.value)} />
+              <input type="text" className={`bper-input ${attemptedNext && !form.beneficiaryName ? "border-red" : ""}`} placeholder="Nom du bénéficiaire *" value={form.beneficiaryName} onChange={e => setForm({...form, beneficiaryName: e.target.value})} />
+              <input type="text" className={`bper-input mono ${attemptedNext && !form.iban ? "border-red" : ""}`} placeholder="IBAN *" value={form.iban} onChange={e => handleIbanInput(e.target.value)} />
               
               <div className="dual-input">
-                <input type="text" className={`bper-input ${isInvalid("bic") ? "border-red" : ""}`} placeholder="Code BIC / SWIFT *" value={form.bic} onChange={e => setForm({...form, bic: e.target.value.toUpperCase()})} />
-                <input type="text" className={`bper-input ${isInvalid("bankName") ? "border-red" : ""}`} placeholder="Nom de la banque *" value={form.bankName} onChange={e => setForm({...form, bankName: e.target.value})} />
+                <input type="text" className={`bper-input ${attemptedNext && !form.bic ? "border-red" : ""}`} placeholder="Code BIC / SWIFT *" value={form.bic} onChange={e => setForm({...form, bic: e.target.value.toUpperCase()})} />
+                <input type="text" className={`bper-input ${attemptedNext && !form.bankName ? "border-red" : ""}`} placeholder="Nom de la banque *" value={form.bankName} onChange={e => setForm({...form, bankName: e.target.value})} />
               </div>
               
               <div className="dual-input">
-                <input type="number" className={`bper-input font-bold ${isInvalid("amount") || Number(form.amount) > userBalance ? "border-red" : ""}`} placeholder="Montant *" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} />
+                <input type="number" className={`bper-input font-bold ${attemptedNext && ( !form.amount || Number(form.amount) > userBalance) ? "border-red" : ""}`} placeholder="Montant *" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} />
                 <select className="bper-input currency-select" value={form.currency} onChange={e => setForm({...form, currency: e.target.value})}>
                   <option>EUR</option><option>USD</option><option>GBP</option>
                 </select>
               </div>
-              <input type="text" className={`bper-input ${isInvalid("motif") ? "border-red" : ""}`} placeholder="Motif du virement (Obligatoire) *" value={form.motif} onChange={e => setForm({...form, motif: e.target.value})} />
+              <input type="text" className={`bper-input ${attemptedNext && !form.motif ? "border-red" : ""}`} placeholder="Motif du virement (Obligatoire) *" value={form.motif} onChange={e => setForm({...form, motif: e.target.value})} />
             </div>
 
             <div className={`bper-option-box ${!isInternal ? 'disabled-opt' : ''}`}>
@@ -212,52 +211,50 @@ export default function VirementInternational() {
 
         {step === 2 && (
           <div className="recap-page fade-in">
-            <div className="recap-alert">
+            <div className="bper-legal-alert">
               <Info size={18} />
-              <span>Vérifier les détail avant validation</span>
+              <p>Vérifier les détail avant validation</p>
             </div>
 
-            {/* SECTION EXPEDITEUR */}
-            <div className="recap-section">
-              <h4 className="recap-section-title"><User size={16}/> DE (EXPEDITEUR)</h4>
-              <div className="recap-card">
-                <div className="recap-row"><label>Nom prénom :</label> <span>{data.user?.nom} {data.user?.prenom}</span></div>
-                <div className="recap-row"><label>Compte Débit :</label> <span>{data.account?.account_number || "Compte Courant"}</span></div>
-                <div className="recap-row"><label>IBAN :</label> <span className="mono">{data.account?.iban}</span></div>
-                <div className="recap-row"><label>Date virement :</label> <span>{new Date().toLocaleDateString()}</span></div>
+            {/* UTILISATION DES CLASSES bper-card-section POUR L'HARMONIE */}
+            <div className="bper-card-section">
+              <h3 className="section-label"><User size={14}/> DE (EXPEDITEUR)</h3>
+              <div className="recap-list">
+                <div className="recap-item"><label>Nom prénom :</label> <span>{data.user?.nom} {data.user?.prenom}</span></div>
+                <div className="recap-item"><label>Compte Débit :</label> <span>{data.account?.account_number || "Compte Courant"}</span></div>
+                <div className="recap-item"><label>IBAN :</label> <span className="mono">{data.account?.iban}</span></div>
+                <div className="recap-item"><label>Date virement :</label> <span>{new Date().toLocaleDateString()}</span></div>
               </div>
             </div>
 
-            {/* SECTION BENEFICIAIRE */}
-            <div className="recap-section">
-              <h4 className="recap-section-title"><CreditCard size={16}/> A (BENEFICIAIRE)</h4>
-              <div className="recap-card">
-                <div className="recap-row"><label>Nom prénom :</label> <span>{form.beneficiaryName}</span></div>
-                <div className="recap-row"><label>IBAN :</label> <span className="mono">{form.iban}</span></div>
-                <div className="recap-row"><label>Code Bic :</label> <span>{form.bic}</span></div>
-                <div className="recap-row"><label>Banque :</label> <span>{form.bankName}</span></div>
+            <div className="bper-card-section">
+              <h3 className="section-label"><CreditCard size={14}/> A (BENEFICIAIRE)</h3>
+              <div className="recap-list">
+                <div className="recap-item"><label>Nom prénom :</label> <span>{form.beneficiaryName}</span></div>
+                <div className="recap-item"><label>IBAN :</label> <span className="mono">{form.iban}</span></div>
+                <div className="recap-item"><label>Code Bic :</label> <span>{form.bic}</span></div>
+                <div className="recap-item"><label>Banque :</label> <span>{form.bankName}</span></div>
               </div>
             </div>
 
-            {/* SECTION TRANSACTION */}
-            <div className="recap-section">
-              <h4 className="recap-section-title"><Receipt size={16}/> TRANSACTION</h4>
-              <div className="recap-card highlight">
-                <div className="recap-row"><label>Montant :</label> <span className="heavy-amount">{form.amount} {form.currency}</span></div>
-                <div className="recap-row"><label>Frais :</label> <span>0,00 {form.currency}</span></div>
-                <div className="recap-row"><label>Date de règlement :</label> <span>{executionDate}</span></div>
-                <div className="recap-row">
+            <div className="bper-card-section">
+              <h3 className="section-label"><Receipt size={14}/> TRANSACTION</h3>
+              <div className="recap-list highlight-recap">
+                <div className="recap-item"><label>Montant :</label> <span className="heavy-amount">{form.amount} {form.currency}</span></div>
+                <div className="recap-item"><label>Frais :</label> <span>0,00 {form.currency}</span></div>
+                <div className="recap-item"><label>Date de règlement :</label> <span>{executionDate}</span></div>
+                <div className="recap-item">
                   <label>Type de virement :</label> 
-                  <span>{isInstant ? "Virement international instantané" : "Virement international standard"}</span>
+                  <span>{isInstant ? "International instantané" : "International standard"}</span>
                 </div>
-                {isInstant && <div className="recap-row"><label>Date du crédit :</label> <span className="text-blue">Immédiat</span></div>}
-                <div className="recap-row"><label>Motif :</label> <span>{form.motif}</span></div>
+                {isInstant && <div className="recap-item"><label>Date du crédit :</label> <span className="text-blue">Immédiat</span></div>}
+                <div className="recap-item"><label>Motif :</label> <span>{form.motif}</span></div>
               </div>
             </div>
 
-            <div className="recap-actions">
-              <button className="btn-continue" onClick={() => setStep(3)}>Signer numériquement</button>
-              <button className="btn-back" onClick={() => setStep(1)}>Modifier</button>
+            <div className="recap-footer">
+                <button className="btn-continue-bper" onClick={() => setStep(3)}>Signer numériquement <Lock size={16} style={{marginLeft: '8px'}}/></button>
+                <button className="btn-back-text" onClick={() => setStep(1)}>Modifier les informations</button>
             </div>
           </div>
         )}
