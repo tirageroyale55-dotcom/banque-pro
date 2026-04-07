@@ -99,35 +99,30 @@ export default function VirementInternational() {
   setError("");
   
   try {
-    // Appel au backend
-    const response = await api("/transaction/transfer", "POST", {
-      recipientIdentifier: form.iban,
+    // ✅ On appelle "transfer-international" et non plus "transfer"
+    const response = await api("/transaction/transfer-international", "POST", {
+      iban: form.iban,
       amount: Number(form.amount),
-      label: form.motif || "Virement International", // On utilise le motif du formulaire
-      pin: pin
+      pin: pin,
+      isInstant: isInstant, // Envoie true si coché, false sinon
+      label: form.motif
     });
 
-    // Si le serveur répond avec succès (référence reçue)
     if (response && response.reference) {
-      setTxRef(response.reference); // ✅ Maintenant cette variable existe !
-      
+      setTxRef(response.reference);
       setTimeout(() => {
         setLoading(false);
-        setStep(5); // Passage à l'écran SUCCÈS (Vert)
+        setStep(5); // Succès
       }, 2000);
     }
-
   } catch (err) {
     setLoading(false);
-    
-    // Si l'IBAN n'est pas trouvé (Bénéficiaire introuvable)
-    if (err.message.includes("Bénéficiaire introuvable") || err.status === 400 || err.status === 403) {
-      setTimeout(() => {
-        setStep(4); // Passage à l'écran ÉCHEC (Rouge)
-      }, 2000);
+    // Si le serveur renvoie "Bénéficiaire non répertorié" -> Écran Rouge (Step 4)
+    if (err.message.includes("répertorié") || err.status === 403) {
+      setStep(4);
     } else {
       setPin("");
-      setError(err.message || "Erreur lors de la transaction");
+      setError(err.message || "Erreur de communication SWIFT");
     }
   }
 };

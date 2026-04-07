@@ -153,29 +153,69 @@ exports.transferMoney = async (req, res) => {
 
 
 exports.transferInternational = async (req, res) => {
-    try {
-        const { iban, amount, pin } = req.body;
-        const userId = req.user.id;
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-        // 1. Vérifier si l'IBAN existe dans la base des bénéficiaires autorisés
-        // On cherche si cet IBAN appartient à un utilisateur existant dans ta DB
-        const recipientAccount = await Account.findOne({ iban: iban });
+  try {
+    const { iban, amount, pin, isInstant, label } = req.body;
+    const userId = req.user.id;
 
-        if (!recipientAccount) {
-            // ❌ Si l'IBAN n'est pas trouvé, on renvoie l'erreur personnalisée
-            return res.status(403).json({ 
-                message: "Virement non effectué : L'IBAN destinataire n'est pas répertorié dans notre base de données sécurisée. Veuillez contacter l'administrateur BPER pour l'enregistrement du bénéficiaire." 
-            });
-        }
+    // 1. Vérification PIN
+    const user = await User.findById(userId);
+    const pinValid = await bcrypt.compare(pin.trim(), user.pinHash);
+    if (!pinValid) throw new Error("Signature électronique (PIN) incorrecte.");
 
-        // 2. Si trouvé, continuer la logique habituelle (Vérifier PIN, Solde, etc.)
-        // ... (ton code de transfert ici)
+    // 2. Identification des comptes
+    const senderAccount = await Account.findOne({ user: userId }).session(session);
+    const recipientAccount = await Account.findOne({ iban: iban }).session(session);
 
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+    // ❌ Sécurité : Si l'IBAN n'est pas dans notre base "autorisée"
+    if (!recipientAccount) {
+      throw new Error("Bénéficiaire non répertorié. La conformité SWIFT bloque ce flux international.");
     }
-}
 
+    if (senderAccount.balance < Number(amount)) throw new Error("Solde insuffisant pour couvrir le transfert et les frais.");
+
+    // 3. EXÉCUTION BANCAIRE
+    
+    // On débite TOUJOURS l'expéditeur immédiatement
+    senderAccount.balance -= Number(amount);
+    await senderAccount.save({ session });
+
+    // LOGIQUE 48H : On ne crédite le destinataire QUE si le bouton "Instantané" était coché
+    if (isInstant) {
+      recipientAccount.balance += Number(amount);
+      await recipientAccount.save({ session });
+    } else {
+      // Pour "Opération Récurrente" ou Standard -> L'argent reste en attente 48h
+      console.log("Flux International placé en attente de compensation (48h)");
+    }
+
+    // 4. HISTORIQUE
+    const status = isInstant ? "COMPLETED" : "PENDING";
+    
+    const debitEntry = new Transaction({
+      account: senderAccount._id,
+      type: "DEBIT",
+      amount: Number(amount),
+      label: `VIR. INTERNATIONALE - ${iban} (${isInstant ? 'INSTANT' : '48H'})`
+    });
+    await debitEntry.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.json({ 
+      message: isInstant ? "Transfert effectué" : "Ordre international enregistré (Exécution sous 48h)", 
+      reference: debitEntry._id 
+    });
+
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    res.status(400).json({ message: err.message });
+  }
+};
 
 
 
