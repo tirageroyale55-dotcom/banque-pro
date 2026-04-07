@@ -4,8 +4,11 @@ import { api } from "../services/api";
 
 import { 
   Globe, CheckCircle, Lock, Loader2, XCircle, Info, Zap, 
-  Calendar, AlertTriangle, ArrowRight, Home, ArrowDown, User, CreditCard, Receipt, HelpCircle, PhoneCall, Eye 
+  Calendar, AlertTriangle, ArrowRight, Home, ArrowDown, User, 
+  CreditCard, Receipt, HelpCircle, PhoneCall, 
+  Eye, Printer, Download // 👈 Vérifie que Eye, Printer et Download sont ICI
 } from "lucide-react";
+
 import "../styles/virement.css";
 
 export default function VirementInternational() {
@@ -16,10 +19,11 @@ export default function VirementInternational() {
   const [pin, setPin] = useState("");
   const [loading, setLoading] = useState(false);
   const [txRef, setTxRef] = useState(`SWIFT-${Math.random().toString(36).toUpperCase().substr(2, 9)}`);
-  
+  const [executionDate, setExecutionDate] = useState(new Date().toLocaleDateString());
+
   const [isInstant, setIsInstant] = useState(false);
   const [isRecurring, setIsRecurring] = useState(true); 
-  const [executionDate, setExecutionDate] = useState("");
+  
   const [isInternal, setIsInternal] = useState(false);
   const [showReport, setShowReport] = useState(false);
 
