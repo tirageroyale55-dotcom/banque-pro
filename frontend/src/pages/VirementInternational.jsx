@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
+
 import { 
   Globe, CheckCircle, Lock, Loader2, XCircle, Info, Zap, 
-  Calendar, AlertTriangle, ArrowRight, Home, ArrowDown, User, CreditCard, Receipt, HelpCircle, PhoneCall
+  Calendar, AlertTriangle, ArrowRight, Home, ArrowDown, User, CreditCard, Receipt, HelpCircle, PhoneCall, Eye 
 } from "lucide-react";
 import "../styles/virement.css";
 
@@ -21,7 +22,7 @@ export default function VirementInternational() {
   const [executionDate, setExecutionDate] = useState("");
   const [isInternal, setIsInternal] = useState(false);
   const [showReport, setShowReport] = useState(false);
-  
+
   const [form, setForm] = useState({
     beneficiaryName: "",
     iban: "",
