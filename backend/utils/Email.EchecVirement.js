@@ -2,14 +2,15 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   host: "smtp.zoho.com", 
-  port: 587,             // 👈 Change 465 par 587
-  secure: false,         // 👈 Change true par false (obligatoire pour le port 587)
+  port: 587,             
+  secure: false,
+  pool: true,         
   auth: {
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false // 👈 Ajoute ceci pour éviter les erreurs de certificat
+    rejectUnauthorized: false 
   }
 });
 

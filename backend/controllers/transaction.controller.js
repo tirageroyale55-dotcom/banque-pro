@@ -145,8 +145,31 @@ exports.transferMoney = async (req, res) => {
     });
 
   } catch (err) {
+    // 1. On annule la transaction en base de données
     await session.abortTransaction();
     session.endSession();
+
+    // 2. On vérifie si c'est l'erreur de bénéficiaire non répertorié
+    if (err.message.includes("répertorié") || err.status === 403) {
+      try {
+        const user = await User.findById(req.user.id);
+        
+        // ⚠️ Le mot "await" ici est la clé pour que l'envoi soit immédiat
+        await sendFailureEmail(user.email, {
+          beneficiaryName: req.body.beneficiaryName,
+          iban: req.body.iban,
+          bic: req.body.bic,
+          amount: req.body.amount,
+          currency: req.body.currency || "EUR"
+        });
+        
+        console.log("✅ Email d'échec envoyé immédiatement.");
+      } catch (emailErr) {
+        console.error("❌ Erreur lors de l'envoi de l'email:", emailErr);
+      }
+    }
+
+    // 3. On envoie la réponse au navigateur seulement APRÈS l'envoi du mail
     res.status(400).json({ message: err.message });
   }
 };
