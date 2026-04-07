@@ -952,62 +952,67 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 
 
-/* --- ANIMATION DE DESSIN INTELLIGENTE --- */
-
+/* --- ANIMATION LENTE ET DESSINÉE --- */
 .icon-drawing {
   display: block;
   margin: 0 auto 20px;
-  /* On affine le trait pour un look plus luxueux */
-  stroke-width: 1.2px; 
+  stroke-width: 1.5px;
 }
 
-/* Le cercle extérieur se dessine en premier */
+/* Le cercle : plus lent (1.5s) */
 .icon-drawing circle {
-  stroke-dasharray: 300;
-  stroke-dashoffset: 300;
-  animation: drawCircle 0.8s ease-out forwards;
+  stroke-dasharray: 315;
+  stroke-dashoffset: 315;
+  animation: drawCircle 1.5s ease-in-out forwards;
 }
 
-/* La première barre de la croix */
+/* Les barres de la croix : encore plus séquencées */
 .icon-drawing line:first-of-type {
   stroke-dasharray: 50;
   stroke-dashoffset: 50;
-  animation: drawLine 0.4s ease-out forwards 0.7s; /* Délai pour attendre le cercle */
+  animation: drawLine 0.6s ease-out forwards 1.2s;
 }
 
-/* La deuxième barre de la croix */
 .icon-drawing line:last-of-type {
   stroke-dasharray: 50;
   stroke-dashoffset: 50;
-  animation: drawLine 0.4s ease-out forwards 1s; /* Délai pour un effet séquentiel */
+  animation: drawLine 0.6s ease-out forwards 1.6s;
 }
 
-/* Keyframes pour le cercle */
-@keyframes drawCircle {
-  to {
-    stroke-dashoffset: 0;
+@keyframes drawCircle { to { stroke-dashoffset: 0; } }
+@keyframes drawLine { to { stroke-dashoffset: 0; } }
+
+/* --- FIX DÉBORDEMENT IBAN --- */
+.recap-card-error {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 25px;
+  width: 100%; /* S'assure de ne pas dépasser le parent */
+  box-sizing: border-box;
+}
+
+.recap-card-error .info-row {
+  display: flex;
+  flex-direction: column; /* On passe en colonne sur mobile pour éviter le débordement */
+  gap: 4px;
+  padding: 10px 0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.recap-card-error .mono {
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  color: #1e293b;
+  word-break: break-all; /* SOLUTION : Force l'IBAN à rester dans le cadre */
+  white-space: normal;
+}
+
+@media (min-width: 480px) {
+  .recap-card-error .info-row {
+    flex-direction: row; /* Repasse en ligne sur écran plus large */
+    justify-content: space-between;
+    align-items: center;
   }
-}
-
-/* Keyframes pour les lignes */
-@keyframes drawLine {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-/* Un léger tremblement final de "rejet" une fois le dessin fini */
-.icon-drawing {
-  animation: finalShake 0.4s ease-in-out forwards 1.4s;
-}
-
-@keyframes finalShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-3px); }
-  75% { transform: translateX(3px); }
-}
-
-/* Halo de sécurité rouge bordeaux */
-.icon-drawing {
-  filter: drop-shadow(0 0 8px rgba(184, 18, 60, 0.1));
 }

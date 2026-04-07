@@ -316,40 +316,49 @@ export default function VirementInternational() {
         {step === 4 && (
   <div className="error-view fade-in">
     <div className="error-card-header">
-      {/* L'icône se dessine toute seule grâce au CSS ci-dessus */}
       <XCircle 
-        size={100} 
+        size={90} 
         color="#be123c" 
         className="icon-drawing" 
       />
-      <h2 className="text-red">Transaction Non Aboutie</h2>
+      <h2 className="text-red">Transaction échouée</h2>
     </div>
     
     <div className="error-alert-content">
       <div className="bper-warning-box">
-        <AlertTriangle size={24} color="#be123c" />
-        <p>
-          <strong>Alerte de Conformité :</strong> Le système de sécurisation des flux sortants (Protocole SWIFT-G) a suspendu ce virement pour motif de : <u>Destination Non Répertoriée</u>.
-        </p>
+        <AlertTriangle size={24} className="text-red" />
+        <p>Ce compte n'est pas autorisé à effectuer des virements internationaux vers le bénéficiaire suivant :</p>
       </div>
 
       <div className="recap-card-error">
-        <div className="info-row"><label>BÉNÉFICIAIRE :</label> <strong>{form.beneficiaryName}</strong></div>
-        <div className="info-row"><label>IBAN DESTINATION :</label> <span className="mono">{form.iban}</span></div>
-        <div className="info-row"><label>BIC/SWIFT :</label> <span>{form.bic}</span></div>
-        <div className="info-row"><label>MONTANT TOTAL :</label> <span className="text-red font-bold">{form.amount} {form.currency}</span></div>
+        <div className="info-row">
+          <label>Bénéficiaire :</label> 
+          <span>{form.beneficiaryName}</span>
+        </div>
+        <div className="info-row">
+          <label>IBAN :</label> 
+          <span className="mono">{form.iban}</span>
+        </div>
+        <div className="info-row">
+          <label>Code BIC :</label> 
+          <span>{form.bic}</span>
+        </div>
+        <div className="info-row">
+          <label>Montant :</label> 
+          <span className="text-red font-bold">{form.amount} {form.currency}</span>
+        </div>
       </div>
 
       <p className="support-text">
-        Votre conseiller clientèle a été notifié de ce rejet. Pour valider manuellement ce compte bénéficiaire, une vérification d'identité supplémentaire est requise.
+        Pour activer les virements vers cette destination, veuillez contacter immédiatement votre conseiller ou le support technique BPER.
       </p>
 
       <div className="error-actions">
-        <button className="btn-contact-support" onClick={() => window.location.href='tel:+390594242'}>
-          <PhoneCall size={18} /> Joindre le service Habilitations
+        <button className="btn-contact-support" onClick={() => window.location.href='mailto:support@bper.it'}>
+          <PhoneCall size={18} /> Contacter le support
         </button>
         <button className="btn-home-primary" onClick={() => navigate("/dashboard")}>
-          Quitter l'espace de virement
+          <Home size={18} /> Retour à l'accueil
         </button>
       </div>
     </div>
