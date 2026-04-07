@@ -1073,3 +1073,45 @@ input:checked + .slider:before { transform: translateX(22px); }
   display: block;
   width: 100%;
 }
+
+
+
+
+/* --- FIX CHAMP DATE DÉBORDEMENT --- */
+
+.form-section .bper-input[type="date"] {
+  width: 100%; /* S'assure qu'il ne dépasse jamais son parent */
+  max-width: 100%;
+  box-sizing: border-box; /* Inclut le padding dans la largeur */
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  background-color: #ffffff;
+  appearance: none; /* Supprime le style système */
+  -webkit-appearance: none;
+  display: block;
+}
+
+/* Force l'affichage correct sur mobile */
+@media (max-width: 480px) {
+  .form-section .bper-input[type="date"] {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+}
+
+/* Optionnel : Styliser l'icône du calendrier interne pour qu'elle soit propre */
+.bper-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.4); /* Gris pro */
+}
+
+/* Si le cadre parent est trop étroit, on s'assure qu'il est en flex-column */
+.form-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 20px;
+}
