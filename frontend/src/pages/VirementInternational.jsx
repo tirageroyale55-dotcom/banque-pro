@@ -102,26 +102,36 @@ export default function VirementInternational() {
   const personalId = userStorage?.personalId;
 
   try {
-    // 1. Vérification du PIN
+    // 1. Vérification du PIN (ton login actuel)
     await api("/auth/login", "POST", { personalId, pin });
     
-    // 2. Vérification de l'IBAN dans la base de données
-    // On suppose que ton API a un endpoint pour vérifier les bénéficiaires
-    const checkBeneficiary = await api(`/client/check-iban?iban=${form.iban}`);
+    // 2. Vérification de l'IBAN via la route existante
+    // Note : On utilise /transaction/check-recipient car c'est défini dans tes routes
+    // On passe l'IBAN comme paramètre 'accountNumber' car ton contrôleur cherche via $or
+    const checkRes = await api(`/transaction/check-recipient?accountNumber=${form.iban}`);
 
     setTimeout(() => {
       setLoading(false);
-      if (checkBeneficiary.isAuthorized) {
-        setStep(5); // ÉTAPE DE SUCCÈS
+      // Si checkRes existe et n'est pas une erreur, c'est que l'IBAN est en base
+      if (checkRes && checkRes.iban) {
+        setStep(5); // SUCCÈS
       } else {
-        setStep(4); // ÉTAPE D'ÉCHEC (CONFORMITÉ)
+        setStep(4); // ÉCHEC PRO
       }
     }, 2000);
 
   } catch (err) {
     setLoading(false);
-    setPin("");
-    setError(err.message || "Code PIN incorrect");
+    // Si l'erreur est 404 (Introuvable), c'est que l'IBAN n'est pas en base -> Échec Pro
+    if (err.status === 404) {
+      setTimeout(() => {
+        setLoading(false);
+        setStep(4); 
+      }, 2000);
+    } else {
+      setPin("");
+      setError(err.message || "Code PIN incorrect");
+    }
   }
 };
 
