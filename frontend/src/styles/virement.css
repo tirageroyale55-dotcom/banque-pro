@@ -1115,3 +1115,65 @@ input:checked + .slider:before { transform: translateX(22px); }
   width: 100%;
   margin-bottom: 20px;
 }
+
+
+
+
+
+
+
+/* --- ÉTAPE 5 : SUCCÈS --- */
+.text-green {
+  color: #059669;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.bper-success-box {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background-color: #ecfdf5;
+  border-left: 4px solid #10b981;
+  padding: 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.bper-success-box p {
+  color: #065f46;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.recap-card-success {
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+/* Animation de l'icône de succès (Dessin + Rebond) */
+.icon-success-anim {
+  display: block;
+  margin: 0 auto 20px;
+  animation: successPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes successPop {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.btn-download-pdf {
+  background: transparent;
+  color: #059669;
+  border: 1px solid #059669;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}

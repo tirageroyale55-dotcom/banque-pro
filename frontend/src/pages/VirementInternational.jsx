@@ -95,29 +95,35 @@ export default function VirementInternational() {
 
   // VERIFICATION DU PIN VIA API AUTH
   const verifyPinAndProcess = async () => {
-    setLoading(true);
-    setError("");
+  setLoading(true);
+  setError("");
+  
+  const userStorage = JSON.parse(localStorage.getItem("user"));
+  const personalId = userStorage?.personalId;
+
+  try {
+    // 1. Vérification du PIN
+    await api("/auth/login", "POST", { personalId, pin });
     
-    // On récupère l'ID perso stocké lors du login pour vérifier le PIN
-    const userStorage = JSON.parse(localStorage.getItem("user"));
-    const personalId = userStorage?.personalId;
+    // 2. Vérification de l'IBAN dans la base de données
+    // On suppose que ton API a un endpoint pour vérifier les bénéficiaires
+    const checkBeneficiary = await api(`/client/check-iban?iban=${form.iban}`);
 
-    try {
-      // Appel à ton API de login pour vérifier si le PIN est correct
-      await api("/auth/login", "POST", { personalId, pin });
-      
-      // Si l'appel réussit (PIN correct), on simule le délai bancaire puis l'erreur de conformité
-      setTimeout(() => {
-        setLoading(false);
-        setStep(4); 
-      }, 2000);
-
-    } catch (err) {
+    setTimeout(() => {
       setLoading(false);
-      setPin(""); // On vide le PIN
-      setError(err.message || "Code PIN incorrect"); // On affiche l'erreur
-    }
-  };
+      if (checkBeneficiary.isAuthorized) {
+        setStep(5); // ÉTAPE DE SUCCÈS
+      } else {
+        setStep(4); // ÉTAPE D'ÉCHEC (CONFORMITÉ)
+      }
+    }, 2000);
+
+  } catch (err) {
+    setLoading(false);
+    setPin("");
+    setError(err.message || "Code PIN incorrect");
+  }
+};
 
   if (!data) return <div className="loading-screen">Chargement sécurisé...</div>;
 
@@ -217,7 +223,7 @@ export default function VirementInternational() {
             </div>
 
             <div className="form-section">
-              <label className="section-title">Date d'exécution (Minimum 48H)</label>
+              <label className="section-title">Date d'exécution </label>
               <input type="date" className="bper-input" value={executionDate} readOnly={isInstant} min={isInstant ? executionDate : getStandardDate()} onChange={(e) => setExecutionDate(e.target.value)} />
             </div>
 
@@ -359,6 +365,39 @@ export default function VirementInternational() {
         </button>
         <button className="btn-home-primary" onClick={() => navigate("/dashboard")}>
           <Home size={18} /> Retour à l'accueil
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+{step === 5 && (
+  <div className="success-view fade-in">
+    <div className="success-card-header">
+      <CheckCircle size={90} color="#10b981" className="icon-success-anim" />
+      <h2 className="text-green">Transaction Confirmée</h2>
+    </div>
+    
+    <div className="success-alert-content">
+      <div className="bper-success-box">
+        <CheckCircle size={24} color="#10b981" />
+        <p>Votre ordre de virement international a été enregistré avec succès et transmis au réseau de compensation.</p>
+      </div>
+
+      <div className="recap-card-success">
+        <div className="info-row"><label>Référence :</label> <span>{txRef}</span></div>
+        <div className="info-row"><label>Bénéficiaire :</label> <strong>{form.beneficiaryName}</strong></div>
+        <div className="info-row"><label>Montant :</label> <span className="text-green font-bold">{form.amount} {form.currency}</span></div>
+        <div className="info-row"><label>Date d'exécution :</label> <span>{executionDate}</span></div>
+      </div>
+
+      <div className="success-actions">
+        <button className="btn-home-primary" onClick={() => navigate("/dashboard")}>
+           <Home size={18} /> Retour au tableau de bord
+        </button>
+        <button className="btn-download-pdf" onClick={() => window.print()}>
+           Télécharger le justificatif (PDF)
         </button>
       </div>
     </div>
