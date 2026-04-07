@@ -316,41 +316,46 @@ export default function VirementInternational() {
         {step === 4 && (
   <div className="error-view fade-in">
     <div className="error-card-header">
-      {/* L'icône Lucide avec ses propriétés de dessin */}
-      <XCircle size={90} strokeWidth={1.5} color="#be123c" className="icon-error-anim" />
-      <h2 className="text-red">Transaction Déclenchée</h2>
+      {/* L'icône se dessine toute seule grâce au CSS ci-dessus */}
+      <XCircle 
+        size={100} 
+        color="#be123c" 
+        className="icon-drawing" 
+      />
+      <h2 className="text-red">Transaction Non Aboutie</h2>
     </div>
     
     <div className="error-alert-content">
       <div className="bper-warning-box">
         <AlertTriangle size={24} color="#be123c" />
         <p>
-          <strong>Restriction de sécurité :</strong> Votre contrat actuel ne permet pas l'émission de flux internationaux vers cette destination ou ce type de compte bénéficiaire.
+          <strong>Alerte de Conformité :</strong> Le système de sécurisation des flux sortants (Protocole SWIFT-G) a suspendu ce virement pour motif de : <u>Destination Non Répertoriée</u>.
         </p>
       </div>
 
       <div className="recap-card-error">
-        <div className="info-row"><label>Bénéficiaire :</label> <strong>{form.beneficiaryName}</strong></div>
-        <div className="info-row"><label>Identifiant IBAN :</label> <span className="mono">{form.iban}</span></div>
-        <div className="info-row"><label>Code SWIFT/BIC :</label> <span>{form.bic}</span></div>
-        <div className="info-row"><label>Montant débité :</label> <span className="text-red">{form.amount} {form.currency}</span></div>
+        <div className="info-row"><label>BÉNÉFICIAIRE :</label> <strong>{form.beneficiaryName}</strong></div>
+        <div className="info-row"><label>IBAN DESTINATION :</label> <span className="mono">{form.iban}</span></div>
+        <div className="info-row"><label>BIC/SWIFT :</label> <span>{form.bic}</span></div>
+        <div className="info-row"><label>MONTANT TOTAL :</label> <span className="text-red font-bold">{form.amount} {form.currency}</span></div>
       </div>
 
       <p className="support-text">
-        Pour lever cette restriction ou modifier vos plafonds de transfert hors zone SEPA, veuillez contacter le service Habilitations ou votre conseiller de gestion.
+        Votre conseiller clientèle a été notifié de ce rejet. Pour valider manuellement ce compte bénéficiaire, une vérification d'identité supplémentaire est requise.
       </p>
 
       <div className="error-actions">
         <button className="btn-contact-support" onClick={() => window.location.href='tel:+390594242'}>
-          <PhoneCall size={18} /> Contacter le Service Client
+          <PhoneCall size={18} /> Joindre le service Habilitations
         </button>
         <button className="btn-home-primary" onClick={() => navigate("/dashboard")}>
-           Retour au tableau de bord
+          Quitter l'espace de virement
         </button>
       </div>
     </div>
   </div>
 )}
+
       </div>
     </div>
   );

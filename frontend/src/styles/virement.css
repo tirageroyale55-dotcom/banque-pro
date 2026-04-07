@@ -949,45 +949,65 @@ input:checked + .slider:before { transform: translateX(22px); }
 }
 
 
-/* Animation de l'icône de l'étape 4 */
-.icon-error-anim {
+
+
+
+/* --- ANIMATION DE DESSIN INTELLIGENTE --- */
+
+.icon-drawing {
   display: block;
   margin: 0 auto 20px;
-  animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  /* On affine le trait pour un look plus luxueux */
+  stroke-width: 1.2px; 
 }
 
-/* Dessin de la croix interne */
-.icon-error-anim line {
-  stroke-dasharray: 20;
-  stroke-dashoffset: 20;
-  animation: drawCross 0.5s ease-out forwards 0.4s;
+/* Le cercle extérieur se dessine en premier */
+.icon-drawing circle {
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: drawCircle 0.8s ease-out forwards;
 }
 
-/* Pulsation d'alerte discrète en arrière-plan */
-.icon-error-anim circle {
-  animation: pulseRed 2s infinite 1s;
-  transform-origin: center;
+/* La première barre de la croix */
+.icon-drawing line:first-of-type {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: drawLine 0.4s ease-out forwards 0.7s; /* Délai pour attendre le cercle */
 }
 
-@keyframes modalPop {
-  0% { transform: scale(0.5); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+/* La deuxième barre de la croix */
+.icon-drawing line:last-of-type {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: drawLine 0.4s ease-out forwards 1s; /* Délai pour un effet séquentiel */
 }
 
-@keyframes drawCross {
-  to { stroke-dashoffset: 0; }
+/* Keyframes pour le cercle */
+@keyframes drawCircle {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
-@keyframes pulseRed {
-  0% { filter: drop-shadow(0 0 0px rgba(225, 29, 72, 0)); }
-  50% { filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.4)); }
-  100% { filter: drop-shadow(0 0 0px rgba(225, 29, 72, 0)); }
+/* Keyframes pour les lignes */
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
-/* Style du texte d'erreur pour matcher le sérieux */
-.text-red {
-  color: #881337; /* Rouge bordeaux très pro */
-  font-family: "Segoe UI", Roboto, sans-serif;
-  letter-spacing: 1px;
-  font-weight: 700;
+/* Un léger tremblement final de "rejet" une fois le dessin fini */
+.icon-drawing {
+  animation: finalShake 0.4s ease-in-out forwards 1.4s;
+}
+
+@keyframes finalShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+/* Halo de sécurité rouge bordeaux */
+.icon-drawing {
+  filter: drop-shadow(0 0 8px rgba(184, 18, 60, 0.1));
 }
