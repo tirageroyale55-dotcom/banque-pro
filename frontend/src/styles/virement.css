@@ -1016,3 +1016,60 @@ input:checked + .slider:before { transform: translateX(22px); }
     align-items: center;
   }
 }
+
+/* --- ANIMATION DE DESSIN + PULSATION --- */
+.icon-drawing {
+  display: block;
+  margin: 0 auto 20px;
+  stroke-width: 1.5px;
+  /* On applique la pulsation globale à l'icône une fois dessinée */
+  animation: pulseScale 2s ease-in-out infinite 2.2s; 
+}
+
+/* Le cercle : dessiné en 1.5s */
+.icon-drawing circle {
+  stroke-dasharray: 315;
+  stroke-dashoffset: 315;
+  animation: drawCircle 1.5s ease-in-out forwards;
+}
+
+/* La croix : dessinée branche par branche */
+.icon-drawing line:first-of-type {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: drawLine 0.6s ease-out forwards 1.2s;
+}
+
+.icon-drawing line:last-of-type {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: drawLine 0.6s ease-out forwards 1.6s;
+}
+
+/* --- KEYFRAMES --- */
+
+@keyframes drawCircle { to { stroke-dashoffset: 0; } }
+@keyframes drawLine { to { stroke-dashoffset: 0; } }
+
+/* L'effet "Grand / Petit" (Pulsation) */
+@keyframes pulseScale {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0px rgba(190, 18, 60, 0));
+  }
+  50% {
+    transform: scale(1.1); /* S'agrandit légèrement */
+    filter: drop-shadow(0 0 15px rgba(190, 18, 60, 0.4)); /* Halo rouge */
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0px rgba(190, 18, 60, 0));
+  }
+}
+
+/* --- CORRECTIF DÉBORDEMENT (Rappel) --- */
+.recap-card-error .mono {
+  word-break: break-all;
+  display: block;
+  width: 100%;
+}
