@@ -98,39 +98,37 @@ export default function VirementInternational() {
   setLoading(true);
   setError("");
   
-  const userStorage = JSON.parse(localStorage.getItem("user"));
-  const personalId = userStorage?.personalId;
-
   try {
-    // 1. Vérification du PIN (ton login actuel)
-    await api("/auth/login", "POST", { personalId, pin });
-    
-    // 2. Vérification de l'IBAN via la route existante
-    // Note : On utilise /transaction/check-recipient car c'est défini dans tes routes
-    // On passe l'IBAN comme paramètre 'accountNumber' car ton contrôleur cherche via $or
-    const checkRes = await api(`/transaction/check-recipient?accountNumber=${form.iban}`);
+    // 1. Appel au backend pour le virement réel
+    // On utilise la route /transaction/transfer que tu as déjà dans ton transaction.routes.js
+    const response = await api("/transaction/transfer", "POST", {
+      recipientIdentifier: form.iban, // L'IBAN du destinataire
+      amount: Number(form.amount),    // Le montant
+      label: "Virement International", // Le motif
+      pin: pin                        // Le PIN pour la sécurité côté serveur
+    });
 
-    setTimeout(() => {
-      setLoading(false);
-      // Si checkRes existe et n'est pas une erreur, c'est que l'IBAN est en base
-      if (checkRes && checkRes.iban) {
-        setStep(5); // SUCCÈS
-      } else {
-        setStep(4); // ÉCHEC PRO
-      }
-    }, 2000);
+    // 2. Si le serveur répond avec succès
+    if (response && response.reference) {
+      setTxRef(response.reference); // On stocke la référence reçue
+      setTimeout(() => {
+        setLoading(false);
+        setStep(5); // On affiche l'écran de SUCCÈS (Icône verte)
+      }, 2000);
+    }
 
   } catch (err) {
     setLoading(false);
-    // Si l'erreur est 404 (Introuvable), c'est que l'IBAN n'est pas en base -> Échec Pro
-    if (err.status === 404) {
+    
+    // 3. Gestion de l'échec (Si l'IBAN n'est pas en base ou restriction)
+    // Ton contrôleur renvoie une erreur si le bénéficiaire est introuvable
+    if (err.message.includes("Bénéficiaire introuvable") || err.status === 400) {
       setTimeout(() => {
-        setLoading(false);
-        setStep(4); 
+        setStep(4); // On affiche l'écran d'ÉCHEC PRO (Icône rouge animée)
       }, 2000);
     } else {
       setPin("");
-      setError(err.message || "Code PIN incorrect");
+      setError(err.message || "Erreur lors de la transaction");
     }
   }
 };
