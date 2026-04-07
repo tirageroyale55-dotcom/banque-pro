@@ -192,10 +192,13 @@ exports.checkRecipient = async (req, res) => {
     }
 
     // Recherche flexible (String ou Number)
+    const cleanVal = accountNumber.trim();
+
+    // ✅ RECHERCHE ÉLARGIE : On ajoute l'IBAN à la liste des possibilités
     const account = await Account.findOne({
       $or: [
-        { accountNumber: accountNumber.trim() },
-        { accountNumber: Number(accountNumber.trim()) }
+        { accountNumber: cleanVal }, // Garde la compatibilité avec tes anciens fichiers
+        { iban: cleanVal }          // Ajoute la compatibilité pour ton virement international
       ]
     });
 
