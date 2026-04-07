@@ -383,6 +383,7 @@ export default function VirementInternational() {
 {step === 5 && (
   <div className={`success-view fade-in ${showReport ? 'viewing-report' : ''}`}>
     {!showReport ? (
+      /* --- VUE SUCCÈS (Bouton Pro Bleu) --- */
       <div className="success-confirmation">
         <div className="success-card-header">
           <CheckCircle size={90} color="#10b981" className="icon-success-anim" />
@@ -392,17 +393,17 @@ export default function VirementInternational() {
         <div className="success-alert-content">
           <div className="bper-success-box">
             <CheckCircle size={24} color="#10b981" />
-            <p>Votre ordre de virement international a été enregistré avec succès.</p>
+            <p>Votre ordre de virement international a été enregistré avec succès et transmis au réseau de compensation.</p>
           </div>
 
           <div className="recap-card-success">
             <div className="info-row"><label>Référence :</label> <span>{txRef}</span></div>
             <div className="info-row"><label>Bénéficiaire :</label> <strong>{form.beneficiaryName}</strong></div>
             <div className="info-row"><label>Montant :</label> <span className="text-green font-bold">{form.amount} {form.currency}</span></div>
+            <div className="info-row"><label>Date d'exécution :</label> <span>{executionDate}</span></div>
           </div>
 
           <div className="success-actions" style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '25px' }}>
-            {/* BOUTON AVEC COULEUR PRO BPER (BLEU FONCÉ) */}
             <button 
               className="btn-view-report" 
               onClick={() => setShowReport(true)} 
@@ -410,12 +411,11 @@ export default function VirementInternational() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', 
                 padding: '14px', backgroundColor: '#003366', color: '#ffffff', 
                 border: 'none', borderRadius: '10px', cursor: 'pointer', 
-                fontWeight: '600', fontSize: '15px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' 
+                fontWeight: '600', fontSize: '15px' 
               }}
             >
               <Eye size={20} /> Voir le rapport complet
             </button>
-            
             <button className="btn-home-primary" onClick={() => navigate("/dashboard")}>
                <Home size={18} /> Retour au tableau de bord
             </button>
@@ -423,43 +423,67 @@ export default function VirementInternational() {
         </div>
       </div>
     ) : (
-      <div className="bper-official-report fade-in" id="report-to-print">
+      /* --- VUE RAPPORT OFFICIEL COMPLET --- */
+      <div className="bper-official-report fade-in">
         <div className="report-header">
-            <img src="/logo-bper.png" alt="BPER" className="report-logo" style={{height: '40px'}} />
+          <img src="/logo-bper.png" alt="BPER" className="report-logo" style={{height: '40px'}} />
           <div className="report-meta">
-            <h3 style={{ color: '#003366', marginBottom: '5px' }}>AVIS D'EXÉCUTION</h3>
+            <h3 style={{ color: '#003366', marginBottom: '5px' }}>AVIS D'EXÉCUTION DE VIREMENT</h3>
             <p style={{ fontSize: '14px', color: '#666' }}>Référence : {txRef}</p>
           </div>
         </div>
 
         <div className="report-greeting" style={{ margin: '20px 0', fontSize: '14px' }}>
           <p>Cher client(e) <strong>{userNom} {userPrenom}</strong>,</p>
-          <p>Confirmation d'exécution de virement international.</p>
+          <p>Nous vous confirmons l'exécution de l'opération internationale effectuée ce jour via nos services digitaux.</p>
         </div>
 
         <div className="report-sections">
-          <div className="report-block" style={{ marginBottom: '15px', padding: '12px', border: '1px solid #eee' }}>
-            <h4 style={{ fontSize: '12px', color: '#003366', borderBottom: '1px solid #eee', paddingBottom: '5px' }}>DÉTAILS BÉNÉFICIAIRE</h4>
-            <div style={{ fontSize: '13px', lineHeight: '1.6' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Nom :</span> <strong>{form.beneficiaryName}</strong></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>IBAN :</span> <span className="mono">{form.iban}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Montant :</span> <strong>{form.amount} {form.currency}</strong></div>
+          {/* TOUTES LES SECTIONS SONT ICI MAINTENANT */}
+          <div className="report-block" style={{ marginBottom: '20px', padding: '15px', border: '1px solid #eee' }}>
+            <h4 style={{ fontSize: '13px', color: '#003366', borderBottom: '1px solid #eee', marginBottom: '10px' }}>DONNEUR D'ORDRE</h4>
+            <div style={{ fontSize: '13px', lineHeight: '1.8' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span className="lbl">Nom :</span> <span>{userNom} {userPrenom}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span className="lbl">Compte N° :</span> <span>{accNum}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span className="lbl">IBAN :</span> <span className="mono">{userIban}</span></div>
+            </div>
+          </div>
+
+          <div className="report-block" style={{ marginBottom: '20px', padding: '15px', border: '1px solid #eee' }}>
+            <h4 style={{ fontSize: '13px', color: '#003366', borderBottom: '1px solid #eee', marginBottom: '10px' }}>BÉNÉFICIAIRE INTERNATIONAL</h4>
+            <div style={{ fontSize: '13px', lineHeight: '1.8' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span className="lbl">Nom :</span> <span>{form.beneficiaryName}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span className="lbl">Banque :</span> <span>{form.bankName}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span className="lbl">IBAN :</span> <span className="mono">{form.iban}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span className="lbl">Code BIC :</span> <span>{form.bic}</span></div>
+            </div>
+          </div>
+
+          <div className="report-block" style={{ marginBottom: '20px', padding: '15px', border: '1px solid #eee', backgroundColor: '#f9fafb' }}>
+            <h4 style={{ fontSize: '13px', color: '#003366', borderBottom: '1px solid #eee', marginBottom: '10px' }}>DÉTAILS DE LA TRANSACTION</h4>
+            <div style={{ fontSize: '13px', lineHeight: '1.8' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Date de l'opération :</span> <span>{new Date().toLocaleDateString()}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Date d'exécution :</span> <span>{executionDate}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Montant :</span> <span>{form.amount} {form.currency}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}><span>Statut :</span> <span style={{ color: '#10b981' }}>{isInstant ? 'Exécuté' : 'En attente (48h)'}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Motif :</span> <span>{form.motif || "Virement international"}</span></div>
             </div>
           </div>
         </div>
 
+        <div className="report-footer-note" style={{ fontSize: '11px', color: '#999', textAlign: 'center', marginTop: '20px' }}>
+          <p>Document généré électroniquement. Ce document constitue une preuve de la transmission de l'ordre de virement international.</p>
+        </div>
+
         <div className="report-actions-footer no-print" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '20px' }}>
-          {/* ACTION IMPRIMER */}
           <button className="btn-print" onClick={() => window.print()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', background: '#003366', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
             <Printer size={18} /> Imprimer
           </button>
-          
-          {/* ACTION TÉLÉCHARGER (DÉCLENCHE L'IMPRESSION POUR SAUVEGARDER EN PDF) */}
-          <button className="btn-download" onClick={() => window.print()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', background: '#004a99', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+          {/* LE BOUTON PDF DÉCLENCHE L'IMPRESSION (QUI PERMET DE SAUVEGARDER EN PDF) */}
+          <button className="btn-download" onClick={() => window.print()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', background: '#003366', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
             <Download size={18} /> PDF
           </button>
-          
-          <button className="btn-close-report" onClick={() => setShowReport(false)} style={{ gridColumn: 'span 2', padding: '12px', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+          <button className="btn-close-report" onClick={() => setShowReport(false)} style={{ gridColumn: 'span 2', padding: '12px', background: '#f3f4f6', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
             Fermer le rapport
           </button>
         </div>
@@ -467,7 +491,6 @@ export default function VirementInternational() {
     )}
   </div>
 )}
-
   </div>
     </div>
   );
