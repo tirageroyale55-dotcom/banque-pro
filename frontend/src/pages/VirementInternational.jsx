@@ -14,7 +14,7 @@ export default function VirementInternational() {
   const [error, setError] = useState("");
   const [pin, setPin] = useState("");
   const [loading, setLoading] = useState(false);
-  const [txRef] = useState(`SWIFT-${Math.random().toString(36).toUpperCase().substr(2, 9)}`);
+  const [txRef, setTxRef] = useState(`SWIFT-${Math.random().toString(36).toUpperCase().substr(2, 9)}`);
   
   const [isInstant, setIsInstant] = useState(false);
   const [isRecurring, setIsRecurring] = useState(true); 
@@ -99,32 +99,31 @@ export default function VirementInternational() {
   setError("");
   
   try {
-    // 1. Appel au backend pour le virement réel
-    // On utilise la route /transaction/transfer que tu as déjà dans ton transaction.routes.js
+    // Appel au backend
     const response = await api("/transaction/transfer", "POST", {
-      recipientIdentifier: form.iban, // L'IBAN du destinataire
-      amount: Number(form.amount),    // Le montant
-      label: "Virement International", // Le motif
-      pin: pin                        // Le PIN pour la sécurité côté serveur
+      recipientIdentifier: form.iban,
+      amount: Number(form.amount),
+      label: form.motif || "Virement International", // On utilise le motif du formulaire
+      pin: pin
     });
 
-    // 2. Si le serveur répond avec succès
+    // Si le serveur répond avec succès (référence reçue)
     if (response && response.reference) {
-      setTxRef(response.reference); // On stocke la référence reçue
+      setTxRef(response.reference); // ✅ Maintenant cette variable existe !
+      
       setTimeout(() => {
         setLoading(false);
-        setStep(5); // On affiche l'écran de SUCCÈS (Icône verte)
+        setStep(5); // Passage à l'écran SUCCÈS (Vert)
       }, 2000);
     }
 
   } catch (err) {
     setLoading(false);
     
-    // 3. Gestion de l'échec (Si l'IBAN n'est pas en base ou restriction)
-    // Ton contrôleur renvoie une erreur si le bénéficiaire est introuvable
-    if (err.message.includes("Bénéficiaire introuvable") || err.status === 400) {
+    // Si l'IBAN n'est pas trouvé (Bénéficiaire introuvable)
+    if (err.message.includes("Bénéficiaire introuvable") || err.status === 400 || err.status === 403) {
       setTimeout(() => {
-        setStep(4); // On affiche l'écran d'ÉCHEC PRO (Icône rouge animée)
+        setStep(4); // Passage à l'écran ÉCHEC (Rouge)
       }, 2000);
     } else {
       setPin("");
