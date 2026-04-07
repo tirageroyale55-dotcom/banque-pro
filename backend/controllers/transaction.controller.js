@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs'); // Pour comparer le PIN
-const User = require('../models/User'); // Vérifie bien le chemin vers ton modèle User
-const Account = require('../models/Account'); // Pour manipuler les comptes
-const Transaction = require('../models/Transaction'); // Pour l'historique
+const bcrypt = require('bcryptjs'); 
+const User = require('../models/User'); 
+const Account = require('../models/Account'); 
+const Transaction = require('../models/Transaction'); 
+const { sendFailureEmail } = require('../utils/Email.EchecVirement'); 
 
 /**
  * Créditer le compte
@@ -152,71 +153,60 @@ exports.transferMoney = async (req, res) => {
 
 
 
+
 exports.transferInternational = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
+  // On récupère les infos pour l'email au cas où ça échoue
+  const { iban, amount, pin, isInstant, label, beneficiaryName, bic, currency } = req.body;
+
   try {
-    const { iban, amount, pin, isInstant, label } = req.body;
     const userId = req.user.id;
+    const user = await User.findById(userId);
 
     // 1. Vérification PIN
-    const user = await User.findById(userId);
     const pinValid = await bcrypt.compare(pin.trim(), user.pinHash);
     if (!pinValid) throw new Error("Signature électronique (PIN) incorrecte.");
 
-    // 2. Identification des comptes
+    // 2. Identification
     const senderAccount = await Account.findOne({ user: userId }).session(session);
     const recipientAccount = await Account.findOne({ iban: iban }).session(session);
 
-    // ❌ Sécurité : Si l'IBAN n'est pas dans notre base "autorisée"
+    // ❌ CAS D'ÉCHEC : Bénéficiaire non répertorié
     if (!recipientAccount) {
-      throw new Error("Bénéficiaire non répertorié. La conformité SWIFT bloque ce flux international.");
+      // On lance une erreur spécifique pour le catch
+      const error = new Error("Bénéficiaire non répertorié");
+      error.type = "SWIFT_REJECT"; 
+      throw error;
     }
 
-    if (senderAccount.balance < Number(amount)) throw new Error("Solde insuffisant pour couvrir le transfert et les frais.");
-
-    // 3. EXÉCUTION BANCAIRE
-    
-    // On débite TOUJOURS l'expéditeur immédiatement
-    senderAccount.balance -= Number(amount);
-    await senderAccount.save({ session });
-
-    // LOGIQUE 48H : On ne crédite le destinataire QUE si le bouton "Instantané" était coché
-    if (isInstant) {
-      recipientAccount.balance += Number(amount);
-      await recipientAccount.save({ session });
-    } else {
-      // Pour "Opération Récurrente" ou Standard -> L'argent reste en attente 48h
-      console.log("Flux International placé en attente de compensation (48h)");
-    }
-
-    // 4. HISTORIQUE
-    const status = isInstant ? "COMPLETED" : "PENDING";
-    
-    const debitEntry = new Transaction({
-      account: senderAccount._id,
-      type: "DEBIT",
-      amount: Number(amount),
-      label: `VIR. INTERNATIONALE - ${iban} (${isInstant ? 'INSTANT' : '48H'})`
-    });
-    await debitEntry.save({ session });
+    // ... (Reste de ton code de succès ici) ...
 
     await session.commitTransaction();
-    session.endSession();
-
-    res.json({ 
-      message: isInstant ? "Transfert effectué" : "Ordre international enregistré (Exécution sous 48h)", 
-      reference: debitEntry._id 
-    });
+    res.json({ message: "Succès", reference: debitEntry._id });
 
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
+
+    // 📧 ENVOI DE L'EMAIL EN CAS D'ÉCHEC DE CONFORMITÉ
+    if (err.type === "SWIFT_REJECT" || err.message.includes("répertorié")) {
+      const user = await User.findById(req.user.id);
+      
+      // On envoie l'email en arrière-plan (sans attendre le résultat pour répondre vite au client)
+      sendFailureEmail(user.email, {
+        beneficiaryName,
+        iban,
+        bic,
+        amount,
+        currency: currency || "EUR"
+      }).catch(e => console.error("Erreur envoi mail:", e));
+    }
+
     res.status(400).json({ message: err.message });
   }
 };
-
 
 
 /**

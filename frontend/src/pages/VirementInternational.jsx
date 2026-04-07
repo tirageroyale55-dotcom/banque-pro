@@ -111,7 +111,10 @@ export default function VirementInternational() {
       amount: Number(form.amount),
       pin: pin,
       isInstant: isInstant, // Envoie true si coché, false sinon
-      label: form.motif
+      label: form.motif,
+      beneficiaryName: form.beneficiaryName, 
+      bic: form.bic,
+      currency: form.currency
     });
 
     if (response && response.reference) {
