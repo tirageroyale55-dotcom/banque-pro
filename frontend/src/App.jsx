@@ -120,6 +120,7 @@ export default function App() {
           <Route path="/payer" element={<Payer />} />
           <Route path="/payer/virement" element={<VirementForm />} />
           <Route path="/payer/virement-international" element={<VirementInternational />} />
+          <Route path="/virement-international" element={<VirementInternational />} />
           <Route path="/produits" element={<Produits />} />
           <Route path="/lifestyle" element={<Lifestyle />} />
           <Route path="/aide" element={<Aide />} />
