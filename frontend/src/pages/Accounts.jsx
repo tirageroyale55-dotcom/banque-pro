@@ -39,6 +39,10 @@ const [startDate, setStartDate] = useState(formatDate(firstDay));
 const [endDate, setEndDate] = useState(formatDate(today));
   const [showFilters, setShowFilters] = useState(false);
 
+  
+const [expandedId, setExpandedId] = useState(null);
+
+
   // 🔹 FILTRE + TRI
   const rawTransactions = data.transactions || [];
 
@@ -182,35 +186,82 @@ const [endDate, setEndDate] = useState(formatDate(today));
           </div>
         )}
 
-        {/* LISTE DES TRANSACTIONS CORRIGÉE */}
+        
+
+{/* LISTE DES TRANSACTIONS AVEC DÉTAILS DYNAMIQUES */}
 <div className="transactions-list">
   {transactions.length === 0 ? (
     <div className="empty-transactions">Aucune transaction disponible</div>
   ) : (
-    transactions.map((tx, i) => (
-      <div 
-        key={tx._id || i} 
-        className="transaction"
-        data-type={tx.type === "CREDIT" ? "Crédit" : "Débit"}
-      >
-        <div className="left">
-          {tx.type === "DEBIT" ? <Send size={18}/> : <PlusCircle size={18} color="#16a34a"/>}
+    transactions.map((tx, i) => {
+      const isExpanded = expandedId === tx._id;
 
-          <div>
-            <div className="motif">{tx.label}</div> 
-            <div className="date">
-              {new Date(tx.createdAt).toLocaleDateString('fr-FR')} à {new Date(tx.createdAt).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}
+      return (
+        <div 
+          key={tx._id || i} 
+          className={`transaction ${isExpanded ? 'active' : ''}`}
+          onClick={() => setExpandedId(isExpanded ? null : tx._id)}
+          style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
+        >
+          <div className="transaction-main-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            <div className="left" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {tx.type === "DEBIT" ? (
+                <Send size={18} style={{ transform: isExpanded ? 'rotate(90deg)' : 'none', transition: '0.3s' }} />
+              ) : (
+                <PlusCircle size={18} color="#16a34a" style={{ transform: isExpanded ? 'rotate(45deg)' : 'none', transition: '0.3s' }} />
+              )}
+
+              <div>
+                <div className="motif" style={{ fontWeight: isExpanded ? 'bold' : 'normal' }}>{tx.label}</div> 
+                <div className="date">{new Date(tx.createdAt).toLocaleDateString('fr-FR')}</div>
+              </div>
+            </div>
+
+            <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
+              {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
             </div>
           </div>
-        </div>
 
-        <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
-          {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
+          {/* VOLET DE DÉTAILS (S'OUVRE AU CLIC) */}
+          {isExpanded && (
+            <div className="transaction-details" style={{ 
+              marginTop: '15px', 
+              paddingTop: '15px', 
+              borderTop: '1px solid #eee',
+              fontSize: '13px',
+              color: '#475569',
+              animation: 'fadeIn 0.3s ease'
+            }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <p style={{ margin: '2px 0', fontSize: '11px', color: '#94a3b8' }}>STATUT</p>
+                  <p style={{ margin: '0', color: '#16a34a', fontWeight: '600' }}>Exécuté</p>
+                </div>
+                <div>
+                  <p style={{ margin: '2px 0', fontSize: '11px', color: '#94a3b8' }}>DATE DE VALEUR</p>
+                  <p style={{ margin: '0' }}>{new Date(tx.createdAt).toLocaleDateString('fr-FR')}</p>
+                </div>
+                <div style={{ gridColumn: 'span 2' }}>
+                  <p style={{ margin: '2px 0', fontSize: '11px', color: '#94a3b8' }}>
+                    {tx.type === "CREDIT" ? "RÉFÉRENCE DONNEUR D'ORDRE" : "RÉFÉRENCE BÉNÉFICIAIRE"}
+                  </p>
+                  <p style={{ margin: '0', wordBreak: 'break-all' }}>{tx._id.toUpperCase()}</p>
+                </div>
+                <div style={{ gridColumn: 'span 2' }}>
+                  <p style={{ margin: '2px 0', fontSize: '11px', color: '#94a3b8' }}>DESCRIPTION OPÉRATION</p>
+                  <p style={{ margin: '0' }}>
+                    {tx.type === "CREDIT" 
+                      ? `Virement SEPA reçu - Identifiant créancier : BPER-${tx._id.slice(-6)}`
+                      : `Paiement électronique - Autorisation : ${tx._id.slice(-8).toUpperCase()}`
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-
-        
-      </div>
-    ))
+      );
+    })
   )}
 </div>
       </div>
