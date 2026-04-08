@@ -44,23 +44,27 @@ api("/client/card")
 },[activeTab]);
 
 useEffect(() => {
-  // On lance les deux appels en même temps
-  Promise.all([
-    api("/client/dashboard"),
-    api("/transactions") // On récupère l'historique que tu as corrigé
-  ])
-  .then(([clientData, transactionsData]) => {
-    // On fusionne les transactions dans l'objet data
-    setData({
-      ...clientData,
-      transactions: transactionsData.transactions // On récupère le tableau depuis l'objet structuré
+  // 1. On récupère d'abord les infos de base (obligatoire)
+  api("/client/dashboard")
+    .then((clientData) => {
+      setData(clientData); // On affiche déjà le dashboard
+
+      // 2. On tente de charger les transactions APRES (optionnel)
+      api("/transactions")
+        .then((transactionsData) => {
+          setData(prev => ({
+            ...prev,
+            transactions: transactionsData.transactions || transactionsData // Gère les deux formats
+          }));
+        })
+        .catch(err => console.error("L'historique n'a pas pu être chargé :", err));
+    })
+    .catch((err) => {
+      // Uniquement si le profil échoue, on redirige
+      console.error("Session expirée ou erreur profil");
+      localStorage.removeItem("token");
+      navigate("/login");
     });
-  })
-  .catch((err) => {
-    console.error("Erreur chargement dashboard:", err);
-    localStorage.removeItem("token");
-    navigate("/login");
-  });
 }, []);
 
 useEffect(()=>{
