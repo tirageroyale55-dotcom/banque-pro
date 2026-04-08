@@ -178,7 +178,7 @@ const [endDate, setEndDate] = useState(formatDate(today));
         {/* LISTE DES TRANSACTIONS CORRIGÉE */}
 <div className="transactions-list">
   {transactions.length === 0 ? (
-    <div className="empty-transactions">Aucune transaction disponible</div>
+    <div className="empty-transactions">Aucune transactio disponible</div>
   ) : (
     transactions.map((tx, i) => (
       <div 
