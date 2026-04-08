@@ -40,26 +40,32 @@ const [endDate, setEndDate] = useState(formatDate(today));
   const [showFilters, setShowFilters] = useState(false);
 
   // 🔹 FILTRE + TRI
-  const transactions = data.transactions
-    .filter(tx => {
-      const txDate = new Date(tx.date);
+  const rawTransactions = data.transactions || [];
 
+  // 2. Filtrage intelligent basé sur les champs réels de ta base de données
+  const transactions = rawTransactions
+    .filter(tx => {
+      // ⚠️ CORRECTION : Utilisation de createdAt (Date MongoDB)
+      const txDate = new Date(tx.createdAt);
+      const txDateString = txDate.toISOString().split("T")[0]; // Format YYYY-MM-DD pour comparer
+
+      // ⚠️ CORRECTION : Filtrage par TYPE (CREDIT/DEBIT) et non par montant
       const matchType =
         filter === "all" ||
-        (filter === "entrants" && tx.amount > 0) ||
-        (filter === "sortants" && tx.amount < 0);
+        (filter === "entrants" && tx.type === "CREDIT") ||
+        (filter === "sortants" && tx.type === "DEBIT");
 
-      const matchStart = startDate ? txDate >= new Date(startDate) : true;
-      const matchEnd = endDate ? txDate <= new Date(endDate) : true;
+      const matchStart = startDate ? txDateString >= startDate : true;
+      const matchEnd = endDate ? txDateString <= endDate : true;
 
       return matchType && matchStart && matchEnd;
     })
-    .sort((a, b) =>
-      sortAsc
-        ? new Date(a.date + " " + a.time) - new Date(b.date + " " + b.time)
-        : new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time)
-    );
-
+    .sort((a, b) => {
+      // ⚠️ CORRECTION : Tri par date de création (le plus récent en haut)
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      return sortAsc ? dateA - dateB : dateB - dateA;
+    });
   // 🔹 GRAPH basé sur transactions filtrées
   const grouped = {};
   transactions.forEach(tx => {
@@ -178,7 +184,7 @@ const [endDate, setEndDate] = useState(formatDate(today));
         {/* LISTE DES TRANSACTIONS CORRIGÉE */}
 <div className="transactions-list">
   {transactions.length === 0 ? (
-    <div className="empty-transactions">Aucune transactio disponible</div>
+    <div className="empty-transactions">Aucune transaction disponible</div>
   ) : (
     transactions.map((tx, i) => (
       <div 

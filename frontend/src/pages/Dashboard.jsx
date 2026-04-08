@@ -44,14 +44,23 @@ api("/client/card")
 },[activeTab]);
 
 useEffect(() => {
-
-api("/client/dashboard")
-.then(setData)
-.catch(() => {
-localStorage.removeItem("token");
-navigate("/login");
-});
-
+  // On lance les deux appels en même temps
+  Promise.all([
+    api("/client/dashboard"),
+    api("/transactions") // On récupère l'historique que tu as corrigé
+  ])
+  .then(([clientData, transactionsData]) => {
+    // On fusionne les transactions dans l'objet data
+    setData({
+      ...clientData,
+      transactions: transactionsData.transactions // On récupère le tableau depuis l'objet structuré
+    });
+  })
+  .catch((err) => {
+    console.error("Erreur chargement dashboard:", err);
+    localStorage.removeItem("token");
+    navigate("/login");
+  });
 }, []);
 
 useEffect(()=>{
