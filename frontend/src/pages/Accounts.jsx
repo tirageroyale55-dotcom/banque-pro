@@ -42,16 +42,15 @@ const [endDate, setEndDate] = useState(formatDate(today));
   // 🔹 FILTRE + TRI
   const transactions = data.transactions
     .filter(tx => {
-      const txDate = new Date(tx.createdAt);
-      const txDateString = txDate.toISOString().split("T")[0];
+      const txDate = new Date(tx.date);
 
       const matchType =
         filter === "all" ||
-        (filter === "entrants" && tx.type === "CREDIT") ||
-        (filter === "sortants" && tx.type === "DEBIT");
+        (filter === "entrants" && tx.amount > 0) ||
+        (filter === "sortants" && tx.amount < 0);
 
-      const matchStart = startDate ? txDateString >= startDate : true;
-      const matchEnd = endDate ? txDateString <= endDate : true;
+      const matchStart = startDate ? txDate >= new Date(startDate) : true;
+      const matchEnd = endDate ? txDate <= new Date(endDate) : true;
 
       return matchType && matchStart && matchEnd;
     })
