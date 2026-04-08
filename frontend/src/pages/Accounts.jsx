@@ -81,19 +81,27 @@ const [selectedTx, setSelectedTx] = useState(null);
       return sortAsc ? dateA - dateB : dateB - dateA;
     });
 
-  // 🔹 GRAPH basé sur transactions filtrées
+  // 🔹 GRAPH basé sur transactions filtrées (CORRIGÉ)
   const grouped = {};
   transactions.forEach(tx => {
-    if (!grouped[tx.date]) {
-      grouped[tx.date] = { in: 0, out: 0 };
+    // ⚠️ Correction 1 : Utiliser createdAt pour la clé de date
+    const dateKey = new Date(tx.createdAt).toLocaleDateString('fr-FR');
+    
+    if (!grouped[dateKey]) {
+      grouped[dateKey] = { in: 0, out: 0 };
     }
-    tx.amount > 0
-      ? grouped[tx.date].in += tx.amount
-      : grouped[tx.date].out += Math.abs(tx.amount);
+    
+    // ⚠️ Correction 2 : Utiliser le TYPE pour classer in/out
+    if (tx.type === "CREDIT") {
+      grouped[dateKey].in += tx.amount;
+    } else {
+      // On utilise Math.abs au cas où le montant est négatif en BDD
+      grouped[dateKey].out += Math.abs(tx.amount);
+    }
   });
 
   const dates = Object.keys(grouped).sort(
-    (a, b) => new Date(a) - new Date(b)
+    (a, b) => new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-'))
   );
 
   const barData = {
