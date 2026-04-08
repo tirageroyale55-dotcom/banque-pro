@@ -22,6 +22,7 @@ ChartJS.register(
   Legend
 );
 
+import { Send, PlusCircle, Receipt, Filter, Copy } from "lucide-react";
 
 function DetailRow({ label, value, color = '#1e293b' }) {
   return (
@@ -55,6 +56,12 @@ const [selectedTx, setSelectedTx] = useState(null);
 
   // 🔹 FILTRE + TRI
   const rawTransactions = data.transactions || [];
+
+  const copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text);
+  // Optionnel : tu peux ajouter une petite alerte ou un toast ici
+  alert("IBAN copié !"); 
+};
 
   // À placer juste avant le return (
 const formatBper = (amount) => {
@@ -151,10 +158,28 @@ const formatBper = (amount) => {
 
       {/* CARD SOLDE */}
 <div className="account-card">
-  {/* On utilise la fonction formatBper ici */}
   <div className="balance">{formatBper(data.balance)} €</div>
   <div className="owner">{data.firstname} {data.lastname}</div>
-  <div className="iban">{data.iban}</div>
+  
+  <div className="iban" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    {data.iban}
+    <button 
+      onClick={() => copyToClipboard(data.iban)}
+      style={{ 
+        background: 'none', 
+        border: 'none', 
+        color: 'inherit', 
+        cursor: 'pointer',
+        padding: '4px',
+        display: 'flex',
+        alignItems: 'center',
+        opacity: 0.8
+      }}
+      title="Copier l'IBAN"
+    >
+      <Copy size={14} />
+    </button>
+  </div>
 </div>
 
       {/* ACTIONS */}
