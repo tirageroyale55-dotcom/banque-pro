@@ -1,54 +1,71 @@
-/* --- CSS SPÉCIFIQUE AU PROFIL (SÉCURISÉ) --- */
 .bper-profile-container {
-    background-color: #f8fafc;
+    background-color: #f4f7f9;
     min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Roboto, sans-serif;
 }
 
-.bper-profile-card {
+.bper-header {
+    background: #ffffff;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.bper-card-blue {
     margin: 15px;
     padding: 20px;
-    background: #fff;
+    background: #ffffff;
     border-radius: 12px;
-    border: 1.5px solid #2563eb; /* Bleu BPER */
+    border: 1.5px solid #1e3a8a; /* Bleu BPER profond */
     display: flex;
     align-items: center;
     gap: 15px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.bper-profile-avatar {
-    width: 60px;
-    height: 60px;
+.bper-avatar-circle {
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
-    background-color: #2563eb;
+    background-color: #1e3a8a;
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
     font-weight: bold;
-    font-size: 20px;
-    position: relative;
+    font-size: 1.2rem;
+    text-transform: uppercase;
 }
 
-.bper-profile-menu-group {
-    background: #fff;
+.bper-menu-section {
+    background: white;
     margin-top: 10px;
-    border-top: 1px solid #eee;
 }
 
-.bper-profile-row {
+.bper-row {
     display: flex;
     align-items: center;
     padding: 16px 20px;
     border-bottom: 1px solid #f1f5f9;
     cursor: pointer;
+    transition: background 0.2s;
 }
 
-.bper-profile-row:active {
-    background-color: #f1f5f9; /* Effet de clic */
+.bper-row:active {
+    background-color: #f8fafc;
 }
 
-.bper-profile-separator {
-    height: 8px;
-    background-color: #f1f5f9;
+.bper-label-small {
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.bper-value-main {
+    font-size: 15px;
+    color: #1e293b;
+    font-weight: 500;
 }
