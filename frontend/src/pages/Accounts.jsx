@@ -56,6 +56,14 @@ const [selectedTx, setSelectedTx] = useState(null);
   // 🔹 FILTRE + TRI
   const rawTransactions = data.transactions || [];
 
+  // À placer juste avant le return (
+const formatBper = (amount) => {
+  return new Intl.NumberFormat('it-IT', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(amount);
+};
+
   // 2. Filtrage intelligent basé sur les champs réels de ta base de données
   const transactions = rawTransactions
     .filter(tx => {
@@ -141,12 +149,13 @@ const [selectedTx, setSelectedTx] = useState(null);
   return (
     <div className="content">
 
-      {/* CARD */}
-      <div className="account-card">
-        <div className="balance">{data.balance} €</div>
-        <div className="owner">{data.firstname} {data.lastname}</div>
-        <div className="iban">{data.iban}</div>
-      </div>
+      {/* CARD SOLDE */}
+<div className="account-card">
+  {/* On utilise la fonction formatBper ici */}
+  <div className="balance">{formatBper(data.balance)} €</div>
+  <div className="owner">{data.firstname} {data.lastname}</div>
+  <div className="iban">{data.iban}</div>
+</div>
 
       {/* ACTIONS */}
       <div className="quick-actions">
