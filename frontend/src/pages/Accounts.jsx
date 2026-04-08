@@ -120,20 +120,26 @@ const [selectedTx, setSelectedTx] = useState(null);
     ]
   };
 
-  let balance = 0;
+  // 🔹 CALCUL DU SOLDE POUR LE GRAPH (LINE CHART)
+  let cumulativeBalance = 0;
   const balanceData = dates.map(d => {
-    balance += (grouped[d]?.in || 0) - (grouped[d]?.out || 0);
-    return balance;
+    // Le solde du jour = Entrées - Sorties
+    cumulativeBalance += (grouped[d]?.in || 0) - (grouped[d]?.out || 0);
+    return cumulativeBalance;
   });
 
   const lineData = {
     labels: dates,
     datasets: [
       {
-        label: "Solde",
+        label: "Évolution du Solde",
         data: balanceData,
         borderColor: "#2563eb",
-        tension: 0.3
+        backgroundColor: "rgba(37, 99, 235, 0.1)", // Ajoute un léger fond bleu sous la ligne
+        fill: true,
+        tension: 0.4, // Rend la courbe plus lisse et "pro"
+        pointRadius: 4,
+        pointBackgroundColor: "#2563eb"
       }
     ]
   };
@@ -299,14 +305,16 @@ const [selectedTx, setSelectedTx] = useState(null);
       </div>
 
       {/* CHARTS */}
-      <div className="charts">
-        <div className="chart">
-          <Bar data={barData}/>
-        </div>
-        <div className="chart">
-          <Line data={lineData}/>
-        </div>
-      </div>
+<div className="charts">
+  <div className="chart">
+    <h4 style={{ fontSize: '12px', color: '#64748b', marginBottom: '10px' }}>Flux de trésorerie</h4>
+    <Bar data={barData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+  </div>
+  <div className="chart">
+    <h4 style={{ fontSize: '12px', color: '#64748b', marginBottom: '10px' }}>Évolution du solde</h4>
+    <Line data={lineData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+  </div>
+</div>
 
     </div>
   );
