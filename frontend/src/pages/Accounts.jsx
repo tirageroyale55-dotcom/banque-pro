@@ -58,9 +58,28 @@ const [selectedTx, setSelectedTx] = useState(null);
   const rawTransactions = data.transactions || [];
 
   const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text);
-  // Optionnel : tu peux ajouter une petite alerte ou un toast ici
-  alert("IBAN copié !"); 
+  if (navigator.clipboard && window.isSecureContext) {
+    // Méthode moderne (HTTPS)
+    navigator.clipboard.writeText(text);
+    alert("IBAN copié !");
+  } else {
+    // Méthode de secours (HTTP)
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed"; // Évite de faire défiler la page
+    textArea.style.left = "-9999px";
+    textArea.style.top = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      alert("IBAN copié (mode compatibilité) !");
+    } catch (err) {
+      console.error("Erreur de copie :", err);
+    }
+    document.body.removeChild(textArea);
+  }
 };
 
   // À placer juste avant le return (
