@@ -22,6 +22,16 @@ ChartJS.register(
   Legend
 );
 
+
+function DetailRow({ label, value, color = '#1e293b' }) {
+  return (
+    <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
+      <div style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>{label}</div>
+      <div style={{ fontSize: '14px', color: color, fontWeight: '500' }}>{value}</div>
+    </div>
+  );
+}
+
 export default function Accounts({ data }) {
 
   const [sortAsc, setSortAsc] = useState(false);
@@ -41,7 +51,7 @@ const [endDate, setEndDate] = useState(formatDate(today));
 
   
 const [expandedId, setExpandedId] = useState(null);
-
+const [selectedTx, setSelectedTx] = useState(null); 
 
   // 🔹 FILTRE + TRI
   const rawTransactions = data.transactions || [];
@@ -188,82 +198,90 @@ const [expandedId, setExpandedId] = useState(null);
 
         
 
-{/* LISTE DES TRANSACTIONS AVEC DÉTAILS DYNAMIQUES */}
+{/* --- LISTE DES TRANSACTIONS --- */}
 <div className="transactions-list">
   {transactions.length === 0 ? (
     <div className="empty-transactions">Aucune transaction disponible</div>
   ) : (
-    transactions.map((tx, i) => {
-      const isExpanded = expandedId === tx._id;
-
-      return (
-        <div 
-          key={tx._id || i} 
-          className={`transaction ${isExpanded ? 'active' : ''}`}
-          onClick={() => setExpandedId(isExpanded ? null : tx._id)}
-          style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
-        >
-          <div className="transaction-main-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-            <div className="left" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              {tx.type === "DEBIT" ? (
-                <Send size={18} style={{ transform: isExpanded ? 'rotate(90deg)' : 'none', transition: '0.3s' }} />
-              ) : (
-                <PlusCircle size={18} color="#16a34a" style={{ transform: isExpanded ? 'rotate(45deg)' : 'none', transition: '0.3s' }} />
-              )}
-
-              <div>
-                <div className="motif" style={{ fontWeight: isExpanded ? 'bold' : 'normal' }}>{tx.label}</div> 
-                <div className="date">{new Date(tx.createdAt).toLocaleDateString('fr-FR')}</div>
-              </div>
-            </div>
-
-            <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
-              {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
-            </div>
+    transactions.map((tx, i) => (
+      <div key={tx._id || i} className="transaction">
+        <div className="left">
+          {/* SEUL L'ICÔNE EST CLIQUABLE POUR OUVRIR LES DÉTAILS */}
+          <div 
+            onClick={() => setSelectedTx(tx)} 
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          >
+            {tx.type === "DEBIT" ? (
+              <Send size={18} />
+            ) : (
+              <PlusCircle size={18} color="#16a34a" />
+            )}
           </div>
 
-          {/* VOLET DE DÉTAILS (S'OUVRE AU CLIC) */}
-          {isExpanded && (
-            <div className="transaction-details" style={{ 
-              marginTop: '15px', 
-              paddingTop: '15px', 
-              borderTop: '1px solid #eee',
-              fontSize: '13px',
-              color: '#475569',
-              animation: 'fadeIn 0.3s ease'
-            }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div>
-                  <p style={{ margin: '2px 0', fontSize: '11px', color: '#94a3b8' }}>STATUT</p>
-                  <p style={{ margin: '0', color: '#16a34a', fontWeight: '600' }}>Exécuté</p>
-                </div>
-                <div>
-                  <p style={{ margin: '2px 0', fontSize: '11px', color: '#94a3b8' }}>DATE DE VALEUR</p>
-                  <p style={{ margin: '0' }}>{new Date(tx.createdAt).toLocaleDateString('fr-FR')}</p>
-                </div>
-                <div style={{ gridColumn: 'span 2' }}>
-                  <p style={{ margin: '2px 0', fontSize: '11px', color: '#94a3b8' }}>
-                    {tx.type === "CREDIT" ? "RÉFÉRENCE DONNEUR D'ORDRE" : "RÉFÉRENCE BÉNÉFICIAIRE"}
-                  </p>
-                  <p style={{ margin: '0', wordBreak: 'break-all' }}>{tx._id.toUpperCase()}</p>
-                </div>
-                <div style={{ gridColumn: 'span 2' }}>
-                  <p style={{ margin: '2px 0', fontSize: '11px', color: '#94a3b8' }}>DESCRIPTION OPÉRATION</p>
-                  <p style={{ margin: '0' }}>
-                    {tx.type === "CREDIT" 
-                      ? `Virement SEPA reçu - Identifiant créancier : BPER-${tx._id.slice(-6)}`
-                      : `Paiement électronique - Autorisation : ${tx._id.slice(-8).toUpperCase()}`
-                    }
-                  </p>
-                </div>
-              </div>
+          <div>
+            <div className="motif">{tx.label}</div> 
+            <div className="date">
+              {new Date(tx.createdAt).toLocaleDateString('fr-FR')}
             </div>
-          )}
+          </div>
         </div>
-      );
-    })
+
+        <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
+          {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
+        </div>
+      </div>
+    ))
   )}
 </div>
+
+{/* --- PAGE DE DÉTAILS (OVERLAY) --- */}
+{selectedTx && (
+  <div style={{
+    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+    backgroundColor: '#fff', zIndex: 9999, display: 'flex', flexDirection: 'column'
+  }}>
+    {/* HEADER DE LA PAGE DÉTAILS */}
+    <div style={{ 
+      padding: '20px', display: 'flex', alignItems: 'center', 
+      borderBottom: '1px solid #eee', background: '#f8fafc' 
+    }}>
+      <button 
+        onClick={() => setSelectedTx(null)}
+        style={{ background: 'none', border: 'none', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+      >
+        ← Retour
+      </button>
+      <div style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginRight: '40px' }}>
+        Détails de l'opération
+      </div>
+    </div>
+
+    {/* CONTENU DE LA PAGE */}
+    <div style={{ padding: '24px', overflowY: 'auto' }}>
+      <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+        <div style={{ fontSize: '32px', fontWeight: 'bold', color: selectedTx.type === 'CREDIT' ? '#16a34a' : '#1e293b' }}>
+          {selectedTx.type === 'CREDIT' ? '+' : '-'}{selectedTx.amount.toLocaleString()} €
+        </div>
+        <div style={{ color: '#64748b', marginTop: '8px' }}>{selectedTx.label}</div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <DetailRow label="Statut" value="Comptabilisé" color="#16a34a" />
+        <DetailRow label="Date d'opération" value={new Date(selectedTx.createdAt).toLocaleDateString('fr-FR')} />
+        <DetailRow label="Date de valeur" value={new Date(selectedTx.createdAt).toLocaleDateString('fr-FR')} />
+        <DetailRow label="Type de paiement" value={selectedTx.type === 'CREDIT' ? 'Virement SEPA reçu' : 'Virement SEPA émis'} />
+        <DetailRow label="Référence interne" value={selectedTx._id.toUpperCase()} />
+        <DetailRow 
+          label="Description BPER" 
+          value={selectedTx.type === 'CREDIT' 
+            ? `Transaction de crédit autorisée par le service central. Identifiant : ${selectedTx._id.slice(-8)}`
+            : `Ordre de virement débité. Référence mandat : ${selectedTx._id.slice(-8)}`
+          } 
+        />
+      </div>
+    </div>
+  </div>
+)}
       </div>
 
       {/* CHARTS */}
