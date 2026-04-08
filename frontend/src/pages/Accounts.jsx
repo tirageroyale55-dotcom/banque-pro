@@ -66,7 +66,7 @@ const [endDate, setEndDate] = useState(formatDate(today));
       const dateB = new Date(b.createdAt);
       return sortAsc ? dateA - dateB : dateB - dateA;
     });
-    
+
   // 🔹 GRAPH basé sur transactions filtrées
   const grouped = {};
   transactions.forEach(tx => {
@@ -194,27 +194,25 @@ const [endDate, setEndDate] = useState(formatDate(today));
         data-type={tx.type === "CREDIT" ? "Crédit" : "Débit"}
       >
         <div className="left">
-          {/* Icône dynamique selon le type */}
           {tx.type === "DEBIT" ? <Send size={18}/> : <PlusCircle size={18} color="#16a34a"/>}
 
           <div>
-            {/* ✅ Correction : On utilise .label */}
             <div className="motif">{tx.label}</div> 
-            {/* ✅ Correction : On formate la date MongoDB (createdAt) */}
             <div className="date">
               {new Date(tx.createdAt).toLocaleDateString('fr-FR')} à {new Date(tx.createdAt).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}
             </div>
           </div>
         </div>
 
-        {/* ✅ Correction : Gestion de la couleur du montant */}
         <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
           {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
         </div>
 
-        <div className="details">
-          ID: {tx._id.substring(tx._id.length - 8)}
+        {/* ✅ VERSION PRO : On garde ta classe .details, on change juste le texte et le style visuel */}
+        <div className="details" style={{ fontSize: '9px', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}>
+          Réf: {tx._id.slice(-10)}
         </div>
+
       </div>
     ))
   )}
