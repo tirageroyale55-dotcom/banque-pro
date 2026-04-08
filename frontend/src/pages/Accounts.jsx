@@ -189,42 +189,27 @@ const [endDate, setEndDate] = useState(formatDate(today));
   ) : (
     transactions.map((tx, i) => (
       <div 
-  key={tx._id || i} 
-  className="transaction"
-  data-type={tx.type === "CREDIT" ? "Crédit" : "Débit"}
-  style={{ position: 'relative', paddingBottom: '20px' }} // 👈 On prépare l'espace pour l'ID en bas
->
-  <div className="left">
-    {tx.type === "DEBIT" ? <Send size={18}/> : <PlusCircle size={18} color="#16a34a"/>}
+        key={tx._id || i} 
+        className="transaction"
+        data-type={tx.type === "CREDIT" ? "Crédit" : "Débit"}
+      >
+        <div className="left">
+          {tx.type === "DEBIT" ? <Send size={18}/> : <PlusCircle size={18} color="#16a34a"/>}
 
-    <div>
-      <div className="motif">{tx.label}</div> 
-      <div className="date">
-        {new Date(tx.createdAt).toLocaleDateString('fr-FR')} à {new Date(tx.createdAt).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}
+          <div>
+            <div className="motif">{tx.label}</div> 
+            <div className="date">
+              {new Date(tx.createdAt).toLocaleDateString('fr-FR')} à {new Date(tx.createdAt).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}
+            </div>
+          </div>
+        </div>
+
+        <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
+          {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
+        </div>
+
+        
       </div>
-    </div>
-  </div>
-
-  <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
-    {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
-  </div>
-
-  {/* ✅ CORRECTION : L'ID placé exactement comme sur ta vidéo */}
-  <div 
-    className="details" 
-    style={{ 
-      position: 'absolute', 
-      bottom: '5px', 
-      left: '15px', 
-      fontSize: '9px', 
-      color: '#94a3b8', 
-      textTransform: 'uppercase',
-      opacity: 0.8
-    }}
-  >
-    REF: {tx._id.toString().slice(-10).toUpperCase()}
-  </div>
-</div>
     ))
   )}
 </div>
