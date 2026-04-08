@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Send, PlusCircle, Receipt, Filter, Copy } from "lucide-react";
 import { Bar, Line } from "react-chartjs-2";
 import {
@@ -34,7 +35,8 @@ function DetailRow({ label, value, color = '#1e293b' }) {
 }
 
 export default function Accounts({ data }) {
-
+  
+  const navigate = useNavigate(); //
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
   
@@ -58,28 +60,9 @@ const [selectedTx, setSelectedTx] = useState(null);
   const rawTransactions = data.transactions || [];
 
   const copyToClipboard = (text) => {
-  if (navigator.clipboard && window.isSecureContext) {
-    // Méthode moderne (HTTPS)
-    navigator.clipboard.writeText(text);
-    alert("IBAN copié !");
-  } else {
-    // Méthode de secours (HTTP)
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    textArea.style.position = "fixed"; // Évite de faire défiler la page
-    textArea.style.left = "-9999px";
-    textArea.style.top = "-9999px";
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    try {
-      document.execCommand('copy');
-      alert("IBAN copié (mode compatibilité) !");
-    } catch (err) {
-      console.error("Erreur de copie :", err);
-    }
-    document.body.removeChild(textArea);
-  }
+  navigator.clipboard.writeText(text);
+  // Optionnel : tu peux ajouter une petite alerte ou un toast ici
+  alert("IBAN copié !"); 
 };
 
   // À placer juste avant le return (
@@ -201,12 +184,20 @@ const formatBper = (amount) => {
   </div>
 </div>
 
+      
       {/* ACTIONS */}
-      <div className="quick-actions">
-        <div><Send size={20}/> Virement</div>
-        <div><PlusCircle size={20}/> Ajouter</div>
-        <div><Receipt size={20}/> Paiement</div>
-      </div>
+<div className="quick-actions">
+  {/* On ajoute le onClick et un style cursor pour montrer que c'est cliquable */}
+  <div 
+    onClick={() => navigate("/virement-international")} 
+    style={{ cursor: 'pointer' }}
+  >
+    <Send size={20}/> Virement
+  </div>
+  
+  <div><PlusCircle size={20}/> Ajouter</div>
+  <div><Receipt size={20}/> Paiement</div>
+</div>
 
       {/* HISTORIQUE */}
       <div className="transactions">
