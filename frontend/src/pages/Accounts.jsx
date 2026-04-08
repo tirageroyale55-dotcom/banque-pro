@@ -226,8 +226,21 @@ const [selectedTx, setSelectedTx] = useState(null);
           </div>
         </div>
 
-        <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
-          {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
+        {/* REPLACEMENT DU BLOC MONTANT + TYPE (CREDIT/DEBIT) */}
+        <div style={{ textAlign: 'right' }}>
+          <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
+            {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
+          </div>
+          {/* ✅ AFFICHAGE DU TYPE RÉTABLI ICI */}
+          <div style={{ 
+            fontSize: '10px', 
+            color: tx.type === "CREDIT" ? "#16a34a" : "#64748b",
+            fontWeight: '600',
+            textTransform: 'uppercase',
+            marginTop: '2px'
+          }}>
+            {tx.type === "CREDIT" ? "Crédit" : "Débit"}
+          </div>
         </div>
       </div>
     ))
