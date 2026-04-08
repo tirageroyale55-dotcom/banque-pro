@@ -4,7 +4,7 @@ import {
   CreditCard, Umbrella, Edit, LogOut, ChevronRight, Camera 
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import "./Profile.css"; // N'oublie pas d'importer le CSS
+import "../styles/Profile.css"; 
 
 export default function Profile({ data = {} }) { // data={} évite le crash si undefined
   const navigate = useNavigate();
