@@ -198,18 +198,23 @@ const [selectedTx, setSelectedTx] = useState(null);
 
         
 
-{/* --- LISTE DES TRANSACTIONS --- */}
+{/* --- LISTE DES TRANSACTIONS (AVEC TYPE RÉTABLI) --- */}
 <div className="transactions-list">
   {transactions.length === 0 ? (
     <div className="empty-transactions">Aucune transaction disponible</div>
   ) : (
     transactions.map((tx, i) => (
-      <div key={tx._id || i} className="transaction">
+      <div 
+        key={tx._id || i} 
+        className="transaction"
+        
+        data-type={tx.type === "CREDIT" ? "Crédit" : "Débit"}
+      >
         <div className="left">
-          {/* SEUL L'ICÔNE EST CLIQUABLE POUR OUVRIR LES DÉTAILS */}
+          {/* SEUL L'ICÔNE DÉCLENCHE LA PAGE DÉTAILS */}
           <div 
             onClick={() => setSelectedTx(tx)} 
-            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '5px' }}
           >
             {tx.type === "DEBIT" ? (
               <Send size={18} />
@@ -226,21 +231,9 @@ const [selectedTx, setSelectedTx] = useState(null);
           </div>
         </div>
 
-        {/* REPLACEMENT DU BLOC MONTANT + TYPE (CREDIT/DEBIT) */}
-        <div style={{ textAlign: 'right' }}>
-          <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
-            {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
-          </div>
-          {/* ✅ AFFICHAGE DU TYPE RÉTABLI ICI */}
-          <div style={{ 
-            fontSize: '10px', 
-            color: tx.type === "CREDIT" ? "#16a34a" : "#64748b",
-            fontWeight: '600',
-            textTransform: 'uppercase',
-            marginTop: '2px'
-          }}>
-            {tx.type === "CREDIT" ? "Crédit" : "Débit"}
-          </div>
+        {/* Montant avec ses classes originales */}
+        <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
+          {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
         </div>
       </div>
     ))
