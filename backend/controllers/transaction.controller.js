@@ -63,13 +63,22 @@ exports.debitAccount = async (req, res) => {
  */
 exports.getTransactions = async (req, res) => {
   try {
+    const user = await User.findById(req.user.id);
     const account = await Account.findOne({ user: req.user.id });
+    
     if (!account) return res.status(404).json({ message: "Compte introuvable" });
 
     const transactions = await Transaction.find({ account: account._id })
       .sort({ createdAt: -1 });
 
-    res.json(transactions);
+    // ✅ On renvoie l'objet complet que Accounts.jsx attend
+    res.json({
+      balance: account.balance,
+      firstname: user.nom,      // ou user.firstname selon ton schéma
+      lastname: user.prenom,    // ou user.lastname selon ton schéma
+      iban: account.iban,
+      transactions: transactions // C'est ici que React va piocher
+    });
   } catch (err) {
     res.status(500).json({ message: "Erreur historique" });
   }

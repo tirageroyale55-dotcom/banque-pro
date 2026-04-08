@@ -175,46 +175,43 @@ const [endDate, setEndDate] = useState(formatDate(today));
           </div>
         )}
 
-        {/* LISTE */}
-        <div className="transactions-list">
+        {/* LISTE DES TRANSACTIONS CORRIGÉE */}
+<div className="transactions-list">
+  {transactions.length === 0 ? (
+    <div className="empty-transactions">Aucune transaction disponible</div>
+  ) : (
+    transactions.map((tx, i) => (
+      <div 
+        key={tx._id || i} 
+        className="transaction"
+        data-type={tx.type === "CREDIT" ? "Crédit" : "Débit"}
+      >
+        <div className="left">
+          {/* Icône dynamique selon le type */}
+          {tx.type === "DEBIT" ? <Send size={18}/> : <PlusCircle size={18} color="#16a34a"/>}
 
-          {transactions.length === 0 ? (
-            <div className="empty-transactions">
-              Aucune transaction disponible
+          <div>
+            {/* ✅ Correction : On utilise .label */}
+            <div className="motif">{tx.label}</div> 
+            {/* ✅ Correction : On formate la date MongoDB (createdAt) */}
+            <div className="date">
+              {new Date(tx.createdAt).toLocaleDateString('fr-FR')} à {new Date(tx.createdAt).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}
             </div>
-          ) : (
-            transactions.map((tx, i) => (
-              <div 
-                key={i} 
-                className="transaction"
-                data-type={tx.amount > 0 ? "Crédit" : "Débit"}
-              >
-
-                <div className="left">
-                  {tx.type === "virement" && <Send size={18}/>}
-                  {tx.type === "paiement" && <Receipt size={18}/>}
-                  {tx.type === "ajout" && <PlusCircle size={18}/>}
-
-                  <div>
-                    <div className="motif">{tx.motif}</div>
-                    <div className="date">{tx.date} {tx.time}</div>
-                  </div>
-                </div>
-
-                <div className={tx.amount > 0 ? "amount plus" : "amount minus"}>
-                  {tx.amount > 0 ? `+${tx.amount}` : tx.amount} €
-                </div>
-
-                <div className="details">
-                  IBAN: {tx.iban || "—"} <br/>
-                  Ref: {tx.ref || "—"}
-                </div>
-
-              </div>
-            ))
-          )}
-
+          </div>
         </div>
+
+        {/* ✅ Correction : Gestion de la couleur du montant */}
+        <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
+          {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
+        </div>
+
+        <div className="details">
+          ID: {tx._id.substring(tx._id.length - 8)}
+        </div>
+      </div>
+    ))
+  )}
+</div>
       </div>
 
       {/* CHARTS */}
