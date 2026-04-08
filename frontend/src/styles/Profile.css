@@ -1,0 +1,54 @@
+/* --- CSS SPÉCIFIQUE AU PROFIL (SÉCURISÉ) --- */
+.bper-profile-container {
+    background-color: #f8fafc;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.bper-profile-card {
+    margin: 15px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1.5px solid #2563eb; /* Bleu BPER */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.bper-profile-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    position: relative;
+}
+
+.bper-profile-menu-group {
+    background: #fff;
+    margin-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.bper-profile-row {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    cursor: pointer;
+}
+
+.bper-profile-row:active {
+    background-color: #f1f5f9; /* Effet de clic */
+}
+
+.bper-profile-separator {
+    height: 8px;
+    background-color: #f1f5f9;
+}
