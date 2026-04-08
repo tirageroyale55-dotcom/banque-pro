@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, PlusCircle, Receipt, Filter } from "lucide-react";
+import { Send, PlusCircle, Receipt, Filter, Copy } from "lucide-react";
 import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -22,7 +22,7 @@ ChartJS.register(
   Legend
 );
 
-import { Send, PlusCircle, Receipt, Filter, Copy } from "lucide-react";
+
 
 function DetailRow({ label, value, color = '#1e293b' }) {
   return (
