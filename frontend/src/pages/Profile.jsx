@@ -14,12 +14,25 @@ export default function Profile({ data: initialData }) {
   const [photo, setPhoto] = useState(null);
 
   useEffect(() => {
-    if (!data) {
-      api("/client/dashboard")
-        .then(res => setData(res))
-        .catch(() => navigate("/login"));
+  if (!data) {
+    api("/client/dashboard")
+      .then(res => {
+        setData(res);
+        // ✅ AJOUTE ÇA : Si le serveur renvoie une photo, on l'affiche
+        const user = res.user || res;
+        if (user.profilePicture) {
+          setPhoto(user.profilePicture);
+        }
+      })
+      .catch(() => navigate("/login"));
+  } else {
+    // ✅ AJOUTE ÇA AUSSI : Si data existe déjà (ex: passé par le Dashboard)
+    const user = data.user || data;
+    if (user.profilePicture) {
+      setPhoto(user.profilePicture);
     }
-  }, [data, navigate]);
+  }
+}, [data, navigate]);
 
 
   // Fonction à ajouter en dehors de ton composant pour réduire la taille
