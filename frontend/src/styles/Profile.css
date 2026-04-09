@@ -69,3 +69,15 @@
     color: #1e293b;
     font-weight: 500;
 }
+
+.camera-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 50%;
+    padding: 4px;
+    border: 1px solid #ddd;
+    display: flex;
+    cursor: pointer;
+}
