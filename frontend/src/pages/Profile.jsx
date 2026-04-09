@@ -40,6 +40,10 @@ export default function Profile({ data: initialData }) {
         // Important: Ne pas définir Content-Type, le navigateur le fera avec le boundary
       });
       console.log("Photo enregistrée avec succès");
+      if(response.url) {
+    setPhoto(response.url); 
+    alert("Profil mis à jour !");
+  }
     } catch (err) {
       console.error("Erreur lors de l'enregistrement de la photo", err);
     }
