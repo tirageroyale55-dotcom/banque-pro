@@ -26,20 +26,23 @@ export default function Profile({ data: initialData }) {
   const file = e.target.files[0];
   if (!file) return;
 
-  // Aperçu immédiat
-  const previewUrl = URL.createObjectURL(file);
-  setPhoto(previewUrl);
+  // Si le fichier est trop gros (> 4MB), on prévient l'utilisateur
+  if (file.size > 4 * 1024 * 1024) {
+    alert("L'image est trop lourde pour Vercel (max 4MB)");
+    return;
+  }
+
+  setPhoto(URL.createObjectURL(file));
 
   const formData = new FormData();
-  formData.append("photo", file); // DOIT correspondre au backend
+  formData.append("photo", file);
 
   const token = localStorage.getItem("token");
 
   try {
     const res = await fetch("/api/client/upload-profile-picture", {
-      method: "POST",
+      method: "POST", // BIEN VÉRIFIER QUE C'EST POST
       headers: {
-        // SURTOUT : Ne pas mettre "Content-Type"
         "Authorization": token ? `Bearer ${token}` : ""
       },
       body: formData
@@ -48,15 +51,13 @@ export default function Profile({ data: initialData }) {
     const result = await res.json();
 
     if (res.ok) {
-      setPhoto(result.url); // On utilise l'URL définitive de Cloudinary
+      setPhoto(result.url);
       alert("Photo enregistrée !");
     } else {
-      // Affiche l'erreur précise du serveur
-      console.error("Détail erreur serveur:", result);
-      alert("Erreur serveur : " + (result.message || "Code " + res.status));
+      alert("Erreur " + res.status + " : " + (result.message || "Fichier trop lourd"));
     }
   } catch (err) {
-    console.error("Erreur Fetch:", err);
+    console.error("Erreur connexion:", err);
     alert("Problème de connexion au serveur.");
   }
 };
