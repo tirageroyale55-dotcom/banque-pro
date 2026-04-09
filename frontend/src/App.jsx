@@ -128,7 +128,7 @@ export default function App() {
           <Route path="/cards" element={<Cards />} />
           <Route path="/financing" element={<Financing />} />
           <Route path="/transactions" element={<Transactions />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<Profile data={userData} />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/help" element={<Help />} />
 

@@ -148,6 +148,8 @@ setActiveTab={setActiveTab}
 
 {activeTab === "accounts" && <Accounts data={data}/>}
 
+{activeTab === "profile" && <Profile data={data} />}
+
 {activeTab === "cards" && (
 
 <div className="cards-section">
