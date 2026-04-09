@@ -75,6 +75,7 @@ const UserSchema = new mongoose.Schema(
   pieceIdentiteVerso: String,
  
   signature: String,
+  profilePicture: { type: String, default: "" },
 
   // ======================
   // CONSENTEMENT
@@ -121,6 +122,7 @@ const UserSchema = new mongoose.Schema(
   loginAttempts: { type: Number, default: 0 }, // compteur de tentatives
   lockedUntil: { type: Date }                // date jusqu'à laquelle le compte est bloqué
 },
+
 { timestamps: true }
 );
 
