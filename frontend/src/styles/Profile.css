@@ -1,71 +1,260 @@
+/* --- CONTAINER PRINCIPAL --- */
 .bper-profile-container {
     background-color: #f4f7f9;
     min-height: 100vh;
-    font-family: 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
 }
 
+/* --- HEADER --- */
 .bper-header {
     background: #ffffff;
-    padding: 15px 20px;
+    padding: 16px 20px;
     display: flex;
     align-items: center;
     border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-.bper-card-blue {
-    margin: 15px;
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 12px;
-    border: 1.5px solid #1e3a8a; /* Bleu BPER profond */
+.back-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #1e3a8a;
+    cursor: pointer;
+    margin-right: 15px;
     display: flex;
     align-items: center;
-    gap: 15px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.header-title {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+    font-size: 17px;
+    margin-right: 37px; /* Équilibre le bouton retour */
+}
+
+/* --- CARTE PROFIL (RECTANGLE BLEU) --- */
+.bper-card-blue {
+    margin: 20px 16px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1.5px solid #1e3a8a; /* Couleur BPER */
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.08);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.bper-card-blue:active {
+    transform: scale(0.98);
 }
 
 .bper-avatar-circle {
-    width: 55px;
-    height: 55px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background-color: #1e3a8a;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 20px;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.camera-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    background: #ffffff;
+    border-radius: 50%;
+    padding: 5px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    color: #1e3a8a;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.profile-info-text {
+    flex: 1;
+}
+
+.profile-label {
+    font-weight: 700;
+    font-size: 16px;
+    color: #0f172a;
+}
+
+.profile-name {
+    color: #64748b;
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+.profile-bank-tag {
+    color: #1e3a8a;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-top: 6px;
+}
+
+/* --- LISTE DES MENUS --- */
 .bper-menu-section {
-    background: white;
-    margin-top: 10px;
+    background: #ffffff;
+    border-top: 1px solid #f1f5f9;
 }
 
 .bper-row {
     display: flex;
     align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid #f1f5f9;
+    padding: 18px 20px;
+    border-bottom: 1px solid #f8fafc;
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .bper-row:active {
-    background-color: #f8fafc;
+    background-color: #f1f5f9;
 }
 
-.bper-label-small {
-    font-size: 11px;
+.row-icon {
+    margin-right: 18px;
+    display: flex;
+    align-items: center;
+}
+
+.row-title {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.section-divider {
+    height: 12px;
+    background-color: #f4f7f9;
+}
+
+/* --- VUE DÉTAILLÉE --- */
+.bper-details-view {
+    animation: slideUp 0.3s ease-out;
+}
+
+.details-header-block {
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.details-header-block h3 {
+    color: #1e3a8a;
+    font-size: 18px;
+    margin: 0;
+}
+
+.details-header-block p {
+    color: #94a3b8;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.info-icon {
+    color: #1e3a8a;
+    margin-top: 10px;
+    opacity: 0.8;
+}
+
+.info-content {
+    flex: 1;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 10px;
+}
+
+.info-label {
+    font-size: 10px;
+    font-weight: 700;
     color: #94a3b8;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 2px;
 }
 
-.bper-value-main {
+.info-value {
     font-size: 15px;
-    color: #1e293b;
+    color: #334155;
     font-weight: 500;
+    margin-top: 4px;
+}
+
+.client-footer {
+    margin-top: 50px;
+    text-align: center;
+    border-top: 1px dashed #e2e8f0;
+    padding-top: 20px;
+}
+
+.client-footer p {
+    font-size: 11px;
+    color: #cbd5e1;
+    margin: 4px 0;
+}
+
+/* --- ANIMATIONS & LOADER --- */
+.fade-in {
+    animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.bper-profile-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+}
+
+.spinner {
+    width: 35px;
+    height: 35px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #1e3a8a;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
