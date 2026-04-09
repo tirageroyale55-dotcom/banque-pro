@@ -1,21 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Settings, Shield, MessageCircle, TrendingUp, 
   CreditCard, Umbrella, Edit, LogOut, ChevronRight, User, Globe, MapPin, Phone, Mail, Camera
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { api } from "../services/api"; 
 import "../styles/Profile.css";
 
-export default function Profile({ data }) {
+export default function Profile({ data: initialData }) {
   const navigate = useNavigate();
+  const [data, setData] = useState(initialData);
   const [showDetails, setShowDetails] = useState(false);
   const [photo, setPhoto] = useState(null);
 
-  // --- LOGIQUE DE DÉTECTION DES NOMS (Adaptée à ton modèle User.js) ---
-  // On cherche 'nom' ou 'lastname' ou 'user.nom'
-  const userInfo = data?.user || data || {}; 
-  const nomUser = userInfo.nom || userInfo.lastname || "";
-  const prenomUser = userInfo.prenom || userInfo.firstname || "";
+  // SÉCURITÉ : Si data est vide au chargement, on va le chercher sur l'API
+  useEffect(() => {
+    if (!data) {
+      api("/client/dashboard")
+        .then(res => setData(res))
+        .catch(() => navigate("/login"));
+    }
+  }, [data, navigate]);
+
+  // Si toujours pas de data après l'appel API, on affiche un loader propre
+  if (!data) {
+    return (
+      <div className="bper-profile-loader">
+        <div className="spinner"></div>
+        <p>Chargement sécurisé...</p>
+      </div>
+    );
+  }
+
+  // --- LOGIQUE D'EXTRACTION (Modèle User.js) ---
+  // On cherche 'nom' et 'prenom' car ce sont les noms dans ton schéma Mongoose
+  const userInfo = data.user || data; 
+  const nomUser = userInfo.nom || "";
+  const prenomUser = userInfo.prenom || "";
   
   const displayName = `${prenomUser} ${nomUser}`.trim() || "Client BPER";
   const initials = `${prenomUser.charAt(0)}${nomUser.charAt(0)}`.toUpperCase() || "BC";
@@ -25,49 +46,48 @@ export default function Profile({ data }) {
     window.location.href = "/login";
   };
 
-  if (!data) return <div className="loading">Chargement du profil...</div>;
-
   return (
     <div className="bper-profile-container">
       
-      {/* HEADER DYNAMIQUE */}
+      {/* HEADER FIXE */}
       <div className="bper-header">
         <button 
           onClick={() => showDetails ? setShowDetails(false) : navigate(-1)} 
-          style={{ background: "none", border: "none", fontSize: "20px", cursor: "pointer" }}
+          className="back-btn"
         >
           ←
         </button>
-        <span style={{ flex: 1, textAlign: "center", fontWeight: "600" }}>
-          {showDetails ? "Informations Personnelles" : "Mon Profil"}
+        <span className="header-title">
+          {showDetails ? "Données Personnelles" : "Mon Profil"}
         </span>
       </div>
 
       {!showDetails ? (
-        <>
-          {/* SECTION MON PROFIL (Rectangle de ton dessin) */}
+        <div className="fade-in">
+          {/* BANNIÈRE PROFIL (Rectangle de ton dessin) */}
           <div className="bper-card-blue" onClick={() => setShowDetails(true)}>
             <div className="bper-avatar-circle">
-               {photo ? <img src={photo} alt="avatar" style={{width:'100%', height:'100%', borderRadius:'50%'}}/> : initials}
+               {photo ? <img src={photo} alt="avatar" className="avatar-img"/> : initials}
                <label className="camera-badge">
                   <Camera size={10} />
                   <input type="file" hidden onChange={(e) => setPhoto(URL.createObjectURL(e.target.files[0]))} />
                </label>
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: "bold", fontSize: "16px" }}>Mon profil</div>
-              <div style={{ color: "#64748b", fontSize: "14px" }}>({displayName})</div>
-              <div style={{ color: "#1e3a8a", fontWeight: "800", fontSize: "12px", marginTop: "4px" }}>BPER BANCA</div>
+            <div className="profile-info-text">
+              <div className="profile-label">Mon profil</div>
+              <div className="profile-name">({displayName})</div>
+              <div className="profile-bank-tag">BPER BANCA</div>
             </div>
             <ChevronRight size={20} color="#cbd5e1" />
           </div>
 
+          {/* LISTE DES MENUS */}
           <div className="bper-menu-section">
             <MenuRow icon={<Settings size={20}/>} title="Paramètres et confidentialité" />
             <MenuRow icon={<Shield size={20}/>} title="Sécurité" />
             <MenuRow icon={<MessageCircle size={20}/>} title="Parlez-nous" />
 
-            <div className="bper-separator" style={{height:'8px', background:'#f4f7f9'}} />
+            <div className="section-divider" />
 
             <MenuRow icon={<TrendingUp size={20}/>} title="Opérations d'investissement" />
             <MenuRow icon={<CreditCard size={20}/>} title="Financement" />
@@ -76,30 +96,32 @@ export default function Profile({ data }) {
                 <MenuRow icon={<Edit size={20}/>} title="Détails du compte" />
             </div>
 
-            <div className="bper-separator" style={{height:'8px', background:'#f4f7f9'}} />
+            <div className="section-divider" />
 
             <div onClick={handleLogout}>
               <MenuRow icon={<LogOut size={20} color="#dc2626"/>} title="Déconnecter" color="#dc2626" />
             </div>
           </div>
-        </>
+        </div>
       ) : (
-        /* VUE DÉTAILLÉE (Ouverture pro des infos) */
-        <div className="bper-details-view" style={{ background: "white", padding: "20px", minHeight: '100vh' }}>
-            <div style={{ marginBottom: "25px", borderLeft: "4px solid #1e3a8a", paddingLeft: "15px" }}>
-                <h3 style={{ margin: 0, color: "#1e3a8a", fontSize: '18px' }}>État Civil & Contact</h3>
-                <p style={{ fontSize: "12px", color: "#94a3b8" }}>Données certifiées conformes à votre pièce d'identité</p>
+        /* VUE DÉTAILLÉE (Informations User) */
+        <div className="bper-details-view fade-in">
+            <div className="details-header-block">
+                <h3>État Civil & Contact</h3>
+                <p>Données certifiées conformes à votre pièce d'identité</p>
             </div>
 
             <InfoRow label="NOM" value={nomUser} icon={<User size={16}/>} />
             <InfoRow label="PRÉNOM" value={prenomUser} icon={<User size={16}/>} />
             <InfoRow label="E-MAIL" value={userInfo.email} icon={<Mail size={16}/>} />
             <InfoRow label="TÉLÉPHONE" value={userInfo.telephone} icon={<Phone size={16}/>} />
-            <InfoRow label="RÉSIDENCE" value={`${userInfo.adresse || ""}, ${userInfo.ville || ""}`} icon={<MapPin size={16}/>} />
+            <InfoRow label="ADRESSE" value={userInfo.adresse} icon={<MapPin size={16}/>} />
+            <InfoRow label="VILLE" value={userInfo.ville} icon={<MapPin size={16}/>} />
             <InfoRow label="NATIONALITÉ" value={userInfo.nationalite} icon={<Globe size={16}/>} />
 
-            <div style={{ marginTop: "40px", textAlign: "center" }}>
-                <p style={{ fontSize: "11px", color: "#cbd5e1" }}>Référence Client : {data._id?.slice(-8).toUpperCase() || "N/A"}</p>
+            <div className="client-footer">
+                <p>Référence Client : {data._id?.slice(-8).toUpperCase() || "BPER-PRO-001"}</p>
+                <p>Compte actif - Certifié par BPER Banca</p>
             </div>
         </div>
       )}
@@ -107,12 +129,12 @@ export default function Profile({ data }) {
   );
 }
 
-// COMPOSANTS INTERNES
+// COMPOSANTS INTERNES POUR LA LISIBILITÉ
 function MenuRow({ icon, title, color = "#1e293b" }) {
   return (
-    <div className="bper-row" style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #f1f5f9' }}>
-      <div style={{ color: color, marginRight: "15px" }}>{icon}</div>
-      <div style={{ flex: 1, fontSize: "15px", color: color }}>{title}</div>
+    <div className="bper-row">
+      <div className="row-icon" style={{ color: color }}>{icon}</div>
+      <div className="row-title" style={{ color: color }}>{title}</div>
       <ChevronRight size={18} color="#cbd5e1" />
     </div>
   );
@@ -120,11 +142,11 @@ function MenuRow({ icon, title, color = "#1e293b" }) {
 
 function InfoRow({ label, value, icon }) {
   return (
-    <div style={{ marginBottom: "18px", display: "flex", alignItems: "center", gap: "15px" }}>
-        <div style={{ color: "#1e3a8a", opacity: 0.7 }}>{icon}</div>
-        <div style={{ flex: 1, borderBottom: "1px solid #f1f5f9", paddingBottom: "5px" }}>
-            <div style={{ fontSize: "10px", color: "#94a3b8", fontWeight: 'bold' }}>{label}</div>
-            <div style={{ fontSize: "15px", color: "#334155" }}>{value || "Non renseigné"}</div>
+    <div className="info-row">
+        <div className="info-icon">{icon}</div>
+        <div className="info-content">
+            <div className="info-label">{label}</div>
+            <div className="info-value">{value || "Non renseigné"}</div>
         </div>
     </div>
   );

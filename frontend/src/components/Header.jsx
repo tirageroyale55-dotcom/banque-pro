@@ -30,7 +30,7 @@ return (
 
 <div
 className="profile"
-onClick={() => navigate("/profile")}
+onClick={() => setActiveTab("profile")}
 >
 
 <div className="avatar">
