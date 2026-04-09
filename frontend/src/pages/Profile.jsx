@@ -21,6 +21,33 @@ export default function Profile({ data: initialData }) {
     }
   }, [data, navigate]);
 
+
+  // Fonction à ajouter en dehors de ton composant pour réduire la taille
+const compressImage = async (file) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800; // On réduit la largeur à 800px
+        const scaleSize = MAX_WIDTH / img.width;
+        canvas.width = MAX_WIDTH;
+        canvas.height = img.height * scaleSize;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        canvas.toBlob((blob) => {
+          resolve(new File([blob], file.name, { type: "image/jpeg" }));
+        }, "image/jpeg", 0.7); // Qualité à 70%
+      };
+    };
+  });
+};
+
   // --- NOUVELLE FONCTION POUR ENREGISTRER LA PHOTO ---
   const handlePhotoChange = async (e) => {
   const file = e.target.files[0];
@@ -38,6 +65,10 @@ export default function Profile({ data: initialData }) {
   formData.append("photo", file);
 
   const token = localStorage.getItem("token");
+  
+  
+  const compressedFile = await compressImage(file); // On compresse ici
+  formData.append("photo", compressedFile);
 
   try {
     const res = await fetch("/api/client/upload-profile-picture", {
