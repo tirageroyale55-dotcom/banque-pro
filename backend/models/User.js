@@ -75,7 +75,7 @@ const UserSchema = new mongoose.Schema(
   pieceIdentiteVerso: String,
  
   signature: String,
-  profilePicture: { type: String, default: "" },
+  profilePicture: { type: String },
 
   // ======================
   // CONSENTEMENT

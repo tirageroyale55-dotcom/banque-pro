@@ -26,22 +26,20 @@ export default function Profile({ data: initialData }) {
   const file = e.target.files[0];
   if (!file) return;
 
-  // 1. Aperçu immédiat pour l'utilisateur
-  setPhoto(URL.createObjectURL(file));
+  // Aperçu immédiat
+  const previewUrl = URL.createObjectURL(file);
+  setPhoto(previewUrl);
 
-  // 2. Préparation du FormData
   const formData = new FormData();
-  formData.append("photo", file);
+  formData.append("photo", file); // DOIT correspondre au backend
 
-  // 3. Récupération du token pour l'autorisation
   const token = localStorage.getItem("token");
 
   try {
-    // On utilise fetch directement au lieu de ton api() pour éviter le conflit JSON
     const res = await fetch("/api/client/upload-profile-picture", {
       method: "POST",
       headers: {
-        // SURTOUT PAS de Content-Type ici, le navigateur s'en occupe
+        // SURTOUT : Ne pas mettre "Content-Type"
         "Authorization": token ? `Bearer ${token}` : ""
       },
       body: formData
@@ -49,16 +47,17 @@ export default function Profile({ data: initialData }) {
 
     const result = await res.json();
 
-    if (res.ok && result.url) {
-      // 4. On met à jour l'affichage avec l'URL finale de Cloudinary
-      setPhoto(result.url);
-      alert("Photo de profil enregistrée avec succès !");
+    if (res.ok) {
+      setPhoto(result.url); // On utilise l'URL définitive de Cloudinary
+      alert("Photo enregistrée !");
     } else {
-      throw new Error(result.message || "Erreur lors de l'upload");
+      // Affiche l'erreur précise du serveur
+      console.error("Détail erreur serveur:", result);
+      alert("Erreur serveur : " + (result.message || "Code " + res.status));
     }
   } catch (err) {
-    console.error("Erreur d'upload:", err);
-    alert("Erreur lors de l'enregistrement de la photo.");
+    console.error("Erreur Fetch:", err);
+    alert("Problème de connexion au serveur.");
   }
 };
 
