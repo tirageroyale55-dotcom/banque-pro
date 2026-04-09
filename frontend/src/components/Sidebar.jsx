@@ -1,100 +1,101 @@
-import {
-Home,
-ArrowRightLeft,
-Grid,
-Gem,
-Headphones,
-CreditCard,
-Wallet,
-User
+import { 
+  Home, ArrowRightLeft, Grid, Gem, Headphones, 
+  CreditCard, Wallet, User 
 } from "lucide-react";
-
 import { useNavigate, useLocation } from "react-router-dom";
 
-export default function Sidebar(){
+export default function Sidebar({ data }) {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-const navigate = useNavigate();
-const location = useLocation();
+  // Extraction des données dynamiques
+  const userInfo = data?.user || data;
+  const nomUser = userInfo?.nom || "";
+  const prenomUser = userInfo?.prenom || "";
+  const displayName = `${prenomUser} ${nomUser}`.trim() || "Chargement...";
+  const profileImage = userInfo?.profilePicture;
 
-return(
+  return (
+    <div className="sidebar">
+      {/* SECTION PROFIL CLIQUABLE */}
+      <div 
+        className={`sidebar-profile ${location.pathname === "/profile" ? "active" : ""}`}
+        onClick={() => navigate("/profile")}
+        style={{ cursor: 'pointer' }}
+      >
+        <div className="avatar large">
+          {profileImage ? (
+            <img src={profileImage} alt="Profil" className="sidebar-img" />
+          ) : (
+            <User size={24} />
+          )}
+        </div>
+        <div className="profile-text">
+          <strong>{displayName}</strong>
+          <span>Voir mon profil</span>
+        </div>
+      </div>
 
-<div className="sidebar">
+      <div className="sidebar-menu">
+        <MenuButton 
+          active={location.pathname === "/dashboard"} 
+          onClick={() => navigate("/dashboard")} 
+          icon={<Home size={20} />} 
+          label="Accueil" 
+        />
+        
+        <MenuButton 
+          active={location.pathname === "/accounts"} 
+          onClick={() => navigate("/accounts")} 
+          icon={<Wallet size={20} />} 
+          label="Comptes" 
+        />
 
-<div className="sidebar-profile">
+        <MenuButton 
+          active={location.pathname === "/cards"} 
+          onClick={() => navigate("/cards")} 
+          icon={<CreditCard size={20} />} 
+          label="Cartes" 
+        />
 
-<div className="avatar large">
-<User size={22}/>
-</div>
+        <MenuButton 
+          active={location.pathname === "/payer"} 
+          onClick={() => navigate("/payer")} 
+          icon={<ArrowRightLeft size={20} />} 
+          label="Payer" 
+        />
 
-<div className="profile-text">
-<strong>John Doe</strong>
-<span>Profil</span>
-</div>
+        <MenuButton 
+          active={location.pathname === "/produits"} 
+          onClick={() => navigate("/produits")} 
+          icon={<Grid size={20} />} 
+          label="Produits" 
+        />
 
-</div>
+        <MenuButton 
+          active={location.pathname === "/lifestyle"} 
+          onClick={() => navigate("/lifestyle")} 
+          icon={<Gem size={20} />} 
+          label="Lifestyle" 
+        />
 
-<div className="sidebar-menu">
+        <MenuButton 
+          active={location.pathname === "/aide"} 
+          onClick={() => navigate("/aide")} 
+          icon={<Headphones size={20} />} 
+          label="Aide" 
+        />
+      </div>
+    </div>
+  );
+}
 
-<button
-className={location.pathname === "/dashboard" ? "side-item active" : "side-item"}
-onClick={()=>navigate("/dashboard")}
->
-<Home size={18}/>
-<span>Accueil</span>
-</button>
-
-<button
-className={location.pathname === "/accounts" ? "side-item active" : "side-item"}
-onClick={()=>navigate("/accounts")}
->
-<Wallet size={18}/>
-<span>Comptes</span>
-</button>
-
-<button
-className={location.pathname === "/cards" ? "side-item active" : "side-item"}
-onClick={()=>navigate("/cards")}
->
-<CreditCard size={18}/>
-<span>Cartes</span>
-</button>
-
-<button
-className={location.pathname === "/payer" ? "side-item active" : "side-item"}
-onClick={()=>navigate("/payer")}
->
-<ArrowRightLeft size={18}/>
-<span>Payer</span>
-</button>
-
-<button
-className={location.pathname === "/produits" ? "side-item active" : "side-item"}
-onClick={()=>navigate("/produits")}
->
-<Grid size={18}/>
-<span>Produits</span>
-</button>
-
-<button
-className={location.pathname === "/lifestyle" ? "side-item active" : "side-item"}
-onClick={()=>navigate("/lifestyle")}
->
-<Gem size={18}/>
-<span>Lifestyle</span>
-</button>
-
-<button
-className={location.pathname === "/aide" ? "side-item active" : "side-item"}
-onClick={()=>navigate("/aide")}
->
-<Headphones size={18}/>
-<span>Aide</span>
-</button>
-
-</div>
-
-</div>
-
-);
-
+// Sous-composant pour éviter la répétition de code
+function MenuButton({ active, onClick, icon, label }) {
+  return (
+    <button className={`side-item ${active ? "active" : ""}`} onClick={onClick}>
+      {icon}
+      <span>{label}</span>
+    </button>
+  );
 }
