@@ -26,26 +26,39 @@ export default function Profile({ data: initialData }) {
   const file = e.target.files[0];
   if (!file) return;
 
-  // 1. On crée le formulaire pour l'envoi de fichier
+  // 1. Aperçu immédiat pour l'utilisateur
+  setPhoto(URL.createObjectURL(file));
+
+  // 2. Préparation du FormData
   const formData = new FormData();
-  formData.append("photo", file); // "photo" doit être identique à upload.single("photo") côté back
+  formData.append("photo", file);
+
+  // 3. Récupération du token pour l'autorisation
+  const token = localStorage.getItem("token");
 
   try {
-    // 2. Envoi au serveur
-    const response = await api("/client/upload-profile-picture", {
+    // On utilise fetch directement au lieu de ton api() pour éviter le conflit JSON
+    const res = await fetch("/api/client/upload-profile-picture", {
       method: "POST",
-      body: formData,
-      // ATTENTION : Ne pas ajouter de Header "Content-Type", 
-      // le navigateur le met automatiquement pour FormData.
+      headers: {
+        // SURTOUT PAS de Content-Type ici, le navigateur s'en occupe
+        "Authorization": token ? `Bearer ${token}` : ""
+      },
+      body: formData
     });
 
-    if (response && response.url) {
-      setPhoto(response.url); // On met à jour l'affichage avec l'URL Cloudinary
-      alert("Photo enregistrée !");
+    const result = await res.json();
+
+    if (res.ok && result.url) {
+      // 4. On met à jour l'affichage avec l'URL finale de Cloudinary
+      setPhoto(result.url);
+      alert("Photo de profil enregistrée avec succès !");
+    } else {
+      throw new Error(result.message || "Erreur lors de l'upload");
     }
   } catch (err) {
-    console.error("Erreur upload:", err);
-    alert("Impossible d'enregistrer la photo.");
+    console.error("Erreur d'upload:", err);
+    alert("Erreur lors de l'enregistrement de la photo.");
   }
 };
 
