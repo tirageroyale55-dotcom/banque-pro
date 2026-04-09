@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const express = require("express");
 const upload = require("../middleware/upload.middleware");
 const auth = require("../middleware/auth.middleware");
 const User = require("../models/User");
@@ -10,25 +11,21 @@ router.get("/dashboard", auth, getDashboard);
 router.post("/upload-profile-picture", auth, upload.single("photo"), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: "Aucun fichier téléchargé" });
+      return res.status(400).json({ message: "Aucun fichier reçu" });
     }
 
-    // L'URL de l'image sur Cloudinary est dans req.file.path
+    // On récupère l'URL renvoyée par Cloudinary
     const imageUrl = req.file.path;
 
-    // On met à jour l'utilisateur dans MongoDB
-    // req.user.id vient de ton middleware d'authentification
+    // On met à jour le champ profilePicture dans MongoDB
     await User.findByIdAndUpdate(req.user.id, {
-      profilePicture: imageUrl 
+      profilePicture: imageUrl
     });
 
-    res.json({ 
-      message: "Photo mise à jour !", 
-      url: imageUrl 
-    });
+    res.json({ url: imageUrl });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Erreur serveur lors de l'upload" });
+    console.error("Erreur Upload:", error);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 });
 

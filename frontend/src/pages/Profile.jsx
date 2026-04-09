@@ -23,31 +23,31 @@ export default function Profile({ data: initialData }) {
 
   // --- NOUVELLE FONCTION POUR ENREGISTRER LA PHOTO ---
   const handlePhotoChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const file = e.target.files[0];
+  if (!file) return;
 
-    // 1. Aperçu immédiat
-    setPhoto(URL.createObjectURL(file));
+  // 1. On crée le formulaire pour l'envoi de fichier
+  const formData = new FormData();
+  formData.append("photo", file); // "photo" doit être identique à upload.single("photo") côté back
 
-    // 2. Envoi au serveur (FormData est nécessaire pour les fichiers)
-    const formData = new FormData();
-    formData.append("photo", file);
+  try {
+    // 2. Envoi au serveur
+    const response = await api("/client/upload-profile-picture", {
+      method: "POST",
+      body: formData,
+      // ATTENTION : Ne pas ajouter de Header "Content-Type", 
+      // le navigateur le met automatiquement pour FormData.
+    });
 
-    try {
-      await api("/client/upload-profile-picture", {
-        method: "POST",
-        body: formData,
-        // Important: Ne pas définir Content-Type, le navigateur le fera avec le boundary
-      });
-      console.log("Photo enregistrée avec succès");
-      if(response.url) {
-    setPhoto(response.url); 
-    alert("Profil mis à jour !");
-  }
-    } catch (err) {
-      console.error("Erreur lors de l'enregistrement de la photo", err);
+    if (response && response.url) {
+      setPhoto(response.url); // On met à jour l'affichage avec l'URL Cloudinary
+      alert("Photo enregistrée !");
     }
-  };
+  } catch (err) {
+    console.error("Erreur upload:", err);
+    alert("Impossible d'enregistrer la photo.");
+  }
+};
 
   if (!data) {
     return (
