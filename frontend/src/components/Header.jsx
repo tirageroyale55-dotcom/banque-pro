@@ -25,20 +25,20 @@ export default function Header({ data }) {
       {!isDesktop && (
         <div className="profile" onClick={() => navigate("/profile")}>
           <div className="avatar">
-            {/* ✅ MODIFICATION ICI : Priorité à l'image, sinon initiales */}
-            {profileImage ? (
-              <img 
-                src={profileImage} 
-                alt="Profile" 
-                style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
-              />
-            ) : (
-              <>
-                {data.firstname?.charAt(0)}
-                {data.lastname?.charAt(0)}
-              </>
-            )}
-          </div>
+  {/* On cherche la photo partout : dans data, ou dans data.user */}
+  {(data?.profilePicture || data?.user?.profilePicture) ? (
+    <img 
+      src={data.profilePicture || data.user.profilePicture} 
+      alt="Profile" 
+      style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
+    />
+  ) : (
+    <>
+      {data?.firstname?.charAt(0) || data?.prenom?.charAt(0)}
+      {data?.lastname?.charAt(0) || data?.nom?.charAt(0)}
+    </>
+  )}
+</div>
         </div>
       )}
 
