@@ -112,7 +112,7 @@ const compressImage = async (file) => {
     );
   }
 
-  const userInfo = data.user || data; 
+  const userInfo = data.user ? data.user : data; 
   const nomUser = userInfo.nom || "";
   const prenomUser = userInfo.prenom || "";
   const displayName = `${prenomUser} ${nomUser}`.trim() || "Client BPER";
