@@ -50,48 +50,45 @@ const compressImage = async (file) => {
 
   // --- NOUVELLE FONCTION POUR ENREGISTRER LA PHOTO ---
   const handlePhotoChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-  // Si le fichier est trop gros (> 4MB), on prévient l'utilisateur
-  if (file.size > 4 * 1024 * 1024) {
-    alert("L'image est trop lourde pour Vercel (max 4MB)");
-    return;
-  }
+    // 1. On affiche l'aperçu immédiatement (même si c'est le gros fichier)
+    setPhoto(URL.createObjectURL(file));
 
-  setPhoto(URL.createObjectURL(file));
+    try {
+      // 2. On compresse l'image (cela prend un peu de temps)
+      const compressedFile = await compressImage(file);
 
-  const formData = new FormData();
-  formData.append("photo", file);
+      // 3. On prépare le formulaire d'envoi avec SEULEMENT le fichier compressé
+      const formData = new FormData();
+      formData.append("photo", compressedFile); // Un seul append suffit ici
 
-  const token = localStorage.getItem("token");
-  
-  
-  const compressedFile = await compressImage(file); // On compresse ici
-  formData.append("photo", compressedFile);
+      const token = localStorage.getItem("token");
 
-  try {
-    const res = await fetch("/api/client/upload-profile-picture", {
-      method: "POST", // BIEN VÉRIFIER QUE C'EST POST
-      headers: {
-        "Authorization": token ? `Bearer ${token}` : ""
-      },
-      body: formData
-    });
+      // 4. Envoi vers le serveur
+      const res = await fetch("/api/client/upload-profile-picture", {
+        method: "POST",
+        headers: {
+          "Authorization": token ? `Bearer ${token}` : ""
+          // Rappel : Pas de "Content-Type" pour les fichiers
+        },
+        body: formData
+      });
 
-    const result = await res.json();
+      const result = await res.json();
 
-    if (res.ok) {
-      setPhoto(result.url);
-      alert("Photo enregistrée !");
-    } else {
-      alert("Erreur " + res.status + " : " + (result.message || "Fichier trop lourd"));
+      if (res.ok) {
+        setPhoto(result.url); // On remplace l'aperçu par l'URL Cloudinary finale
+        alert("Photo de profil enregistrée !");
+      } else {
+        alert("Erreur " + res.status + " : " + (result.message || "Échec de l'enregistrement"));
+      }
+    } catch (err) {
+      console.error("Erreur connexion:", err);
+      alert("Problème de connexion au serveur.");
     }
-  } catch (err) {
-    console.error("Erreur connexion:", err);
-    alert("Problème de connexion au serveur.");
-  }
-};
+  };
 
   if (!data) {
     return (
