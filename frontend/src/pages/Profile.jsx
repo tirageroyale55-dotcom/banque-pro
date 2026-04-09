@@ -75,7 +75,7 @@ export default function Profile({ data: initialData }) {
             </div>
             <div className="profile-info-text">
               <div className="profile-label">Mon profil</div>
-              <div className="profile-name">({displayName})</div>
+              <div className="profile-name">{displayName}</div>
               <div className="profile-bank-tag">BPER BANCA</div>
             </div>
             <ChevronRight size={20} color="#cbd5e1" />
