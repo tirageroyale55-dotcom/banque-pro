@@ -68,17 +68,10 @@ export default function Profile({ data: initialData }) {
           <div className="bper-card-blue" onClick={() => setShowDetails(true)}>
             <div className="bper-avatar-circle">
                {photo ? <img src={photo} alt="avatar" className="avatar-img"/> : initials}
-               <label 
-  className="camera-badge"
-  onClick={(e) => e.stopPropagation()} // 👈 AJOUTE CETTE LIGNE ICI
->
-  <Camera size={10} />
-  <input 
-    type="file" 
-    hidden 
-    onChange={(e) => setPhoto(URL.createObjectURL(e.target.files[0]))} 
-  />
-</label>
+               <label className="camera-badge">
+                  <Camera size={10} />
+                  <input type="file" hidden onChange={(e) => setPhoto(URL.createObjectURL(e.target.files[0]))} />
+               </label>
             </div>
             <div className="profile-info-text">
               <div className="profile-label">Mon profil</div>
