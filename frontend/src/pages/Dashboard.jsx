@@ -20,29 +20,21 @@ export default function Dashboard() {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
   const [card, setCard] = useState(null);
   
-  // États pour l'animation du Header/BalanceBar
-  const [scrollOffset, setScrollOffset] = useState(-60);
-  const [opacity, setOpacity] = useState(0);
-
   const navigate = useNavigate();
   const contentRef = useRef(null);
 
-  // 1. Gestion du Responsive
+  // Gestion du Responsive
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 2. Chargement des données (Dashboard + Transactions)
+  // Chargement des données
   useEffect(() => {
-    // On récupère les infos client
     api("/client/dashboard")
       .then((clientData) => {
         setData(clientData);
-
-        // On tente de charger les transactions (on gère l'erreur 404 ici discrètement)
-        // On essaie /transaction (sans s) car c'est ce qui marche dans ton server.js
         api("/transaction") 
           .then((transactionsData) => {
             setData(prev => ({
@@ -50,95 +42,49 @@ export default function Dashboard() {
               transactions: transactionsData.transactions || transactionsData
             }));
           })
-          .catch(err => console.log("Note: Historique non chargé via /transaction"));
+          .catch(() => console.log("Historique non chargé"));
       })
-      .catch((err) => {
-        console.error("Session expirée");
+      .catch(() => {
         localStorage.removeItem("token");
         navigate("/login");
       });
   }, [navigate]);
 
-  // 3. Chargement des cartes si l'onglet change
   useEffect(() => {
     if (activeTab === "cards") {
-      api("/client/card")
-        .then(setCard)
-        .catch(() => console.log("Erreur carte"));
+      api("/client/card").then(setCard).catch(() => {});
     }
   }, [activeTab]);
 
-  // 4. Reset du scroll quand on change d'onglet
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [activeTab]);
-
-  // 5. Logique de la BalanceBar (Sticky scroll)
-  useEffect(() => {
-    if (!data || activeTab !== "accounts") return;
-
-    const handleScroll = () => {
-      const bar = document.querySelector('.balance-bar');
-      const accountCard = document.querySelector('.account-card');
-      if (!bar || !accountCard) return;
-
-      const cardRect = accountCard.getBoundingClientRect();
-      if (cardRect.top < 135) {
-        bar.classList.add('show');
-      } else {
-        bar.classList.remove('show');
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, true);
-    return () => window.removeEventListener("scroll", handleScroll, true);
-  }, [activeTab, data]);
-
-  if (!data) return (
-    <div className="loader-container">
-      <div className="spinner"></div>
-      <p>BPER Banca : Connexion sécurisée...</p>
-    </div>
-  );
+  if (!data) return <div className="loader">Chargement...</div>;
 
   return (
-    <div className={isDesktop ? "bank-app-desktop" : "bank-app-mobile"}>
+    <div className={isDesktop ? "app-layout-desktop" : "app-layout-mobile"}>
       
-      {/* SIDEBAR : Fixe à gauche sur PC */}
+      {/* 1. SIDEBAR : Elle est ici et nulle part ailleurs */}
       {isDesktop && <Sidebar data={data} />}
 
-      {/* ZONE DE CONTENU PRINCIPALE */}
-      <div className="main-wrapper">
+      {/* 2. CONTENU PRINCIPAL */}
+      <div className="main-viewport">
         
         <Header data={data} />
 
-        <div className="content-container">
+        <div className="scrollable-content">
           <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-          <BalanceBar 
-            balance={data.balance} 
-            offset={scrollOffset} 
-            opacity={opacity} 
-          />
+          <BalanceBar balance={data.balance} />
 
-          <main className="page-content" ref={contentRef}>
-            
-            {/* ONGLET COMPTES */}
+          <main className="page-body" ref={contentRef}>
             {activeTab === "accounts" && <Accounts data={data} />}
 
-            {/* ONGLET CARTES */}
             {activeTab === "cards" && (
               <div className="cards-section">
                 <h3 className="cards-title">Mes cartes</h3>
                 <div className="cards-slider">
-                  {card && (
-                    <div className="cards-slide">
-                      <BankCard card={card}/>
-                    </div>
-                  )}
-                  <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+                  {card && <BankCard card={card}/>}
+                  <div className="card-request" onClick={() => navigate("/request-card")}>
                     <div className="card-request-inner">
-                      <div className="card-plus">+</div>
+                      <span>+</span>
                       <p>Demander une carte</p>
                     </div>
                   </div>
@@ -146,21 +92,18 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* ONGLET FINANCEMENT */}
             {activeTab === "financing" && (
-              <div className="content">
-                <div className="account-card">
-                  <h3>Financements</h3>
-                  <p>Aucun financement ou prêt en cours.</p>
-                </div>
+              <div className="account-card">
+                <h3>Financements</h3>
+                <p>Aucun prêt en cours.</p>
               </div>
             )}
-
           </main>
         </div>
       </div>
 
-      
+      {/* 3. MOBILE NAV : N'apparaît JAMAIS sur ordinateur */}
+      {!isDesktop && <BottomNav />}
       
     </div>
   );
