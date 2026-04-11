@@ -340,51 +340,57 @@ white-space:nowrap;
 
 
 
-/* --- CONFIGURATION ORDINATEUR --- */
+/* --- RESET --- */
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* --- VERSION ORDINATEUR (PRO) --- */
 @media (min-width: 1000px) {
-  .bank-app-desktop {
-    display: flex; /* Aligne Sidebar et Main-wrapper côte à côte */
-    background-color: #004d40; /* Ta couleur de fond */
-    min-height: 100vh;
-    width: 100%;
+  .bper-desktop-layout {
+    display: flex; /* Aligne sidebar et contenu côte à côte */
+    background-color: #004d40; /* Ton vert BPER */
+    height: 100vh;
+    width: 100vw;
   }
 
   .sidebar {
-    width: 280px;
-    min-width: 280px;
-    height: 100vh;
-    position: sticky;
-    top: 0;
-    background: #003a30; /* Un peu plus sombre que le fond */
-    z-index: 100;
+    width: 280px !important;
+    height: 100vh !important;
+    position: relative !important; /* Pour ne plus flotter en haut */
+    flex-shrink: 0;
+    background-color: #003a30;
   }
 
-  .main-wrapper {
-    flex: 1; /* Prend tout l'espace restant */
+  .bper-main-content {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 0 40px; /* Plus d'espace sur les côtés sur PC */
-    max-width: calc(100% - 280px);
+    height: 100vh;
+    overflow: hidden;
   }
 
-  /* Cache les éléments mobiles si nécessaire */
-  .bottom-nav {
-    display: none;
+  .bper-scroll-area {
+    flex: 1;
+    overflow-y: auto; /* Seul le contenu défile, pas la sidebar */
+    padding: 0 40px;
   }
+
+  /* On cache la navigation mobile sur PC */
+  .bottom-nav { display: none !important; }
 }
 
-/* --- CONFIGURATION MOBILE --- */
+/* --- VERSION MOBILE --- */
 @media (max-width: 999px) {
-  .bank-app-mobile {
-    display: block;
-    padding-bottom: 80px; /* Pour ne pas cacher le contenu sous la BottomNav */
+  .bper-mobile-layout {
+    background-color: #004d40;
+    min-height: 100vh;
+    padding-bottom: 70px;
   }
-  
-  .sidebar {
-    display: none;
-  }
+  .sidebar { display: none; }
 }
-
 
 /* =========================
 PRO DESKTOP BANK LAYOUT
