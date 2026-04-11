@@ -29,6 +29,7 @@ app.use("/api/client", require("./routes/card.routes"));
 
 
 app.use("/api/transaction", require("./routes/transaction.routes"));
+app.use("/api/transactions", require("./routes/transaction.routes"));
 
 const PORT = process.env.PORT || 5000;
 
