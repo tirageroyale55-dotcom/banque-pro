@@ -104,8 +104,7 @@ export default function Dashboard() {
   return (
     <div className={isDesktop ? "bank-app-desktop" : "bank-app-mobile"}>
       
-      {/* SIDEBAR : Fixe à gauche sur PC */}
-      {isDesktop && <Sidebar data={data} />}
+      
 
       {/* ZONE DE CONTENU PRINCIPALE */}
       <div className="main-wrapper">
