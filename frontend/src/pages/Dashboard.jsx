@@ -127,13 +127,16 @@ return (
 
 <div className="bank-app">
 
-<Sidebar data={data} /> {/* Colonne de gauche (260px) */}
+{isDesktop && <Sidebar/>}
 
-<div className="desktop-content">
+<div className={isDesktop ? "desktop-content" : ""}>
 
 <Header data={data} />
 
-<Tabs activeTab={activeTab} />
+<Tabs
+activeTab={activeTab}
+setActiveTab={setActiveTab}
+/>
 
 <BalanceBar 
   balance={data.balance} 
@@ -141,7 +144,7 @@ return (
   opacity={opacity} 
 />
 
-<div className="page-content">
+<div className="page-content" ref={contentRef}>
 
 {activeTab === "accounts" && <Accounts data={data}/>}
 
