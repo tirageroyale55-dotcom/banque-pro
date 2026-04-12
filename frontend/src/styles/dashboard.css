@@ -433,6 +433,86 @@ white-space:nowrap;
   }
 }
 
+/* ============================================================
+   FORCE DESKTOP PRO : SUPPRESSION DÉFINITIVE DOUBLE PAGE
+   ============================================================ */
+
+@media (min-width: 1000px) {
+
+  /* 1. On réinitialise la structure de base */
+  .bank-app {
+    display: flex !important;
+    flex-direction: row !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: hidden !important;
+    position: relative !important;
+    padding: 0 !important;
+  }
+
+  /* 2. SIDEBAR : On la bloque à gauche */
+  .sidebar {
+    display: flex !important;
+    width: 260px !important;
+    min-width: 260px !important;
+    height: 100vh !important;
+    background: #0a4f4e !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
+    z-index: 9999 !important;
+    padding: 30px 20px !important;
+  }
+
+  /* 3. COLONNE DE DROITE : Le contenu */
+  .desktop-content {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: #0b5c5b !important;
+  }
+
+  /* 4. ANNULATION DU MODE MOBILE SUR LE HEADER */
+  /* C'est ici qu'on règle ton problème de double page */
+  .header {
+    position: relative !important; /* Sort du mode "fixé en haut de l'écran" */
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 80px !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    background: rgba(11, 92, 91, 0.6) !important;
+    z-index: 100 !important;
+  }
+
+  /* 5. ANNULATION DU MODE MOBILE SUR LES TABS */
+  .tabs-wrapper {
+    position: relative !important;
+    top: 0 !important;
+    width: 100% !important;
+    background: transparent !important;
+    padding: 10px 30px !important;
+    z-index: 50 !important;
+  }
+
+  /* 6. ZONE DE SCROLL : On enlève le margin-top de 145px du mobile */
+  .page-content {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    margin-top: 0 !important; /* TRÈS IMPORTANT : supprime l'espace vide du mobile */
+    padding: 20px 40px !important;
+    display: block !important;
+  }
+
+  /* 7. SÉCURITÉ : On cache tout ce qui est mobile */
+  .bottom-nav {
+    display: none !important;
+  }
+}
+
 
 
 
