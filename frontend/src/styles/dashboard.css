@@ -338,121 +338,117 @@ white-space:nowrap;
 
 
 /* ============================================================
-   VERSION ORDINATEUR PRO (BASÉE SUR LE SCHÉMA)
+   CONFIGURATION DESKTOP PRO (STYLE BPER BANCA)
    ============================================================ */
 
 @media (min-width: 1000px) {
   
-  /* Conteneur principal horizontal */
+  /* Conteneur Principal : Aligne Sidebar à gauche et Contenu à droite */
   .bank-app {
     display: flex !important;
     flex-direction: row !important;
     height: 100vh !important;
-    background: #0b5c5b !important;
+    width: 100vw !important;
     overflow: hidden !important;
+    background: #0b5c5b !important;
   }
 
-  /* SIDEBAR : Fixe à gauche comme sur le schéma */
+  /* SIDEBAR : Fixe à gauche selon ton dessin */
   .sidebar {
     display: flex !important;
     width: 260px !important;
     min-width: 260px !important;
     height: 100vh !important;
-    background: #0a4f4e !important; /* Vert plus foncé pour contraste */
+    background: #0a4f4e !important;
     flex-direction: column;
-    padding: 30px 20px;
+    padding: 30px 20px !important;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     position: relative !important;
-    z-index: 100;
   }
 
-  /* ZONE DE DROITE (Header + Tabs + Content) */
+  /* ZONE DE DROITE (Header + Content) */
   .desktop-content {
     flex: 1 !important;
     display: flex !important;
     flex-direction: column !important;
     height: 100vh !important;
+    overflow: hidden !important;
     position: relative !important;
-    background: #0b5c5b !important;
   }
 
-  /* HEADER : Aligné à droite (cloches/profil) */
+  /* HEADER : Aligné en haut à droite (comme ton schéma) */
   .header {
-    position: relative !important; /* Annule le 'fixed' du mobile */
+    position: relative !important; /* Annule le fixed du mobile */
     top: auto !important;
     left: auto !important;
     width: 100% !important;
     height: 80px !important;
-    background: transparent !important;
+    background: transparent !important; /* Look propre */
     display: flex !important;
-    justify-content: flex-end !important; /* Aligne les icônes à droite */
+    justify-content: flex-end !important; /* Profil et icônes à droite */
     padding: 0 40px !important;
+    z-index: 10 !important;
     backdrop-filter: none !important;
   }
 
-  /* TABS (Comptes, Cartes, Financement) : Centré ou aligné gauche */
+  /* TABS : Sous le header, alignés à gauche du contenu */
   .tabs-wrapper {
-    position: relative !important; /* Annule le 'fixed' du mobile */
+    position: relative !important; /* Annule le fixed du mobile */
     top: auto !important;
+    left: auto !important;
     width: 100% !important;
     background: transparent !important;
-    padding: 10px 40px !important;
-    z-index: 10;
+    padding: 0 40px !important;
+    margin-bottom: 20px !important;
+    z-index: 5 !important;
+    backdrop-filter: none !important;
   }
 
-  .tabs {
-    justify-content: flex-start !important;
-    gap: 15px !important;
-  }
-
-  /* ZONE DE SCROLL : Historique et graphiques */
+  /* ZONE DE SCROLL : Contient les comptes et l'historique */
   .page-content {
     flex: 1 !important;
-    overflow-y: auto !important; /* Seule cette zone défile */
-    margin-top: 0 !important; /* Supprime l'espace mobile de 145px */
-    padding: 20px 40px 40px 40px !important;
+    overflow-y: auto !important; /* Seul le contenu défile */
+    margin-top: 0 !important; /* Supprime le vide de 145px du mobile */
+    padding: 0 40px 40px 40px !important;
   }
 
-  /* Masquer la navigation du bas sur ordinateur */
+  /* Masquer la navigation mobile */
   .bottom-nav {
     display: none !important;
   }
 
-  /* Style des boutons Sidebar */
+  /* Style des boutons Sidebar pour faire "Pro" */
   .side-item {
     all: unset;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 15px;
-    margin-bottom: 5px;
-    border-radius: 12px;
+    gap: 15px;
+    padding: 12px 18px;
     color: white;
+    border-radius: 12px;
     cursor: pointer;
     transition: 0.2s;
+    font-size: 15px;
+    margin-bottom: 4px;
   }
 
   .side-item:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
   }
 
   .side-item.active {
-    background: white;
-    color: #0b5c5b;
+    background: white !important;
+    color: #0b5c5b !important;
     font-weight: 600;
   }
-}
 
-/* ============================================================
-   SÉCURITÉ MOBILE (Empêche le mélange)
-   ============================================================ */
-@media (max-width: 999px) {
-  .sidebar {
-    display: none !important;
-  }
-  /* On garde le comportement fixed uniquement ici */
-  .header, .tabs-wrapper {
-    position: fixed !important;
+  /* Avatar Sidebar */
+  .sidebar-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    padding: 10px;
   }
 }
 

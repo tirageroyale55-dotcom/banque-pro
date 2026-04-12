@@ -126,17 +126,10 @@ if (!data) return null;
 return (
 
 <div className="bank-app">
-
-{isDesktop && <Sidebar/>}
-
-<div className={isDesktop ? "desktop-content" : ""}>
-
-<Header data={data} />
-
-<Tabs
-activeTab={activeTab}
-setActiveTab={setActiveTab}
-/>
+  {isDesktop && <Sidebar data={data} />}
+  <div className="desktop-content">
+    <Header data={data} />
+    <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
 <BalanceBar 
   balance={data.balance} 
@@ -144,7 +137,7 @@ setActiveTab={setActiveTab}
   opacity={opacity} 
 />
 
-<div className="page-content" ref={contentRef}>
+<div className="page-content">
 
 {activeTab === "accounts" && <Accounts data={data}/>}
 
