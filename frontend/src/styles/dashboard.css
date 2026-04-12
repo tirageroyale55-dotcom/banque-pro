@@ -342,7 +342,121 @@ white-space:nowrap;
 
 
 
+/* =========================
+   DESKTOP BANK LAYOUT PRO
+   ========================= */
 
+@media (min-width: 1000px) {
+  
+  /* Conteneur principal : Aligne Sidebar à gauche et Contenu à droite */
+  .bank-app {
+    display: flex !important;
+    flex-direction: row !important;
+    height: 100vh;
+    overflow: hidden;
+    background: #0b5c5b;
+  }
+
+  /* SIDEBAR : Fixe à gauche */
+  .sidebar {
+    display: flex !important;
+    width: 260px;
+    height: 100vh;
+    background: #0a4f4e;
+    padding: 30px 20px;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* CONTENU DROIT : Zone qui contient Header + Tabs + Page */
+  .desktop-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden; /* Empêche le scroll sur toute la page */
+    background: #0b5c5b;
+  }
+
+  /* HEADER : Enlevé du mode "fixed" pour rester en haut à droite */
+  .header {
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: 80px;
+    background: rgba(11, 92, 91, 0.6) !important;
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 30px;
+    z-index: 10;
+  }
+
+  /* TABS : Enlevé du mode "fixed" pour ne plus flotter sur le texte */
+  .tabs-wrapper {
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: transparent !important;
+    padding: 10px 30px;
+    z-index: 5;
+  }
+
+  /* BALANCE BAR STICKY (Optionnel sur PC) */
+  .balance-bar {
+    position: absolute !important;
+    top: 80px !important;
+    left: 0 !important;
+    width: 100% !important;
+  }
+
+  /* ZONE DE SCROLL : C'est ici que les transactions défilent */
+  .page-content {
+    flex: 1;
+    overflow-y: auto; /* Seul le contenu défile */
+    padding: 20px 40px 40px 40px;
+    margin-top: 0 !important; /* On annule le margin-top du mobile */
+  }
+
+  /* Masquer la navigation mobile */
+  .bottom-nav {
+    display: none !important;
+  }
+
+  /* Design des cartes et comptes sur PC */
+  .content {
+    max-width: 1000px;
+    margin: 0;
+  }
+
+  /* STYLE MENU SIDEBAR (Si tu as ces classes) */
+  .side-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: 0.3s;
+    font-size: 15px;
+  }
+
+  .side-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .side-item.active {
+    background: white;
+    color: #0b5c5b;
+    font-weight: 600;
+  }
+}
 
 
 
