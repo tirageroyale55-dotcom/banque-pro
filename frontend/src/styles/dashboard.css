@@ -332,7 +332,46 @@ white-space:nowrap;
 
 
 
+/* CORRECTIF FINAL POUR ORDINATEUR */
+@media (min-width: 1000px) {
+  /* On s'assure que le conteneur principal prend toute la place sans déborder */
+  .main-content-wrapper {
+    margin-left: 240px; /* Largeur de ta sidebar */
+    width: calc(100% - 240px);
+    position: relative;
+    min-height: 100vh;
+  }
 
+  /* Ton Header est en fixed, on le cadre à droite de la sidebar */
+  .header {
+    left: 240px !important;
+    width: calc(100% - 240px) !important;
+  }
+
+  /* On aligne les onglets (Tabs) aussi */
+  .tabs-wrapper {
+    left: 240px !important;
+    width: calc(100% - 240px) !important;
+  }
+
+  /* On empêche le design mobile de s'étaler */
+  .page-content {
+    max-width: 1000px;
+    margin: 145px auto 0 auto; /* Centre le contenu */
+    padding: 20px;
+  }
+}
+
+/* Cache la Sidebar sur mobile si elle apparaît par erreur */
+@media (max-width: 999px) {
+  .sidebar {
+    display: none !important;
+  }
+  .main-content-wrapper {
+    margin-left: 0;
+    width: 100%;
+  }
+}
 
 
 
