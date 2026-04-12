@@ -337,7 +337,91 @@ white-space:nowrap;
 
 
 
+/* ============================================================
+   NOUVELLE VERSION ORDINATEUR PRO (CONFORME AU SCHÉMA)
+   ============================================================ */
 
+@media (min-width: 1000px) {
+
+  /* Alignement horizontal : Sidebar à gauche, Contenu à droite */
+  .bank-app {
+    display: flex !important;
+    flex-direction: row !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: hidden !important; /* Empêche tout l'écran de scroller */
+    background: #0b5c5b !important;
+  }
+
+  /* SIDEBAR : Fixe à gauche (comme sur ton dessin) */
+  .sidebar {
+    display: flex !important;
+    width: 260px !important;
+    min-width: 260px !important;
+    height: 100vh !important;
+    background: #0a4f4e !important;
+    flex-direction: column !important;
+    position: relative !important; /* Ne flotte pas sur le contenu */
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* COLONNE DE DROITE : Header + Onglets + Zone de scroll */
+  .desktop-content {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    position: relative !important;
+  }
+
+  /* HEADER : En haut à droite (Profil & Notifications) */
+  .header {
+    position: relative !important; /* ANNULE le mode mobile qui causait le décalage */
+    width: 100% !important;
+    height: 80px !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    padding: 0 40px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* ONGLETS (Tabs) : Juste sous le header, alignés comme ton schéma */
+  .tabs-wrapper {
+    position: relative !important; /* ANNULE le mode mobile */
+    width: 100% !important;
+    padding: 0 40px !important;
+    background: transparent !important;
+    margin-bottom: 10px !important;
+  }
+
+  /* ZONE DE CONTENU (SCROLLABLE) */
+  /* C'est ici que s'affichent le Solde et l'Historique */
+  .page-content {
+    flex: 1 !important;
+    overflow-y: auto !important; /* Seule cette zone défile */
+    margin-top: 0 !important; /* Supprime le vide du mobile */
+    padding: 20px 40px !important;
+  }
+
+  /* Désactivation des éléments mobiles */
+  .bottom-nav {
+    display: none !important;
+  }
+
+  /* Ajustement des composants internes pour le mode Pro */
+  .content {
+    max-width: 1000px !important;
+    margin: 0 !important;
+  }
+}
+
+/* PROTECTION : On s'assure que le mobile reste intact */
+@media (max-width: 999px) {
+  .sidebar { display: none !important; }
+  .header, .tabs-wrapper { position: fixed !important; }
+  .page-content { margin-top: 145px !important; }
+}
 
 
 
