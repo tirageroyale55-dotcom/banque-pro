@@ -337,227 +337,123 @@ white-space:nowrap;
 
 
 
-/* --- RESET --- */
-body, html {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
+/* ============================================================
+   VERSION ORDINATEUR PRO (BASÉE SUR LE SCHÉMA)
+   ============================================================ */
 
-/* --- VERSION ORDINATEUR (PRO) --- */
 @media (min-width: 1000px) {
-  .bper-desktop-layout {
-    display: flex; /* Aligne sidebar et contenu côte à côte */
-    background-color: #004d40; /* Ton vert BPER */
-    height: 100vh;
-    width: 100vw;
-  }
-
-  .sidebar {
-    width: 280px !important;
+  
+  /* Conteneur principal horizontal */
+  .bank-app {
+    display: flex !important;
+    flex-direction: row !important;
     height: 100vh !important;
-    position: relative !important; /* Pour ne plus flotter en haut */
-    flex-shrink: 0;
-    background-color: #003a30;
+    background: #0b5c5b !important;
+    overflow: hidden !important;
   }
 
-  .bper-main-content {
-    flex: 1;
-    display: flex;
+  /* SIDEBAR : Fixe à gauche comme sur le schéma */
+  .sidebar {
+    display: flex !important;
+    width: 260px !important;
+    min-width: 260px !important;
+    height: 100vh !important;
+    background: #0a4f4e !important; /* Vert plus foncé pour contraste */
     flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
+    padding: 30px 20px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative !important;
+    z-index: 100;
   }
 
-  .bper-scroll-area {
-    flex: 1;
-    overflow-y: auto; /* Seul le contenu défile, pas la sidebar */
-    padding: 0 40px;
+  /* ZONE DE DROITE (Header + Tabs + Content) */
+  .desktop-content {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    position: relative !important;
+    background: #0b5c5b !important;
   }
 
-  /* On cache la navigation mobile sur PC */
-  .bottom-nav { display: none !important; }
+  /* HEADER : Aligné à droite (cloches/profil) */
+  .header {
+    position: relative !important; /* Annule le 'fixed' du mobile */
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    height: 80px !important;
+    background: transparent !important;
+    display: flex !important;
+    justify-content: flex-end !important; /* Aligne les icônes à droite */
+    padding: 0 40px !important;
+    backdrop-filter: none !important;
+  }
+
+  /* TABS (Comptes, Cartes, Financement) : Centré ou aligné gauche */
+  .tabs-wrapper {
+    position: relative !important; /* Annule le 'fixed' du mobile */
+    top: auto !important;
+    width: 100% !important;
+    background: transparent !important;
+    padding: 10px 40px !important;
+    z-index: 10;
+  }
+
+  .tabs {
+    justify-content: flex-start !important;
+    gap: 15px !important;
+  }
+
+  /* ZONE DE SCROLL : Historique et graphiques */
+  .page-content {
+    flex: 1 !important;
+    overflow-y: auto !important; /* Seule cette zone défile */
+    margin-top: 0 !important; /* Supprime l'espace mobile de 145px */
+    padding: 20px 40px 40px 40px !important;
+  }
+
+  /* Masquer la navigation du bas sur ordinateur */
+  .bottom-nav {
+    display: none !important;
+  }
+
+  /* Style des boutons Sidebar */
+  .side-item {
+    all: unset;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .side-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .side-item.active {
+    background: white;
+    color: #0b5c5b;
+    font-weight: 600;
+  }
 }
 
-/* --- VERSION MOBILE --- */
+/* ============================================================
+   SÉCURITÉ MOBILE (Empêche le mélange)
+   ============================================================ */
 @media (max-width: 999px) {
-  .bper-mobile-layout {
-    background-color: #004d40;
-    min-height: 100vh;
-    padding-bottom: 70px;
+  .sidebar {
+    display: none !important;
   }
-  .sidebar { display: none; }
-}
-
-/* =========================
-PRO DESKTOP BANK LAYOUT
-========================= */
-
-/* SIDEBAR */
-
-.sidebar{
-display:none;
-}
-
-/* =========================
-DESKTOP BANK LAYOUT
-========================= */
-
-@media (min-width:1000px){
-
-.bank-app{
-display:flex;
-height:100vh;
-}
-
-/* SIDEBAR */
-
-.sidebar{
-width:240px;
-height:100vh;
-
-background:#0a4f4e;
-
-padding:30px 20px;
-
-display:flex;
-flex-direction:column;
-
-position:relative;
-}
-
-/* CONTENU DROIT */
-
-.desktop-content{
-flex:1;
-
-display:flex;
-flex-direction:column;
-
-height:100vh;
-}
-
-/* HEADER */
-
-.header{
-position:relative;
-
-height:80px;
-
-display:flex;
-align-items:center;
-justify-content:flex-end;
-
-padding:0 30px;
-
-background:rgba(11,92,91,0.6);
-backdrop-filter:blur(10px);
-}
-
-/* TABS */
-
-.tabs-wrapper{
-position:relative;
-
-top:0;
-
-padding:20px 30px;
-}
-
-/* CONTENT */
-
-.page-content{
-  flex:1;
-  overflow-y:auto;
-
-  height: calc(100vh - 145px);
-
-  padding:30px;
-}
-
-/* HIDE MOBILE NAV */
-
-.bottom-nav{
-display:none;
-}
-
-/* DESKTOP ACCOUNT CARD WIDTH */
-
-.content{
-max-width:900px;
-}
-
-
-/* SIDEBAR */
-
-.sidebar{
-width:240px;
-background:#0a4f4e;
-height:100vh;
-
-padding:30px 20px;
-
-display:flex;
-flex-direction:column;
-}
-
-/* PROFILE */
-
-.sidebar-profile{
-display:flex;
-align-items:center;
-gap:12px;
-
-margin-bottom:40px;
-}
-
-.profile-text{
-display:flex;
-flex-direction:column;
-font-size:14px;
-}
-
-.profile-text span{
-opacity:0.6;
-font-size:12px;
-}
-
-/* MENU */
-
-.sidebar-menu{
-display:flex;
-flex-direction:column;
-gap:6px;
-}
-
-/* ITEM */
-
-.side-item{
-all:unset;
-
-display:flex;
-align-items:center;
-gap:12px;
-
-padding:12px 14px;
-
-border-radius:10px;
-
-cursor:pointer;
-
-color:white;
-font-size:14px;
-}
-
-.side-item:hover{
-background:#0f6d6c;
-}
-
-.side-item.active{
-background:white;
-color:#0b5c5b;
-font-weight:600;
-}
+  /* On garde le comportement fixed uniquement ici */
+  .header, .tabs-wrapper {
+    position: fixed !important;
+  }
 }
 
 
