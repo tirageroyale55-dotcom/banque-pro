@@ -343,23 +343,21 @@ white-space:nowrap;
 
 
 /* ============================================================
-   FORCE DESKTOP PRO (Correction mélange Mobile/PC)
+   FORCE DESKTOP PRO (Élimine la Double Page)
    ============================================================ */
 
 @media (min-width: 1000px) {
 
-  /* 1. On réinitialise le conteneur pour aligner Sidebar et Contenu */
+  /* On réinitialise la structure pour mettre Sidebar et Contenu côte à côte */
   .bank-app {
     display: flex !important;
     flex-direction: row !important;
-    position: relative !important;
     height: 100vh !important;
     overflow: hidden !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    position: relative !important;
   }
 
-  /* 2. On force la Sidebar à prendre sa place à gauche */
+  /* SIDEBAR : Fixe à gauche */
   .sidebar {
     display: flex !important;
     width: 260px !important;
@@ -368,62 +366,70 @@ white-space:nowrap;
     background: #0a4f4e !important;
     position: relative !important;
     flex-shrink: 0 !important;
-    z-index: 9999 !important;
+    z-index: 1000 !important;
   }
 
-  /* 3. On crée la colonne de droite pour le contenu */
+  /* CONTENU DROIT : Zone qui contient Header + Tabs + Page */
   .desktop-content {
     flex: 1 !important;
     display: flex !important;
     flex-direction: column !important;
     height: 100vh !important;
-    width: calc(100% - 260px) !important;
     position: relative !important;
+    overflow: hidden !important; /* Très important pour le scroll */
   }
 
-  /* 4. ANNIHILATION DU MODE MOBILE (IMPORTANT) */
-  /* On force le Header et les Tabs à ne plus être "Fixed" */
+  /* HEADER : On ANNULE le position:fixed du mobile */
   .header {
-    position: relative !important; /* Sort du mode mobile fixe */
+    position: relative !important; /* Il redevient un bloc normal à droite */
     top: auto !important;
     left: auto !important;
     right: auto !important;
     width: 100% !important;
     height: 80px !important;
-    display: flex !important;
-    justify-content: flex-end !important;
-    background: rgba(11, 92, 91, 0.6) !important;
-    z-index: 10 !important;
+    z-index: 100 !important;
+    transform: none !important;
   }
 
+  /* TABS : On ANNULE aussi le position:fixed */
   .tabs-wrapper {
-    position: relative !important; /* Sort du mode mobile fixe */
+    position: relative !important;
     top: auto !important;
     left: auto !important;
+    right: auto !important;
     width: 100% !important;
     background: transparent !important;
     padding: 10px 30px !important;
-    z-index: 5 !important;
+    z-index: 50 !important;
   }
 
-  /* 5. ZONE DE SCROLL PROPRE */
+  /* ZONE DE SCROLL : C'est ici que les transactions s'affichent */
   .page-content {
     flex: 1 !important;
-    overflow-y: auto !important; /* Seul le contenu scrolle */
-    margin-top: 0 !important; /* Supprime le décalage du mode mobile */
+    overflow-y: auto !important; /* Seule cette partie défile */
+    margin-top: 0 !important; /* On supprime le décalage mobile de 145px */
     padding: 20px 40px !important;
     display: block !important;
   }
 
-  /* 6. NETTOYAGE FINAL */
+  /* On cache la navigation du bas */
   .bottom-nav {
-    display: none !important; /* Plus de barre en bas sur PC */
+    display: none !important;
   }
+}
 
-  /* On s'assure que les cartes ne sont pas trop larges */
-  .content, .accounts-container, .cards-section {
-    max-width: 1100px !important;
-    margin: 0 !important;
+/* ============================================================
+   FORCE MOBILE (Pour éviter que le PC ne dérègle le téléphone)
+   ============================================================ */
+@media (max-width: 999px) {
+  .sidebar {
+    display: none !important;
+  }
+  .header, .tabs-wrapper {
+    position: fixed !important;
+  }
+  .page-content {
+    margin-top: 145px !important;
   }
 }
 
