@@ -124,52 +124,81 @@ useEffect(() => {
 if (!data) return null;
 
 return (
-  <div className="bank-app">
-    {/* ON SUPPRIME LA SIDEBAR ICI CAR ELLE EST DÉJÀ DANS CLIENTLAYOUT */}
-    
-    <div className="main-content-wrapper">
-      <Header data={data} />
 
-      <div className="scrollable-view">
-        <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+<div className="bank-app">
 
-        <BalanceBar 
-          balance={data.balance} 
-          offset={scrollOffset} 
-          opacity={opacity} 
-        />
+{isDesktop && <Sidebar/>}
 
-        <div className="page-content" ref={contentRef}>
-          {activeTab === "accounts" && <Accounts data={data}/>}
-          {activeTab === "profile" && <Profile data={data} />}
-          {activeTab === "cards" && (
-            <div className="cards-section">
-              <h3 className="cards-title">Mes cartes</h3>
-              <div className="cards-slider">
-                {card && <div className="cards-slide"><BankCard card={card}/></div>}
-                <div className="cards-slide card-request" onClick={()=>navigate("/request-card")}>
-                  <div className="card-request-inner">
-                    <div className="card-plus">+</div>
-                    <p>Demander une carte</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-          {activeTab === "financing" && (
-            <div className="content">
-              <div className="account-card">
-                <h3>Financements</h3>
-                <p>Aucun financement disponible</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+<div className={isDesktop ? "desktop-content" : ""}>
 
-    {!isDesktop && <BottomNav/>}
-  </div>
+<Header data={data} />
+
+<Tabs
+activeTab={activeTab}
+setActiveTab={setActiveTab}
+/>
+
+<BalanceBar 
+  balance={data.balance} 
+  offset={scrollOffset} 
+  opacity={opacity} 
+/>
+
+<div className="page-content" ref={contentRef}>
+
+{activeTab === "accounts" && <Accounts data={data}/>}
+
+{activeTab === "profile" && <Profile data={data} />}
+
+{activeTab === "cards" && (
+
+<div className="cards-section">
+
+<h3 className="cards-title">Mes cartes</h3>
+
+<div className="cards-slider">
+
+{card && (
+<div className="cards-slide">
+<BankCard card={card}/>
+</div>
+)}
+
+<div
+className="cards-slide card-request"
+onClick={()=>navigate("/request-card")}
+>
+
+<div className="card-request-inner">
+<div className="card-plus">+</div>
+<p>Demander une carte</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
+{activeTab === "financing" && (
+<div className="content">
+<div className="account-card">
+<h3>Financements</h3>
+<p>Aucun financement disponible</p>
+</div>
+</div>
+)}
+
+</div>
+
+</div>
+
+{!isDesktop && <BottomNav/>}
+
+</div>
+
 );
 
 }
