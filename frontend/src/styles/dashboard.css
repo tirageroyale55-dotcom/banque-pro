@@ -343,98 +343,87 @@ white-space:nowrap;
 
 
 /* ============================================================
-   VERSION ORDINATEUR (DESKTOP PRO) 
-   S'active uniquement au-dessus de 1000px
+   FORCE DESKTOP PRO (Correction mélange Mobile/PC)
    ============================================================ */
 
 @media (min-width: 1000px) {
 
-  /* 1. On force le layout en ligne (Sidebar à gauche, Reste à droite) */
+  /* 1. On réinitialise le conteneur pour aligner Sidebar et Contenu */
   .bank-app {
     display: flex !important;
     flex-direction: row !important;
-    height: 100vh;
-    overflow: hidden;
-    background: #0b5c5b !important;
+    position: relative !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
-  /* 2. SIDEBAR : Fixe et propre */
+  /* 2. On force la Sidebar à prendre sa place à gauche */
   .sidebar {
     display: flex !important;
     width: 260px !important;
+    min-width: 260px !important;
     height: 100vh !important;
     background: #0a4f4e !important;
-    flex-shrink: 0;
     position: relative !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    flex-direction: column;
-    padding: 30px 20px;
+    flex-shrink: 0 !important;
+    z-index: 9999 !important;
   }
 
-  /* 3. CONTENU DROIT (Main Viewport) */
+  /* 3. On crée la colonne de droite pour le contenu */
   .desktop-content {
     flex: 1 !important;
     display: flex !important;
     flex-direction: column !important;
     height: 100vh !important;
-    overflow: hidden !important;
+    width: calc(100% - 260px) !important;
+    position: relative !important;
   }
 
-  /* 4. HEADER & TABS : On retire le "fixed" qui crée la double page */
+  /* 4. ANNIHILATION DU MODE MOBILE (IMPORTANT) */
+  /* On force le Header et les Tabs à ne plus être "Fixed" */
   .header {
-    position: relative !important; /* Ne flotte plus */
-    width: 100% !important;
-    height: 80px !important;
+    position: relative !important; /* Sort du mode mobile fixe */
+    top: auto !important;
     left: auto !important;
     right: auto !important;
+    width: 100% !important;
+    height: 80px !important;
+    display: flex !important;
+    justify-content: flex-end !important;
     background: rgba(11, 92, 91, 0.6) !important;
-    backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: flex-end;
-    padding: 0 30px;
+    z-index: 10 !important;
   }
 
   .tabs-wrapper {
-    position: relative !important; /* Ne flotte plus */
+    position: relative !important; /* Sort du mode mobile fixe */
     top: auto !important;
+    left: auto !important;
+    width: 100% !important;
     background: transparent !important;
     padding: 10px 30px !important;
+    z-index: 5 !important;
   }
 
-  /* 5. ZONE DE SCROLL : C'est ici que les transactions s'affichent */
+  /* 5. ZONE DE SCROLL PROPRE */
   .page-content {
     flex: 1 !important;
-    overflow-y: auto !important;
-    margin-top: 0 !important; /* Supprime le décalage mobile */
+    overflow-y: auto !important; /* Seul le contenu scrolle */
+    margin-top: 0 !important; /* Supprime le décalage du mode mobile */
     padding: 20px 40px !important;
+    display: block !important;
   }
 
-  /* 6. ON CACHE LE MOBILE SUR PC */
+  /* 6. NETTOYAGE FINAL */
   .bottom-nav {
-    display: none !important;
+    display: none !important; /* Plus de barre en bas sur PC */
   }
 
-  /* Ajustement des cartes */
-  .content {
-    max-width: 900px !important;
+  /* On s'assure que les cartes ne sont pas trop larges */
+  .content, .accounts-container, .cards-section {
+    max-width: 1100px !important;
     margin: 0 !important;
-  }
-}
-
-/* ============================================================
-   VERSION MOBILE (GARDER TES STYLES ACTUELS)
-   ============================================================ */
-@media (max-width: 999px) {
-  .sidebar {
-    display: none !important;
-  }
-  
-  .header, .tabs-wrapper {
-    position: fixed !important;
-  }
-  
-  .page-content {
-    margin-top: 145px !important;
   }
 }
 
