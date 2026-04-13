@@ -76,39 +76,41 @@ export default function Dashboard() {
   if (!data) return null;
 
   // --- RENDU DESKTOP (SÉPARÉ ET FONCTIONNEL) ---
+  // --- RENDU DESKTOP (SÉPARÉ ET FONCTIONNEL) ---
   if (isDesktop) {
     return (
       <div className="bank-app desktop-layout">
         <aside className="desktop-sidebar">
           <div className="sidebar-logo">BPER</div>
           <nav className="sidebar-nav">
-            {/* Tous les boutons sont maintenant fonctionnels via setActiveTab */}
             <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>Accueil</div>
             <div className="nav-item" onClick={() => setActiveTab('accounts')}>Comptes</div>
             <div className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>Cartes</div>
             <div className="nav-item">Payer</div>
             <div className="nav-item">Produits</div>
             <div className="nav-item">Lifestyle</div>
-            <div className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>Aide / Profil</div>
+            <div className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>Aide</div>
           </nav>
         </aside>
 
         <main className="desktop-main">
-          {/* Header avec profil intégré à droite comme sur ton dessin */}
-          <Header data={data} />
-          
-          {/* Les TABS sont supprimés ici sur Desktop pour être Pro */}
+          {/* HEADER DESKTOP : Aligné selon ton dessin */}
+          <div className="header-desktop-top">
+            <div className="welcome-section">
+              <h1>Bienvenue, {data.firstName} {data.lastName}</h1>
+            </div>
+            <div className="profile-section-top">
+               {/* Icônes notification et profil comme sur ton dessin */}
+               <div className="icon-notif">🔔</div>
+               <div className="profile-avatar-circle" onClick={() => setActiveTab('profile')}>
+                 {data.firstName.charAt(0)}{data.lastName.charAt(0)}
+               </div>
+            </div>
+          </div>
           
           <div className="desktop-scroll-area">
-            {activeTab === "accounts" && (
-                <>
-                    <div className="welcome-text">Bienvenue, {data.firstName} {data.lastName}</div>
-                    <Accounts data={data} />
-                </>
-            )}
-            
+            {activeTab === "accounts" && <Accounts data={data} />}
             {activeTab === "profile" && <Profile data={data} />}
-            
             {activeTab === "cards" && (
               <div className="cards-section">
                 <h3 className="cards-title">Mes cartes</h3>

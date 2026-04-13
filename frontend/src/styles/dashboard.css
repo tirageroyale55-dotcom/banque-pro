@@ -447,7 +447,55 @@ white-space:nowrap;
 
 
 
+@media (min-width: 1000px) {
+  /* Aligner Bienvenue à gauche et Profil à droite */
+  .header-desktop-top {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 30px 50px !important;
+    width: 100% !important;
+  }
 
+  .welcome-section h1 {
+    color: white !important;
+    font-size: 28px !important;
+    margin: 0 !important;
+  }
+
+  /* La zone profil en haut à droite du dessin */
+  .profile-section-top {
+    display: flex !important;
+    align-items: center !important;
+    gap: 20px !important;
+  }
+
+  .profile-avatar-circle {
+    width: 45px !important;
+    height: 45px !important;
+    background: white !important;
+    color: #0b5c5b !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+  }
+
+  .icon-notif {
+    font-size: 22px !important;
+    color: white !important;
+    cursor: pointer !important;
+  }
+
+  /* On désactive totalement les anciens composants Header et Tabs sur PC */
+  .desktop-main > header, 
+  .desktop-main .tabs-wrapper {
+    display: none !important;
+  }
+}
 
 
 
