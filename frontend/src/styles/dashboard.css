@@ -338,12 +338,12 @@ white-space:nowrap;
 
 
 /* ============================================================
-   VERSION ORDINATEUR PRO - ALIGNEMENT EXACT SUR LE SCHÉMA
+   VERSION ORDINATEUR PRO (SCHEMA EXACT)
    ============================================================ */
 
 @media (min-width: 1000px) {
 
-  /* 1. MISE EN PAGE : Sidebar à gauche, Reste à droite */
+  /* 1. ON FORCE LE LAYOUT EN LIGNE */
   .bank-app {
     display: flex !important;
     flex-direction: row !important;
@@ -360,67 +360,94 @@ white-space:nowrap;
     min-width: 260px !important;
     height: 100vh !important;
     background: #0a4f4e !important;
-    position: relative !important; /* Pour rester dans le flux à gauche */
+    position: relative !important;
     flex-shrink: 0 !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 100 !important;
   }
 
-  /* 3. BLOC DE DROITE : Header + Tabs + Content */
+  /* 3. COLONNE DE DROITE (Header + Tabs + Content) */
   .desktop-content {
     flex: 1 !important;
     display: flex !important;
     flex-direction: column !important;
     height: 100vh !important;
-    overflow: hidden !important;
+    background: #0b5c5b !important;
+    position: relative !important;
   }
 
-  /* 4. HEADER : Redevient un bloc normal en haut à droite */
+  /* 4. HEADER : Redevient un bloc normal (ANNULE LE FIXED MOBILE) */
   .header {
-    position: relative !important; /* ANNULE le position:fixed du mobile */
+    position: relative !important; /* Force le header à ne plus flotter */
     top: auto !important;
     left: auto !important;
     right: auto !important;
     width: 100% !important;
     height: 80px !important;
     display: flex !important;
-    justify-content: flex-end !important; /* Profil à droite comme sur l'image */
-    background: transparent !important; /* Plus léger sur PC */
+    justify-content: flex-end !important; /* Profil à droite comme sur ton image */
+    background: transparent !important;
     padding: 0 40px !important;
     z-index: 10 !important;
+    backdrop-filter: none !important;
   }
 
   /* 5. TABS (ONGLETS) : Juste sous le header */
   .tabs-wrapper {
-    position: relative !important; /* ANNULE le position:fixed du mobile */
+    position: relative !important; /* Force les onglets à ne plus flotter */
     top: auto !important;
     left: auto !important;
     width: 100% !important;
     background: transparent !important;
     padding: 0 40px !important;
-    margin-bottom: 10px !important;
     z-index: 5 !important;
+    backdrop-filter: none !important;
   }
 
-  /* 6. ZONE DE SCROLL : Solde + Historique */
+  /* 6. ZONE DE SCROLL : Solde + Transactions */
   .page-content {
     flex: 1 !important;
-    overflow-y: auto !important; /* Seul le contenu défile */
-    margin-top: 0 !important; /* SUPPRIME le margin-top: 145px du mobile */
-    padding: 0 40px 40px 40px !important;
+    overflow-y: auto !important; /* Seul le contenu scrolle */
+    margin-top: 0 !important; /* SUPPRIME LE TROU DE 145PX DU MOBILE */
+    padding: 20px 40px !important;
   }
 
-  /* 7. NETTOYAGE */
-  .bottom-nav {
-    display: none !important; /* Cache la barre mobile */
-  }
-
+  /* 7. SUPPRESSION DES ELEMENTS MOBILES */
+  .bottom-nav, 
   .balance-bar {
-    display: none !important; /* On ne veut pas de la barre flottante sur PC */
+    display: none !important;
   }
 
-  .content {
-    max-width: 100% !important;
-    margin: 0 !important;
+  /* Ajustement Sidebar Items */
+  .side-item {
+    all: unset;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 20px;
+    color: white;
+    cursor: pointer;
+    border-radius: 12px;
+    margin: 4px 10px;
+    transition: 0.2s;
+  }
+
+  .side-item.active {
+    background: white !important;
+    color: #0b5c5b !important;
+    font-weight: 600;
+  }
+}
+
+/* PROTECTION MOBILE : On isole les styles mobiles */
+@media (max-width: 999px) {
+  .sidebar {
+    display: none !important;
+  }
+  .header, .tabs-wrapper {
+    position: fixed !important;
+  }
+  .page-content {
+    margin-top: 145px !important;
   }
 }
 
