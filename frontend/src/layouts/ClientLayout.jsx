@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import BottomNav from "../components/BottomNav";
-import Sidebar from "../components/Sidebar";
 
 export default function ClientLayout() {
   // Détecter si on est sur ordinateur (Desktop) ou mobile
@@ -15,15 +14,17 @@ export default function ClientLayout() {
 
   return (
     <div className="bank-layout">
-      {/* 1. Sur PC : On affiche la Sidebar à gauche */}
-      {isDesktop && <Sidebar />}
+      {/* Désormais, la structure Desktop est gérée DIRECTEMENT 
+          à l'intérieur de tes pages (comme Dashboard.jsx).
+          On ne met plus rien ici pour éviter les doublons.
+      */}
       
-      <div className={isDesktop ? "desktop-content" : "mobile-content"}>
-        {/* 2. L'Outlet : C'est ici que tes pages (Dashboard, Payer...) s'affichent */}
+      <div className={isDesktop ? "desktop-wrapper" : "mobile-wrapper"}>
+        {/* L'Outlet affiche tes pages (Dashboard, etc.) */}
         <Outlet />
       </div>
 
-      {/* 3. Sur Mobile : On affiche TOUJOURS le menu du bas */}
+      {/* Sur Mobile : On garde le menu du bas */}
       {!isDesktop && <BottomNav />}
     </div>
   );
