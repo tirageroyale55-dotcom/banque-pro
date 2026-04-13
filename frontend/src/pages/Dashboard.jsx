@@ -8,6 +8,7 @@ import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
 import Accounts from "./Accounts";
+// Ajout de l'import Profile au cas où il manquerait
 import Profile from "./Profile"; 
 
 import "../styles/dashboard.css";
@@ -17,86 +18,101 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("accounts");
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
   const [card, setCard] = useState(null);
-  const navigate = useNavigate();
+  const [scrollOffset, setScrollOffset] = useState(-60);
+  const [opacity, setOpacity] = useState(0);
 
+  const navigate = useNavigate();
+  const contentRef = useRef(null);
+
+  // Gestion du redimensionnement
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Chargement des données
   useEffect(() => {
-    api("/client/dashboard").then(setData).catch(() => navigate("/login"));
+    api("/client/dashboard")
+      .then((clientData) => {
+        setData(clientData);
+        api("/transactions")
+          .then((transactionsData) => {
+            setData(prev => ({
+              ...prev,
+              transactions: transactionsData.transactions || transactionsData
+            }));
+          })
+          .catch(err => console.error("Erreur transactions", err));
+      })
+      .catch(() => {
+        localStorage.removeItem("token");
+        navigate("/login");
+      });
   }, [navigate]);
+
+  useEffect(() => {
+    if (activeTab === "cards") {
+      api("/client/card").then(setCard).catch(() => console.log("Erreur carte"));
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeTab]);
+
+  // BalanceBar (Logique Mobile uniquement)
+  useEffect(() => {
+    if (!data || activeTab !== "accounts" || isDesktop) return;
+    const handleScroll = () => {
+      const bar = document.querySelector('.balance-bar');
+      const accountCard = document.querySelector('.account-card');
+      if (!bar || !accountCard) return;
+      const cardRect = accountCard.getBoundingClientRect();
+      if (cardRect.top < 135) bar.classList.add('show');
+      else bar.classList.remove('show');
+    };
+    window.addEventListener("scroll", handleScroll, true);
+    return () => window.removeEventListener("scroll", handleScroll, true);
+  }, [activeTab, data, isDesktop]);
 
   if (!data) return null;
 
-  // ==========================================
-  // 1. RENDU DESKTOP (SÉPARÉ ET PERSONNALISÉ)
-  // ==========================================
+  // --- RENDU DESKTOP (SÉPARÉ) ---
   if (isDesktop) {
     return (
       <div className="bank-app desktop-layout">
-        {/* SIDEBAR BPER PRO */}
+        {/* Menu latéral intégré directement ici */}
         <aside className="desktop-sidebar">
           <div className="sidebar-logo">BPER</div>
-          
           <nav className="sidebar-nav">
-            <div 
-              className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} 
-              onClick={() => setActiveTab('accounts')}
-            >
-              <span className="icon">🏠</span> Accueil
-            </div>
-            <div className="nav-item"><span className="icon">📂</span> Comptes</div>
-            <div 
-              className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} 
-              onClick={() => setActiveTab('cards')}
-            >
-              <span className="icon">💳</span> Mes Cartes
-            </div>
-            <div className="nav-item"><span className="icon">💸</span> Payer</div>
-            <div className="nav-item"><span className="icon">📈</span> Produits</div>
-            <div className="nav-item"><span className="icon">💎</span> Lifestyle</div>
-            
-            {/* REMPLACEMENT DE 'HELP' PAR 'PROFILE' */}
-            <div 
-              className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} 
-              onClick={() => setActiveTab('profile')}
-            >
-              <span className="icon">👤</span> Mon Profil
-            </div>
+            <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>Accueil</div>
+            <div className="nav-item">Comptes</div>
+            <div className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>Cartes</div>
+            <div className="nav-item">Payer</div>
+            <div className="nav-item">Produits</div>
+            <div className="nav-item">Lifestyle</div>
+            <div className="nav-item">Aide</div>
           </nav>
-
-          <div className="sidebar-footer">
-            <button className="logout-btn" onClick={() => { localStorage.clear(); navigate('/login'); }}>
-              Déconnexion
-            </button>
-          </div>
         </aside>
 
-        {/* CONTENU PRINCIPAL (SANS TABS) */}
+        {/* Contenu de droite */}
         <main className="desktop-main">
           <Header data={data} />
-          
+          <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="desktop-scroll-area">
-            {activeTab === "accounts" && (
-              <div className="desktop-view-container">
-                <h2 className="welcome-text">Bienvenue, {data.firstName} {data.lastName}</h2>
-                <Accounts data={data} />
-              </div>
-            )}
-            
+            {activeTab === "accounts" && <Accounts data={data} />}
             {activeTab === "profile" && <Profile data={data} />}
-
             {activeTab === "cards" && (
               <div className="cards-section">
-                <h3 className="cards-title">Gestion de vos cartes</h3>
-                <div className="cards-grid">
-                  {card && <BankCard card={card}/>}
-                  <div className="add-card-box" onClick={() => navigate("/request-card")}>
-                    <span>+</span>
-                    <p>Demander une nouvelle carte</p>
+                <h3 className="cards-title">Mes cartes</h3>
+                <div className="cards-slider">
+                  {card && <div className="cards-slide"><BankCard card={card}/></div>}
+                  <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+                    <div className="card-request-inner">
+                      <div className="card-plus">+</div>
+                      <p>Demander une carte</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -107,15 +123,13 @@ export default function Dashboard() {
     );
   }
 
-  // ==========================================
-  // 2. RENDU MOBILE (TON CODE D'ORIGINE INTACT)
-  // ==========================================
+  // --- RENDU MOBILE (TON CODE D'ORIGINE INTACT) ---
   return (
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <BalanceBar balance={data.balance} />
-      <div className="page-content">
+      <BalanceBar balance={data.balance} offset={scrollOffset} opacity={opacity} />
+      <div className="page-content" ref={contentRef}>
         {activeTab === "accounts" && <Accounts data={data}/>}
         {activeTab === "profile" && <Profile data={data} />}
         {activeTab === "cards" && (
@@ -123,7 +137,7 @@ export default function Dashboard() {
             <h3 className="cards-title">Mes cartes</h3>
             <div className="cards-slider">
               {card && <div className="cards-slide"><BankCard card={card}/></div>}
-              <div className="cards-slide card-request" onClick={()=>navigate("/request-card")}>
+              <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
                 <div className="card-request-inner"><div className="card-plus">+</div><p>Demander une carte</p></div>
               </div>
             </div>
