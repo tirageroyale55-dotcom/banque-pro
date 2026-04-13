@@ -8,7 +8,6 @@ import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
 import Accounts from "./Accounts";
-// Ajout de l'import Profile au cas où il manquerait
 import Profile from "./Profile"; 
 
 import "../styles/dashboard.css";
@@ -24,14 +23,12 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const contentRef = useRef(null);
 
-  // Gestion du redimensionnement
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Chargement des données
   useEffect(() => {
     api("/client/dashboard")
       .then((clientData) => {
@@ -78,31 +75,40 @@ export default function Dashboard() {
 
   if (!data) return null;
 
-  // --- RENDU DESKTOP (SÉPARÉ) ---
+  // --- RENDU DESKTOP (SÉPARÉ ET FONCTIONNEL) ---
   if (isDesktop) {
     return (
       <div className="bank-app desktop-layout">
-        {/* Menu latéral intégré directement ici */}
         <aside className="desktop-sidebar">
           <div className="sidebar-logo">BPER</div>
           <nav className="sidebar-nav">
+            {/* Tous les boutons sont maintenant fonctionnels via setActiveTab */}
             <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>Accueil</div>
-            <div className="nav-item">Comptes</div>
+            <div className="nav-item" onClick={() => setActiveTab('accounts')}>Comptes</div>
             <div className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>Cartes</div>
             <div className="nav-item">Payer</div>
             <div className="nav-item">Produits</div>
             <div className="nav-item">Lifestyle</div>
-            <div className="nav-item">Aide</div>
+            <div className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>Aide / Profil</div>
           </nav>
         </aside>
 
-        {/* Contenu de droite */}
         <main className="desktop-main">
+          {/* Header avec profil intégré à droite comme sur ton dessin */}
           <Header data={data} />
-          <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+          
+          {/* Les TABS sont supprimés ici sur Desktop pour être Pro */}
+          
           <div className="desktop-scroll-area">
-            {activeTab === "accounts" && <Accounts data={data} />}
+            {activeTab === "accounts" && (
+                <>
+                    <div className="welcome-text">Bienvenue, {data.firstName} {data.lastName}</div>
+                    <Accounts data={data} />
+                </>
+            )}
+            
             {activeTab === "profile" && <Profile data={data} />}
+            
             {activeTab === "cards" && (
               <div className="cards-section">
                 <h3 className="cards-title">Mes cartes</h3>
