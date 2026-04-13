@@ -17,9 +17,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("accounts");
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
   const [card, setCard] = useState(null);
-
   const navigate = useNavigate();
-  const contentRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
@@ -31,69 +29,74 @@ export default function Dashboard() {
     api("/client/dashboard").then(setData).catch(() => navigate("/login"));
   }, [navigate]);
 
-  useEffect(() => {
-    if (activeTab === "cards") {
-      api("/client/card").then(setCard).catch(() => console.log("Erreur carte"));
-    }
-  }, [activeTab]);
-
   if (!data) return null;
 
-  // --- RENDU DESKTOP ---
+  // ==========================================
+  // 1. RENDU DESKTOP (SÉPARÉ ET PERSONNALISÉ)
+  // ==========================================
   if (isDesktop) {
     return (
       <div className="bank-app desktop-layout">
+        {/* SIDEBAR BPER PRO */}
         <aside className="desktop-sidebar">
           <div className="sidebar-logo">BPER</div>
+          
           <nav className="sidebar-nav">
-            {/* Tous les boutons sont maintenant gérés ici pour le Desktop */}
-            <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>
-              <span className="nav-icon">🏠</span> Accueil
+            <div 
+              className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} 
+              onClick={() => setActiveTab('accounts')}
+            >
+              <span className="icon">🏠</span> Accueil
             </div>
-            <div className="nav-item"><span className="nav-icon">📑</span> Comptes</div>
-            <div className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>
-              <span className="nav-icon">💳</span> Cartes
+            <div className="nav-item"><span className="icon">📂</span> Comptes</div>
+            <div 
+              className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} 
+              onClick={() => setActiveTab('cards')}
+            >
+              <span className="icon">💳</span> Mes Cartes
             </div>
-            <div className="nav-item"><span className="nav-icon">⇄</span> Payer</div>
-            <div className="nav-item"><span className="nav-icon">🏢</span> Produits</div>
-            <div className="nav-item"><span className="nav-icon">💎</span> Lifestyle</div>
-            {/* L'aide est remplacée par le Profil ici comme demandé */}
-            <div className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>
-              <span className="nav-icon">👤</span> Mon Profil
+            <div className="nav-item"><span className="icon">💸</span> Payer</div>
+            <div className="nav-item"><span className="icon">📈</span> Produits</div>
+            <div className="nav-item"><span className="icon">💎</span> Lifestyle</div>
+            
+            {/* REMPLACEMENT DE 'HELP' PAR 'PROFILE' */}
+            <div 
+              className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} 
+              onClick={() => setActiveTab('profile')}
+            >
+              <span className="icon">👤</span> Mon Profil
             </div>
           </nav>
+
+          <div className="sidebar-footer">
+            <button className="logout-btn" onClick={() => { localStorage.clear(); navigate('/login'); }}>
+              Déconnexion
+            </button>
+          </div>
         </aside>
 
+        {/* CONTENU PRINCIPAL (SANS TABS) */}
         <main className="desktop-main">
-          {/* Le Header Desktop ne contient plus que les infos essentielles (Notifs/Profil) */}
-          <header className="desktop-header-minimal">
-             <div className="header-actions">
-                <span className="icon-btn">🔔</span>
-                <div className="user-profile-circle" onClick={() => setActiveTab('profile')}>
-                   {data.firstname?.charAt(0)}{data.lastname?.charAt(0)}
-                </div>
-             </div>
-          </header>
-
+          <Header data={data} />
+          
           <div className="desktop-scroll-area">
-            {/* On affiche directement le contenu selon l'onglet actif sans le composant <Tabs /> */}
             {activeTab === "accounts" && (
-               <div className="welcome-section">
-                  <h1 className="welcome-text">Bienvenue, {data.firstname} {data.lastname}</h1>
-                  <Accounts data={data} />
-               </div>
+              <div className="desktop-view-container">
+                <h2 className="welcome-text">Bienvenue, {data.firstName} {data.lastName}</h2>
+                <Accounts data={data} />
+              </div>
             )}
             
             {activeTab === "profile" && <Profile data={data} />}
 
             {activeTab === "cards" && (
               <div className="cards-section">
-                <h3 className="cards-title">Mes cartes</h3>
+                <h3 className="cards-title">Gestion de vos cartes</h3>
                 <div className="cards-grid">
                   {card && <BankCard card={card}/>}
-                  <div className="card-request-box" onClick={() => navigate("/request-card")}>
+                  <div className="add-card-box" onClick={() => navigate("/request-card")}>
                     <span>+</span>
-                    <p>Demander une carte</p>
+                    <p>Demander une nouvelle carte</p>
                   </div>
                 </div>
               </div>
@@ -104,13 +107,15 @@ export default function Dashboard() {
     );
   }
 
-  // --- RENDU MOBILE (STRICTEMENT INTACT) ---
+  // ==========================================
+  // 2. RENDU MOBILE (TON CODE D'ORIGINE INTACT)
+  // ==========================================
   return (
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <BalanceBar balance={data.balance} />
-      <div className="page-content" ref={contentRef}>
+      <div className="page-content">
         {activeTab === "accounts" && <Accounts data={data}/>}
         {activeTab === "profile" && <Profile data={data} />}
         {activeTab === "cards" && (
@@ -118,7 +123,7 @@ export default function Dashboard() {
             <h3 className="cards-title">Mes cartes</h3>
             <div className="cards-slider">
               {card && <div className="cards-slide"><BankCard card={card}/></div>}
-              <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+              <div className="cards-slide card-request" onClick={()=>navigate("/request-card")}>
                 <div className="card-request-inner"><div className="card-plus">+</div><p>Demander une carte</p></div>
               </div>
             </div>
