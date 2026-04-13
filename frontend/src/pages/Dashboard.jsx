@@ -1,204 +1,158 @@
-import { useState, useEffect } from "react";
-import { api } from "../services/api";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { api } from "../services/api";
 
+// Imports des composants
 import Header from "../components/Header";
 import Tabs from "../components/Tabs";
 import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 import Sidebar from "../components/Sidebar";
 import BankCard from "../components/BankCard";
-
-import { useRef } from "react"; // en haut
-
 import Accounts from "./Accounts";
+// Assurez-vous que Profile est bien importé pour éviter l'écran vide
+import Profile from "./Profile"; 
 
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
+  const [data, setData] = useState(null);
+  const [activeTab, setActiveTab] = useState("accounts");
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
+  const [card, setCard] = useState(null);
+  const [scrollOffset, setScrollOffset] = useState(-60);
+  const [opacity, setOpacity] = useState(0);
 
-const [data, setData] = useState(null);
-const [activeTab, setActiveTab] = useState("accounts");
-const [showBalanceBar, setShowBalanceBar] = useState(false);
-const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
-const [card,setCard] = useState(null);
+  const navigate = useNavigate();
+  const contentRef = useRef(null);
 
-const [scrollOffset, setScrollOffset] = useState(-60); // Cachée par défaut
-const [opacity, setOpacity] = useState(0);
+  // Gestion de la taille de l'écran
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-const navigate = useNavigate();
+  // Chargement des données initiales
+  useEffect(() => {
+    api("/client/dashboard")
+      .then((clientData) => {
+        setData(clientData);
+        api("/transactions")
+          .then((transactionsData) => {
+            setData(prev => ({
+              ...prev,
+              transactions: transactionsData.transactions || transactionsData
+            }));
+          })
+          .catch(err => console.error("Erreur transactions:", err));
+      })
+      .catch((err) => {
+        console.error("Session expirée");
+        localStorage.removeItem("token");
+        navigate("/login");
+      });
+  }, [navigate]);
 
-const lastScrollRef = useRef(0);
-const contentRef = useRef(null);
-
-useEffect(()=>{
-
-if(activeTab === "cards"){
-
-api("/client/card")
-.then(setCard)
-.catch(()=>console.log("Erreur carte"));
-
-}
-
-},[activeTab]);
-
-useEffect(() => {
-  // 1. On récupère d'abord les infos de base (obligatoire)
-  api("/client/dashboard")
-    .then((clientData) => {
-      setData(clientData); // On affiche déjà le dashboard
-
-      // 2. On tente de charger les transactions APRES (optionnel)
-      api("/transactions")
-        .then((transactionsData) => {
-          setData(prev => ({
-            ...prev,
-            transactions: transactionsData.transactions || transactionsData // Gère les deux formats
-          }));
-        })
-        .catch(err => console.error("L'historique n'a pas pu être chargé :", err));
-    })
-    .catch((err) => {
-      // Uniquement si le profil échoue, on redirige
-      console.error("Session expirée ou erreur profil");
-      localStorage.removeItem("token");
-      navigate("/login");
-    });
-}, []);
-
-useEffect(()=>{
-
-const handleResize = () => {
-setIsDesktop(window.innerWidth >= 1000);
-};
-
-window.addEventListener("resize", handleResize);
-
-return () => window.removeEventListener("resize", handleResize);
-
-},[]);
-
-useEffect(()=>{
-setShowBalanceBar(false)
-window.scrollTo(0,0)
-},[activeTab])
-
-useEffect(() => {
-  // On ne fait rien si les données ne sont pas encore chargées
-  if (!data || activeTab !== "accounts") {
-    const bar = document.querySelector('.balance-bar');
-    if (bar) bar.classList.remove('show');
-    return;
-  }
-
-  const handleScroll = () => {
-    const bar = document.querySelector('.balance-bar');
-    const accountCard = document.querySelector('.account-card');
-    
-    // Si la carte n'est pas encore là (chargement API), on sort
-    if (!bar || !accountCard) return;
-
-    const cardRect = accountCard.getBoundingClientRect();
-    const triggerPoint = 135; 
-
-    if (cardRect.top < triggerPoint) {
-      bar.classList.add('show');
-    } else {
-      bar.classList.remove('show');
+  // Chargement des cartes si l'onglet est actif
+  useEffect(() => {
+    if (activeTab === "cards") {
+      api("/client/card")
+        .then(setCard)
+        .catch(() => console.log("Erreur carte"));
     }
-  };
+  }, [activeTab]);
 
-  // On attache l'évenement
-  window.addEventListener("scroll", handleScroll, true);
-  
-  // On l'exécute une fois au montage pour vérifier la position actuelle
-  handleScroll();
+  // Reset scroll quand on change d'onglet
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeTab]);
 
-  return () => {
-    window.removeEventListener("scroll", handleScroll, true);
-  };
-}, [activeTab, data]); // <--- AJOUTE 'data' ICI
+  // Gestion de la BalanceBar (Uniquement Mobile)
+  useEffect(() => {
+    if (!data || activeTab !== "accounts" || isDesktop) return;
 
+    const handleScroll = () => {
+      const bar = document.querySelector('.balance-bar');
+      const accountCard = document.querySelector('.account-card');
+      if (!bar || !accountCard) return;
 
-if (!data) return null;
+      const cardRect = accountCard.getBoundingClientRect();
+      if (cardRect.top < 135) {
+        bar.classList.add('show');
+      } else {
+        bar.classList.remove('show');
+      }
+    };
 
-return (
+    window.addEventListener("scroll", handleScroll, true);
+    return () => window.removeEventListener("scroll", handleScroll, true);
+  }, [activeTab, data, isDesktop]);
 
-<div className="bank-app">
+  if (!data) return <div style={{color: 'white', padding: '20px'}}>Chargement...</div>;
 
-{isDesktop && <Sidebar/>}
+  return (
+    <div className="bank-app">
+      {/* 1. SIDEBAR : Uniquement sur Desktop */}
+      {isDesktop && <Sidebar />}
 
-<div className={isDesktop ? "desktop-content" : ""}>
+      {/* 2. ZONE DE CONTENU PRINCIPALE */}
+      <div className={isDesktop ? "desktop-content" : "mobile-layout"}>
+        
+        {/* IMPORTANT : On affiche le Header et les Tabs ici. 
+          Sur Desktop, ils se rangeront à droite de la Sidebar grâce au CSS.
+          Sur Mobile, ils resteront en haut.
+        */}
+        <Header data={data} />
+        
+        <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-<Header data={data} />
+        {/* BalanceBar : Uniquement sur Mobile (supprimée du Desktop pour le propre) */}
+        {!isDesktop && (
+          <BalanceBar 
+            balance={data.balance} 
+            offset={scrollOffset} 
+            opacity={opacity} 
+          />
+        )}
 
-<Tabs
-activeTab={activeTab}
-setActiveTab={setActiveTab}
-/>
+        <div className="page-content" ref={contentRef}>
+          {activeTab === "accounts" && <Accounts data={data} />}
+          
+          {activeTab === "profile" && <Profile data={data} />}
 
-<BalanceBar 
-  balance={data.balance} 
-  offset={scrollOffset} 
-  opacity={opacity} 
-/>
+          {activeTab === "cards" && (
+            <div className="cards-section">
+              <h3 className="cards-title">Mes cartes</h3>
+              <div className="cards-slider">
+                {card && (
+                  <div className="cards-slide">
+                    <BankCard card={card} />
+                  </div>
+                )}
+                <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+                  <div className="card-request-inner">
+                    <div className="card-plus">+</div>
+                    <p>Demander une carte</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
-<div className="page-content" ref={contentRef}>
+          {activeTab === "financing" && (
+            <div className="content">
+              <div className="account-card">
+                <h3>Financements</h3>
+                <p>Aucun financement disponible</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
-{activeTab === "accounts" && <Accounts data={data}/>}
-
-{activeTab === "profile" && <Profile data={data} />}
-
-{activeTab === "cards" && (
-
-<div className="cards-section">
-
-<h3 className="cards-title">Mes cartes</h3>
-
-<div className="cards-slider">
-
-{card && (
-<div className="cards-slide">
-<BankCard card={card}/>
-</div>
-)}
-
-<div
-className="cards-slide card-request"
-onClick={()=>navigate("/request-card")}
->
-
-<div className="card-request-inner">
-<div className="card-plus">+</div>
-<p>Demander une carte</p>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-)}
-
-{activeTab === "financing" && (
-<div className="content">
-<div className="account-card">
-<h3>Financements</h3>
-<p>Aucun financement disponible</p>
-</div>
-</div>
-)}
-
-</div>
-
-</div>
-
-{!isDesktop && <BottomNav/>}
-
-</div>
-
-);
-
+      {/* 3. NAVIGATION BASSE : Uniquement sur Mobile */}
+      {!isDesktop && <BottomNav />}
+    </div>
+  );
 }
