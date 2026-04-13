@@ -18,7 +18,7 @@ export default function ClientLayout() {
       {/* 1. Sur PC : On affiche la Sidebar à gauche */}
       {isDesktop && <Sidebar />}
       
-      <div className={isDesktop ? "desktop-content" : "mobile-content"}>
+      <div className={isDesktop ? "desktop-content" : "mobile-tent"}>
         {/* 2. L'Outlet : C'est ici que tes pages (Dashboard, Payer...) s'affichent */}
         <Outlet />
       </div>
