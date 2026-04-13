@@ -36,7 +36,56 @@ export default function Sidebar({ data }) {
         </div>
       </div>
 
-      
+      <div className="sidebar-menu">
+        <MenuButton 
+          active={location.pathname === "/dashboard"} 
+          onClick={() => navigate("/dashboard")} 
+          icon={<Home size={20} />} 
+          label="Accueil" 
+        />
+        
+        <MenuButton 
+          active={location.pathname === "/accounts"} 
+          onClick={() => navigate("/accounts")} 
+          icon={<Wallet size={20} />} 
+          label="Comptes" 
+        />
+
+        <MenuButton 
+          active={location.pathname === "/cards"} 
+          onClick={() => navigate("/cards")} 
+          icon={<CreditCard size={20} />} 
+          label="Cartes" 
+        />
+
+        <MenuButton 
+          active={location.pathname === "/payer"} 
+          onClick={() => navigate("/payer")} 
+          icon={<ArrowRightLeft size={20} />} 
+          label="Payer" 
+        />
+
+        <MenuButton 
+          active={location.pathname === "/produits"} 
+          onClick={() => navigate("/produits")} 
+          icon={<Grid size={20} />} 
+          label="Produits" 
+        />
+
+        <MenuButton 
+          active={location.pathname === "/lifestyle"} 
+          onClick={() => navigate("/lifestyle")} 
+          icon={<Gem size={20} />} 
+          label="Lifestyle" 
+        />
+
+        <MenuButton 
+          active={location.pathname === "/aide"} 
+          onClick={() => navigate("/aide")} 
+          icon={<Headphones size={20} />} 
+          label="Aide" 
+        />
+      </div>
     </div>
   );
 }
