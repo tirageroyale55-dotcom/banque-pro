@@ -332,68 +332,69 @@ white-space:nowrap;
 
 
 
+
+
+
+
+
+/* Version Desktop - Mise en page */
 @media (min-width: 1000px) {
-  /* On annule le mode "flottant" qui crée les doublons visuels */
-  .desktop-content .header, 
-  .desktop-content .tabs-wrapper {
+  .desktop-layout {
+    display: flex !important;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background: #0b5c5b;
+  }
+
+  .desktop-sidebar {
+    width: 260px;
+    background: #0a4f4e;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-logo {
+    padding: 30px;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+  }
+
+  .sidebar-nav .nav-item {
+    padding: 15px 30px;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+  }
+
+  .sidebar-nav .nav-item.active {
+    background: white;
+    color: #0b5c5b;
+    font-weight: 600;
+  }
+
+  .desktop-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* Annule le mode "fixed" du mobile sur PC */
+  .desktop-main .header, 
+  .desktop-main .tabs-wrapper {
     position: relative !important;
     top: 0 !important;
-    left: 0 !important;
     width: 100% !important;
-    backdrop-filter: none !important;
     background: transparent !important;
-  }
-
-  /* On enlève la marge qui servait au mobile */
-  .desktop-content .page-content {
-    margin-top: 20px !important;
-  }
-}
-
-
-
-
-@media (min-width: 1000px) {
-  /* On force le layout côte à côte */
-  .bank-app {
-    display: flex !important;
-    flex-direction: row !important;
-    height: 100vh !important;
-    overflow: hidden !important;
-  }
-
-  /* La colonne de droite qui contient tout sauf la sidebar */
-  .desktop-content {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100vh !important;
-    position: relative !important;
-  }
-
-  /* ON ANNULE LE MODE FIXE QUI CRÉE LE DOUBLON */
-  .header, .tabs-wrapper {
-    position: relative !important; /* Ne flotte plus sur la sidebar */
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
-    width: 100% !important;
     backdrop-filter: none !important;
-    background: transparent !important;
   }
 
-  .header { height: 80px !important; }
-
-  /* ON SUPPRIME LE VIDE DE 145PX DU MOBILE */
-  .page-content {
-    margin-top: 0 !important; 
-    padding: 20px 40px !important;
-    overflow-y: auto !important;
-  }
-
-  /* ON SUPPRIME LA BARRE DU BAS SUR PC */
-  .bottom-nav {
-    display: none !important;
+  .desktop-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 40px;
   }
 }
 
