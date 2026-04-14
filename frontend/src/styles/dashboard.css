@@ -338,123 +338,90 @@ white-space:nowrap;
 
 
 @media (min-width: 1000px) {
+  /* Fond Vert BPER global */
   .desktop-layout {
-    display: flex;
-    height: 100vh;
-    background: #0b5c5b !important;
-    color: white;
+    display: flex !important;
+    background-color: #0b5c5b !important;
+    height: 100vh !important;
+    color: white !important;
+    font-family: sans-serif;
   }
 
   /* SIDEBAR */
   .desktop-sidebar {
-    width: 250px;
-    background: rgba(0, 0, 0, 0.15);
-    display: flex;
-    flex-direction: column;
+    width: 240px;
+    background: rgba(0,0,0,0.15);
     padding: 40px 20px;
-  }
-
-  .sidebar-logo {
-    font-size: 30px;
-    font-weight: 800;
-    margin-bottom: 40px;
-  }
-
-  .sidebar-nav .nav-item {
-    padding: 12px 15px;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: 0.3s;
-  }
-
-  .sidebar-nav .nav-item.active {
-    opacity: 1;
-    font-weight: bold;
-    border-left: 3px solid white;
-  }
-
-  /* MAIN AREA */
-  .desktop-main {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    position: relative;
-    overflow-y: auto;
   }
 
-  /* FORCE LE HEADER EN HAUT À DROITE */
-  .desktop-top-bar {
+  .sidebar-logo { font-size: 30px; font-weight: 800; margin-bottom: 40px; }
+  .sidebar-nav .nav-item { padding: 12px; cursor: pointer; opacity: 0.7; }
+  .sidebar-nav .nav-item.active { opacity: 1; font-weight: bold; border-left: 3px solid white; padding-left: 9px; }
+
+  .desktop-main { flex: 1; display: flex; flex-direction: column; }
+
+  /* HEADER TOP DROITE */
+  .desktop-header-top {
+    height: 80px;
     display: flex;
     justify-content: flex-end;
-    padding: 20px 40px;
-  }
-
-  /* On écrase le style mobile du Header pour le Desktop */
-  .desktop-top-bar .header {
-    position: relative !important;
-    background: transparent !important;
-    width: auto !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-  }
-
-  /* CONTENEUR GLOBAL DU CONTENU */
-  .desktop-content-container {
-    max-width: 1100px;
-    margin: 0 auto;
-    width: 100%;
-    padding: 20px 40px;
-  }
-
-  /* ALIGNEMENT SOLDE ET BOUTONS */
-  .desktop-hero-section {
-    display: grid;
-    grid-template-columns: 1fr 300px; /* Solde large, boutons fixe */
-    gap: 40px;
     align-items: center;
-    margin-bottom: 50px;
+    padding: 0 40px;
+    gap: 30px;
   }
+  .user-info-desktop { text-align: right; }
+  .user-fullname { display: block; font-weight: bold; font-size: 1.1rem; }
+  .header-icons-desktop { display: flex; gap: 15px; }
+  .icon-circle { width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-  .desktop-quick-actions {
+  /* SECTION SOLDE + BOUTONS (LE COEUR DU DESSIN) */
+  .hero-section-desktop {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px;
+    max-width: 1100px;
   }
 
-  .d-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    color: white;
-    padding: 15px 20px;
+  .balance-block-desktop .amount { font-size: 3.5rem; margin: 10px 0; }
+  .iban-display { opacity: 0.6; font-family: monospace; }
+
+  .actions-column-desktop { display: flex; flex-direction: column; gap: 15px; }
+  
+  /* Bouton stylé BPER */
+  .btn-outline, .btn-filled {
+    width: 250px;
+    padding: 14px;
     border-radius: 30px;
+    border: 1px solid white;
+    background: transparent;
+    color: white;
     cursor: pointer;
-    font-size: 14px;
-    transition: 0.3s;
+    font-weight: 600;
   }
+  .btn-filled { background: white; color: #0b5c5b; }
 
-  .d-btn.primary {
-    background: white;
-    color: #0b5c5b;
-    font-weight: bold;
-  }
-
-  /* HISTORIQUE LARGEUR TOTALE */
-  .desktop-history-full {
-    background: rgba(255, 255, 255, 0.08);
+  /* HISTORIQUE (BAS) */
+  .history-container-desktop {
+    margin: 20px 40px;
+    background: rgba(255,255,255,0.05);
     border-radius: 20px;
     padding: 30px;
-    min-height: 400px;
   }
-
-  .history-title {
-    font-size: 1.2rem;
-    margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .history-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+  .tr-row { 
+    display: flex; 
+    justify-content: space-between; 
+    padding: 15px 0; 
+    border-bottom: 1px solid rgba(255,255,255,0.1); 
   }
+  .tr-amount.credit { color: #4ade80; font-weight: bold; }
+  .tr-amount.debit { color: white; }
 
-  /* CACHE LES ÉLÉMENTS MOBILES */
+  /* CACHE TOUT LE MOBILE */
+  .desktop-layout .header, 
   .desktop-layout .tabs-wrapper, 
   .desktop-layout .bottom-nav,
   .desktop-layout .balance-bar {
