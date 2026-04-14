@@ -448,51 +448,84 @@ white-space:nowrap;
 
 
 @media (min-width: 1000px) {
-  /* Aligner Bienvenue à gauche et Profil à droite */
-  .header-desktop-top {
+  .desktop-layout {
     display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 30px 50px !important;
-    width: 100% !important;
+    height: 100vh;
+    background: #0b5c5b;
+    overflow: hidden;
   }
 
-  .welcome-section h1 {
-    color: white !important;
-    font-size: 28px !important;
-    margin: 0 !important;
+  .desktop-sidebar {
+    width: 260px;
+    background: #0a4f4e;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255,255,255,0.1);
   }
 
-  /* La zone profil en haut à droite du dessin */
-  .profile-section-top {
-    display: flex !important;
-    align-items: center !important;
-    gap: 20px !important;
+  .sidebar-logo {
+    color: white;
+    font-size: 30px;
+    font-weight: 800;
+    margin-bottom: 40px;
   }
 
-  .profile-avatar-circle {
-    width: 45px !important;
-    height: 45px !important;
-    background: white !important;
-    color: #0b5c5b !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+  .desktop-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 
-  .icon-notif {
-    font-size: 22px !important;
-    color: white !important;
-    cursor: pointer !important;
+  /* HEADER TOP : POSITIONNEMENT EXACT DU DESSIN */
+  .desktop-header-top {
+    height: 80px;
+    display: flex;
+    justify-content: flex-end; /* POUSSE TOUT À DROITE */
+    align-items: center;
+    padding: 0 40px;
   }
 
-  /* On désactive totalement les anciens composants Header et Tabs sur PC */
-  .desktop-main > header, 
-  .desktop-main .tabs-wrapper {
+  .user-profile-top {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: white;
+  }
+
+  .welcome-name {
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0.9;
+  }
+
+  .header-icons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .profile-avatar {
+    width: 45px;
+    height: 45px;
+    background: white;
+    color: #0b5c5b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .desktop-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 40px;
+  }
+
+  /* SUPPRESSION DES ONGLETS MOBILES SUR DESKTOP */
+  .desktop-main .tabs-wrapper, .bottom-nav {
     display: none !important;
   }
 }

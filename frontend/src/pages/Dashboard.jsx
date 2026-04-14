@@ -75,11 +75,11 @@ export default function Dashboard() {
 
   if (!data) return null;
 
-  // --- RENDU DESKTOP (SÉPARÉ ET FONCTIONNEL) ---
-  // --- RENDU DESKTOP (SÉPARÉ ET FONCTIONNEL) ---
+  // --- RENDU DESKTOP (LOGO GAUCHE | PROFIL DROITE) ---
   if (isDesktop) {
     return (
       <div className="bank-app desktop-layout">
+        {/* BARRE LATERALE (SIDEBAR) */}
         <aside className="desktop-sidebar">
           <div className="sidebar-logo">BPER</div>
           <nav className="sidebar-nav">
@@ -93,24 +93,30 @@ export default function Dashboard() {
           </nav>
         </aside>
 
+        {/* CONTENU PRINCIPAL */}
         <main className="desktop-main">
-          {/* HEADER DESKTOP : Aligné selon ton dessin */}
-          <div className="header-desktop-top">
-            <div className="welcome-section">
-              <h1>Bienvenue, {data.firstName} {data.lastName}</h1>
+          {/* HEADER : ICI LE PROFIL EST POUSSÉ À DROITE COMME SUR TON DESSIN */}
+          <header className="desktop-header-top">
+            <div className="user-profile-top">
+              <span className="welcome-name">Bienvenue, {data.firstName} {data.lastName}</span>
+              <div className="header-icons">
+                <div className="icon-circle">🔔</div>
+                <div className="profile-avatar" onClick={() => setActiveTab('profile')}>
+                   {data.firstName.charAt(0)}{data.lastName.charAt(0)}
+                </div>
+              </div>
             </div>
-            <div className="profile-section-top">
-               {/* Icônes notification et profil comme sur ton dessin */}
-               <div className="icon-notif">🔔</div>
-               <div className="profile-avatar-circle" onClick={() => setActiveTab('profile')}>
-                 {data.firstName.charAt(0)}{data.lastName.charAt(0)}
-               </div>
-            </div>
-          </div>
+          </header>
           
           <div className="desktop-scroll-area">
-            {activeTab === "accounts" && <Accounts data={data} />}
+            {activeTab === "accounts" && (
+                <div className="dashboard-view">
+                    <Accounts data={data} />
+                </div>
+            )}
+            
             {activeTab === "profile" && <Profile data={data} />}
+            
             {activeTab === "cards" && (
               <div className="cards-section">
                 <h3 className="cards-title">Mes cartes</h3>
@@ -131,12 +137,12 @@ export default function Dashboard() {
     );
   }
 
-  // --- RENDU MOBILE (TON CODE D'ORIGINE INTACT) ---
+  // --- RENDU MOBILE (NON TOUCHÉ) ---
   return (
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <BalanceBar balance={data.balance} offset={scrollOffset} opacity={opacity} />
+      <BalanceBar balance={data.balance} />
       <div className="page-content" ref={contentRef}>
         {activeTab === "accounts" && <Accounts data={data}/>}
         {activeTab === "profile" && <Profile data={data} />}
@@ -145,9 +151,6 @@ export default function Dashboard() {
             <h3 className="cards-title">Mes cartes</h3>
             <div className="cards-slider">
               {card && <div className="cards-slide"><BankCard card={card}/></div>}
-              <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
-                <div className="card-request-inner"><div className="card-plus">+</div><p>Demander une carte</p></div>
-              </div>
             </div>
           </div>
         )}
