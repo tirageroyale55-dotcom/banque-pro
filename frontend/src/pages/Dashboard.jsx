@@ -14,6 +14,7 @@ import "../styles/dashboard.css";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true); // Ajout d'un état loading
   const [activeTab, setActiveTab] = useState("accounts");
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
   const [card, setCard] = useState(null);
@@ -30,9 +31,11 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     api("/client/dashboard")
       .then((clientData) => {
         setData(clientData);
+        setLoading(false);
         api("/transactions")
           .then((transactionsData) => {
             setData(prev => ({
@@ -73,7 +76,14 @@ export default function Dashboard() {
     return () => window.removeEventListener("scroll", handleScroll, true);
   }, [activeTab, data, isDesktop]);
 
-  if (!data) return null;
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="loader"></div>
+        <p>Chargement de votre espace BPER...</p>
+      </div>
+    );
+  }
 
   // --- RENDU DESKTOP (LOGO GAUCHE | PROFIL DROITE) ---
   if (isDesktop) {
