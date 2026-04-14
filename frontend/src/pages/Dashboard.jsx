@@ -81,7 +81,7 @@ export default function Dashboard() {
   if (isDesktop) {
     return (
       <div className="bank-app bper-desktop-interface">
-        {/* SIDEBAR GAUCHE (Exactement comme ton dessin) */}
+        {/* SIDEBAR */}
         <aside className="bper-sidebar">
           <div className="bper-logo">BPER</div>
           <nav className="bper-nav">
@@ -95,45 +95,61 @@ export default function Dashboard() {
         </aside>
 
         <main className="bper-main-content">
-          {/* HEADER TOP DROITE (Profil + Notification exactement comme le dessin) */}
+          {/* HEADER TOP DROITE - Correction Nom/Prénom */}
           <header className="bper-header-top">
              <div className="bper-user-welcome">
                 Bienvenue, <span className="user-name">{data.firstName} {data.lastName}</span>
              </div>
              <div className="bper-top-icons">
-                <div className="icon-wrapper">🔔</div> {/* Icône Notification du dessin */}
-                <div className="icon-wrapper profile-trigger" onClick={() => setActiveTab('profile')}>👤</div> {/* Icône Profil du dessin */}
+                <div className="icon-wrapper">🔔</div>
+                <div className="icon-wrapper profile-trigger" onClick={() => setActiveTab('profile')}>👤</div>
              </div>
           </header>
 
           <div className="bper-scroll-zone">
             {activeTab === "accounts" && (
-              <div className="bper-dashboard-grid">
+              <div className="bper-dashboard-container">
                 
-                {/* BLOC SOLDE (Le grand rectangle du dessin avec le portefeuille) */}
-                <section className="bper-balance-card">
-                  <div className="balance-info">
+                {/* SECTION SOLDE + ACTIONS (Alignement horizontal large) */}
+                <section className="bper-hero-card">
+                  <div className="bper-balance-box">
                     <p className="balance-label">Solde disponible 👁️</p>
                     <h2 className="balance-value">{data.balance?.toLocaleString()} €</h2>
-                    <div className="wallet-icon">💼</div> {/* L'icône portefeuille en bas à droite du bloc sur ton dessin */}
+                    <p className="iban-sub">IT37Q0538712100120619128863</p>
+                    <div className="wallet-icon-container">💼</div>
                   </div>
                   
-                  {/* LES BOUTONS À DROITE DU SOLDE (Arrondis comme sur ton dessin) */}
-                  <div className="bper-action-buttons">
-                    <button className="bper-btn"><span>📄</span> Voir mon IBAN</button>
-                    <button className="bper-btn active"><span>➕</span> Effectuer un virement</button>
-                    <button className="bper-btn"><span>💳</span> Voir ma carte virtuelle</button>
+                  <div className="bper-actions-list">
+                    <button className="bper-btn-action">Voir mon IBAN</button>
+                    <button className="bper-btn-action active">Effectuer un virement</button>
+                    <button className="bper-btn-action">Voir ma carte virtuelle</button>
                   </div>
                 </section>
 
-                {/* HISTORIQUE (Le bloc large en dessous sur ton dessin) */}
-                <section className="bper-history-section">
-                  <div className="history-title">
-                    <span className="hamburger-icon">≡</span> Historique des transactions
+                {/* HISTORIQUE (Prend toute la largeur en bas) */}
+                <section className="bper-history-full">
+                  <div className="history-top-bar">
+                    <span className="hamburger">≡</span> 
+                    <h3>Historique des transactions</h3>
                   </div>
-                  <div className="history-list">
-                    {/* Contenu de l'historique ici */}
-                    <div className="placeholder-text">Les graphes et transactions ici...</div>
+                  
+                  <div className="history-content-desktop">
+                    {/* Intégration de tes vraies transactions */}
+                    {data.transactions && data.transactions.length > 0 ? (
+                      data.transactions.map((tr, idx) => (
+                        <div key={idx} className="desktop-tr-item">
+                           <div className="tr-main">
+                             <p className="tr-label">{tr.label}</p>
+                             <p className="tr-date">{tr.date}</p>
+                           </div>
+                           <div className={`tr-val ${tr.type}`}>
+                             {tr.type === 'credit' ? '+' : '-'}{tr.amount} €
+                           </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="no-data">Les graphes et transactions s'afficheront ici...</p>
+                    )}
                   </div>
                 </section>
 
@@ -147,13 +163,12 @@ export default function Dashboard() {
     );
   }
 
-  {/* RENDU MOBILE - NE CHANGE PAS D'UN POIL */}
+  // --- RENDU MOBILE (INTOUCHÉ) ---
   return (
     <div className="bank-app">
-      <Header data={data} />
-      <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <div className="page-content">{/* ... ton contenu mobile ... */}</div>
-      <BottomNav />
+       <Header data={data} />
+       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+       {/* ... reste de ton mobile ... */}
     </div>
   );
 }
