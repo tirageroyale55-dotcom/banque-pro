@@ -78,11 +78,10 @@ export default function Dashboard() {
 
   if (!data) return null;
 
-  // --- RENDU DESKTOP (MODIFIÉ SELON TON DESSIN) ---
   if (isDesktop) {
     return (
       <div className="bank-app desktop-layout">
-        {/* Menu latéral gauche (Sidebar) */}
+        {/* SIDEBAR GAUCHE (Exactement comme ton dessin) */}
         <aside className="desktop-sidebar">
           <div className="sidebar-logo">BPER</div>
           <nav className="sidebar-nav">
@@ -95,34 +94,48 @@ export default function Dashboard() {
           </nav>
         </aside>
 
-        {/* Contenu de droite */}
         <main className="desktop-main">
-          {/* Header Desktop : Nom + Icônes à droite (selon dessin) */}
-          <header className="desktop-header-top">
-            <div className="user-welcome">
-              Bienvenue, {data.firstName} {data.lastName}
-            </div>
-            <div className="header-icons">
-               <div className="icon-box">🔔</div> {/* Notification */}
-               <div className="icon-box profile-trigger" onClick={() => setActiveTab('profile')}>👤</div> {/* Profil */}
-            </div>
-          </header>
-
-          {/* Note: Le composant <Tabs /> est supprimé ici pour le Desktop */}
+          {/* HEADER : On réutilise TON composant pour avoir tes vraies icônes */}
+          <div className="desktop-header-container">
+            <Header data={data} />
+          </div>
 
           <div className="desktop-scroll-area">
-            {activeTab === "accounts" && <Accounts data={data} />}
+            {activeTab === "accounts" && (
+              <div className="dashboard-content-grid">
+                {/* SECTION SOLDE + BOUTONS (Comme sur ton dessin) */}
+                <section className="balance-section-desktop">
+                  <div className="balance-card-wrapper">
+                     <Accounts data={data} /> {/* Ton composant compte */}
+                  </div>
+                  
+                  {/* Les boutons que tu as dessinés à gauche/côté du solde */}
+                  <div className="quick-actions-desktop">
+                    <button className="action-btn">Voir mon IBAN</button>
+                    <button className="action-btn-primary">Effectuer un virement</button>
+                    <button className="action-btn">Voir ma carte virtuelle</button>
+                  </div>
+                </section>
+
+                {/* HISTORIQUE DES TRANSACTIONS (Le grand bloc en bas sur ton dessin) */}
+                <section className="history-section-desktop">
+                   <div className="section-header">
+                     <span className="icon">≡</span> Historique des transactions
+                   </div>
+                   {/* Ici la liste des transactions de data.transactions */}
+                </section>
+              </div>
+            )}
+
             {activeTab === "profile" && <Profile data={data} />}
+            
             {activeTab === "cards" && (
               <div className="cards-section">
                 <h3 className="cards-title">Mes cartes</h3>
                 <div className="cards-slider">
                   {card && <div className="cards-slide"><BankCard card={card}/></div>}
                   <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
-                    <div className="card-request-inner">
-                      <div className="card-plus">+</div>
-                      <p>Demander une carte</p>
-                    </div>
+                    <div className="card-request-inner"><div className="card-plus">+</div><p>Demander une carte</p></div>
                   </div>
                 </div>
               </div>
@@ -133,7 +146,7 @@ export default function Dashboard() {
     );
   }
 
-  // --- RENDU MOBILE (STRICTEMENT INTACT COMME DEMANDÉ) ---
+  // --- RENDU MOBILE (INTOUCHÉ) ---
   return (
     <div className="bank-app">
       <Header data={data} />
