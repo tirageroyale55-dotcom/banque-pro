@@ -337,131 +337,93 @@ white-space:nowrap;
 
 
 
-/* ============================================================
-   MODE DESKTOP PRO (STYLE BPER BANCA)
-   Cible : .desktop-layout (Ajouté dans Dashboard.jsx)
-   ============================================================ */
-
 @media (min-width: 1000px) {
+  /* On cache les Tabs et la BottomNav sur Desktop car le menu est à gauche */
+  .tabs-wrapper, .bottom-nav, .balance-bar {
+    display: none !important;
+  }
 
-  /* 1. MISE EN PAGE : Aligne Sidebar à gauche et Contenu à droite */
   .desktop-layout {
-    display: flex !important;
-    flex-direction: row !important;
-    height: 100vh !important;
-    width: 100vw !important;
-    overflow: hidden !important; /* Empêche le scroll de tout l'écran */
-    background: #0b5c5b !important; /* Couleur de fond BPER */
-    padding: 0 !important;
+    display: flex;
+    height: 100vh;
+    background-color: #f4f7f6; /* Fond clair pro pour le contenu */
   }
 
-  /* 2. SIDEBAR : Fixe à gauche sur toute la hauteur */
+  /* SIDEBAR STYLE BPER */
   .desktop-sidebar {
-    display: flex !important;
-    width: 260px !important;
-    min-width: 260px !important;
-    height: 100vh !important;
-    background: #0a4f4e !important; /* Sidebar plus sombre pour contraste */
-    flex-direction: column !important;
-    padding: 30px 20px !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative !important;
-    flex-shrink: 0 !important;
-  }
-
-  /* Logo BPER sur le dessin */
-  .sidebar-logo {
+    width: 280px;
+    background: #004a4d; /* Vert foncé BPER */
     color: white;
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    margin-bottom: 40px;
-    padding-left: 10px;
-  }
-
-  /* Style des items du menu de ton dessin */
-  .sidebar-nav {
+    padding: 40px 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+  }
+
+  .sidebar-logo {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 50px;
+    padding-left: 15px;
   }
 
   .sidebar-nav .nav-item {
-    all: unset;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 12px 18px;
-    color: white;
-    font-size: 15px;
+    padding: 15px;
+    margin-bottom: 8px;
     cursor: pointer;
-    border-radius: 12px;
-    transition: all 0.2s ease;
-  }
-
-  .sidebar-nav .nav-item:hover {
-    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    transition: 0.3s;
+    font-size: 16px;
   }
 
   .sidebar-nav .nav-item.active {
-    background: white !important;
-    color: #0b5c5b !important; /* Couleur BPER sur l'actif */
+    background: rgba(255, 255, 255, 0.15);
     font-weight: 600;
   }
 
-  /* 3. COLONNE DE DROITE (Header + Content) */
+  /* CONTENU DE DROITE */
   .desktop-main {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100vh !important;
-    overflow: hidden !important;
-    position: relative !important;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
-  /* HEADER : Aligné en haut à droite (comme ton schéma) */
-  /* On annule chirurgicalement le fixed du mobile */
-  .desktop-main .header {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    width: 100% !important;
-    height: 80px !important;
+  /* BARRE HAUTE : Contient le profil et notif à droite */
+  .desktop-top-bar {
+    height: 80px;
+    display: flex;
+    justify-content: flex-end; /* Pousse le Header (profil) à droite */
+    align-items: center;
+    padding: 0 40px;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  /* Force le Header mobile à se comporter normalement en desktop */
+  .desktop-top-bar .header {
+    position: static !important;
     background: transparent !important;
-    display: flex !important;
-    justify-content: flex-end !important; /* Profil et icônes à droite */
-    padding: 0 40px !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    z-index: 10 !important;
-    backdrop-filter: none !important;
+    box-shadow: none !important;
+    width: auto !important;
   }
 
-  /* TABS : Juste sous le header */
-  /* On annule chirurgicalement le fixed du mobile */
-  .desktop-main .tabs-wrapper {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    width: 100% !important;
-    background: transparent !important;
-    padding: 10px 40px !important;
-    margin-bottom: 10px !important;
-    z-index: 5 !important;
-    backdrop-filter: none !important;
-  }
-
-  /* ZONE DE SCROLL INDÉPENDANTE : C'est la seule partie qui défile */
   .desktop-scroll-area {
-    flex: 1 !important;
-    overflow-y: auto !important;
-    margin-top: 0 !important; /* Supprime le vide du mobile */
-    padding: 20px 40px 40px 40px !important;
+    padding: 40px;
+    overflow-y: auto;
+    flex: 1;
   }
 
-  /* Ajustement des cartes pour le PC */
+  .welcome-section h1 {
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 30px;
+  }
+
+  /* Ajustement des composants internes */
   .account-card {
-    max-width: 900px !important;
-    margin: 0 auto 30px auto !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
   }
 }
 
