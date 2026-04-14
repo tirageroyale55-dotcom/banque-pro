@@ -338,116 +338,6 @@ white-space:nowrap;
 
 
 @media (min-width: 1000px) {
-  /* Supprime tout l'affichage mobile */
-  .bank-app:not(.bper-desktop-interface) { display: none !important; }
-
-  .bper-desktop-interface {
-    display: flex !important;
-    height: 100vh !important;
-    background-color: #0b5c5b !important; /* Couleur BPER */
-    color: white !important;
-    overflow: hidden !important;
-  }
-
-  /* SIDEBAR */
-  .bper-sidebar {
-    width: 250px;
-    background: rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    padding: 40px 20px;
-    border-right: 1px solid rgba(255,255,255,0.1);
-  }
-  .bper-logo { font-size: 35px; font-weight: bold; margin-bottom: 50px; }
-  .bper-nav .nav-item {
-    padding: 15px 10px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    opacity: 0.8;
-  }
-  .bper-nav .nav-item.active { opacity: 1; font-weight: bold; }
-
-  /* MAIN */
-  .bper-main-content { flex: 1; display: flex; flex-direction: column; }
-
-  /* HEADER TOP DROITE (Exactement comme ton schéma) */
-  .bper-header-top {
-    height: 80px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 0 40px;
-    gap: 20px;
-  }
-  .bper-user-welcome { font-size: 1.1rem; }
-  .user-name { font-weight: bold; }
-  .bper-top-icons { display: flex; gap: 15px; }
-  .icon-wrapper {
-    width: 45px;
-    height: 45px;
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
-
-  /* BLOC SOLDE ET BOUTONS */
-  .bper-balance-card {
-    margin: 20px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 30px;
-    border-radius: 20px;
-  }
-  .balance-value { font-size: 3rem; margin: 10px 0; }
-  .wallet-icon { font-size: 2rem; text-align: right; }
-
-  .bper-action-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  .bper-btn {
-    width: 280px;
-    padding: 15px 25px;
-    border-radius: 30px;
-    border: 1px solid white;
-    background: transparent;
-    color: white;
-    text-align: left;
-    cursor: pointer;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .bper-btn.active { background: white; color: #0b5c5b; font-weight: bold; }
-
-  /* HISTORIQUE (Bas du dessin) */
-  .bper-history-section {
-    margin: 20px 40px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 20px;
-    padding: 30px;
-    flex: 1;
-  }
-  .history-title {
-    font-size: 1.3rem;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-}
-
-
-
-
-@media (min-width: 1000px) {
   .bper-desktop-interface {
     display: flex !important;
     background-color: #0b5c5b !important;
@@ -540,6 +430,7 @@ white-space:nowrap;
   .tr-val { font-size: 1.2rem; font-weight: 700; }
   .tr-val.credit { color: #4ade80; }
 }
+
 
 
 
