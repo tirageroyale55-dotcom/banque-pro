@@ -14,7 +14,7 @@ import "../styles/dashboard.css";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true); // Ajout d'un état loading
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("accounts");
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
   const [card, setCard] = useState(null);
@@ -31,7 +31,6 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
     api("/client/dashboard")
       .then((clientData) => {
         setData(clientData);
@@ -61,35 +60,43 @@ export default function Dashboard() {
     window.scrollTo(0, 0);
   }, [activeTab]);
 
-  // BalanceBar (Logique Mobile uniquement)
+  // ==========================================
+  // BalanceBar (Logique Mobile uniquement) - RESTAURÉE
+  // ==========================================
   useEffect(() => {
-    if (!data || activeTab !== "accounts" || isDesktop) return;
+    if (!data || activeTab !== "accounts" || isDesktop) {
+        const bar = document.querySelector('.balance-bar');
+        if (bar) bar.classList.remove('show');
+        return;
+    }
+
     const handleScroll = () => {
       const bar = document.querySelector('.balance-bar');
       const accountCard = document.querySelector('.account-card');
+      
       if (!bar || !accountCard) return;
+
       const cardRect = accountCard.getBoundingClientRect();
-      if (cardRect.top < 135) bar.classList.add('show');
-      else bar.classList.remove('show');
+      const triggerPoint = 135; 
+
+      if (cardRect.top < triggerPoint) {
+        bar.classList.add('show');
+      } else {
+        bar.classList.remove('show');
+      }
     };
+
     window.addEventListener("scroll", handleScroll, true);
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll, true);
   }, [activeTab, data, isDesktop]);
 
-  if (loading) {
-    return (
-      <div className="loading-screen">
-        <div className="loader"></div>
-        <p>Chargement de votre espace BPER...</p>
-      </div>
-    );
-  }
+  if (loading || !data) return null;
 
   // --- RENDU DESKTOP (LOGO GAUCHE | PROFIL DROITE) ---
   if (isDesktop) {
     return (
       <div className="bank-app desktop-layout">
-        {/* BARRE LATERALE (SIDEBAR) */}
         <aside className="desktop-sidebar">
           <div className="sidebar-logo">BPER</div>
           <nav className="sidebar-nav">
@@ -103,9 +110,7 @@ export default function Dashboard() {
           </nav>
         </aside>
 
-        {/* CONTENU PRINCIPAL */}
         <main className="desktop-main">
-          {/* HEADER : ICI LE PROFIL EST POUSSÉ À DROITE COMME SUR TON DESSIN */}
           <header className="desktop-header-top">
             <div className="user-profile-top">
               <span className="welcome-name">Bienvenue, {data.firstName} {data.lastName}</span>
@@ -119,14 +124,8 @@ export default function Dashboard() {
           </header>
           
           <div className="desktop-scroll-area">
-            {activeTab === "accounts" && (
-                <div className="dashboard-view">
-                    <Accounts data={data} />
-                </div>
-            )}
-            
+            {activeTab === "accounts" && <Accounts data={data} />}
             {activeTab === "profile" && <Profile data={data} />}
-            
             {activeTab === "cards" && (
               <div className="cards-section">
                 <h3 className="cards-title">Mes cartes</h3>
@@ -147,12 +146,16 @@ export default function Dashboard() {
     );
   }
 
-  // --- RENDU MOBILE (NON TOUCHÉ) ---
+  // --- RENDU MOBILE (STRICTEMENT INTACT) ---
   return (
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <BalanceBar balance={data.balance} />
+      <BalanceBar 
+        balance={data.balance} 
+        offset={scrollOffset} 
+        opacity={opacity} 
+      />
       <div className="page-content" ref={contentRef}>
         {activeTab === "accounts" && <Accounts data={data}/>}
         {activeTab === "profile" && <Profile data={data} />}
@@ -161,6 +164,12 @@ export default function Dashboard() {
             <h3 className="cards-title">Mes cartes</h3>
             <div className="cards-slider">
               {card && <div className="cards-slide"><BankCard card={card}/></div>}
+              <div className="cards-slide card-request" onClick={()=>navigate("/request-card")}>
+                <div className="card-request-inner">
+                   <div className="card-plus">+</div>
+                   <p>Demander une carte</p>
+                </div>
+              </div>
             </div>
           </div>
         )}
