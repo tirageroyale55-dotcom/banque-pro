@@ -338,94 +338,109 @@ white-space:nowrap;
 
 
 @media (min-width: 1000px) {
-  /* Fond Vert BPER global */
-  .desktop-layout {
+  /* Supprime tout l'affichage mobile */
+  .bank-app:not(.bper-desktop-interface) { display: none !important; }
+
+  .bper-desktop-interface {
     display: flex !important;
-    background-color: #0b5c5b !important;
     height: 100vh !important;
+    background-color: #0b5c5b !important; /* Couleur BPER */
     color: white !important;
-    font-family: sans-serif;
+    overflow: hidden !important;
   }
 
   /* SIDEBAR */
-  .desktop-sidebar {
-    width: 240px;
-    background: rgba(0,0,0,0.15);
-    padding: 40px 20px;
+  .bper-sidebar {
+    width: 250px;
+    background: rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
+    padding: 40px 20px;
+    border-right: 1px solid rgba(255,255,255,0.1);
   }
+  .bper-logo { font-size: 35px; font-weight: bold; margin-bottom: 50px; }
+  .bper-nav .nav-item {
+    padding: 15px 10px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    opacity: 0.8;
+  }
+  .bper-nav .nav-item.active { opacity: 1; font-weight: bold; }
 
-  .sidebar-logo { font-size: 30px; font-weight: 800; margin-bottom: 40px; }
-  .sidebar-nav .nav-item { padding: 12px; cursor: pointer; opacity: 0.7; }
-  .sidebar-nav .nav-item.active { opacity: 1; font-weight: bold; border-left: 3px solid white; padding-left: 9px; }
+  /* MAIN */
+  .bper-main-content { flex: 1; display: flex; flex-direction: column; }
 
-  .desktop-main { flex: 1; display: flex; flex-direction: column; }
-
-  /* HEADER TOP DROITE */
-  .desktop-header-top {
+  /* HEADER TOP DROITE (Exactement comme ton schéma) */
+  .bper-header-top {
     height: 80px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
     padding: 0 40px;
-    gap: 30px;
+    gap: 20px;
   }
-  .user-info-desktop { text-align: right; }
-  .user-fullname { display: block; font-weight: bold; font-size: 1.1rem; }
-  .header-icons-desktop { display: flex; gap: 15px; }
-  .icon-circle { width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .bper-user-welcome { font-size: 1.1rem; }
+  .user-name { font-weight: bold; }
+  .bper-top-icons { display: flex; gap: 15px; }
+  .icon-wrapper {
+    width: 45px;
+    height: 45px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
 
-  /* SECTION SOLDE + BOUTONS (LE COEUR DU DESSIN) */
-  .hero-section-desktop {
+  /* BLOC SOLDE ET BOUTONS */
+  .bper-balance-card {
+    margin: 20px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 40px;
-    max-width: 1100px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 30px;
+    border-radius: 20px;
   }
+  .balance-value { font-size: 3rem; margin: 10px 0; }
+  .wallet-icon { font-size: 2rem; text-align: right; }
 
-  .balance-block-desktop .amount { font-size: 3.5rem; margin: 10px 0; }
-  .iban-display { opacity: 0.6; font-family: monospace; }
-
-  .actions-column-desktop { display: flex; flex-direction: column; gap: 15px; }
-  
-  /* Bouton stylé BPER */
-  .btn-outline, .btn-filled {
-    width: 250px;
-    padding: 14px;
+  .bper-action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .bper-btn {
+    width: 280px;
+    padding: 15px 25px;
     border-radius: 30px;
     border: 1px solid white;
     background: transparent;
     color: white;
+    text-align: left;
     cursor: pointer;
-    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  .btn-filled { background: white; color: #0b5c5b; }
+  .bper-btn.active { background: white; color: #0b5c5b; font-weight: bold; }
 
-  /* HISTORIQUE (BAS) */
-  .history-container-desktop {
+  /* HISTORIQUE (Bas du dessin) */
+  .bper-history-section {
     margin: 20px 40px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.03);
     border-radius: 20px;
     padding: 30px;
+    flex: 1;
   }
-  .history-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-  .tr-row { 
-    display: flex; 
-    justify-content: space-between; 
-    padding: 15px 0; 
-    border-bottom: 1px solid rgba(255,255,255,0.1); 
-  }
-  .tr-amount.credit { color: #4ade80; font-weight: bold; }
-  .tr-amount.debit { color: white; }
-
-  /* CACHE TOUT LE MOBILE */
-  .desktop-layout .header, 
-  .desktop-layout .tabs-wrapper, 
-  .desktop-layout .bottom-nav,
-  .desktop-layout .balance-bar {
-    display: none !important;
+  .history-title {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 }
 
