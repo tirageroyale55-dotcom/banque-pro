@@ -79,53 +79,55 @@ export default function Dashboard() {
   if (!data) return null;
 
   if (isDesktop) {
-    return (
-      <div className="bank-app desktop-layout">
-        {/* SIDEBAR GAUCHE (Exactement comme ton dessin) */}
-        <aside className="desktop-sidebar">
-          <div className="sidebar-logo">BPER</div>
-          <nav className="sidebar-nav">
-            <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>Accueil</div>
-            <div className="nav-item">Cartes</div>
-            <div className="nav-item">Payer</div>
-            <div className={`nav-item ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>Produits</div>
-            <div className="nav-item">Lifestyle</div>
-            <div className="nav-item">Aide</div>
-          </nav>
-        </aside>
+  return (
+    <div className="bank-app desktop-layout">
+      {/* SIDEBAR FIXE À GAUCHE */}
+      <aside className="desktop-sidebar">
+        <div className="sidebar-logo">BPER</div>
+        <nav className="sidebar-nav">
+          <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>Accueil</div>
+          <div className="nav-item">Cartes</div>
+          <div className="nav-item">Payer</div>
+          <div className="nav-item">Produits</div>
+          <div className="nav-item">Lifestyle</div>
+          <div className="nav-item">Aide</div>
+        </nav>
+      </aside>
 
-        <main className="desktop-main">
-          {/* HEADER : On réutilise TON composant pour avoir tes vraies icônes */}
-          <div className="desktop-header-container">
-            <Header data={data} />
-          </div>
+      <main className="desktop-main">
+        {/* HEADER EN HAUT À DROITE (Ton composant exact) */}
+        <div className="desktop-top-bar">
+          <Header data={data} />
+        </div>
 
-          <div className="desktop-scroll-area">
-            {activeTab === "accounts" && (
-              <div className="dashboard-content-grid">
-                {/* SECTION SOLDE + BOUTONS (Comme sur ton dessin) */}
-                <section className="balance-section-desktop">
-                  <div className="balance-card-wrapper">
-                     <Accounts data={data} /> {/* Ton composant compte */}
-                  </div>
-                  
-                  {/* Les boutons que tu as dessinés à gauche/côté du solde */}
-                  <div className="quick-actions-desktop">
-                    <button className="action-btn">Voir mon IBAN</button>
-                    <button className="action-btn-primary">Effectuer un virement</button>
-                    <button className="action-btn">Voir ma carte virtuelle</button>
-                  </div>
-                </section>
-
-                {/* HISTORIQUE DES TRANSACTIONS (Le grand bloc en bas sur ton dessin) */}
-                <section className="history-section-desktop">
-                   <div className="section-header">
-                     <span className="icon">≡</span> Historique des transactions
-                   </div>
-                   {/* Ici la liste des transactions de data.transactions */}
-                </section>
+        <div className="desktop-content-container">
+          {activeTab === "accounts" && (
+            <>
+              {/* SECTION HAUTE : SOLDE + BOUTONS ACTION */}
+              <div className="desktop-hero-section">
+                <div className="balance-wrapper">
+                  <Accounts data={data} />
+                </div>
+                
+                <div className="desktop-quick-actions">
+                  <button className="d-btn">Voir mon IBAN</button>
+                  <button className="d-btn primary">Effectuer un virement</button>
+                  <button className="d-btn">Voir ma carte virtuelle</button>
+                </div>
               </div>
-            )}
+
+              {/* SECTION BASSE : HISTORIQUE (Prend toute la largeur) */}
+              <div className="desktop-history-full">
+                <div className="history-title">
+                   <span>≡</span> Historique des transactions
+                </div>
+                {/* Remplace par ta liste de transactions réelle ici */}
+                <div className="history-list-placeholder">
+                   {/* Ici ton composant de liste ou map sur data.transactions */}
+                </div>
+              </div>
+            </>
+          )}
 
             {activeTab === "profile" && <Profile data={data} />}
             
