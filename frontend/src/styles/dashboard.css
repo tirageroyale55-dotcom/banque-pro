@@ -567,7 +567,95 @@ white-space:nowrap;
 
 
 
+/* RESET FORCE POUR DESKTOP */
+@media (min-width: 1000px) {
+  /* On cache tout ce qui est mobile pour éviter les bugs */
+  .bank-app, .bottom-nav, .balance-bar, .tabs-wrapper {
+    display: none !important;
+  }
 
+  .desktop-main-container {
+    display: flex !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    position: fixed !important; /* Force l'affichage au premier plan */
+    top: 0;
+    left: 0;
+    background: #f4f7f6;
+    z-index: 9999;
+  }
+
+  .sidebar-desktop {
+    width: 260px;
+    background: #0a4f4e;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 30px 0;
+  }
+
+  .sidebar-brand {
+    font-size: 28px;
+    font-weight: bold;
+    padding: 0 30px 40px;
+  }
+
+  .nav-item {
+    padding: 15px 30px;
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
+  .nav-item.active {
+    background: white;
+    color: #0b5c5b;
+    opacity: 1;
+    font-weight: bold;
+  }
+
+  .content-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  .header-desktop-top {
+    height: 80px;
+    background: white;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 40px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .profile-top-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #333;
+  }
+
+  .avatar-circle {
+    width: 45px;
+    height: 45px;
+    background: #0b5c5b;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .scrollable-content-desktop {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px;
+  }
+}
 
 
 

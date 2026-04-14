@@ -14,7 +14,6 @@ import "../styles/dashboard.css";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("accounts");
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
   const [card, setCard] = useState(null);
@@ -34,7 +33,6 @@ export default function Dashboard() {
     api("/client/dashboard")
       .then((clientData) => {
         setData(clientData);
-        setLoading(false);
         api("/transactions")
           .then((transactionsData) => {
             setData(prev => ({
@@ -60,88 +58,58 @@ export default function Dashboard() {
     window.scrollTo(0, 0);
   }, [activeTab]);
 
-  // ==========================================
-  // BalanceBar (Logique Mobile uniquement) - RESTAURÉE
-  // ==========================================
+  // --- LOGIQUE BALANCEBAR MOBILE (CONSERVÉE) ---
   useEffect(() => {
-    if (!data || activeTab !== "accounts" || isDesktop) {
-        const bar = document.querySelector('.balance-bar');
-        if (bar) bar.classList.remove('show');
-        return;
-    }
-
+    if (!data || activeTab !== "accounts" || isDesktop) return;
     const handleScroll = () => {
       const bar = document.querySelector('.balance-bar');
       const accountCard = document.querySelector('.account-card');
-      
       if (!bar || !accountCard) return;
-
       const cardRect = accountCard.getBoundingClientRect();
-      const triggerPoint = 135; 
-
-      if (cardRect.top < triggerPoint) {
-        bar.classList.add('show');
-      } else {
-        bar.classList.remove('show');
-      }
+      if (cardRect.top < 135) bar.classList.add('show');
+      else bar.classList.remove('show');
     };
-
     window.addEventListener("scroll", handleScroll, true);
-    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll, true);
   }, [activeTab, data, isDesktop]);
 
-  if (loading || !data) return null;
+  if (!data) return null;
 
-  // --- RENDU DESKTOP (LOGO GAUCHE | PROFIL DROITE) ---
+  // --- RENDU DESKTOP (VÉRIFIÉ) ---
   if (isDesktop) {
     return (
-      <div className="bank-app desktop-layout">
-        <aside className="desktop-sidebar">
-          <div className="sidebar-logo">BPER</div>
-          <nav className="sidebar-nav">
+      <div className="desktop-main-container">
+        {/* SIDEBAR GAUCHE */}
+        <aside className="sidebar-desktop">
+          <div className="sidebar-brand">BPER</div>
+          <nav className="nav-list">
             <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>Accueil</div>
-            <div className="nav-item" onClick={() => setActiveTab('accounts')}>Comptes</div>
-            <div className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>Cartes</div>
-            <div className="nav-item">Payer</div>
-            <div className="nav-item">Produits</div>
-            <div className="nav-item">Lifestyle</div>
+            <div className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>Mes Cartes</div>
             <div className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>Aide</div>
           </nav>
         </aside>
 
-        <main className="desktop-main">
-          <header className="desktop-header-top">
-            <div className="user-profile-top">
-              <span className="welcome-name">Bienvenue, {data.firstName} {data.lastName}</span>
-              <div className="header-icons">
-                <div className="icon-circle">🔔</div>
-                <div className="profile-avatar" onClick={() => setActiveTab('profile')}>
-                   {data.firstName.charAt(0)}{data.lastName.charAt(0)}
-                </div>
+        {/* CONTENU DROITE */}
+        <div className="content-right">
+          <header className="header-desktop-top">
+            <div className="profile-top-info">
+              <span>{data.firstName} {data.lastName}</span>
+              <div className="avatar-circle" onClick={() => setActiveTab('profile')}>
+                {data.firstName[0]}{data.lastName[0]}
               </div>
             </div>
           </header>
           
-          <div className="desktop-scroll-area">
+          <main className="scrollable-content-desktop">
             {activeTab === "accounts" && <Accounts data={data} />}
             {activeTab === "profile" && <Profile data={data} />}
             {activeTab === "cards" && (
-              <div className="cards-section">
-                <h3 className="cards-title">Mes cartes</h3>
-                <div className="cards-slider">
-                  {card && <div className="cards-slide"><BankCard card={card}/></div>}
-                  <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
-                    <div className="card-request-inner">
-                      <div className="card-plus">+</div>
-                      <p>Demander une carte</p>
-                    </div>
-                  </div>
-                </div>
+              <div className="cards-wrapper-desktop">
+                {card ? <BankCard card={card} /> : <p>Chargement des cartes...</p>}
               </div>
             )}
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
     );
   }
@@ -151,28 +119,11 @@ export default function Dashboard() {
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <BalanceBar 
-        balance={data.balance} 
-        offset={scrollOffset} 
-        opacity={opacity} 
-      />
+      <BalanceBar balance={data.balance} offset={scrollOffset} opacity={opacity} />
       <div className="page-content" ref={contentRef}>
         {activeTab === "accounts" && <Accounts data={data}/>}
         {activeTab === "profile" && <Profile data={data} />}
-        {activeTab === "cards" && (
-          <div className="cards-section">
-            <h3 className="cards-title">Mes cartes</h3>
-            <div className="cards-slider">
-              {card && <div className="cards-slide"><BankCard card={card}/></div>}
-              <div className="cards-slide card-request" onClick={()=>navigate("/request-card")}>
-                <div className="card-request-inner">
-                   <div className="card-plus">+</div>
-                   <p>Demander une carte</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {activeTab === "cards" && card && <BankCard card={card} />}
       </div>
       <BottomNav />
     </div>
