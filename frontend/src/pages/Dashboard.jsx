@@ -8,6 +8,7 @@ import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
 import Accounts from "./Accounts";
+// Ajout de l'import Profile au cas où il manquerait
 import Profile from "./Profile"; 
 
 import "../styles/dashboard.css";
@@ -23,12 +24,14 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const contentRef = useRef(null);
 
+  // Gestion du redimensionnement
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Chargement des données
   useEffect(() => {
     api("/client/dashboard")
       .then((clientData) => {
@@ -58,7 +61,7 @@ export default function Dashboard() {
     window.scrollTo(0, 0);
   }, [activeTab]);
 
-  // --- LOGIQUE BALANCEBAR MOBILE (CONSERVÉE) ---
+  // BalanceBar (Logique Mobile uniquement)
   useEffect(() => {
     if (!data || activeTab !== "accounts" || isDesktop) return;
     const handleScroll = () => {
@@ -75,46 +78,52 @@ export default function Dashboard() {
 
   if (!data) return null;
 
-  // --- RENDU DESKTOP (VÉRIFIÉ) ---
+  // --- RENDU DESKTOP (SÉPARÉ) ---
   if (isDesktop) {
     return (
-      <div className="desktop-main-container">
-        {/* SIDEBAR GAUCHE */}
-        <aside className="sidebar-desktop">
-          <div className="sidebar-brand">BPER</div>
-          <nav className="nav-list">
+      <div className="bank-app desktop-layout">
+        {/* Menu latéral intégré directement ici */}
+        <aside className="desktop-sidebar">
+          <div className="sidebar-logo">BPER</div>
+          <nav className="sidebar-nav">
             <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>Accueil</div>
-            <div className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>Mes Cartes</div>
-            <div className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>Aide</div>
+            <div className="nav-item">Comptes</div>
+            <div className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>Cartes</div>
+            <div className="nav-item">Payer</div>
+            <div className="nav-item">Produits</div>
+            <div className="nav-item">Lifestyle</div>
+            <div className="nav-item">Aide</div>
           </nav>
         </aside>
 
-        {/* CONTENU DROITE */}
-        <div className="content-right">
-          <header className="header-desktop-top">
-            <div className="profile-top-info">
-              <span>{data.firstName} {data.lastName}</span>
-              <div className="avatar-circle" onClick={() => setActiveTab('profile')}>
-                {data.firstName[0]}{data.lastName[0]}
-              </div>
-            </div>
-          </header>
-          
-          <main className="scrollable-content-desktop">
+        {/* Contenu de droite */}
+        <main className="desktop-main">
+          <Header data={data} />
+          <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+          <div className="desktop-scroll-area">
             {activeTab === "accounts" && <Accounts data={data} />}
             {activeTab === "profile" && <Profile data={data} />}
             {activeTab === "cards" && (
-              <div className="cards-wrapper-desktop">
-                {card ? <BankCard card={card} /> : <p>Chargement des cartes...</p>}
+              <div className="cards-section">
+                <h3 className="cards-title">Mes cartes</h3>
+                <div className="cards-slider">
+                  {card && <div className="cards-slide"><BankCard card={card}/></div>}
+                  <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+                    <div className="card-request-inner">
+                      <div className="card-plus">+</div>
+                      <p>Demander une carte</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     );
   }
 
-  // --- RENDU MOBILE (STRICTEMENT INTACT) ---
+  // --- RENDU MOBILE (TON CODE D'ORIGINE INTACT) ---
   return (
     <div className="bank-app">
       <Header data={data} />
@@ -123,7 +132,17 @@ export default function Dashboard() {
       <div className="page-content" ref={contentRef}>
         {activeTab === "accounts" && <Accounts data={data}/>}
         {activeTab === "profile" && <Profile data={data} />}
-        {activeTab === "cards" && card && <BankCard card={card} />}
+        {activeTab === "cards" && (
+          <div className="cards-section">
+            <h3 className="cards-title">Mes cartes</h3>
+            <div className="cards-slider">
+              {card && <div className="cards-slide"><BankCard card={card}/></div>}
+              <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+                <div className="card-request-inner"><div className="card-plus">+</div><p>Demander une carte</p></div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <BottomNav />
     </div>
