@@ -460,6 +460,46 @@ white-space:nowrap;
 
 
 
+.bper-hero-card-white {
+    background: white !important;
+    color: #0b5c5b !important;
+    border-radius: 25px;
+    padding: 40px;
+    margin-bottom: 25px;
+  }
+
+  .bper-iban-display {
+    font-family: monospace;
+    font-size: 1.2rem;
+    background: #f0f7f7;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    display: inline-block;
+  }
+
+  .bper-history-block-white {
+    background: white !important;
+    color: #0b5c5b !important;
+    border-radius: 25px;
+    padding: 40px;
+  }
+
+  /* Style des montants pour matcher Accounts.jsx */
+  .bper-tr-value-green.plus { color: #16a34a !important; font-weight: bold; }
+  .bper-tr-value-green.minus { color: #dc2626 !important; font-weight: bold; }
+
+  .bper-chart-container {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid #eee;
+  }
+
+  .bper-scroll-zone {
+    flex: 1;
+    overflow-y: auto; /* Permet le scroll de toute la page */
+    padding: 0 50px 50px 50px;
+  }
 
 
 
