@@ -540,50 +540,60 @@ white-space:nowrap;
 }
 
 
-/* Style pour reproduire l'étiquette Crédit/Débit de ta capture WhatsApp */
-.bper-tr-right-container {
+/* Header de l'historique avec bouton filtre */
+.bper-history-header-with-filter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f7f7;
+}
+
+.bper-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.bper-filter-icon-btn {
+    background: #f1f5f9;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #0b5c5b;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.bper-filter-icon-btn:hover {
+    background: #e2e8f0;
+}
+
+/* Alignement Crédit/Débit sur la ligne */
+.bper-tr-right-column {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
 }
 
-.bper-type-label-whatsapp {
-    font-size: 11px;
-    color: #64748b;
-    background: #f1f5f9;
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-bottom: 4px;
+.bper-type-label-line {
+    font-size: 10px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: capitalize;
+    margin-bottom: 2px;
 }
 
-.bper-tr-value-whatsapp {
-    font-size: 16px;
-    font-weight: bold;
+.bper-tr-value-line {
+    font-size: 15px;
+    font-weight: 700;
 }
 
-.bper-tr-value-whatsapp.plus { color: #16a34a; }
-.bper-tr-value-whatsapp.minus { color: #dc2626; }
-
-/* Alignement horizontal des graphiques sur Desktop */
-.bper-desktop-charts-row {
-    display: flex;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.bper-chart-card-half {
-    flex: 1;
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-}
-
-.bper-chart-card-half h4 {
-    color: #0b5c5b;
-    margin-bottom: 15px;
-    font-size: 14px;
-}
+.bper-tr-value-line.plus { color: #16a34a; }
+.bper-tr-value-line.minus { color: #dc2626; }
 
 
 

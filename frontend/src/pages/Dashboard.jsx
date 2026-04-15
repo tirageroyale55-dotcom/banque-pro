@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { Send, PlusCircle, Filter, Receipt } from "lucide-react";
+import { Send, PlusCircle, Filter } from "lucide-react";
 
 // Imports Graphiques
 import { Bar, Line } from "react-chartjs-2";
@@ -37,7 +37,6 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  // Formatage It-IT
   const formatBper = (amount) => {
     return new Intl.NumberFormat('it-IT', {
       minimumFractionDigits: 2,
@@ -72,7 +71,7 @@ export default function Dashboard() {
 
   if (!data) return null;
 
-  // --- LOGIQUE DES GRAPHIQUES (Analogue à Accounts.jsx) ---
+  // --- LOGIQUE GRAPHIQUES ---
   const transactions = data.transactions || [];
   const grouped = {};
   transactions.forEach(tx => {
@@ -101,7 +100,7 @@ export default function Dashboard() {
   const lineData = {
     labels: dates,
     datasets: [{
-      label: "Évolution Solde",
+      label: "Solde",
       data: balanceHistory,
       borderColor: "#0b5c5b",
       tension: 0.3,
@@ -131,7 +130,7 @@ export default function Dashboard() {
                 Bienvenue, <span className="user-name">{data.firstName} {data.lastName}</span>
              </div>
              <div className="bper-top-icons">
-                <div className="bper-square-icon"><Filter size={20} /></div>
+                <div className="bper-square-icon">🔔</div>
                 <div className="bper-square-icon profile-btn" onClick={() => setActiveTab('profile')}>👤</div>
              </div>
           </header>
@@ -140,12 +139,13 @@ export default function Dashboard() {
             {activeTab === "accounts" && (
               <div className="bper-dashboard-container">
                 
-                {/* CARTE SOLDE (NON TOUCHÉE) */}
+                {/* CARTE SOLDE (RESTE INTACTE) */}
                 <section className="bper-hero-card-white">
                   <div className="bper-balance-block">
                     <p className="bper-label-green">Solde disponible 👁️</p>
                     <h1 className="bper-amount-green">{formatBper(data.balance)} €</h1>
                     {showIban && <p className="bper-iban-display">{data.iban}</p>}
+                    <div className="bper-dashboard-bag-icon">💼</div>
                   </div>
                   <div className="bper-actions-row-under">
                     <button className="bper-pill-green" onClick={() => setShowIban(!showIban)}>Voir mon IBAN</button>
@@ -154,11 +154,17 @@ export default function Dashboard() {
                   </div>
                 </section>
 
-                {/* HISTORIQUE DES TRANSACTIONS (STYLE CAPTURE WHATSAPP) */}
+                {/* CARTE HISTORIQUE AVEC ICÔNE DE TRI EN HAUT À DROITE */}
                 <section className="bper-history-block-white">
-                  <div className="bper-history-header-green">
-                    <span className="bper-menu-symbol-green">≡</span> 
-                    <h3>Historique des transactions</h3>
+                  <div className="bper-history-header-with-filter">
+                    <div className="bper-header-left">
+                       <span className="bper-menu-symbol-green">≡</span> 
+                       <h3>Historique des transactions</h3>
+                    </div>
+                    {/* ICÔNE DE TRI (FILTER) */}
+                    <button className="bper-filter-icon-btn">
+                       <Filter size={18} />
+                    </button>
                   </div>
 
                   <div className="bper-transactions-table-green">
@@ -174,11 +180,12 @@ export default function Dashboard() {
                            </div>
                         </div>
                         
-                        <div className="bper-tr-right-container">
-                          <span className="bper-type-label-whatsapp">
+                        {/* ALIGNEMENT LIBELLÉ TYPE + MONTANT */}
+                        <div className="bper-tr-right-column">
+                          <span className="bper-type-label-line">
                             {tr.type === "CREDIT" ? "Crédit" : "Débit"}
                           </span>
-                          <div className={`bper-tr-value-whatsapp ${tr.type === 'CREDIT' ? 'plus' : 'minus'}`}>
+                          <div className={`bper-tr-value-line ${tr.type === 'CREDIT' ? 'plus' : 'minus'}`}>
                             {tr.type === 'CREDIT' ? '+' : '-'}{tr.amount.toLocaleString()} €
                           </div>
                         </div>
@@ -187,15 +194,15 @@ export default function Dashboard() {
                   </div>
                 </section>
 
-                {/* SECTION GRAPHIQUES HORIZONTAUX */}
+                {/* GRAPHIQUES HORIZONTAUX */}
                 <div className="bper-desktop-charts-row">
                   <div className="bper-chart-card-half">
-                    <h4>Flux Crédit / Débit</h4>
-                    <Bar data={barData} options={{ maintainAspectRatio: false }} height={250} />
+                    <h4>Analyse Crédit / Débit</h4>
+                    <Bar data={barData} options={{ maintainAspectRatio: false }} height={220} />
                   </div>
                   <div className="bper-chart-card-half">
                     <h4>Évolution du Solde</h4>
-                    <Line data={lineData} options={{ maintainAspectRatio: false }} height={250} />
+                    <Line data={lineData} options={{ maintainAspectRatio: false }} height={220} />
                   </div>
                 </div>
 
