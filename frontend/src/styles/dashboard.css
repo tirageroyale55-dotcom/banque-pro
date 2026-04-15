@@ -540,7 +540,24 @@ white-space:nowrap;
 }
 
 
+.bper-type-badge-whatsapp {
+    display: block;
+    font-size: 10px;
+    color: #64748b;
+    text-align: right;
+    margin-bottom: 2px;
+}
 
+.bper-amount-val.plus { color: #16a34a; font-weight: bold; font-size: 18px; }
+.bper-amount-val.minus { color: #dc2626; font-weight: bold; font-size: 18px; }
+
+.bper-tr-item-green {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
 
 
 
