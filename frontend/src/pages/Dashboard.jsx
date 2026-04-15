@@ -81,7 +81,7 @@ export default function Dashboard() {
   if (isDesktop) {
     return (
       <div className="bank-app bper-desktop-interface">
-        {/* SIDEBAR GAUCHE */}
+        {/* SIDEBAR GAUCHE - Fidèle au dessin */}
         <aside className="bper-sidebar">
           <div className="bper-logo">BPER</div>
           <nav className="bper-nav">
@@ -95,72 +95,66 @@ export default function Dashboard() {
         </aside>
 
         <main className="bper-main-content">
-          {/* HEADER TOP : Vrai Nom + Vraies Icônes */}
+          {/* HEADER TOP : "Bienvenue, Nom Prénom" + 2 icônes carrées à droite */}
           <header className="bper-header-top">
              <div className="bper-user-welcome">
                 Bienvenue, <span className="user-name">{data.firstName} {data.lastName}</span>
              </div>
              <div className="bper-top-icons">
-                <div className="icon-box-bper">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <div className="bper-square-icon">
+                   <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 22a2.02 2.02 0 0 1-2.01-2h4.02A2.02 2.02 0 0 1 12 22zm7-3H5v-2l2-1V9c0-3.07 1.63-5.64 4.5-6.32V2h1v.68C15.37 3.36 17 5.92 17 9v6l2 1v2z"/></svg>
                 </div>
-                <div className="icon-box-bper profile-btn" onClick={() => setActiveTab('profile')}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <div className="bper-square-icon profile-btn" onClick={() => setActiveTab('profile')}>
+                   <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 </div>
              </div>
           </header>
 
           <div className="bper-scroll-zone">
             {activeTab === "accounts" && (
-              <div className="bper-dashboard-grid">
+              <div className="bper-dashboard-container">
                 
-                {/* BLOC SOLDE & BOUTONS ALIGNÉS (FACE À FACE) */}
-                <section className="bper-hero-section">
-                  <div className="balance-info-left">
-                    <p className="balance-label">Solde disponible 👁️</p>
-                    <h2 className="balance-value">{data.balance?.toLocaleString()} €</h2>
-                    <div className="wallet-img-container">💼</div>
+                {/* SECTION SOLDE : Grand bloc avec boutons alignés à droite */}
+                <section className="bper-hero-card">
+                  <div className="bper-balance-box">
+                    <p className="bper-label">Solde disponible 👁️</p>
+                    <h1 className="bper-amount">{data.balance?.toLocaleString()} €</h1>
+                    <div className="bper-wallet-container">💼</div>
                   </div>
                   
-                  {/* BOUTONS ALIGNÉS LES UNS CONTRE LES AUTRES */}
-                  <div className="bper-horizontal-actions">
-                    <button className="bper-action-pill">Voir mon IBAN</button>
-                    <button className="bper-action-pill active">Effectuer un virement</button>
-                    <button className="bper-action-pill">Voir ma carte virtuelle</button>
+                  <div className="bper-actions-row">
+                    <button className="bper-pill">Voir mon IBAN</button>
+                    <button className="bper-pill active">Effectuer un virement</button>
+                    <button className="bper-pill">Voir ma carte virtuelle</button>
                   </div>
                 </section>
 
-                {/* HISTORIQUE ET GRAPHE (VRAIES DONNÉES) */}
-                <section className="bper-history-full">
-                  <div className="history-top-bar">
-                    <span className="hamburger">≡</span> 
+                {/* SECTION HISTORIQUE : Prend toute la largeur */}
+                <section className="bper-history-block">
+                  <div className="bper-history-header">
+                    <span className="bper-menu-symbol">≡</span> 
                     <h3>Historique des transactions</h3>
                   </div>
                   
-                  <div className="transactions-container-desktop">
-                    {data.transactions && data.transactions.length > 0 ? (
-                      data.transactions.map((tr, index) => (
-                        <div key={index} className="desktop-tr-row">
-                          <div className="tr-left">
-                             <div className="tr-icon-circle">{tr.type === 'credit' ? '↓' : '↑'}</div>
-                             <div className="tr-texts">
-                               <p className="tr-label">{tr.label}</p>
-                               <p className="tr-date">{tr.date}</p>
-                             </div>
-                          </div>
-                          <div className={`tr-amount-desktop ${tr.type}`}>
-                            {tr.type === 'credit' ? '+' : '-'}{tr.amount.toLocaleString()} €
-                          </div>
+                  <div className="bper-transactions-table">
+                    {data.transactions?.map((tr, i) => (
+                      <div key={i} className="bper-tr-item">
+                        <div className="bper-tr-left">
+                           <div className="bper-tr-circle">{tr.type === 'credit' ? '↓' : '↑'}</div>
+                           <div className="bper-tr-details">
+                             <p className="bper-tr-name">{tr.label}</p>
+                             <p className="bper-tr-date">{tr.date}</p>
+                           </div>
                         </div>
-                      ))
-                    ) : (
-                      <p className="no-data">Aucune transaction récente.</p>
-                    )}
+                        <div className={`bper-tr-value ${tr.type}`}>
+                          {tr.type === 'credit' ? '+' : '-'}{tr.amount.toLocaleString()} €
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </section>
               </div>
             )}
-            
             {activeTab === "profile" && <Profile data={data} />}
           </div>
         </main>
@@ -168,7 +162,7 @@ export default function Dashboard() {
     );
   }
 
-  // --- RENDU MOBILE INTACT ---
+  {/* Rendu Mobile inchangé */}
   return (
     <div className="bank-app">
       <Header data={data} />
