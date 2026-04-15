@@ -81,7 +81,6 @@ export default function Dashboard() {
   if (isDesktop) {
     return (
       <div className="bank-app bper-desktop-interface">
-        {/* SIDEBAR GAUCHE - Fidèle au dessin */}
         <aside className="bper-sidebar">
           <div className="bper-logo">BPER</div>
           <nav className="bper-nav">
@@ -95,12 +94,12 @@ export default function Dashboard() {
         </aside>
 
         <main className="bper-main-content">
-          {/* HEADER TOP : "Bienvenue, Nom Prénom" + 2 icônes carrées à droite */}
+          {/* HEADER : Bienvenue à GAUCHE, Profil à DROITE */}
           <header className="bper-header-top">
-             <div className="bper-user-welcome">
+             <div className="bper-user-welcome-left">
                 Bienvenue, <span className="user-name">{data.firstName} {data.lastName}</span>
              </div>
-             <div className="bper-top-icons">
+             <div className="bper-top-icons-right">
                 <div className="bper-square-icon">
                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 22a2.02 2.02 0 0 1-2.01-2h4.02A2.02 2.02 0 0 1 12 22zm7-3H5v-2l2-1V9c0-3.07 1.63-5.64 4.5-6.32V2h1v.68C15.37 3.36 17 5.92 17 9v6l2 1v2z"/></svg>
                 </div>
@@ -114,29 +113,39 @@ export default function Dashboard() {
             {activeTab === "accounts" && (
               <div className="bper-dashboard-container">
                 
-                {/* SECTION SOLDE : Grand bloc avec boutons alignés à droite */}
-                <section className="bper-hero-card">
-                  <div className="bper-balance-box">
-                    <p className="bper-label">Solde disponible 👁️</p>
-                    <h1 className="bper-amount">{data.balance?.toLocaleString()} €</h1>
-                    <div className="bper-wallet-container">💼</div>
+                {/* CARTE SOLDE : BLANCHE AVEC TEXTE VERT */}
+                <section className="bper-hero-card-white">
+                  <div className="bper-balance-box-main">
+                    <p className="bper-label-green">Solde disponible 👁️</p>
+                    <h1 className="bper-amount-green">{data.balance?.toLocaleString()} €</h1>
+                    <p className="bper-iban-green">IT37Q0538712100120619128863</p>
                   </div>
                   
-                  <div className="bper-actions-row">
-                    <button className="bper-pill">Voir mon IBAN</button>
-                    <button className="bper-pill active">Effectuer un virement</button>
-                    <button className="bper-pill">Voir ma carte virtuelle</button>
+                  {/* BOUTONS EN DESSOUS DU SOLDE - ALIGNÉS HORIZONTALEMENT */}
+                  <div className="bper-actions-footer">
+                    <button className="bper-pill-green">Voir mon IBAN</button>
+                    <button className="bper-pill-green active">Effectuer un virement</button>
+                    <button className="bper-pill-green">Voir ma carte virtuelle</button>
                   </div>
                 </section>
 
-                {/* SECTION HISTORIQUE : Prend toute la largeur */}
-                <section className="bper-history-block">
+                {/* SECTION HISTORIQUE AVEC LES GRAPHES */}
+                <section className="bper-history-block-dark">
                   <div className="bper-history-header">
                     <span className="bper-menu-symbol">≡</span> 
                     <h3>Historique des transactions</h3>
                   </div>
+
+                  {/* Zone pour les Graphes (simulation visuelle comme ton dessin) */}
+                  <div className="bper-graph-area">
+                     <div className="graph-bar" style={{height: '60%'}}></div>
+                     <div className="graph-bar" style={{height: '80%'}}></div>
+                     <div className="graph-bar" style={{height: '40%'}}></div>
+                     <div className="graph-bar" style={{height: '90%'}}></div>
+                     <p className="graph-label">Statistiques mensuelles</p>
+                  </div>
                   
-                  <div className="bper-transactions-table">
+                  <div className="bper-transactions-list">
                     {data.transactions?.map((tr, i) => (
                       <div key={i} className="bper-tr-item">
                         <div className="bper-tr-left">
@@ -155,14 +164,13 @@ export default function Dashboard() {
                 </section>
               </div>
             )}
-            {activeTab === "profile" && <Profile data={data} />}
           </div>
         </main>
       </div>
     );
   }
 
-  {/* Rendu Mobile inchangé */}
+
   return (
     <div className="bank-app">
       <Header data={data} />
