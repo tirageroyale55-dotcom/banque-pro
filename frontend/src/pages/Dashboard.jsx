@@ -81,6 +81,7 @@ export default function Dashboard() {
   if (isDesktop) {
     return (
       <div className="bank-app bper-desktop-interface">
+        {/* SIDEBAR GAUCHE - Reste intacte */}
         <aside className="bper-sidebar">
           <div className="bper-logo">BPER</div>
           <nav className="bper-nav">
@@ -94,12 +95,12 @@ export default function Dashboard() {
         </aside>
 
         <main className="bper-main-content">
-          {/* HEADER : Bienvenue à GAUCHE, Profil à DROITE */}
+          {/* HEADER TOP : Bienvenue à GAUCHE, Profil à DROITE */}
           <header className="bper-header-top">
-             <div className="bper-user-welcome-left">
+             <div className="bper-user-welcome">
                 Bienvenue, <span className="user-name">{data.firstName} {data.lastName}</span>
              </div>
-             <div className="bper-top-icons-right">
+             <div className="bper-top-icons">
                 <div className="bper-square-icon">
                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 22a2.02 2.02 0 0 1-2.01-2h4.02A2.02 2.02 0 0 1 12 22zm7-3H5v-2l2-1V9c0-3.07 1.63-5.64 4.5-6.32V2h1v.68C15.37 3.36 17 5.92 17 9v6l2 1v2z"/></svg>
                 </div>
@@ -109,53 +110,51 @@ export default function Dashboard() {
              </div>
           </header>
 
+          {/* Zone de contenu qui SCROLL */}
           <div className="bper-scroll-zone">
             {activeTab === "accounts" && (
               <div className="bper-dashboard-container">
                 
-                {/* CARTE SOLDE : BLANCHE AVEC TEXTE VERT */}
+                {/* SECTION SOLDE : Carte BLANCHE, boutons DESSOUS */}
                 <section className="bper-hero-card-white">
-                  <div className="bper-balance-box-main">
+                  <div className="bper-balance-block">
                     <p className="bper-label-green">Solde disponible 👁️</p>
                     <h1 className="bper-amount-green">{data.balance?.toLocaleString()} €</h1>
-                    <p className="bper-iban-green">IT37Q0538712100120619128863</p>
+                    {/* Sacoche supprimée ici */}
                   </div>
                   
-                  {/* BOUTONS EN DESSOUS DU SOLDE - ALIGNÉS HORIZONTALEMENT */}
-                  <div className="bper-actions-footer">
+                  {/* BOUTONS : Alignement Horizontal SOUS le solde */}
+                  <div className="bper-actions-row-under">
                     <button className="bper-pill-green">Voir mon IBAN</button>
                     <button className="bper-pill-green active">Effectuer un virement</button>
                     <button className="bper-pill-green">Voir ma carte virtuelle</button>
                   </div>
                 </section>
 
-                {/* SECTION HISTORIQUE AVEC LES GRAPHES */}
-                <section className="bper-history-block-dark">
-                  <div className="bper-history-header">
-                    <span className="bper-menu-symbol">≡</span> 
+                {/* SECTION HISTORIQUE : Carte BLANCHE avec GRAPHIQUE */}
+                <section className="bper-history-block-white">
+                  <div className="bper-history-header-green">
+                    <span className="bper-menu-symbol-green">≡</span> 
                     <h3>Historique des transactions</h3>
                   </div>
 
-                  {/* Zone pour les Graphes (simulation visuelle comme ton dessin) */}
-                  <div className="bper-graph-area">
-                     <div className="graph-bar" style={{height: '60%'}}></div>
-                     <div className="graph-bar" style={{height: '80%'}}></div>
-                     <div className="graph-bar" style={{height: '40%'}}></div>
-                     <div className="graph-bar" style={{height: '90%'}}></div>
-                     <p className="graph-label">Statistiques mensuelles</p>
+                  {/* EMPLACEMENT DU GRAPHIQUE (À toi de mettre ton composant Chart ici) */}
+                  <div className="bper-chart-placeholder">
+                    {/* <MyChartComponent data={data.transactions} /> */}
+                    <p>Le graphique s'affichera ici (Graph placeholder)</p>
                   </div>
                   
-                  <div className="bper-transactions-list">
+                  <div className="bper-transactions-table-green">
                     {data.transactions?.map((tr, i) => (
-                      <div key={i} className="bper-tr-item">
+                      <div key={i} className="bper-tr-item-green">
                         <div className="bper-tr-left">
-                           <div className="bper-tr-circle">{tr.type === 'credit' ? '↓' : '↑'}</div>
+                           <div className="bper-tr-circle-green">{tr.type === 'credit' ? '↓' : '↑'}</div>
                            <div className="bper-tr-details">
                              <p className="bper-tr-name">{tr.label}</p>
                              <p className="bper-tr-date">{tr.date}</p>
                            </div>
                         </div>
-                        <div className={`bper-tr-value ${tr.type}`}>
+                        <div className={`bper-tr-value-green ${tr.type}`}>
                           {tr.type === 'credit' ? '+' : '-'}{tr.amount.toLocaleString()} €
                         </div>
                       </div>
@@ -164,13 +163,14 @@ export default function Dashboard() {
                 </section>
               </div>
             )}
+            {activeTab === "profile" && <Profile data={data} />}
           </div>
         </main>
       </div>
     );
   }
 
-
+  {/* Rendu Mobile inchangé */}
   return (
     <div className="bank-app">
       <Header data={data} />
