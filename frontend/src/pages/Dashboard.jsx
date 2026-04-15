@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { Send, PlusCircle, Filter } from "lucide-react";
+import { Send, PlusCircle, Filter, Receipt, ChevronDown } from "lucide-react";
 
 // Imports Graphiques
 import { Bar, Line } from "react-chartjs-2";
@@ -32,8 +32,13 @@ export default function Dashboard() {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("accounts");
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
-  const [card, setCard] = useState(null);
   const [showIban, setShowIban] = useState(false);
+  
+  // Logique de filtrage (récupérée de Accounts.jsx)
+  const [showFilters, setShowFilters] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [filterType, setFilterType] = useState("all");
 
   const navigate = useNavigate();
 
@@ -71,10 +76,18 @@ export default function Dashboard() {
 
   if (!data) return null;
 
-  // --- LOGIQUE GRAPHIQUES ---
-  const transactions = data.transactions || [];
+  // --- FILTRAGE DES TRANSACTIONS ---
+  const filteredTransactions = (data.transactions || []).filter(tx => {
+    const txDate = new Date(tx.createdAt).toISOString().split("T")[0];
+    const matchType = filterType === "all" || (filterType === "entrants" && tx.type === "CREDIT") || (filterType === "sortants" && tx.type === "DEBIT");
+    const matchStart = startDate ? txDate >= startDate : true;
+    const matchEnd = endDate ? txDate <= endDate : true;
+    return matchType && matchStart && matchEnd;
+  });
+
+  // --- LOGIQUE DES GRAPHIQUES ---
   const grouped = {};
-  transactions.forEach(tx => {
+  filteredTransactions.forEach(tx => {
     const dateKey = new Date(tx.createdAt).toLocaleDateString('fr-FR');
     if (!grouped[dateKey]) grouped[dateKey] = { in: 0, out: 0 };
     if (tx.type === "CREDIT") grouped[dateKey].in += tx.amount;
@@ -86,29 +99,23 @@ export default function Dashboard() {
   const barData = {
     labels: dates,
     datasets: [
-      { label: "Entrées", data: dates.map(d => grouped[d].in), backgroundColor: "#16a34a" },
-      { label: "Sorties", data: dates.map(d => grouped[d].out), backgroundColor: "#dc2626" }
+      { label: "Entrées", data: dates.map(d => grouped[d].in), backgroundColor: "#16a34a", borderRadius: 5 },
+      { label: "Sorties", data: dates.map(d => grouped[d].out), backgroundColor: "#dc2626", borderRadius: 5 }
     ]
   };
-
-  let currentBal = 0;
-  const balanceHistory = dates.map(d => {
-    currentBal += (grouped[d].in - grouped[d].out);
-    return currentBal;
-  });
 
   const lineData = {
     labels: dates,
     datasets: [{
       label: "Solde",
-      data: balanceHistory,
+      data: dates.map((_, i) => dates.slice(0, i+1).reduce((acc, d) => acc + (grouped[d].in - grouped[d].out), 0)),
       borderColor: "#0b5c5b",
-      tension: 0.3,
-      fill: false
+      backgroundColor: "rgba(11, 92, 91, 0.1)",
+      fill: true,
+      tension: 0.4
     }]
   };
 
-  // --- RENDU DESKTOP ---
   if (isDesktop) {
     return (
       <div className="bank-app bper-desktop-interface">
@@ -119,19 +126,15 @@ export default function Dashboard() {
             <div className="nav-item">Cartes</div>
             <div className="nav-item">Payer</div>
             <div className="nav-item">Produits</div>
-            <div className="nav-item">Lifestyle</div>
-            <div className="nav-item">Aide</div>
           </nav>
         </aside>
 
         <main className="bper-main-content">
           <header className="bper-header-top">
-             <div className="bper-user-welcome">
-                Bienvenue, <span className="user-name">{data.firstName} {data.lastName}</span>
-             </div>
+             <div className="bper-user-welcome">Bienvenue, <span className="user-name">{data.firstName} {data.lastName}</span></div>
              <div className="bper-top-icons">
-                <div className="bper-square-icon">🔔</div>
-                <div className="bper-square-icon profile-btn" onClick={() => setActiveTab('profile')}>👤</div>
+                <div className="bper-square-icon" onClick={() => setShowFilters(!showFilters)}><Filter size={18} /></div>
+                <div className="bper-square-icon">👤</div>
              </div>
           </header>
 
@@ -139,13 +142,11 @@ export default function Dashboard() {
             {activeTab === "accounts" && (
               <div className="bper-dashboard-container">
                 
-                {/* CARTE SOLDE (RESTE INTACTE) */}
+                {/* CARTE SOLDE (Inchangée) */}
                 <section className="bper-hero-card-white">
                   <div className="bper-balance-block">
                     <p className="bper-label-green">Solde disponible 👁️</p>
                     <h1 className="bper-amount-green">{formatBper(data.balance)} €</h1>
-                    {showIban && <p className="bper-iban-display">{data.iban}</p>}
-                    <div className="bper-dashboard-bag-icon">💼</div>
                   </div>
                   <div className="bper-actions-row-under">
                     <button className="bper-pill-green" onClick={() => setShowIban(!showIban)}>Voir mon IBAN</button>
@@ -154,38 +155,43 @@ export default function Dashboard() {
                   </div>
                 </section>
 
-                {/* CARTE HISTORIQUE AVEC ICÔNE DE TRI EN HAUT À DROITE */}
+                {/* HISTORIQUE AVEC FILTRE */}
                 <section className="bper-history-block-white">
-                  <div className="bper-history-header-with-filter">
-                    <div className="bper-header-left">
-                       <span className="bper-menu-symbol-green">≡</span> 
-                       <h3>Historique des transactions</h3>
+                  <div className="bper-history-header-green" style={{ justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span className="bper-menu-symbol-green">≡</span> 
+                      <h3>Historique des transactions</h3>
                     </div>
-                    {/* ICÔNE DE TRI (FILTER) */}
-                    <button className="bper-filter-icon-btn">
-                       <Filter size={18} />
+                    <button className="filter-trigger" onClick={() => setShowFilters(!showFilters)}>
+                      <Filter size={16} /> Filtrer par date
                     </button>
                   </div>
 
+                  {showFilters && (
+                    <div className="desktop-filters-panel">
+                      <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                      <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                      <select onChange={(e) => setFilterType(e.target.value)}>
+                        <option value="all">Toutes</option>
+                        <option value="entrants">Crédits</option>
+                        <option value="sortants">Débits</option>
+                      </select>
+                    </div>
+                  )}
+
                   <div className="bper-transactions-table-green">
-                    {transactions.map((tr, i) => (
+                    {filteredTransactions.map((tr, i) => (
                       <div key={i} className="bper-tr-item-green">
                         <div className="bper-tr-left">
-                           <div className="bper-tr-circle-green">
-                              {tr.type === "CREDIT" ? <PlusCircle size={18} color="#16a34a" /> : <Send size={18} />}
-                           </div>
+                           <div className="bper-tr-circle-green">{tr.type === "CREDIT" ? <PlusCircle size={18} color="#16a34a" /> : <Send size={18} />}</div>
                            <div className="bper-tr-details">
                              <p className="bper-tr-name">{tr.label}</p>
                              <p className="bper-tr-date">{new Date(tr.createdAt).toLocaleDateString('fr-FR')}</p>
                            </div>
                         </div>
-                        
-                        {/* ALIGNEMENT LIBELLÉ TYPE + MONTANT */}
-                        <div className="bper-tr-right-column">
-                          <span className="bper-type-label-line">
-                            {tr.type === "CREDIT" ? "Crédit" : "Débit"}
-                          </span>
-                          <div className={`bper-tr-value-line ${tr.type === 'CREDIT' ? 'plus' : 'minus'}`}>
+                        <div className="bper-tr-right-aligned">
+                          <span className="bper-type-inline">{tr.type === "CREDIT" ? "Crédit" : "Débit"}</span>
+                          <div className={`bper-tr-value-whatsapp ${tr.type === 'CREDIT' ? 'plus' : 'minus'}`}>
                             {tr.type === 'CREDIT' ? '+' : '-'}{tr.amount.toLocaleString()} €
                           </div>
                         </div>
@@ -194,37 +200,31 @@ export default function Dashboard() {
                   </div>
                 </section>
 
-                {/* GRAPHIQUES HORIZONTAUX */}
-                <div className="bper-desktop-charts-row">
-                  <div className="bper-chart-card-half">
-                    <h4>Analyse Crédit / Débit</h4>
-                    <Bar data={barData} options={{ maintainAspectRatio: false }} height={220} />
+                {/* GRAPHIQUES PROPORTIONNÉS */}
+                <div className="bper-desktop-charts-container">
+                  <div className="bper-chart-small">
+                    <h4>Flux Mensuels</h4>
+                    <div className="chart-wrapper"><Bar data={barData} options={{ maintainAspectRatio: false }} /></div>
                   </div>
-                  <div className="bper-chart-card-half">
-                    <h4>Évolution du Solde</h4>
-                    <Line data={lineData} options={{ maintainAspectRatio: false }} height={220} />
+                  <div className="bper-chart-small">
+                    <h4>Évolution Solde</h4>
+                    <div className="chart-wrapper"><Line data={lineData} options={{ maintainAspectRatio: false }} /></div>
                   </div>
                 </div>
 
               </div>
             )}
-            {activeTab === "profile" && <Profile data={data} />}
           </div>
         </main>
       </div>
     );
   }
 
-  // --- RENDU MOBILE ---
   return (
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <div className="page-content">
-        {activeTab === "accounts" && <Accounts data={data}/>}
-        {activeTab === "cards" && <BankCard card={card} />}
-        {activeTab === "profile" && <Profile data={data} />}
-      </div>
+      <div className="page-content">{activeTab === "accounts" && <Accounts data={data}/>}</div>
       <BottomNav />
     </div>
   );
