@@ -340,94 +340,96 @@ white-space:nowrap;
 @media (min-width: 1000px) {
   .bper-desktop-interface {
     display: flex !important;
-    height: 100vh !important;
     background-color: #0b5c5b !important;
+    height: 100vh !important;
     color: white !important;
   }
 
-  /* SIDEBAR : Plus étroite et pro */
-  .bper-sidebar {
-    width: 220px;
-    background: rgba(0, 0, 0, 0.1);
-    padding: 40px 20px;
-    border-right: 1px solid rgba(255,255,255,0.05);
-  }
-  .bper-logo { font-size: 32px; font-weight: 900; margin-bottom: 40px; }
-  .bper-nav .nav-item { padding: 12px 5px; cursor: pointer; opacity: 0.6; transition: 0.3s; }
-  .bper-nav .nav-item.active { opacity: 1; color: #4ade80; font-weight: bold; }
-
   /* HEADER TOP DROITE */
   .bper-header-top {
-    height: 70px;
+    height: 90px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    padding: 0 40px;
-    gap: 20px;
+    padding: 0 50px;
+    gap: 25px;
   }
+  .user-name { font-weight: 700; color: #fff; }
   .bper-top-icons { display: flex; gap: 12px; }
-  .icon-wrapper {
-    width: 42px;
-    height: 42px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 10px;
-    cursor: pointer;
+  .icon-box-bper {
+    width: 42px; height: 42px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; background: rgba(255,255,255,0.05);
   }
 
-  /* BLOC SOLDE + BOUTONS (ALIGNEMENT EXACT) */
-  .bper-balance-card {
-    margin: 30px 40px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
-    padding: 40px;
+  /* SECTION SOLDE + BOUTONS ALIGNÉS */
+  .bper-hero-section {
     display: flex;
+    flex-direction: row !important; /* Force l'alignement horizontal */
     justify-content: space-between;
     align-items: center;
+    margin: 20px 50px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 40px;
+    border-radius: 24px;
+    gap: 30px;
   }
-  .balance-value { font-size: 3.5rem; font-weight: 700; margin: 15px 0; }
+
+  .balance-info-left { flex: 1; }
+  .balance-value { font-size: 3.5rem; font-weight: bold; margin: 15px 0; }
   
-  .bper-action-buttons {
+  /* LES BOUTONS : Alignés horizontalement l'un contre l'autre */
+  .bper-horizontal-actions {
     display: flex;
-    flex-direction: column;
+    flex-direction: row !important; /* Horizontal */
     gap: 12px;
   }
-  .bper-btn-outline, .bper-btn-filled {
-    width: 260px;
-    padding: 14px 20px;
-    border-radius: 40px;
-    border: 1.5px solid white;
+
+  .bper-action-pill {
+    padding: 12px 24px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.4);
     background: transparent;
     color: white;
     font-weight: 600;
+    white-space: nowrap;
     cursor: pointer;
     transition: 0.2s;
   }
-  .bper-btn-filled { background: white; color: #0b5c5b; }
 
-  /* HISTORIQUE DES VRAIES TRANSACTIONS */
-  .bper-history-section {
-    margin: 0 40px 40px 40px;
-    background: rgba(255, 255, 255, 0.04);
+  .bper-action-pill.active {
+    background: white !important;
+    color: #0b5c5b !important;
+    border-color: white;
+  }
+
+  /* HISTORIQUE DES TRANSACTIONS */
+  .bper-history-full {
+    margin: 0 50px 40px 50px;
+    background: rgba(255,255,255,0.03);
     border-radius: 24px;
     padding: 30px;
   }
-  .history-header { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+  .history-top-bar { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
   
   .desktop-tr-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 0;
+    padding: 18px 0;
     border-bottom: 1px solid rgba(255,255,255,0.05);
   }
   .tr-left { display: flex; align-items: center; gap: 15px; }
-  .tr-label { font-weight: 600; font-size: 1rem; }
+  .tr-icon-circle {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tr-label { font-weight: 600; font-size: 1.05rem; }
   .tr-date { font-size: 0.85rem; opacity: 0.6; }
-  .tr-amount { font-weight: 700; font-size: 1.1rem; }
-  .tr-amount.credit { color: #4ade80; }
-
-  /* CACHE MOBILE */
-  .desktop-layout .header, .desktop-layout .tabs-wrapper, .desktop-layout .bottom-nav { display: none !important; }
+  .tr-amount-desktop.credit { color: #4ade80; font-weight: bold; }
 }
 
 
