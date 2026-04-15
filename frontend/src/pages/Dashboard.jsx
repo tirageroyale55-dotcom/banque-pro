@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { Send, PlusCircle, Receipt, Filter, Copy } from "lucide-react";
+import { Send, PlusCircle, Filter, Receipt } from "lucide-react";
 
 // Imports Graphiques
 import { Bar, Line } from "react-chartjs-2";
@@ -33,17 +33,11 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("accounts");
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
   const [card, setCard] = useState(null);
-  
-  // États pour les filtres (logique Accounts.jsx)
-  const [filter, setFilter] = useState("all");
-  const [sortAsc, setSortAsc] = useState(false);
-  const today = new Date().toISOString().split("T")[0];
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState(today);
+  const [showIban, setShowIban] = useState(false);
 
   const navigate = useNavigate();
 
-  // Formatage Italien (BPER)
+  // Formatage It-IT
   const formatBper = (amount) => {
     return new Intl.NumberFormat('it-IT', {
       minimumFractionDigits: 2,
@@ -78,17 +72,42 @@ export default function Dashboard() {
 
   if (!data) return null;
 
-  // --- LOGIQUE DE TRAITEMENT DES TRANSACTIONS ---
-  const rawTransactions = data.transactions || [];
-  const filteredTransactions = rawTransactions
-    .filter(tx => {
-      const txDate = new Date(tx.createdAt).toISOString().split("T")[0];
-      const matchType = filter === "all" || (filter === "entrants" && tx.type === "CREDIT") || (filter === "sortants" && tx.type === "DEBIT");
-      const matchStart = startDate ? txDate >= startDate : true;
-      const matchEnd = endDate ? txDate <= endDate : true;
-      return matchType && matchStart && matchEnd;
-    })
-    .sort((a, b) => sortAsc ? new Date(a.createdAt) - new Date(b.createdAt) : new Date(b.createdAt) - new Date(a.createdAt));
+  // --- LOGIQUE DES GRAPHIQUES (Analogue à Accounts.jsx) ---
+  const transactions = data.transactions || [];
+  const grouped = {};
+  transactions.forEach(tx => {
+    const dateKey = new Date(tx.createdAt).toLocaleDateString('fr-FR');
+    if (!grouped[dateKey]) grouped[dateKey] = { in: 0, out: 0 };
+    if (tx.type === "CREDIT") grouped[dateKey].in += tx.amount;
+    else grouped[dateKey].out += Math.abs(tx.amount);
+  });
+
+  const dates = Object.keys(grouped).sort((a, b) => new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-')));
+  
+  const barData = {
+    labels: dates,
+    datasets: [
+      { label: "Entrées", data: dates.map(d => grouped[d].in), backgroundColor: "#16a34a" },
+      { label: "Sorties", data: dates.map(d => grouped[d].out), backgroundColor: "#dc2626" }
+    ]
+  };
+
+  let currentBal = 0;
+  const balanceHistory = dates.map(d => {
+    currentBal += (grouped[d].in - grouped[d].out);
+    return currentBal;
+  });
+
+  const lineData = {
+    labels: dates,
+    datasets: [{
+      label: "Évolution Solde",
+      data: balanceHistory,
+      borderColor: "#0b5c5b",
+      tension: 0.3,
+      fill: false
+    }]
+  };
 
   // --- RENDU DESKTOP ---
   if (isDesktop) {
@@ -109,10 +128,10 @@ export default function Dashboard() {
         <main className="bper-main-content">
           <header className="bper-header-top">
              <div className="bper-user-welcome">
-                Bienvenue, <span className="user-name">{data.firstname} {data.lastname}</span>
+                Bienvenue, <span className="user-name">{data.firstName} {data.lastName}</span>
              </div>
              <div className="bper-top-icons">
-                <div className="bper-square-icon"><Filter size={20} onClick={() => {}} /></div>
+                <div className="bper-square-icon"><Filter size={20} /></div>
                 <div className="bper-square-icon profile-btn" onClick={() => setActiveTab('profile')}>👤</div>
              </div>
           </header>
@@ -121,48 +140,46 @@ export default function Dashboard() {
             {activeTab === "accounts" && (
               <div className="bper-dashboard-container">
                 
-                {/* SECTION SOLDE (Image 4 & 5) */}
+                {/* CARTE SOLDE (NON TOUCHÉE) */}
                 <section className="bper-hero-card-white">
                   <div className="bper-balance-block">
                     <p className="bper-label-green">Solde disponible 👁️</p>
                     <h1 className="bper-amount-green">{formatBper(data.balance)} €</h1>
-                    <div className="bper-iban-row">
-                        <span>{data.iban}</span>
-                        <Copy size={14} onClick={() => navigator.clipboard.writeText(data.iban)} style={{cursor:'pointer'}}/>
-                    </div>
+                    {showIban && <p className="bper-iban-display">{data.iban}</p>}
                   </div>
-                  
                   <div className="bper-actions-row-under">
-                    <button className="bper-pill-green" onClick={() => navigate("/virement-international")}><Send size={16}/> Virement</button>
-                    <button className="bper-pill-green active"><PlusCircle size={16}/> Ajouter</button>
-                    <button className="bper-pill-green"><Receipt size={16}/> Paiement</button>
+                    <button className="bper-pill-green" onClick={() => setShowIban(!showIban)}>Voir mon IBAN</button>
+                    <button className="bper-pill-green active" onClick={() => navigate("/virement-international")}>Effectuer un virement</button>
+                    <button className="bper-pill-green">Voir ma carte virtuelle</button>
                   </div>
                 </section>
 
-                {/* SECTION HISTORIQUE (Style Image 5) */}
+                {/* HISTORIQUE DES TRANSACTIONS (STYLE CAPTURE WHATSAPP) */}
                 <section className="bper-history-block-white">
                   <div className="bper-history-header-green">
                     <span className="bper-menu-symbol-green">≡</span> 
                     <h3>Historique des transactions</h3>
                   </div>
 
-                  <div className="bper-transactions-list-desktop">
-                    {filteredTransactions.map((tx, i) => (
-                      <div key={tx._id || i} className="bper-tr-item-green">
+                  <div className="bper-transactions-table-green">
+                    {transactions.map((tr, i) => (
+                      <div key={i} className="bper-tr-item-green">
                         <div className="bper-tr-left">
                            <div className="bper-tr-circle-green">
-                              {tx.type === "CREDIT" ? <PlusCircle size={18} color="#16a34a"/> : <Send size={18}/>}
+                              {tr.type === "CREDIT" ? <PlusCircle size={18} color="#16a34a" /> : <Send size={18} />}
                            </div>
                            <div className="bper-tr-details">
-                             <p className="bper-tr-name">{tx.label}</p>
-                             <p className="bper-tr-date">{new Date(tx.createdAt).toLocaleDateString('fr-FR')}</p>
+                             <p className="bper-tr-name">{tr.label}</p>
+                             <p className="bper-tr-date">{new Date(tr.createdAt).toLocaleDateString('fr-FR')}</p>
                            </div>
                         </div>
-                        <div className="bper-tr-right">
-                          {/* BADGE CRÉDIT/DÉBIT EXACTEMENT COMME SUR L'IMAGE WHATSAPP */}
-                          <span className="bper-type-badge-whatsapp">{tx.type === "CREDIT" ? "Crédit" : "Débit"}</span>
-                          <div className={`bper-amount-val ${tx.type === "CREDIT" ? "plus" : "minus"}`}>
-                            {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
+                        
+                        <div className="bper-tr-right-container">
+                          <span className="bper-type-label-whatsapp">
+                            {tr.type === "CREDIT" ? "Crédit" : "Débit"}
+                          </span>
+                          <div className={`bper-tr-value-whatsapp ${tr.type === 'CREDIT' ? 'plus' : 'minus'}`}>
+                            {tr.type === 'CREDIT' ? '+' : '-'}{tr.amount.toLocaleString()} €
                           </div>
                         </div>
                       </div>
@@ -170,23 +187,18 @@ export default function Dashboard() {
                   </div>
                 </section>
 
-                {/* SECTION GRAPHES (En bas) */}
-                <section className="bper-history-block-white">
-                   <h4 style={{color:'#0b5c5b', marginBottom:'20px'}}>Analyse des flux</h4>
-                   <div style={{height: '300px'}}>
-                      <Bar 
-                        data={{
-                            labels: [...new Set(filteredTransactions.map(t => new Date(t.createdAt).toLocaleDateString()))].reverse(),
-                            datasets: [{
-                                label: 'Transactions',
-                                data: filteredTransactions.map(t => t.amount),
-                                backgroundColor: '#0b5c5b'
-                            }]
-                        }} 
-                        options={{ maintainAspectRatio: false }} 
-                      />
-                   </div>
-                </section>
+                {/* SECTION GRAPHIQUES HORIZONTAUX */}
+                <div className="bper-desktop-charts-row">
+                  <div className="bper-chart-card-half">
+                    <h4>Flux Crédit / Débit</h4>
+                    <Bar data={barData} options={{ maintainAspectRatio: false }} height={250} />
+                  </div>
+                  <div className="bper-chart-card-half">
+                    <h4>Évolution du Solde</h4>
+                    <Line data={lineData} options={{ maintainAspectRatio: false }} height={250} />
+                  </div>
+                </div>
+
               </div>
             )}
             {activeTab === "profile" && <Profile data={data} />}
@@ -196,7 +208,7 @@ export default function Dashboard() {
     );
   }
 
-  // --- RENDU MOBILE (STRICTEMENT INCHANGÉ) ---
+  // --- RENDU MOBILE ---
   return (
     <div className="bank-app">
       <Header data={data} />
