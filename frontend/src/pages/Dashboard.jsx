@@ -22,6 +22,7 @@ import BottomNav from "../components/BottomNav";
 import Accounts from "./Accounts";
 import BankCard from "../components/BankCard";
 import Profile from "./Profile";
+import Financing from "./Financing"; // Ajout de l'import manquant
 
 import "../styles/dashboard.css";
 
@@ -38,6 +39,7 @@ function DetailRow({ label, value, color = '#1e293b' }) {
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
+  const [card, setCard] = useState(null); // Pour la partie Card
   const [activeTab, setActiveTab] = useState("accounts");
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
   const [showIban, setShowIban] = useState(false);
@@ -61,6 +63,7 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    // Chargement Dashboard + Transactions
     api("/client/dashboard")
       .then((clientData) => {
         setData(clientData);
@@ -70,11 +73,16 @@ export default function Dashboard() {
           });
       })
       .catch(() => { navigate("/login"); });
+
+    // Chargement de la carte (nécessaire pour BankCard)
+    api("/client/card")
+      .then(setCard)
+      .catch(() => console.log("Erreur carte"));
   }, [navigate]);
 
   if (!data) return null;
 
-  // Logique filtrage
+  // Logique filtrage Desktop (6 dernières)
   const allTx = data.transactions || [];
   const filteredTx = allTx.filter(tx => {
     const txDate = new Date(tx.createdAt).toISOString().split("T")[0];
@@ -85,36 +93,6 @@ export default function Dashboard() {
   });
 
   const displayTx = filteredTx.slice(0, 6);
-
-  // Graphes
-  const grouped = {};
-  filteredTx.forEach(tx => {
-    const dateKey = new Date(tx.createdAt).toLocaleDateString('fr-FR');
-    if (!grouped[dateKey]) grouped[dateKey] = { in: 0, out: 0 };
-    if (tx.type === "CREDIT") grouped[dateKey].in += tx.amount;
-    else grouped[dateKey].out += Math.abs(tx.amount);
-  });
-  const dates = Object.keys(grouped).sort((a, b) => new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-')));
-
-  const barData = {
-    labels: dates,
-    datasets: [
-      { label: "Entrées", data: dates.map(d => grouped[d].in), backgroundColor: "#16a34a" },
-      { label: "Sorties", data: dates.map(d => grouped[d].out), backgroundColor: "#dc2626" }
-    ]
-  };
-
-  const lineData = {
-    labels: dates,
-    datasets: [{
-      label: "Solde",
-      data: dates.map((_, i) => dates.slice(0, i+1).reduce((acc, d) => acc + (grouped[d].in - grouped[d].out), 0)),
-      borderColor: "#2563eb",
-      tension: 0.3,
-      fill: true,
-      backgroundColor: "rgba(37, 99, 235, 0.05)"
-    }]
-  };
 
   // --- RENDU DESKTOP ---
   if (isDesktop) {
@@ -145,7 +123,7 @@ export default function Dashboard() {
                   <div className="bper-balance-block">
                     <p className="bper-label-green">Solde disponible 👁️</p>
                     <h1 className="bper-amount-green">{formatBper(data.balance)} €</h1>
-                    {/* AFFICHAGE IBAN CORRIGÉ */}
+                    
                     {showIban && (
                       <div className="iban-box" style={{marginTop: '10px', background: '#f1f5f9', padding: '10px', borderRadius: '8px', display: 'flex', justifyContent: 'center', gap: '10px', alignItems: 'center'}}>
                         <span style={{fontWeight: 'bold', color: '#1e293b'}}>{data.iban}</span>
@@ -205,28 +183,18 @@ export default function Dashboard() {
                     ))}
                   </div>
                 </section>
-
-                <div className="bper-desktop-charts-container" style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
-                  <div className="bper-chart-small" style={{ flex: 1, background: 'white', padding: '20px', borderRadius: '20px', height: '300px' }}>
-                    <h4 style={{ color: '#0b5c5b', marginBottom: '10px' }}>Flux Entrées/Sorties</h4>
-                    <div style={{ height: '200px' }}><Bar data={barData} options={{ maintainAspectRatio: false }} /></div>
-                  </div>
-                  <div className="bper-chart-small" style={{ flex: 1, background: 'white', padding: '20px', borderRadius: '20px', height: '300px' }}>
-                    <h4 style={{ color: '#0b5c5b', marginBottom: '10px' }}>Solde</h4>
-                    <div style={{ height: '200px' }}><Line data={lineData} options={{ maintainAspectRatio: false }} /></div>
-                  </div>
-                </div>
               </div>
             )}
             {activeTab === "profile" && <Profile data={data} />}
           </div>
         </main>
 
+        {/* MODAL DÉTAILS PRO DESKTOP */}
         {selectedTx && (
           <div className="bper-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <div className="bper-modal-content" style={{ backgroundColor: 'white', width: '500px', borderRadius: '25px', padding: '30px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
-                <h2 style={{ fontSize: '18px' }}>Détails</h2>
+                <h2 style={{ fontSize: '18px' }}>Détails de l'opération</h2>
                 <button onClick={() => setSelectedTx(null)} style={{ border: 'none', background: 'none', fontSize: '20px', cursor: 'pointer' }}>✕</button>
               </div>
               <div style={{ textAlign: 'center', margin: '20px 0' }}>
@@ -236,8 +204,8 @@ export default function Dashboard() {
                 <p>{selectedTx.label}</p>
               </div>
               <DetailRow label="Statut" value="Comptabilisé" color="#16a34a" />
-              <DetailRow label="Date" value={new Date(selectedTx.createdAt).toLocaleDateString('fr-FR')} />
-              <DetailRow label="Référence" value={selectedTx._id?.toUpperCase()} />
+              <DetailRow label="Date d'opération" value={new Date(selectedTx.createdAt).toLocaleDateString('fr-FR')} />
+              <DetailRow label="Référence interne" value={selectedTx._id?.toUpperCase()} />
             </div>
           </div>
         )}
@@ -245,16 +213,19 @@ export default function Dashboard() {
     );
   }
 
-  // --- RENDU MOBILE (RESTAURÉ ET INTACT) ---
+  // --- RENDU MOBILE (RESTAURÉ AVEC TES COMPOSANTS) ---
   return (
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      
       <div className="page-content">
         {activeTab === "accounts" && <Accounts data={data}/>}
-        {activeTab === "cards" && <BankCard />}
+        {activeTab === "cards" && <BankCard card={card} />}
+        {activeTab === "financing" && <Financing />}
         {activeTab === "profile" && <Profile data={data} />}
       </div>
+      
       <BottomNav setActiveTab={setActiveTab} activeTab={activeTab} />
     </div>
   );
