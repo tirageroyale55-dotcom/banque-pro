@@ -6,7 +6,7 @@ import Header from "../components/Header";
 import Tabs from "../components/Tabs";
 import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
-import Sidebar from "../components/Sidebar";
+
 import BankCard from "../components/BankCard";
 
 import { useRef } from "react"; // en haut
