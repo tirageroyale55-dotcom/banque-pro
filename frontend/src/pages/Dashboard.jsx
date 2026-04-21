@@ -258,20 +258,7 @@ export default function Dashboard() {
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      
-      <div className="page-content">
-        {activeTab === "accounts" && <Accounts data={data}/>}
-        
-        {activeTab === "cards" && (
-          <div className="cards-section" style={{ padding: '20px' }}>
-            <h3 style={{ marginBottom: '20px' }}>Mes Cartes</h3>
-            <BankCard card={data.card} />
-          </div>
-        )}
-        
-        {activeTab === "financing" && <Financing />}
-      </div>
-      
+      <div className="page-content">{activeTab === "accounts" && <Accounts data={data}/>}</div>
       <BottomNav />
     </div>
   );
