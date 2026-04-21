@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { Send, PlusCircle, Filter, Copy } from "lucide-react";
+import { Send, PlusCircle, Filter, Copy, Plus } from "lucide-react"; // Ajout de Plus
 
 // Imports Graphiques
 import { Bar, Line } from "react-chartjs-2";
@@ -13,7 +13,8 @@ import {
   LineElement,
   PointElement,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 } from "chart.js";
 
 import Header from "../components/Header";
@@ -22,11 +23,11 @@ import BottomNav from "../components/BottomNav";
 import Accounts from "./Accounts";
 import BankCard from "../components/BankCard";
 import Profile from "./Profile";
-import Financing from "./Financing"; // Ajout de l'import manquant
+import Financing from "./Financing";
 
 import "../styles/dashboard.css";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip, Legend, Filler);
 
 function DetailRow({ label, value, color = '#1e293b' }) {
   return (
@@ -39,12 +40,11 @@ function DetailRow({ label, value, color = '#1e293b' }) {
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
-  const [card, setCard] = useState(null); // Pour la partie Card
+  const [card, setCard] = useState(null);
   const [activeTab, setActiveTab] = useState("accounts");
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
   const [showIban, setShowIban] = useState(false);
   const [selectedTx, setSelectedTx] = useState(null); 
-  
   const [showFilters, setShowFilters] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -63,28 +63,23 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    // Chargement Dashboard + Transactions
     api("/client/dashboard")
       .then((clientData) => {
         setData(clientData);
-        api("/transactions")
-          .then((transactionsData) => {
-            setData(prev => ({ ...prev, transactions: transactionsData.transactions || transactionsData }));
-          });
+        api("/transactions").then((txData) => {
+          setData(prev => ({ ...prev, transactions: txData.transactions || txData }));
+        });
       })
-      .catch(() => { navigate("/login"); });
+      .catch(() => navigate("/login"));
 
-    // Chargement de la carte (nécessaire pour BankCard)
-    api("/client/card")
-      .then(setCard)
-      .catch(() => console.log("Erreur carte"));
+    api("/client/card").then(setCard).catch(() => console.log("Erreur carte"));
   }, [navigate]);
 
   if (!data) return null;
 
-  // Logique filtrage Desktop (6 dernières)
-  const allTx = data.transactions || [];
-  const filteredTx = allTx.filter(tx => {
+  // Logique de filtrage pour les graphiques et la liste Desktop
+  const transactions = data.transactions || [];
+  const filteredTx = transactions.filter(tx => {
     const txDate = new Date(tx.createdAt).toISOString().split("T")[0];
     const matchType = filterType === "all" || (filterType === "entrants" && tx.type === "CREDIT") || (filterType === "sortants" && tx.type === "DEBIT");
     const matchStart = startDate ? txDate >= startDate : true;
@@ -92,9 +87,36 @@ export default function Dashboard() {
     return matchType && matchStart && matchEnd;
   });
 
-  const displayTx = filteredTx.slice(0, 6);
+  // Calcul des données graphiques (In/Out)
+  const grouped = {};
+  filteredTx.forEach(tx => {
+    const dateKey = new Date(tx.createdAt).toLocaleDateString('fr-FR');
+    if (!grouped[dateKey]) grouped[dateKey] = { in: 0, out: 0 };
+    if (tx.type === "CREDIT") grouped[dateKey].in += tx.amount;
+    else grouped[dateKey].out += Math.abs(tx.amount);
+  });
+  const dates = Object.keys(grouped).sort((a, b) => new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-')));
 
-  // --- RENDU DESKTOP ---
+  const barData = {
+    labels: dates,
+    datasets: [
+      { label: "Entrées", data: dates.map(d => grouped[d].in), backgroundColor: "#16a34a" },
+      { label: "Sorties", data: dates.map(d => grouped[d].out), backgroundColor: "#dc2626" }
+    ]
+  };
+
+  const lineData = {
+    labels: dates,
+    datasets: [{
+      label: "Évolution Solde",
+      data: dates.map((_, i) => dates.slice(0, i+1).reduce((acc, d) => acc + (grouped[d].in - grouped[d].out), 0)),
+      borderColor: "#2563eb",
+      backgroundColor: "rgba(37, 99, 235, 0.1)",
+      fill: true,
+      tension: 0.4
+    }]
+  };
+
   if (isDesktop) {
     return (
       <div className="bank-app bper-desktop-interface">
@@ -102,110 +124,103 @@ export default function Dashboard() {
           <div className="bper-logo">BPER</div>
           <nav className="bper-nav">
             <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>Accueil</div>
-            <div className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>Profil</div>
-            <div className="nav-item">Cartes</div>
-            <div className="nav-item">Payer</div>
+            <div className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>Mon Profil</div>
+            <div className="nav-item">Mes Cartes</div>
           </nav>
         </aside>
 
         <main className="bper-main-content">
           <header className="bper-header-top">
-             <div className="bper-user-welcome">Bienvenue, <span className="user-name">{data.firstname} {data.lastname}</span></div>
-             <div className="bper-top-icons">
-                <div className="bper-square-icon" onClick={() => setActiveTab('profile')}>👤</div>
-             </div>
+             <div className="bper-user-welcome">Tableau de bord de <span className="user-name">{data.firstname} {data.lastname}</span></div>
+             <div className="bper-top-icons" onClick={() => setActiveTab('profile')} style={{cursor:'pointer'}}>👤</div>
           </header>
 
           <div className="bper-scroll-zone">
             {activeTab === "accounts" && (
-              <div className="bper-dashboard-container">
-                <section className="bper-hero-card-white">
-                  <div className="bper-balance-block">
-                    <p className="bper-label-green">Solde disponible 👁️</p>
-                    <h1 className="bper-amount-green">{formatBper(data.balance)} €</h1>
-                    
-                    {showIban && (
-                      <div className="iban-box" style={{marginTop: '10px', background: '#f1f5f9', padding: '10px', borderRadius: '8px', display: 'flex', justifyContent: 'center', gap: '10px', alignItems: 'center'}}>
-                        <span style={{fontWeight: 'bold', color: '#1e293b'}}>{data.iban}</span>
-                        <Copy size={16} style={{cursor: 'pointer'}} onClick={() => {navigator.clipboard.writeText(data.iban); alert("IBAN copié !")}}/>
-                      </div>
-                    )}
-                  </div>
-                  <div className="bper-actions-row-under">
-                    <button className="bper-pill-green" onClick={() => setShowIban(!showIban)}>{showIban ? "Masquer l'IBAN" : "Voir mon IBAN"}</button>
-                    <button className="bper-pill-green active" onClick={() => navigate("/virement-international")}>Effectuer un virement</button>
-                    <button className="bper-pill-green">Voir ma carte virtuelle</button>
-                  </div>
-                </section>
-
-                <section className="bper-history-block-white">
-                  <div className="bper-history-header-green" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span className="bper-menu-symbol-green">≡</span> 
-                      <h3>Historique des transactions</h3>
-                    </div>
-                    <button className="filter-btn" onClick={() => setShowFilters(!showFilters)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                      <Filter size={20} color="#0b5c5b"/>
-                    </button>
-                  </div>
-
-                  {showFilters && (
-                    <div className="desktop-filters-panel" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', padding: '15px', background: '#f8fafc', marginBottom: '10px', borderRadius: '10px' }}>
-                      <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-                      <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-                      <select onChange={(e) => setFilterType(e.target.value)}>
-                        <option value="all">Toutes</option>
-                        <option value="entrants">Entrées</option>
-                        <option value="sortants">Sorties</option>
-                      </select>
-                    </div>
-                  )}
-
-                  <div className="bper-transactions-table-green">
-                    {displayTx.map((tr, i) => (
-                      <div key={i} className="bper-tr-item-green">
-                        <div className="bper-tr-left">
-                           <div className="bper-tr-circle-green" onClick={() => setSelectedTx(tr)} style={{ cursor: 'pointer' }}>
-                              {tr.type === "CREDIT" ? <PlusCircle size={18} color="#16a34a" /> : <Send size={18} />}
-                           </div>
-                           <div className="bper-tr-details">
-                             <p className="bper-tr-name">{tr.label}</p>
-                             <p className="bper-tr-date">{new Date(tr.createdAt).toLocaleDateString('fr-FR')}</p>
-                           </div>
+              <div className="bper-dashboard-grid">
+                
+                {/* SECTION GAUCHE : SOLDE & CARTES */}
+                <div className="bper-left-col">
+                  <section className="bper-hero-card-white">
+                    <div className="bper-balance-block">
+                      <p className="bper-label-green">Solde total disponible</p>
+                      <h1 className="bper-amount-green">{formatBper(data.balance)} €</h1>
+                      {showIban && (
+                        <div className="iban-box-desktop">
+                          <span>{data.iban}</span>
+                          <Copy size={14} onClick={() => {navigator.clipboard.writeText(data.iban); alert("IBAN copié !")}}/>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                          <span style={{ fontSize: '10px', background: '#eee', padding: '2px 6px', borderRadius: '4px' }}>{tr.type === "CREDIT" ? "Crédit" : "Débit"}</span>
-                          <div style={{ fontWeight: 'bold', color: tr.type === 'CREDIT' ? '#16a34a' : '#dc2626' }}>
+                      )}
+                    </div>
+                    <div className="bper-actions-row-under">
+                      <button className="bper-pill-green" onClick={() => setShowIban(!showIban)}>{showIban ? "Cacher" : "Voir mon IBAN"}</button>
+                      <button className="bper-pill-green active" onClick={() => navigate("/virement-international")}>Virement</button>
+                      <button className="bper-pill-green"><Plus size={14} /> Ajouter une carte</button>
+                    </div>
+                  </section>
+
+                  {/* LES GRAPHS SONT ICI */}
+                  <section className="bper-charts-section">
+                    <div className="chart-container-desktop">
+                      <h4>Analyse des flux financiers</h4>
+                      <div style={{height: '220px'}}><Bar data={barData} options={{maintainAspectRatio: false}} /></div>
+                    </div>
+                    <div className="chart-container-desktop">
+                      <h4>Variation du patrimoine</h4>
+                      <div style={{height: '220px'}}><Line data={lineData} options={{maintainAspectRatio: false}} /></div>
+                    </div>
+                  </section>
+                </div>
+
+                {/* SECTION DROITE : HISTORIQUE */}
+                <div className="bper-right-col">
+                  <section className="bper-history-block-white">
+                    <div className="bper-history-header-green">
+                      <h3>Dernières opérations</h3>
+                      <Filter size={18} onClick={() => setShowFilters(!showFilters)} style={{cursor:'pointer'}}/>
+                    </div>
+
+                    <div className="bper-transactions-table-green">
+                      {filteredTx.slice(0, 8).map((tr, i) => (
+                        <div key={i} className="bper-tr-item-green" onClick={() => setSelectedTx(tr)}>
+                          <div className="bper-tr-left">
+                             <div className="bper-tr-circle-green">
+                                {tr.type === "CREDIT" ? <PlusCircle size={16} color="#16a34a" /> : <Send size={16} />}
+                             </div>
+                             <div>
+                               <p className="bper-tr-name">{tr.label}</p>
+                               <p className="bper-tr-date">{new Date(tr.createdAt).toLocaleDateString()}</p>
+                             </div>
+                          </div>
+                          <div className={tr.type === 'CREDIT' ? 'amt plus' : 'amt minus'}>
                             {tr.type === 'CREDIT' ? '+' : '-'}{tr.amount.toLocaleString()} €
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
+                      ))}
+                    </div>
+                  </section>
+                </div>
               </div>
             )}
             {activeTab === "profile" && <Profile data={data} />}
           </div>
         </main>
 
-        {/* MODAL DÉTAILS PRO DESKTOP */}
+        {/* MODAL TRANSACTION PRO */}
         {selectedTx && (
-          <div className="bper-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div className="bper-modal-content" style={{ backgroundColor: 'white', width: '500px', borderRadius: '25px', padding: '30px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
-                <h2 style={{ fontSize: '18px' }}>Détails de l'opération</h2>
-                <button onClick={() => setSelectedTx(null)} style={{ border: 'none', background: 'none', fontSize: '20px', cursor: 'pointer' }}>✕</button>
+          <div className="bper-modal-overlay" onClick={() => setSelectedTx(null)}>
+            <div className="bper-modal-content" onClick={e => e.stopPropagation()}>
+              <div className="modal-header-pro">
+                <h3>Détails Bancaires</h3>
+                <button onClick={() => setSelectedTx(null)}>✕</button>
               </div>
-              <div style={{ textAlign: 'center', margin: '20px 0' }}>
-                <div style={{ fontSize: '32px', fontWeight: 'bold', color: selectedTx.type === 'CREDIT' ? '#16a34a' : '#1e293b' }}>
-                  {selectedTx.type === 'CREDIT' ? '+' : '-'}{selectedTx.amount.toLocaleString()} €
-                </div>
-                <p>{selectedTx.label}</p>
+              <div className="modal-body-pro">
+                <div className="main-amount">{selectedTx.amount.toLocaleString()} €</div>
+                <DetailRow label="Libellé" value={selectedTx.label} />
+                <DetailRow label="Date comptable" value={new Date(selectedTx.createdAt).toLocaleDateString()} />
+                <DetailRow label="Nature" value={selectedTx.type === 'CREDIT' ? 'Crédit' : 'Débit'} color={selectedTx.type === 'CREDIT' ? '#16a34a' : '#dc2626'} />
+                <DetailRow label="Référence" value={selectedTx._id?.toUpperCase()} />
               </div>
-              <DetailRow label="Statut" value="Comptabilisé" color="#16a34a" />
-              <DetailRow label="Date d'opération" value={new Date(selectedTx.createdAt).toLocaleDateString('fr-FR')} />
-              <DetailRow label="Référence interne" value={selectedTx._id?.toUpperCase()} />
             </div>
           </div>
         )}
@@ -213,19 +228,17 @@ export default function Dashboard() {
     );
   }
 
-  // --- RENDU MOBILE (RESTAURÉ AVEC TES COMPOSANTS) ---
+  // --- RENDU MOBILE ---
   return (
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      
       <div className="page-content">
         {activeTab === "accounts" && <Accounts data={data}/>}
         {activeTab === "cards" && <BankCard card={card} />}
         {activeTab === "financing" && <Financing />}
         {activeTab === "profile" && <Profile data={data} />}
       </div>
-      
       <BottomNav setActiveTab={setActiveTab} activeTab={activeTab} />
     </div>
   );

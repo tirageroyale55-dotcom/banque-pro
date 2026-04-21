@@ -540,15 +540,7 @@ white-space:nowrap;
 }
 
 
-.desktop-filters-panel {
-    display: flex;
-    gap: 15px;
-    padding: 15px;
-    background: #f8fafc;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #e2e8f0;
-}
+
 
 .bper-tr-right-aligned {
     display: flex;
