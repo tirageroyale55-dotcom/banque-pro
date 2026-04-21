@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
@@ -6,177 +6,199 @@ import Header from "../components/Header";
 import Tabs from "../components/Tabs";
 import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
+import Sidebar from "../components/Sidebar";
 import BankCard from "../components/BankCard";
+
+import { useRef } from "react"; // en haut
+
 import Accounts from "./Accounts";
-// Ajout de l'import Profile au cas où il manquerait
-import Profile from "./Profile"; 
 
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
-  const [data, setData] = useState(null);
-  const [activeTab, setActiveTab] = useState("accounts");
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
-  const [card, setCard] = useState(null);
-  const [scrollOffset, setScrollOffset] = useState(-60);
-  const [opacity, setOpacity] = useState(0);
 
-  const navigate = useNavigate();
-  const contentRef = useRef(null);
+const [data, setData] = useState(null);
+const [activeTab, setActiveTab] = useState("accounts");
+const [showBalanceBar, setShowBalanceBar] = useState(false);
+const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
+const [card,setCard] = useState(null);
 
-  // Gestion du redimensionnement
-  useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+const [scrollOffset, setScrollOffset] = useState(-60); // Cachée par défaut
+const [opacity, setOpacity] = useState(0);
 
-  // Chargement des données
-  useEffect(() => {
-    api("/client/dashboard")
-      .then((clientData) => {
-        setData(clientData);
-        api("/transactions")
-          .then((transactionsData) => {
-            setData(prev => ({
-              ...prev,
-              transactions: transactionsData.transactions || transactionsData
-            }));
-          })
-          .catch(err => console.error("Erreur transactions", err));
-      })
-      .catch(() => {
-        localStorage.removeItem("token");
-        navigate("/login");
-      });
-  }, [navigate]);
+const navigate = useNavigate();
 
-  useEffect(() => {
-    if (activeTab === "cards") {
-      api("/client/card").then(setCard).catch(() => console.log("Erreur carte"));
-    }
-  }, [activeTab]);
+const lastScrollRef = useRef(0);
+const contentRef = useRef(null);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [activeTab]);
+useEffect(()=>{
 
-  // BalanceBar (Logique Mobile uniquement)
-  useEffect(() => {
-    if (!data || activeTab !== "accounts" || isDesktop) return;
-    const handleScroll = () => {
-      const bar = document.querySelector('.balance-bar');
-      const accountCard = document.querySelector('.account-card');
-      if (!bar || !accountCard) return;
-      const cardRect = accountCard.getBoundingClientRect();
-      if (cardRect.top < 135) bar.classList.add('show');
-      else bar.classList.remove('show');
-    };
-    window.addEventListener("scroll", handleScroll, true);
-    return () => window.removeEventListener("scroll", handleScroll, true);
-  }, [activeTab, data, isDesktop]);
+if(activeTab === "cards"){
 
-  if (!data) return null;
+api("/client/card")
+.then(setCard)
+.catch(()=>console.log("Erreur carte"));
 
-  if (isDesktop) {
-    return (
-      <div className="bank-app bper-desktop-interface">
-        {/* SIDEBAR GAUCHE - Reste intacte */}
-        <aside className="bper-sidebar">
-          <div className="bper-logo">BPER</div>
-          <nav className="bper-nav">
-            <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>Accueil</div>
-            <div className="nav-item">Cartes</div>
-            <div className="nav-item">Payer</div>
-            <div className="nav-item">Produits</div>
-            <div className="nav-item">Lifestyle</div>
-            <div className="nav-item">Aide</div>
-          </nav>
-        </aside>
+}
 
-        <main className="bper-main-content">
-          {/* HEADER TOP : Bienvenue à GAUCHE, Profil à DROITE */}
-          <header className="bper-header-top">
-             <div className="bper-user-welcome">
-                Bienvenue, <span className="user-name">{data.firstName} {data.lastName}</span>
-             </div>
-             <div className="bper-top-icons">
-                <div className="bper-square-icon">
-                   <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 22a2.02 2.02 0 0 1-2.01-2h4.02A2.02 2.02 0 0 1 12 22zm7-3H5v-2l2-1V9c0-3.07 1.63-5.64 4.5-6.32V2h1v.68C15.37 3.36 17 5.92 17 9v6l2 1v2z"/></svg>
-                </div>
-                <div className="bper-square-icon profile-btn" onClick={() => setActiveTab('profile')}>
-                   <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                </div>
-             </div>
-          </header>
+},[activeTab]);
 
-          {/* Zone de contenu qui SCROLL */}
-          <div className="bper-scroll-zone">
-            {activeTab === "accounts" && (
-              <div className="bper-dashboard-container">
-                
-                {/* SECTION SOLDE : Carte BLANCHE, boutons DESSOUS */}
-                <section className="bper-hero-card-white">
-                  <div className="bper-balance-block">
-                    <p className="bper-label-green">Solde disponible 👁️</p>
-                    <h1 className="bper-amount-green">{data.balance?.toLocaleString()} €</h1>
-                    {/* Sacoche supprimée ici */}
-                  </div>
-                  
-                  {/* BOUTONS : Alignement Horizontal SOUS le solde */}
-                  <div className="bper-actions-row-under">
-                    <button className="bper-pill-green">Voir mon IBAN</button>
-                    <button className="bper-pill-green active">Effectuer un virement</button>
-                    <button className="bper-pill-green">Voir ma carte virtuelle</button>
-                  </div>
-                </section>
+useEffect(() => {
+  // 1. On récupère d'abord les infos de base (obligatoire)
+  api("/client/dashboard")
+    .then((clientData) => {
+      setData(clientData); // On affiche déjà le dashboard
 
-                {/* SECTION HISTORIQUE : Carte BLANCHE avec GRAPHIQUE */}
-                <section className="bper-history-block-white">
-                  <div className="bper-history-header-green">
-                    <span className="bper-menu-symbol-green">≡</span> 
-                    <h3>Historique des transactions</h3>
-                  </div>
+      // 2. On tente de charger les transactions APRES (optionnel)
+      api("/transactions")
+        .then((transactionsData) => {
+          setData(prev => ({
+            ...prev,
+            transactions: transactionsData.transactions || transactionsData // Gère les deux formats
+          }));
+        })
+        .catch(err => console.error("L'historique n'a pas pu être chargé :", err));
+    })
+    .catch((err) => {
+      // Uniquement si le profil échoue, on redirige
+      console.error("Session expirée ou erreur profil");
+      localStorage.removeItem("token");
+      navigate("/login");
+    });
+}, []);
 
-                  {/* EMPLACEMENT DU GRAPHIQUE (À toi de mettre ton composant Chart ici) */}
-                  <div className="bper-chart-placeholder">
-                    {/* <MyChartComponent data={data.transactions} /> */}
-                    <p>Le graphique s'affichera ici (Graph placeholder)</p>
-                  </div>
-                  
-                  <div className="bper-transactions-table-green">
-                    {data.transactions?.map((tr, i) => (
-                      <div key={i} className="bper-tr-item-green">
-                        <div className="bper-tr-left">
-                           <div className="bper-tr-circle-green">{tr.type === 'credit' ? '↓' : '↑'}</div>
-                           <div className="bper-tr-details">
-                             <p className="bper-tr-name">{tr.label}</p>
-                             <p className="bper-tr-date">{tr.date}</p>
-                           </div>
-                        </div>
-                        <div className={`bper-tr-value-green ${tr.type}`}>
-                          {tr.type === 'credit' ? '+' : '-'}{tr.amount.toLocaleString()} €
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              </div>
-            )}
-            {activeTab === "profile" && <Profile data={data} />}
-          </div>
-        </main>
-      </div>
-    );
+useEffect(()=>{
+
+const handleResize = () => {
+setIsDesktop(window.innerWidth >= 1000);
+};
+
+window.addEventListener("resize", handleResize);
+
+return () => window.removeEventListener("resize", handleResize);
+
+},[]);
+
+useEffect(()=>{
+setShowBalanceBar(false)
+window.scrollTo(0,0)
+},[activeTab])
+
+useEffect(() => {
+  // On ne fait rien si les données ne sont pas encore chargées
+  if (!data || activeTab !== "accounts") {
+    const bar = document.querySelector('.balance-bar');
+    if (bar) bar.classList.remove('show');
+    return;
   }
 
-  {/* Rendu Mobile inchangé */}
-  return (
-    <div className="bank-app">
-      <Header data={data} />
-      <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <div className="page-content">{/* ... */}</div>
-      <BottomNav />
-    </div>
-  );
+  const handleScroll = () => {
+    const bar = document.querySelector('.balance-bar');
+    const accountCard = document.querySelector('.account-card');
+    
+    // Si la carte n'est pas encore là (chargement API), on sort
+    if (!bar || !accountCard) return;
+
+    const cardRect = accountCard.getBoundingClientRect();
+    const triggerPoint = 135; 
+
+    if (cardRect.top < triggerPoint) {
+      bar.classList.add('show');
+    } else {
+      bar.classList.remove('show');
+    }
+  };
+
+  // On attache l'évenement
+  window.addEventListener("scroll", handleScroll, true);
+  
+  // On l'exécute une fois au montage pour vérifier la position actuelle
+  handleScroll();
+
+  return () => {
+    window.removeEventListener("scroll", handleScroll, true);
+  };
+}, [activeTab, data]); // <--- AJOUTE 'data' ICI
+
+
+if (!data) return null;
+
+return (
+
+<div className="bank-app">
+
+{isDesktop && <Sidebar/>}
+
+<div className={isDesktop ? "desktop-content" : ""}>
+
+<Header data={data} />
+
+<Tabs
+activeTab={activeTab}
+setActiveTab={setActiveTab}
+/>
+
+<BalanceBar 
+  balance={data.balance} 
+  offset={scrollOffset} 
+  opacity={opacity} 
+/>
+
+<div className="page-content" ref={contentRef}>
+
+{activeTab === "accounts" && <Accounts data={data}/>}
+
+{activeTab === "profile" && <Profile data={data} />}
+
+{activeTab === "cards" && (
+
+<div className="cards-section">
+
+<h3 className="cards-title">Mes cartes</h3>
+
+<div className="cards-slider">
+
+{card && (
+<div className="cards-slide">
+<BankCard card={card}/>
+</div>
+)}
+
+<div
+className="cards-slide card-request"
+onClick={()=>navigate("/request-card")}
+>
+
+<div className="card-request-inner">
+<div className="card-plus">+</div>
+<p>Demander une carte</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
+{activeTab === "financing" && (
+<div className="content">
+<div className="account-card">
+<h3>Financements</h3>
+<p>Aucun financement disponible</p>
+</div>
+</div>
+)}
+
+</div>
+
+</div>
+
+{!isDesktop && <BottomNav/>}
+
+</div>
+
+);
+
 }
