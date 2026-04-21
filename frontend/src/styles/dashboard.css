@@ -637,6 +637,79 @@ white-space:nowrap;
 
 
 
+/* Overlay Pro */
+.bper-detail-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 2000;
+    display: flex; justify-content: center; align-items: center;
+}
+
+.bper-detail-card {
+    background: white;
+    width: 600px;
+    border-radius: 25px;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+.detail-header-pro {
+    background: #f8fafc;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-body-pro { padding: 40px; }
+
+.detail-amount-center { text-align: center; margin-bottom: 40px; }
+
+.a-plus { font-size: 36px; font-weight: bold; color: #16a34a; }
+.a-minus { font-size: 36px; font-weight: bold; color: #1e293b; }
+
+/* Panel Filtre */
+.f-input {
+    border: 1px solid #e2e8f0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+}
+
+.f-btn {
+    background: #0b5c5b;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.bper-chart-card-small {
+    background: white;
+    padding: 15px;
+    border-radius: 15px;
+    flex: 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .blocked-screen {
   height: 100vh;
