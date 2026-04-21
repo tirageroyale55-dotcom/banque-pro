@@ -1,224 +1,204 @@
 import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { Send, PlusCircle, Filter, Copy } from "lucide-react";
-
-// Imports Graphiques
-import { Bar, Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  PointElement,
-  Tooltip,
-  Legend
-} from "chart.js";
 
 import Header from "../components/Header";
 import Tabs from "../components/Tabs";
+import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
+import Sidebar from "../components/Sidebar";
+import BankCard from "../components/BankCard";
+
+import { useRef } from "react"; // en haut
+
 import Accounts from "./Accounts";
-import Cards from "./Cards";
-import Financing from "./Financing";
-import Profile from "./Profile";
 
 import "../styles/dashboard.css";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip, Legend);
+export default function Dashboard() {
 
-function DetailRow({ label, value, color = '#1e293b' }) {
-  return (
-    <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '12px', marginBottom: '12px' }}>
-      <div style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>{label}</div>
-      <div style={{ fontSize: '14px', color: color, fontWeight: '500' }}>{value}</div>
-    </div>
-  );
+const [data, setData] = useState(null);
+const [activeTab, setActiveTab] = useState("accounts");
+const [showBalanceBar, setShowBalanceBar] = useState(false);
+const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
+const [card,setCard] = useState(null);
+
+const [scrollOffset, setScrollOffset] = useState(-60); // Cachée par défaut
+const [opacity, setOpacity] = useState(0);
+
+const navigate = useNavigate();
+
+const lastScrollRef = useRef(0);
+const contentRef = useRef(null);
+
+useEffect(()=>{
+
+if(activeTab === "cards"){
+
+api("/client/card")
+.then(setCard)
+.catch(()=>console.log("Erreur carte"));
+
 }
 
-export default function Dashboard() {
-  const [data, setData] = useState(null);
-  const [activeTab, setActiveTab] = useState("accounts");
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
-  const [showIban, setShowIban] = useState(false);
-  const [selectedTx, setSelectedTx] = useState(null); 
-  
-  const [showFilters, setShowFilters] = useState(false);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [filterType, setFilterType] = useState("all");
+},[activeTab]);
 
-  const navigate = useNavigate();
+useEffect(() => {
+  // 1. On récupère d'abord les infos de base (obligatoire)
+  api("/client/dashboard")
+    .then((clientData) => {
+      setData(clientData); // On affiche déjà le dashboard
 
-  const formatBper = (amount) => {
-    return new Intl.NumberFormat('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
-  };
+      // 2. On tente de charger les transactions APRES (optionnel)
+      api("/transactions")
+        .then((transactionsData) => {
+          setData(prev => ({
+            ...prev,
+            transactions: transactionsData.transactions || transactionsData // Gère les deux formats
+          }));
+        })
+        .catch(err => console.error("L'historique n'a pas pu être chargé :", err));
+    })
+    .catch((err) => {
+      // Uniquement si le profil échoue, on redirige
+      console.error("Session expirée ou erreur profil");
+      localStorage.removeItem("token");
+      navigate("/login");
+    });
+}, []);
 
-  useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+useEffect(()=>{
 
-  useEffect(() => {
-    api("/client/dashboard")
-      .then((clientData) => {
-        setData(clientData);
-        api("/transactions")
-          .then((transactionsData) => {
-            setData(prev => ({ ...prev, transactions: transactionsData.transactions || transactionsData }));
-          });
-      })
-      .catch(() => { navigate("/login"); });
-  }, [navigate]);
+const handleResize = () => {
+setIsDesktop(window.innerWidth >= 1000);
+};
 
-  if (!data) return null;
+window.addEventListener("resize", handleResize);
 
-  // Logique filtrage
-  const allTx = data.transactions || [];
-  const filteredTx = allTx.filter(tx => {
-    const txDate = new Date(tx.createdAt).toISOString().split("T")[0];
-    const matchType = filterType === "all" || (filterType === "entrants" && tx.type === "CREDIT") || (filterType === "sortants" && tx.type === "DEBIT");
-    const matchStart = startDate ? txDate >= startDate : true;
-    const matchEnd = endDate ? txDate <= endDate : true;
-    return matchType && matchStart && matchEnd;
-  });
+return () => window.removeEventListener("resize", handleResize);
 
-  const displayTx = filteredTx.slice(0, 6);
+},[]);
 
-  // --- RENDU DESKTOP ---
-  if (isDesktop) {
-    return (
-      <div className="bank-app bper-desktop-interface">
-        <aside className="bper-sidebar">
-          <div className="bper-logo">BPER</div>
-          <nav className="bper-nav">
-            <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>Accueil</div>
-            <div className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>Mes Cartes</div>
-            <div className={`nav-item ${activeTab === 'financing' ? 'active' : ''}`} onClick={() => setActiveTab('financing')}>Financement</div>
-            <div className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>Profil</div>
-          </nav>
-        </aside>
+useEffect(()=>{
+setShowBalanceBar(false)
+window.scrollTo(0,0)
+},[activeTab])
 
-        <main className="bper-main-content">
-          <header className="bper-header-top">
-             <div className="bper-user-welcome">Bienvenue, <span className="user-name">{data.firstname} {data.lastname}</span></div>
-             <div className="bper-top-icons">
-                <div className="bper-square-icon" onClick={() => setActiveTab('profile')} style={{cursor:'pointer'}}>👤</div>
-             </div>
-          </header>
-
-          <div className="bper-scroll-zone">
-            {activeTab === "accounts" && (
-              <div className="bper-dashboard-container">
-                <section className="bper-hero-card-white">
-                  <div className="bper-balance-block">
-                    <p className="bper-label-green">Solde disponible 👁️</p>
-                    <h1 className="bper-amount-green">{formatBper(data.balance)} €</h1>
-                    {showIban && (
-                      <div className="iban-display-desktop" style={{marginTop:'15px', padding:'10px', background:'#f8fafc', borderRadius:'10px', display:'flex', alignItems:'center', justifyContent:'center', gap:'10px', border:'1px dashed #0b5c5b'}}>
-                        <span style={{fontWeight:'bold', color:'#0b5c5b'}}>{data.iban}</span>
-                        <Copy size={16} style={{cursor:'pointer'}} onClick={() => {navigator.clipboard.writeText(data.iban); alert("IBAN copié !")}} />
-                      </div>
-                    )}
-                  </div>
-                  <div className="bper-actions-row-under">
-                    <button className="bper-pill-green" onClick={() => setShowIban(!showIban)}>Voir mon IBAN</button>
-                    <button className="bper-pill-green active" onClick={() => navigate("/virement-international")}>Effectuer un virement</button>
-                    <button className="bper-pill-green">Voir ma carte virtuelle</button>
-                  </div>
-                </section>
-
-                <section className="bper-history-block-white">
-                  <div className="bper-history-header-green" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span className="bper-menu-symbol-green">≡</span> 
-                      <h3>Historique des transactions</h3>
-                    </div>
-                    <button className="filter-btn" onClick={() => setShowFilters(!showFilters)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                      <Filter size={20} color="#0b5c5b"/>
-                    </button>
-                  </div>
-
-                  {showFilters && (
-                    <div className="filters-panel" style={{display:'flex', justifyContent:'flex-end', gap:'15px', marginBottom:'15px'}}>
-                        <input type="date" value={startDate} onChange={(e)=>setStartDate(e.target.value)} />
-                        <input type="date" value={endDate} onChange={(e)=>setEndDate(e.target.value)} />
-                        <select onChange={(e)=>setFilterType(e.target.value)}>
-                            <option value="all">Toutes</option>
-                            <option value="entrants">Entrées</option>
-                            <option value="sortants">Sorties</option>
-                        </select>
-                    </div>
-                  )}
-
-                  <div className="bper-transactions-table-green">
-                    {displayTx.map((tr, i) => (
-                      <div key={i} className="bper-tr-item-green">
-                        <div className="bper-tr-left">
-                           <div className="bper-tr-circle-green" onClick={() => setSelectedTx(tr)} style={{ cursor: 'pointer' }}>
-                              {tr.type === "CREDIT" ? <PlusCircle size={18} color="#16a34a" /> : <Send size={18} />}
-                           </div>
-                           <div className="bper-tr-details">
-                             <p className="bper-tr-name">{tr.label}</p>
-                             <p className="bper-tr-date">{new Date(tr.createdAt).toLocaleDateString('fr-FR')}</p>
-                           </div>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                          <span style={{ fontSize: '10px', background: '#eee', padding: '2px 6px', borderRadius: '4px' }}>{tr.type === "CREDIT" ? "Crédit" : "Débit"}</span>
-                          <div className={tr.type === 'CREDIT' ? 'amount plus' : 'amount minus'} style={{fontWeight:'bold', color: tr.type === 'CREDIT' ? '#16a34a' : '#dc2626'}}>
-                            {tr.type === 'CREDIT' ? '+' : '-'}{tr.amount.toLocaleString()} €
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              </div>
-            )}
-            {activeTab === "cards" && <Cards />}
-            {activeTab === "financing" && <Financing />}
-            {activeTab === "profile" && <Profile data={data} />}
-          </div>
-        </main>
-
-        {/* MODAL DÉTAILS PRO */}
-        {selectedTx && (
-          <div className="bper-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div className="bper-modal-content" style={{ backgroundColor: 'white', width: '500px', borderRadius: '25px', padding: '30px' }}>
-               <div style={{display:'flex', justifyContent:'space-between', borderBottom:'1px solid #eee', paddingBottom:'10px'}}>
-                  <h2 style={{fontSize:'18px'}}>Détails de l'opération</h2>
-                  <button onClick={()=>setSelectedTx(null)} style={{border:'none', background:'none', fontSize:'20px', cursor:'pointer'}}>✕</button>
-               </div>
-               <div style={{textAlign:'center', margin:'20px 0'}}>
-                  <div style={{fontSize:'32px', fontWeight:'bold', color: selectedTx.type === 'CREDIT' ? '#16a34a' : '#1e293b'}}>
-                    {selectedTx.type === 'CREDIT' ? '+' : '-'}{selectedTx.amount.toLocaleString()} €
-                  </div>
-                  <p>{selectedTx.label}</p>
-               </div>
-               <DetailRow label="Statut" value="Comptabilisé" color="#16a34a" />
-               <DetailRow label="Date d'opération" value={new Date(selectedTx.createdAt).toLocaleDateString('fr-FR')} />
-               <DetailRow label="Référence" value={selectedTx._id?.toUpperCase()} />
-            </div>
-          </div>
-        )}
-      </div>
-    );
+useEffect(() => {
+  // On ne fait rien si les données ne sont pas encore chargées
+  if (!data || activeTab !== "accounts") {
+    const bar = document.querySelector('.balance-bar');
+    if (bar) bar.classList.remove('show');
+    return;
   }
 
-  // --- RENDU MOBILE (RESTAURÉ) ---
-  return (
-    <div className="bank-app">
-      <Header data={data} />
-      <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <div className="page-content">
-        {activeTab === "accounts" && <Accounts data={data}/>}
-        {activeTab === "cards" && <Cards />}
-        {activeTab === "financing" && <Financing />}
-        {activeTab === "profile" && <Profile data={data} />}
-      </div>
-      <BottomNav setActiveTab={setActiveTab} activeTab={activeTab} />
-    </div>
-  );
+  const handleScroll = () => {
+    const bar = document.querySelector('.balance-bar');
+    const accountCard = document.querySelector('.account-card');
+    
+    // Si la carte n'est pas encore là (chargement API), on sort
+    if (!bar || !accountCard) return;
+
+    const cardRect = accountCard.getBoundingClientRect();
+    const triggerPoint = 135; 
+
+    if (cardRect.top < triggerPoint) {
+      bar.classList.add('show');
+    } else {
+      bar.classList.remove('show');
+    }
+  };
+
+  // On attache l'évenement
+  window.addEventListener("scroll", handleScroll, true);
+  
+  // On l'exécute une fois au montage pour vérifier la position actuelle
+  handleScroll();
+
+  return () => {
+    window.removeEventListener("scroll", handleScroll, true);
+  };
+}, [activeTab, data]); // <--- AJOUTE 'data' ICI
+
+
+if (!data) return null;
+
+return (
+
+<div className="bank-app">
+
+{isDesktop && <Sidebar/>}
+
+<div className={isDesktop ? "desktop-content" : ""}>
+
+<Header data={data} />
+
+<Tabs
+activeTab={activeTab}
+setActiveTab={setActiveTab}
+/>
+
+<BalanceBar 
+  balance={data.balance} 
+  offset={scrollOffset} 
+  opacity={opacity} 
+/>
+
+<div className="page-content" ref={contentRef}>
+
+{activeTab === "accounts" && <Accounts data={data}/>}
+
+{activeTab === "profile" && <Profile data={data} />}
+
+{activeTab === "cards" && (
+
+<div className="cards-section">
+
+<h3 className="cards-title">Mes cartes</h3>
+
+<div className="cards-slider">
+
+{card && (
+<div className="cards-slide">
+<BankCard card={card}/>
+</div>
+)}
+
+<div
+className="cards-slide card-request"
+onClick={()=>navigate("/request-card")}
+>
+
+<div className="card-request-inner">
+<div className="card-plus">+</div>
+<p>Demander une carte</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
+{activeTab === "financing" && (
+<div className="content">
+<div className="account-card">
+<h3>Financements</h3>
+<p>Aucun financement disponible</p>
+</div>
+</div>
+)}
+
+</div>
+
+</div>
+
+{!isDesktop && <BottomNav/>}
+
+</div>
+
+);
+
 }
