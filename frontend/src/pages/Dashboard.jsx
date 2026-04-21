@@ -22,6 +22,7 @@ import BottomNav from "../components/BottomNav";
 import Accounts from "./Accounts";
 import BankCard from "../components/BankCard";
 import Profile from "./Profile";
+import Financing from "./Financing"
 
 import "../styles/dashboard.css";
 
@@ -268,7 +269,25 @@ export default function Dashboard() {
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <div className="page-content">{activeTab === "accounts" && <Accounts data={data}/>}</div>
+      <div className="page-content">
+  {/* Affiche les comptes */}
+  {activeTab === "accounts" && <Accounts data={data}/>}
+
+  {/* Affiche la carte bancaire si l'onglet est "cards" */}
+  {activeTab === "cards" && (
+    <div style={{ padding: "20px" }}>
+      {/* On passe la première carte de la liste si elle existe */}
+      {data.cards && data.cards.length > 0 ? (
+        <BankCard card={data.cards[0]} />
+      ) : (
+        <p>Aucune carte disponible</p>
+      )}
+    </div>
+  )}
+
+  {/* Affiche le financement */}
+  {activeTab === "financing" && <Financing />}
+</div>
       <BottomNav />
     </div>
   );
