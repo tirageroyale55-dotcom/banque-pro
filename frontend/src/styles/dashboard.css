@@ -540,27 +540,7 @@ white-space:nowrap;
 }
 
 
-.bper-main-content {
-    flex: 1;
-    background-color: #f4f7f6; /* Gris très léger style bancaire */
-    height: 100vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-}
 
-.bper-dashboard-container {
-    max-width: 1000px; /* Évite que les grafs soient trop étirés */
-    margin: 0 auto;
-    padding: 40px 20px;
-}
-
-.bper-history-block-white {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    border: 1px solid #e5e7eb;
-}
 
 .bper-tr-right-aligned {
     display: flex;
