@@ -637,147 +637,163 @@ white-space:nowrap;
 
 
 
-/* Layout Principal */
+/* Layout Desktop Général */
 .bper-desktop-layout {
   display: flex;
   height: 100vh;
-  background-color: #f0f4f3; /* Fond gris clair/vert très pâle */
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8fafb;
+  font-family: sans-serif;
 }
 
-/* Sidebar Gauche */
+/* Sidebar GAUCHE */
 .bper-sidebar {
   width: 240px;
-  background-color: #ffffff;
-  border-right: 1px solid #e0e0e0;
+  background-color: #fff;
+  border-right: 1px solid #eee;
   display: flex;
   flex-direction: column;
-  padding: 20px 0;
+  padding: 20px;
 }
 
 .sidebar-logo {
   font-size: 24px;
   font-weight: bold;
-  color: #0b5c5b; /* Vert BPER */
-  padding: 0 30px 40px;
-}
-
-.sidebar-nav .nav-item {
-  padding: 15px 30px;
-  cursor: pointer;
-  color: #444;
-  font-weight: 500;
-  transition: 0.3s;
-}
-
-.sidebar-nav .nav-item:hover, .sidebar-nav .nav-item.active {
-  background-color: #e8f2f1;
   color: #0b5c5b;
-  border-left: 4px solid #0b5c5b;
+  margin-bottom: 40px;
 }
 
-/* Zone de contenu */
-.bper-content {
+.menu-item {
+  padding: 15px 10px;
+  cursor: pointer;
+  color: #666;
+  border-radius: 8px;
+  margin-bottom: 5px;
+}
+
+.menu-item.active, .menu-item:hover {
+  background-color: #e6f2f2;
+  color: #0b5c5b;
+  font-weight: bold;
+}
+
+/* Zone de contenu principale */
+.bper-main {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.content-header {
-  padding: 20px 40px;
+/* Top Nav */
+.bper-top-nav {
+  height: 70px;
+  background: #fff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
+  padding: 0 30px;
+  border-bottom: 1px solid #eee;
 }
 
-.welcome-text { font-size: 18px; color: #666; }
-.welcome-text span { font-weight: bold; color: #0b5c5b; }
+.user-name { font-weight: bold; color: #333; }
 
-.header-icons { display: flex; gap: 15px; }
+.top-icons { display: flex; gap: 15px; }
 .icon-box {
   width: 40px; height: 40px;
-  background: #f5f5f5;
-  border-radius: 8px; /* Carré arrondi comme ton plan */
+  background: #f1f1f1;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
+  border-radius: 8px; cursor: pointer;
 }
+.profile-circle { border-radius: 50%; background: #0b5c5b; color: white; }
 
-/* Cartes (Widgets) */
-.scroll-container {
-  padding: 30px 40px;
+/* Contenu scrollable */
+.dashboard-scrollable {
+  padding: 30px;
   overflow-y: auto;
 }
 
-.widget-card {
+/* Carte Solde (Plan dessin) */
+.bper-hero-card {
   background: white;
+  border: 1px solid #eee;
   border-radius: 15px;
   padding: 25px;
   margin-bottom: 25px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-.solde-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f9fdfc 100%);
-  border: 1px solid #d1e5e4;
-}
-
-.solde-info h2 {
+.solde-header h2 {
   font-size: 32px;
   color: #0b5c5b;
-  margin: 10px 0 20px;
+  margin: 10px 0;
 }
 
-/* Boutons arrondis (Pill) */
-.actions-row { display: flex; gap: 15px; flex-wrap: wrap; }
-.btn-pill {
+.solde-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.solde-actions button {
   padding: 10px 20px;
-  border-radius: 25px; /* Forme pilule comme le plan */
+  border-radius: 20px;
   border: 1px solid #0b5c5b;
-  background: white;
+  background: transparent;
   color: #0b5c5b;
   cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s;
 }
 
-.btn-pill.accent {
+.solde-actions button.btn-active {
   background: #0b5c5b;
   color: white;
 }
 
-.btn-pill:hover { opacity: 0.8; }
-
-/* Liste Transactions */
-.section-title {
-  font-weight: bold;
-  font-size: 18px;
-  color: #0b5c5b;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* Historique */
+.bper-history-section {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 25px;
 }
 
-.tx-item {
+.section-title {
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #0b5c5b;
+}
+
+.tr-row {
   display: flex;
   justify-content: space-between;
   padding: 12px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #f9f9f9;
 }
 
-.tx-left { display: flex; gap: 15px; align-items: center; }
-.tx-icon {
-  width: 35px; height: 35px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-}
-.tx-icon.credit { background: #e6f4ea; color: #16a34a; }
-.tx-icon.debit { background: #fce8e8; color: #dc2626; }
+.plus { color: #16a34a; font-weight: bold; }
+.minus { color: #dc2626; font-weight: bold; }
 
-.tx-amount.credit { color: #16a34a; font-weight: bold; }
-.tx-amount.debit { color: #dc2626; font-weight: bold; }
+/* Les Graphes côte à côte (Grid) */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.chart-container {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid #eee;
+}
+
+.chart-container p {
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #555;
+}
+
+.canvas-wrapper {
+  height: 250px;
+}
 
 
 
