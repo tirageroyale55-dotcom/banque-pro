@@ -2,16 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { Send, PlusCircle, Filter, Bell, User } from "lucide-react";
-
-// Imports pour les graphiques
-import { Bar, Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
-  LineElement,
-  PointElement,
   Tooltip,
   Legend,
 } from "chart.js";
@@ -26,7 +22,7 @@ import Profile from "./Profile";
 
 import "../styles/dashboard.css";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
@@ -53,23 +49,25 @@ export default function Dashboard() {
     api("/client/dashboard")
       .then((clientData) => {
         setData(clientData);
-        api("/transactions").then((txData) => {
-          setData(prev => ({ ...prev, transactions: txData.transactions || txData }));
+        api("/transactions").then((tx) => {
+          setData(prev => ({ ...prev, transactions: tx.transactions || tx }));
         });
       })
-      .catch(() => navigate("/login"));
+      .catch(() => {
+        localStorage.removeItem("token");
+        navigate("/login");
+      });
   }, [navigate]);
 
   if (!data) return null;
 
-  // --- LOGIQUE DES GRAPHS ---
+  // Préparation du Graphique (Analyse des flux)
   const rawTransactions = data.transactions || [];
   const grouped = {};
   rawTransactions.forEach((tx) => {
     const dateKey = new Date(tx.createdAt).toLocaleDateString("fr-FR");
     if (!grouped[dateKey]) grouped[dateKey] = { in: 0, out: 0 };
-    if (tx.type === "CREDIT") grouped[dateKey].in += tx.amount;
-    else grouped[dateKey].out += Math.abs(tx.amount);
+    tx.type === "CREDIT" ? (grouped[dateKey].in += tx.amount) : (grouped[dateKey].out += Math.abs(tx.amount));
   });
 
   const dates = Object.keys(grouped).sort((a, b) => new Date(a.split("/").reverse().join("-")) - new Date(b.split("/").reverse().join("-")));
@@ -77,20 +75,19 @@ export default function Dashboard() {
   const barData = {
     labels: dates,
     datasets: [
-      { label: "Entrées", data: dates.map(d => grouped[d].in), backgroundColor: "#16a34a" },
-      { label: "Sorties", data: dates.map(d => grouped[d].out), backgroundColor: "#dc2626" }
-    ]
+      { label: "Entrées", data: dates.map(d => grouped[d].in), backgroundColor: "#16a34a", borderRadius: 4 },
+      { label: "Sorties", data: dates.map(d => grouped[d].out), backgroundColor: "#dc2626", borderRadius: 4 }
+    ],
   };
 
-  // --- RENDU DESKTOP (Basé sur ton plan) ---
   if (isDesktop) {
     return (
       <div className="bper-desktop-layout">
-        {/* SIDEBAR GAUCHE */}
+        {/* SIDEBAR GAUCHE (Selon ton plan) */}
         <aside className="bper-sidebar">
-          <div className="bper-logo">BPER</div>
-          <nav className="bper-nav">
-            <div className="nav-item active">Accueil</div>
+          <div className="sidebar-logo">BPER</div>
+          <nav className="sidebar-nav">
+            <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>Accueil</div>
             <div className="nav-item">Cartes</div>
             <div className="nav-item">Payer</div>
             <div className="nav-item">Produits</div>
@@ -99,71 +96,69 @@ export default function Dashboard() {
           </nav>
         </aside>
 
-        {/* CONTENU PRINCIPAL */}
-        <main className="bper-main">
-          {/* HEADER AVEC BIENVENUE ET ICONES A DROITE */}
-          <header className="bper-top-bar">
+        {/* CONTENU DROITE */}
+        <main className="bper-content">
+          {/* HEADER AVEC NOTIF ET PROFIL (En haut à droite sur ton plan) */}
+          <header className="content-header">
             <div className="welcome-text">
               Bienvenue, <span>{data.firstName} {data.lastName}</span>
             </div>
             <div className="header-icons">
               <div className="icon-box"><Bell size={20} /></div>
-              <div className="icon-box" onClick={() => setActiveTab('profile')}><User size={20} /></div>
+              <div className="icon-box profile" onClick={() => setActiveTab('profile')}><User size={20} /></div>
             </div>
           </header>
 
-          <div className="bper-content-scroll">
-            {/* SECTION SOLDE DISPONIBLE */}
-            <section className="bper-card-white balance-section">
-              <div className="balance-header">
-                <p>Solde disponible <span className="eye-icon">👁️</span></p>
+          <div className="scroll-container">
+            {/* SECTION SOLDE (Le grand rectangle du haut) */}
+            <section className="widget-card solde-card">
+              <div className="solde-info">
+                <p>Solde disponible 👁️</p>
                 <h2>{formatBper(data.balance)} €</h2>
               </div>
-              <div className="action-buttons">
-                <button className="btn-outline" onClick={() => setShowIban(!showIban)}>
+              <div className="actions-row">
+                <button className="btn-pill" onClick={() => setShowIban(!showIban)}>
                   {showIban ? data.iban : "Voir mon IBAN"}
                 </button>
-                <button className="btn-filled" onClick={() => navigate("/virement-international")}>
-                  <Send size={16} /> Effectuer un virement
+                <button className="btn-pill accent" onClick={() => navigate("/virement-international")}>
+                  🚀 Effectuer un virement
                 </button>
-                <button className="btn-outline">Voir ma carte virtuelle</button>
+                <button className="btn-pill">Voir ma carte virtuelle</button>
               </div>
             </section>
 
-            {/* SECTION HISTORIQUE (PLEINE LARGEUR) */}
-            <section className="bper-card-white history-section">
+            {/* SECTION HISTORIQUE (Le rectangle du milieu) */}
+            <section className="widget-card">
               <div className="section-title">
                 <span>≡</span> Historique des transactions
               </div>
               <div className="tx-list">
-                {rawTransactions.map((tx, i) => (
+                {rawTransactions.slice(0, 5).map((tx, i) => (
                   <div key={i} className="tx-item">
-                    <div className="tx-info">
-                      <div className="tx-icon">{tx.type === "CREDIT" ? <PlusCircle size={18} color="#16a34a"/> : <Send size={18}/>}</div>
+                    <div className="tx-left">
+                      <div className={`tx-icon ${tx.type.toLowerCase()}`}>
+                        {tx.type === "CREDIT" ? <PlusCircle size={16}/> : <Send size={16}/>}
+                      </div>
                       <div>
-                        <div className="tx-label">{tx.label}</div>
-                        <div className="tx-date">{new Date(tx.createdAt).toLocaleDateString()}</div>
+                        <p className="tx-label">{tx.label}</p>
+                        <p className="tx-date">{new Date(tx.createdAt).toLocaleDateString()}</p>
                       </div>
                     </div>
-                    <div className={`tx-amount ${tx.type === 'CREDIT' ? 'plus' : 'minus'}`}>
-                      {tx.type === 'CREDIT' ? '+' : '-'}{tx.amount.toLocaleString()} €
+                    <div className={`tx-amount ${tx.type.toLowerCase()}`}>
+                      {tx.type === "CREDIT" ? "+" : "-"}{tx.amount} €
                     </div>
                   </div>
                 ))}
               </div>
             </section>
 
-            {/* SECTION GRAPHS (DEUX COLONNES EN BAS) */}
-            <div className="graphs-grid">
-              <div className="bper-card-white graph-box">
-                <h4>Flux de trésorerie</h4>
-                <div style={{height: '200px'}}><Bar data={barData} options={{maintainAspectRatio: false}} /></div>
+            {/* SECTION GRAPHIQUE (Le rectangle "les graf ici" en bas) */}
+            <section className="widget-card">
+              <div className="section-title">Analyse des flux</div>
+              <div style={{ height: "250px" }}>
+                <Bar data={barData} options={{ maintainAspectRatio: false }} />
               </div>
-              <div className="bper-card-white graph-box">
-                <h4>Analyse débit/crédit</h4>
-                <div style={{height: '200px'}}><Line data={{labels: dates, datasets: barData.datasets}} options={{maintainAspectRatio: false}} /></div>
-              </div>
-            </div>
+            </section>
           </div>
         </main>
       </div>
@@ -175,9 +170,9 @@ export default function Dashboard() {
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      <BalanceBar balance={data.balance} />
       <div className="page-content">
         {activeTab === "accounts" && <Accounts data={data} />}
-        {activeTab === "cards" && <BankCard card={null} />}
         {activeTab === "profile" && <Profile data={data} />}
       </div>
       <BottomNav />
