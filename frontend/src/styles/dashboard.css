@@ -337,118 +337,126 @@ white-space:nowrap;
 
 
 
-/* Garder ton style mobile actuel en haut du fichier tel quel */
-
-/* --- STYLES DESKTOP PROFESSIONNEL (BPER) --- */
-@media (min-width: 1000px) {
-  .bank-app { display: none !important; } /* Cache la version mobile */
-
-  .bper-desktop-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    background-color: #f8f9fa;
-    font-family: 'Segoe UI', Roboto, sans-serif;
-  }
-
-  /* Sidebar */
-  .bper-sidebar {
-    width: 250px;
-    background: #ffffff;
-    border-right: 1px solid #e0e0e0;
-    display: flex;
-    flex-direction: column;
-    padding: 20px 0;
-  }
-
-  .bper-logo {
-    padding: 0 30px 40px;
-    font-size: 32px;
-    font-weight: bold;
-    color: #003a70; /* Bleu BPER */
-    letter-spacing: -1px;
-  }
-
-  .bper-nav { flex: 1; }
-
-  .nav-item {
-    padding: 15px 30px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    color: #5f6368;
-    cursor: pointer;
-    font-weight: 500;
-    transition: 0.3s;
-  }
-
-  .nav-item:hover { background: #f1f3f4; color: #003a70; }
-  .nav-item.active {
-    background: #e8f0fe;
-    color: #1967d2;
-    border-right: 4px solid #1967d2;
-  }
-
-  /* Main Content */
-  .bper-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-  }
-
-  .bper-topbar {
-    height: 70px;
-    background: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 40px;
-    border-bottom: 1px solid #e0e0e0;
-  }
-
-  .topbar-icons { display: flex; gap: 15px; }
-  .icon-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #f1f3f4;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #5f6368;
-  }
-
-  .bper-content { padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
-
-  /* Solde Box (Dessin) */
-  .solde-box {
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    margin-bottom: 30px;
-  }
-
-  .solde-box h2 { font-size: 36px; color: #202124; margin: 10px 0 20px; }
-
-  .action-buttons { display: flex; gap: 15px; }
-  .btn-light { border: 1px solid #dadce0; background: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
-  .btn-dark { background: #202124; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
-
-  /* History */
-  .bper-history-section h3 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    color: #3c4043;
-  }
+/* --- RESET & VARIABLES --- */
+:root {
+  --bper-blue: #003a70;
+  --bper-gray: #f4f7f9;
+  --sidebar-width: 260px;
 }
 
-/* Si on est sur mobile, on cache la version Desktop */
-@media (max-width: 999px) {
-  .bper-desktop-container { display: none; }
+/* --- STRUCTURE DESKTOP --- */
+.desktop-mode {
+  display: flex;
+  height: 100vh;
+  background-color: var(--bper-gray);
+  overflow: hidden;
+}
+
+/* Sidebar (Menu Gauche Dessiné) */
+.main-sidebar {
+  width: var(--sidebar-width);
+  background: white;
+  border-right: 1px solid #e0e6ed;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+}
+
+.sidebar-logo {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--bper-blue);
+  padding: 0 25px 30px;
+  letter-spacing: -1px;
+}
+
+.sidebar-nav {
+  flex: 1;
+}
+
+.sidebar-nav button {
+  width: 100%;
+  padding: 14px 25px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border: none;
+  background: none;
+  font-size: 16px;
+  color: #556b82;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.sidebar-nav button:hover {
+  background: #f0f4f8;
+}
+
+.sidebar-nav button.active {
+  color: var(--bper-blue);
+  background: #eef4ff;
+  border-left: 4px solid var(--bper-blue);
+  font-weight: 600;
+}
+
+/* Zone de contenu principale */
+.main-viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.desktop-top-bar {
+  height: 70px;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+  border-bottom: 1px solid #e0e6ed;
+}
+
+.top-actions {
+  display: flex;
+  gap: 20px;
+  color: #666;
+}
+
+.scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px;
+}
+
+/* --- STRUCTURE MOBILE (Inchangée pour ne pas casser ton code) --- */
+.mobile-mode .main-viewport {
+  height: 100vh;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.mobile-mode .scrollable-content {
+  padding-bottom: 100px; /* Espace pour BottomNav */
+}
+
+/* --- ADAPTATION DES COMPOSANTS --- */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.card-request-btn {
+  border: 2px dashed #ccc;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  cursor: pointer;
+  background: white;
+  color: var(--bper-blue);
 }
 
 
