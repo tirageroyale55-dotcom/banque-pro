@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -6,10 +6,11 @@ import {
   CreditCard, 
   ArrowRightLeft, 
   Package, 
-  LifeBuoy, 
+  Heart, 
+  HelpCircle,
   LogOut,
   Bell,
-  UserCircle
+  User
 } from "lucide-react";
 
 import Header from "../components/Header";
@@ -28,8 +29,8 @@ export default function Dashboard() {
   const [card, setCard] = useState(null);
   const navigate = useNavigate();
 
-  // --- LOGIQUE COMMUNE ---
   useEffect(() => {
+    // Chargement des données BPER
     api("/client/dashboard")
       .then((clientData) => {
         setData(clientData);
@@ -59,7 +60,7 @@ export default function Dashboard() {
     window.scrollTo(0, 0);
   }, [activeTab]);
 
-  // --- LOGIQUE MOBILE (Scroll BalanceBar) ---
+  // Logique de scroll BalanceBar (Uniquement Mobile)
   useEffect(() => {
     if (isDesktop || !data || activeTab !== "accounts") return;
     const handleScroll = () => {
@@ -75,97 +76,73 @@ export default function Dashboard() {
 
   if (!data) return null;
 
-  // --- RENDU DES ONGLETS (Contenu Central) ---
-  const renderContent = () => {
-    switch (activeTab) {
-      case "accounts": return <Accounts data={data} />;
-      case "cards": return (
-        <div className="cards-section">
-          <h3 className="section-title">Mes cartes bancaires</h3>
-          <div className="cards-grid">
-            {card && <BankCard card={card} />}
-            <div className="card-request-btn" onClick={() => navigate("/request-card")}>
-              <span>+ Demander une nouvelle carte</span>
-            </div>
-          </div>
-        </div>
-      );
-      case "financing": return (
-        <div className="empty-state">
-          <h3>Financements</h3>
-          <p>Aucun dossier de financement en cours.</p>
-        </div>
-      );
-      default: return <Accounts data={data} />;
-    }
-  };
-
   return (
-    <div className={`bank-app ${isDesktop ? "desktop-mode" : "mobile-mode"}`}>
+    <div className={`bank-app ${isDesktop ? "is-desktop-layout" : ""}`}>
       
-      {/* VERSION DESKTOP : SIDEBAR GAUCHE (Comme ton dessin) */}
+      {/* SIDEBAR DESKTOP - Affichée selon ton dessin */}
       {isDesktop && (
-        <aside className="main-sidebar">
-          <div className="sidebar-logo">BPER</div>
-          <nav className="sidebar-nav">
-            <button className={activeTab === "accounts" ? "active" : ""} onClick={() => setActiveTab("accounts")}>
-              <LayoutDashboard size={20} /> Accueil
-            </button>
-            <button className={activeTab === "cards" ? "active" : ""} onClick={() => setActiveTab("cards")}>
-              <CreditCard size={20} /> Cartes
-            </button>
-            <button onClick={() => setActiveTab("financing")}>
-              <ArrowRightLeft size={20} /> Payer
-            </button>
-            <button>
-              <Package size={20} /> Produits
-            </button>
-            <button>
-              <LifeBuoy size={20} /> Lifestyle
-            </button>
-            <button>
-              <LifeBuoy size={20} /> Aide
-            </button>
+        <aside className="bper-sidebar">
+          <div className="bper-logo">BPER</div>
+          <nav className="bper-nav">
+            <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>
+              <LayoutDashboard size={22} /> <span>Accueil</span>
+            </div>
+            <div className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>
+              <CreditCard size={22} /> <span>Cartes</span>
+            </div>
+            <div className="nav-item">
+              <ArrowRightLeft size={22} /> <span>Payer</span>
+            </div>
+            <div className="nav-item">
+              <Package size={22} /> <span>Produits</span>
+            </div>
+            <div className="nav-item">
+              <Heart size={22} /> <span>Lifestyle</span>
+            </div>
+            <div className="nav-item">
+              <HelpCircle size={22} /> <span>Aide</span>
+            </div>
           </nav>
-          <div className="sidebar-footer">
-            <button className="logout-btn" onClick={() => { localStorage.clear(); navigate("/login"); }}>
-              <LogOut size={18} /> Déconnexion
-            </button>
-          </div>
         </aside>
       )}
 
-      {/* ZONE DE CONTENU PRINCIPALE */}
-      <main className="main-viewport">
-        
-        {/* Header (Profil/Notif en Desktop haut droite) */}
-        <header className="content-header">
-           {!isDesktop && <Header data={data} />} {/* Mobile Header */}
-           {isDesktop && (
-             <div className="desktop-top-bar">
-                <div className="welcome-msg">
-                  Bienvenue, <strong>{data.firstName} {data.lastName}</strong>
-                </div>
-                <div className="top-actions">
-                  <Bell size={22} className="icon-btn" />
-                  <UserCircle size={22} className="icon-btn" />
-                </div>
-             </div>
-           )}
-        </header>
-
-        {!isDesktop && (
-          <>
-            <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-            <BalanceBar balance={data.balance} />
-          </>
+      <div className="main-container">
+        {/* HEADER : Mobile (Ton Header) vs Desktop (Barre de bienvenue) */}
+        {!isDesktop ? (
+          <Header data={data} />
+        ) : (
+          <header className="desktop-top-header">
+            <div className="welcome-text">
+              Bienvenue, <strong>{data.firstName} {data.lastName}</strong>
+            </div>
+            <div className="top-icons">
+              <Bell size={24} />
+              <div className="profile-circle"><User size={20} /></div>
+            </div>
+          </header>
         )}
 
-        <div className="scrollable-content">
-          {renderContent()}
-        </div>
+        {!isDesktop && <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />}
+        
+        {!isDesktop && <BalanceBar balance={data.balance} />}
 
-      </main>
+        <div className="content-area">
+          {activeTab === "accounts" && <Accounts data={data} />}
+          
+          {activeTab === "cards" && (
+            <div className="cards-wrapper">
+              <h2 className="section-title">Mes Cartes</h2>
+              <div className="cards-display">
+                {card && <BankCard card={card} />}
+                <div className="add-card-placeholder" onClick={() => navigate("/request-card")}>
+                  <div className="plus-icon">+</div>
+                  <p>Demander une carte</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       {!isDesktop && <BottomNav />}
     </div>
