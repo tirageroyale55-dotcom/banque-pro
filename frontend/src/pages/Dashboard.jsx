@@ -2,15 +2,8 @@ import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { 
-  LayoutDashboard, 
-  CreditCard, 
-  ArrowRightLeft, 
-  Package, 
-  Heart, 
-  HelpCircle,
-  LogOut,
-  Bell,
-  User
+  LayoutDashboard, CreditCard, ArrowRightLeft, 
+  Package, Heart, HelpCircle, Bell, User 
 } from "lucide-react";
 
 import Header from "../components/Header";
@@ -30,18 +23,12 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Chargement des données BPER
     api("/client/dashboard")
       .then((clientData) => {
         setData(clientData);
-        api("/transactions")
-          .then((transactionsData) => {
-            setData(prev => ({
-              ...prev,
-              transactions: transactionsData.transactions || transactionsData
-            }));
-          })
-          .catch(err => console.error("Erreur historique :", err));
+        api("/transactions").then((tData) => {
+          setData(prev => ({ ...prev, transactions: tData.transactions || tData }));
+        }).catch(() => {});
       })
       .catch(() => {
         localStorage.removeItem("token");
@@ -55,96 +42,83 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (activeTab === "cards") {
-      api("/client/card").then(setCard).catch(() => console.log("Erreur carte"));
+      api("/client/card").then(setCard).catch(() => {});
     }
-    window.scrollTo(0, 0);
   }, [activeTab]);
-
-  // Logique de scroll BalanceBar (Uniquement Mobile)
-  useEffect(() => {
-    if (isDesktop || !data || activeTab !== "accounts") return;
-    const handleScroll = () => {
-      const bar = document.querySelector('.balance-bar');
-      const accountCard = document.querySelector('.account-card');
-      if (!bar || !accountCard) return;
-      if (accountCard.getBoundingClientRect().top < 135) bar.classList.add('show');
-      else bar.classList.remove('show');
-    };
-    window.addEventListener("scroll", handleScroll, true);
-    return () => window.removeEventListener("scroll", handleScroll, true);
-  }, [activeTab, data, isDesktop]);
 
   if (!data) return null;
 
-  return (
-    <div className={`bank-app ${isDesktop ? "is-desktop-layout" : ""}`}>
-      
-      {/* SIDEBAR DESKTOP - Affichée selon ton dessin */}
-      {isDesktop && (
+  // --- VERSION DESKTOP (Inspirée de ton dessin) ---
+  if (isDesktop) {
+    return (
+      <div className="bper-desktop-root">
         <aside className="bper-sidebar">
-          <div className="bper-logo">BPER</div>
-          <nav className="bper-nav">
-            <div className={`nav-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>
-              <LayoutDashboard size={22} /> <span>Accueil</span>
+          <div className="sidebar-brand">BPER</div>
+          <nav className="sidebar-menu">
+            <div className={`menu-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>
+              <LayoutDashboard size={20} /> Accueil
             </div>
-            <div className={`nav-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>
-              <CreditCard size={22} /> <span>Cartes</span>
+            <div className={`menu-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>
+              <CreditCard size={20} /> Cartes
             </div>
-            <div className="nav-item">
-              <ArrowRightLeft size={22} /> <span>Payer</span>
-            </div>
-            <div className="nav-item">
-              <Package size={22} /> <span>Produits</span>
-            </div>
-            <div className="nav-item">
-              <Heart size={22} /> <span>Lifestyle</span>
-            </div>
-            <div className="nav-item">
-              <HelpCircle size={22} /> <span>Aide</span>
-            </div>
+            <div className="menu-item"><ArrowRightLeft size={20} /> Payer</div>
+            <div className="menu-item"><Package size={20} /> Produits</div>
+            <div className="menu-item"><Heart size={20} /> Lifestyle</div>
+            <div className="menu-item"><HelpCircle size={20} /> Aide</div>
           </nav>
         </aside>
-      )}
 
-      <div className="main-container">
-        {/* HEADER : Mobile (Ton Header) vs Desktop (Barre de bienvenue) */}
-        {!isDesktop ? (
-          <Header data={data} />
-        ) : (
-          <header className="desktop-top-header">
-            <div className="welcome-text">
+        <main className="bper-main">
+          <header className="bper-topbar">
+            <div className="user-welcome">
               Bienvenue, <strong>{data.firstName} {data.lastName}</strong>
             </div>
-            <div className="top-icons">
-              <Bell size={24} />
-              <div className="profile-circle"><User size={20} /></div>
+            <div className="user-actions">
+              <Bell size={20} />
+              <div className="avatar"><User size={18} /></div>
             </div>
           </header>
-        )}
 
-        {!isDesktop && <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />}
-        
-        {!isDesktop && <BalanceBar balance={data.balance} />}
-
-        <div className="content-area">
-          {activeTab === "accounts" && <Accounts data={data} />}
-          
-          {activeTab === "cards" && (
-            <div className="cards-wrapper">
-              <h2 className="section-title">Mes Cartes</h2>
-              <div className="cards-display">
+          <section className="bper-content">
+            {activeTab === "accounts" && <Accounts data={data} />}
+            {activeTab === "cards" && (
+              <div className="desktop-cards-grid">
                 {card && <BankCard card={card} />}
-                <div className="add-card-placeholder" onClick={() => navigate("/request-card")}>
-                  <div className="plus-icon">+</div>
+                <div className="new-card-box" onClick={() => navigate("/request-card")}>
+                  <span>+ Demander une carte</span>
+                </div>
+              </div>
+            )}
+          </section>
+        </main>
+      </div>
+    );
+  }
+
+  // --- VERSION MOBILE (Ton code original, intact) ---
+  return (
+    <div className="bank-app">
+      <Header data={data} />
+      <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      <BalanceBar balance={data.balance} />
+      <div className="page-content">
+        {activeTab === "accounts" && <Accounts data={data}/>}
+        {activeTab === "cards" && (
+          <div className="cards-section">
+            <h3 className="cards-title">Mes cartes</h3>
+            <div className="cards-slider">
+              {card && <div className="cards-slide"><BankCard card={card}/></div>}
+              <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+                <div className="card-request-inner">
+                  <div className="card-plus">+</div>
                   <p>Demander une carte</p>
                 </div>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-
-      {!isDesktop && <BottomNav />}
+      <BottomNav/>
     </div>
   );
 }

@@ -337,122 +337,127 @@ white-space:nowrap;
 
 
 
-/* --- LE STYLE MOBILE EXISTANT RESTE AU DÉBUT DU FICHIER --- */
-
-/* --- STYLE DESKTOP ISOLÉ (DÉBUT) --- */
+/* ============================================================
+   STYLE DESKTOP BPER (Uniquement pour écran >= 1000px)
+   ============================================================ */
 @media screen and (min-width: 1000px) {
-    .is-desktop-layout {
+    /* Cache le scroll sur le body pour un look app desktop */
+    body { overflow: hidden; }
+
+    .bper-desktop-root {
         display: flex;
-        background-color: #f8f9fa;
-        min-height: 100vh;
+        width: 100vw;
+        height: 100vh;
+        background-color: #F4F7F9;
+        font-family: 'Segoe UI', sans-serif;
     }
 
-    /* Sidebar Gauche (Dessin) */
+    /* Sidebar conforme au dessin */
     .bper-sidebar {
-        width: 280px;
-        background: #ffffff;
-        border-right: 1px solid #eee;
+        width: 260px;
+        background: white;
+        border-right: 1px solid #E2E8F0;
         display: flex;
         flex-direction: column;
-        position: fixed;
-        height: 100vh;
     }
 
-    .bper-logo {
+    .sidebar-brand {
         padding: 30px;
         font-size: 32px;
         font-weight: 800;
-        color: #003a70; /* Bleu BPER */
-        border-bottom: 1px solid #f5f5f5;
+        color: #003a70;
+        letter-spacing: -1px;
     }
 
-    .bper-nav {
-        padding: 20px 0;
+    .sidebar-menu {
         flex: 1;
+        padding: 10px 0;
     }
 
-    .nav-item {
-        padding: 15px 30px;
+    .menu-item {
+        padding: 14px 30px;
         display: flex;
         align-items: center;
-        gap: 15px;
-        color: #666;
+        gap: 12px;
+        color: #64748B;
         cursor: pointer;
-        transition: 0.3s;
+        font-size: 15px;
+        transition: 0.2s;
     }
 
-    .nav-item:hover {
-        background: #f0f4f8;
-        color: #003a70;
-    }
-
-    .nav-item.active {
-        background: #eef4ff;
+    .menu-item:hover { background: #F8FAFC; color: #003a70; }
+    .menu-item.active {
+        background: #EFF6FF;
         color: #003a70;
         border-right: 4px solid #003a70;
         font-weight: 600;
     }
 
-    /* Conteneur de droite */
-    .main-container {
-        margin-left: 280px; /* Largeur sidebar */
-        width: calc(100% - 280px);
+    /* Main Content Area */
+    .bper-main {
+        flex: 1;
         display: flex;
         flex-direction: column;
+        overflow-y: auto;
     }
 
-    .desktop-top-header {
-        height: 80px;
+    .bper-topbar {
+        height: 70px;
         background: white;
+        padding: 0 40px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0 40px;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid #E2E8F0;
     }
 
-    .top-icons {
+    .user-actions {
         display: flex;
         align-items: center;
         gap: 20px;
-        color: #888;
+        color: #64748B;
     }
 
-    .profile-circle {
-        width: 40px;
-        height: 40px;
-        background: #f0f0f0;
+    .avatar {
+        width: 38px;
+        height: 38px;
+        background: #F1F5F9;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
-    /* Zone de contenu */
-    .content-area {
+    .bper-content {
         padding: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
     }
 
-    .cards-display {
+    .desktop-cards-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 30px;
-        margin-top: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 25px;
     }
 
-    .add-card-placeholder {
-        border: 2px dashed #ddd;
-        border-radius: 20px;
-        height: 220px;
+    .new-card-box {
+        height: 200px;
+        border: 2px dashed #CBD5E1;
+        border-radius: 16px;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
         background: white;
+        color: #003a70;
         cursor: pointer;
     }
 }
-/* --- STYLE DESKTOP ISOLÉ (FIN) --- */
+
+/* Force l'affichage mobile si < 1000px même si la classe desktop est là par erreur */
+@media screen and (max-width: 999px) {
+    .bper-desktop-root { display: none !important; }
+}
 
 
 
