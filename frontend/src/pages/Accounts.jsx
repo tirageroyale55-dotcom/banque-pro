@@ -68,9 +68,9 @@ export default function Accounts({ data }) {
   };
 
   // Filtrage intelligent
+  // 2. Filtrage intelligent + Limitation à 10
   const transactions = rawTransactions
     .filter(tx => {
-      // Sécurité : on vérifie que tx.createdAt existe
       const dateVal = tx.createdAt || tx.date;
       if (!dateVal) return false;
 
@@ -90,8 +90,10 @@ export default function Accounts({ data }) {
     .sort((a, b) => {
       const dateA = new Date(a.createdAt || a.date);
       const dateB = new Date(b.createdAt || b.date);
+      // On garde le plus récent en haut (sortAsc est généralement false par défaut)
       return sortAsc ? dateA - dateB : dateB - dateA;
-    });
+    })
+    .slice(0, 10); // <--- CETTE LIGNE LIMITE À 10 RÉSULTATS
 
   // Logique Graphes
   const grouped = {};
