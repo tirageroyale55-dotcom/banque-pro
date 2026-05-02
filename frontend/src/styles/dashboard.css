@@ -474,6 +474,18 @@ white-space:nowrap;
   .bper-desktop-layout { display: none !important; }
 }
 
+@media screen and (min-width: 1000px) {
+  .bank-app { display: none !important; } /* Cache le mobile */
+  
+  .bper-desktop-layout { display: flex; height: 100vh; background: #f4f7f9; }
+  .bper-sidebar-left { width: 280px; background: white; border-right: 1px solid #ddd; }
+  .bper-brand { padding: 30px; font-size: 30px; font-weight: bold; color: #003a70; }
+  .nav-link { padding: 15px 30px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .nav-link.active { background: #eef4ff; color: #003a70; border-right: 4px solid #003a70; }
+  .bper-main-viewport { flex: 1; display: flex; flex-direction: column; }
+  .bper-top-bar { height: 70px; background: white; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; border-bottom: 1px solid #ddd; }
+  .bper-scroll-content { padding: 40px; overflow-y: auto; }
+}
 
 
 
