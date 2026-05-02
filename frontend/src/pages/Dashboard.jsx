@@ -48,55 +48,8 @@ export default function Dashboard() {
 
   if (!data) return null;
 
-  // --- VERSION DESKTOP (Inspirée de ton dessin) ---
-  if (isDesktop) {
-    return (
-      <div className="bper-desktop-root">
-        <aside className="bper-sidebar">
-          <div className="sidebar-brand">BPER</div>
-          <nav className="sidebar-menu">
-            <div className={`menu-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>
-              <LayoutDashboard size={20} /> Accueil
-            </div>
-            <div className={`menu-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>
-              <CreditCard size={20} /> Cartes
-            </div>
-            <div className="menu-item"><ArrowRightLeft size={20} /> Payer</div>
-            <div className="menu-item"><Package size={20} /> Produits</div>
-            <div className="menu-item"><Heart size={20} /> Lifestyle</div>
-            <div className="menu-item"><HelpCircle size={20} /> Aide</div>
-          </nav>
-        </aside>
-
-        <main className="bper-main">
-          <header className="bper-topbar">
-            <div className="user-welcome">
-              Bienvenue, <strong>{data.firstName} {data.lastName}</strong>
-            </div>
-            <div className="user-actions">
-              <Bell size={20} />
-              <div className="avatar"><User size={18} /></div>
-            </div>
-          </header>
-
-          <section className="bper-content">
-            {activeTab === "accounts" && <Accounts data={data} />}
-            {activeTab === "cards" && (
-              <div className="desktop-cards-grid">
-                {card && <BankCard card={card} />}
-                <div className="new-card-box" onClick={() => navigate("/request-card")}>
-                  <span>+ Demander une carte</span>
-                </div>
-              </div>
-            )}
-          </section>
-        </main>
-      </div>
-    );
-  }
-
-  // --- VERSION MOBILE (Ton code original, intact) ---
-  return (
+  // --- RENDU MOBILE (TON CODE ORIGINAL NON TOUCHÉ) ---
+  const renderMobile = () => (
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -121,4 +74,52 @@ export default function Dashboard() {
       <BottomNav/>
     </div>
   );
+
+  // --- RENDU DESKTOP (STRICTEMENT BASÉ SUR L'IMAGE WhatsApp Image 2026-04-12 at 19.24.15.jpeg) ---
+  const renderDesktop = () => (
+    <div id="BPER-DESKTOP-CONTAINER">
+      <aside className="bper-sidebar">
+        <div className="sidebar-logo">BPER</div>
+        <nav className="sidebar-nav">
+          <div className={`nav-link ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>
+            <LayoutDashboard size={20} /> <span>Accueil</span>
+          </div>
+          <div className={`nav-link ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>
+            <CreditCard size={20} /> <span>Cartes</span>
+          </div>
+          <div className="nav-link"><ArrowRightLeft size={20} /> <span>Payer</span></div>
+          <div className="nav-link"><Package size={20} /> <span>Produits</span></div>
+          <div className="nav-link"><Heart size={20} /> <span>Lifestyle</span></div>
+          <div className="nav-link"><HelpCircle size={20} /> <span>Aide</span></div>
+        </nav>
+      </aside>
+
+      <main className="bper-main-content">
+        <header className="bper-navbar">
+          <div className="bper-welcome">
+            Bienvenue, <span className="user-name">{data.firstName} {data.lastName}</span>
+          </div>
+          <div className="bper-top-icons">
+            <Bell size={22} />
+            <div className="bper-avatar"><User size={20} /></div>
+          </div>
+        </header>
+
+        <section className="bper-page-wrapper">
+          {activeTab === "accounts" && <Accounts data={data} />}
+          {activeTab === "cards" && (
+            <div className="desktop-cards-layout">
+              {card && <BankCard card={card} />}
+              <div className="desktop-add-card" onClick={() => navigate("/request-card")}>
+                <div className="plus-circle">+</div>
+                <p>Demander une carte</p>
+              </div>
+            </div>
+          )}
+        </section>
+      </main>
+    </div>
+  );
+
+  return isDesktop ? renderDesktop() : renderMobile();
 }
