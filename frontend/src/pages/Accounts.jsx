@@ -23,8 +23,6 @@ ChartJS.register(
   Legend
 );
 
-
-
 function DetailRow({ label, value, color = '#1e293b' }) {
   return (
     <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
@@ -35,52 +33,47 @@ function DetailRow({ label, value, color = '#1e293b' }) {
 }
 
 export default function Accounts({ data }) {
-  
-  const navigate = useNavigate(); //
+  const navigate = useNavigate();
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
   
   const today = new Date();
+  // MODIFICATION : On remonte à 3 mois en arrière par défaut pour être sûr de voir des transactions
+  const defaultStart = new Date();
+  defaultStart.setMonth(today.getMonth() - 3);
 
-// début du mois
-const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+  const formatDate = (date) => date.toISOString().split("T")[0];
 
-// format YYYY-MM-DD (obligatoire pour input date)
-const formatDate = (date) => date.toISOString().split("T")[0];
-
-const [startDate, setStartDate] = useState(formatDate(firstDay));
-const [endDate, setEndDate] = useState(formatDate(today));
+  const [startDate, setStartDate] = useState(formatDate(defaultStart));
+  const [endDate, setEndDate] = useState(formatDate(today));
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedTx, setSelectedTx] = useState(null); 
 
-  
-const [expandedId, setExpandedId] = useState(null);
-const [selectedTx, setSelectedTx] = useState(null); 
-
-  // 🔹 FILTRE + TRI
+  // 🔹 RECUPERATION DES DONNEES
   const rawTransactions = data.transactions || [];
 
   const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text);
-  // Optionnel : tu peux ajouter une petite alerte ou un toast ici
-  alert("IBAN copié !"); 
-};
+    navigator.clipboard.writeText(text);
+    alert("IBAN copié !"); 
+  };
 
-  // À placer juste avant le return (
-const formatBper = (amount) => {
-  return new Intl.NumberFormat('it-IT', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(amount);
-};
+  const formatBper = (amount) => {
+    return new Intl.NumberFormat('it-IT', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
+  };
 
-  // 2. Filtrage intelligent basé sur les champs réels de ta base de données
+  // 🔹 FILTRAGE DES TRANSACTIONS
   const transactions = rawTransactions
     .filter(tx => {
-      // ⚠️ CORRECTION : Utilisation de createdAt (Date MongoDB)
-      const txDate = new Date(tx.createdAt);
-      const txDateString = txDate.toISOString().split("T")[0]; // Format YYYY-MM-DD pour comparer
+      // On s'assure d'avoir une date valide
+      const dateString = tx.createdAt || tx.date; 
+      if (!dateString) return false;
 
-      // ⚠️ CORRECTION : Filtrage par TYPE (CREDIT/DEBIT) et non par montant
+      const txDate = new Date(dateString);
+      const txDateString = txDate.toISOString().split("T")[0];
+
       const matchType =
         filter === "all" ||
         (filter === "entrants" && tx.type === "CREDIT") ||
@@ -92,266 +85,149 @@ const formatBper = (amount) => {
       return matchType && matchStart && matchEnd;
     })
     .sort((a, b) => {
-      // ⚠️ CORRECTION : Tri par date de création (le plus récent en haut)
-      const dateA = new Date(a.createdAt);
-      const dateB = new Date(b.createdAt);
+      const dateA = new Date(a.createdAt || a.date);
+      const dateB = new Date(b.createdAt || b.date);
       return sortAsc ? dateA - dateB : dateB - dateA;
     });
 
-  // 🔹 GRAPH basé sur transactions filtrées (CORRIGÉ)
+  // 🔹 LOGIQUE GRAPHIQUES
   const grouped = {};
   transactions.forEach(tx => {
-    // ⚠️ Correction 1 : Utiliser createdAt pour la clé de date
-    const dateKey = new Date(tx.createdAt).toLocaleDateString('fr-FR');
+    const d = new Date(tx.createdAt || tx.date);
+    const dateKey = d.toLocaleDateString('fr-FR');
+    if (!grouped[dateKey]) grouped[dateKey] = { in: 0, out: 0 };
     
-    if (!grouped[dateKey]) {
-      grouped[dateKey] = { in: 0, out: 0 };
-    }
-    
-    // ⚠️ Correction 2 : Utiliser le TYPE pour classer in/out
-    if (tx.type === "CREDIT") {
-      grouped[dateKey].in += tx.amount;
-    } else {
-      // On utilise Math.abs au cas où le montant est négatif en BDD
-      grouped[dateKey].out += Math.abs(tx.amount);
-    }
+    if (tx.type === "CREDIT") grouped[dateKey].in += tx.amount;
+    else grouped[dateKey].out += Math.abs(tx.amount);
   });
 
-  const dates = Object.keys(grouped).sort(
-    (a, b) => new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-'))
+  const dates = Object.keys(grouped).sort((a, b) => 
+    new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-'))
   );
 
   const barData = {
     labels: dates,
     datasets: [
-      {
-        label: "Entrées",
-        data: dates.map(d => grouped[d]?.in || 0),
-        backgroundColor: "#16a34a"
-      },
-      {
-        label: "Sorties",
-        data: dates.map(d => grouped[d]?.out || 0),
-        backgroundColor: "#dc2626"
-      }
+      { label: "Entrées", data: dates.map(d => grouped[d].in), backgroundColor: "#16a34a" },
+      { label: "Sorties", data: dates.map(d => grouped[d].out), backgroundColor: "#dc2626" }
     ]
   };
 
-  let balance = 0;
+  let currentBalance = 0;
   const balanceData = dates.map(d => {
-    balance += (grouped[d]?.in || 0) - (grouped[d]?.out || 0);
-    return balance;
+    currentBalance += (grouped[d].in - grouped[d].out);
+    return currentBalance;
   });
 
   const lineData = {
     labels: dates,
-    datasets: [
-      {
-        label: "Solde",
-        data: balanceData,
-        borderColor: "#2563eb",
-        tension: 0.3
-      }
-    ]
+    datasets: [{ label: "Solde", data: balanceData, borderColor: "#2563eb", tension: 0.3 }]
   };
 
   return (
     <div className="content">
+      {/* CARD SOLDE BPER */}
+      <div className="account-card">
+        <div className="balance">{formatBper(data.balance)} €</div>
+        <div className="owner">{data.firstName} {data.lastName}</div>
+        <div className="iban" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {data.iban}
+          <button onClick={() => copyToClipboard(data.iban)} className="copy-btn">
+            <Copy size={14} />
+          </button>
+        </div>
+      </div>
 
-      {/* CARD SOLDE */}
-<div className="account-card">
-  <div className="balance">{formatBper(data.balance)} €</div>
-  <div className="owner">{data.firstname} {data.lastname}</div>
-  
-  <div className="iban" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-    {data.iban}
-    <button 
-      onClick={() => copyToClipboard(data.iban)}
-      style={{ 
-        background: 'none', 
-        border: 'none', 
-        color: 'inherit', 
-        cursor: 'pointer',
-        padding: '4px',
-        display: 'flex',
-        alignItems: 'center',
-        opacity: 0.8
-      }}
-      title="Copier l'IBAN"
-    >
-      <Copy size={14} />
-    </button>
-  </div>
-</div>
+      <div className="quick-actions">
+        <div onClick={() => navigate("/virement-international")} style={{ cursor: 'pointer' }}>
+          <Send size={20}/> Virement
+        </div>
+        <div><PlusCircle size={20}/> Ajouter</div>
+        <div><Receipt size={20}/> Paiement</div>
+      </div>
 
-      
-      {/* ACTIONS */}
-<div className="quick-actions">
-  {/* On ajoute le onClick et un style cursor pour montrer que c'est cliquable */}
-  <div 
-    onClick={() => navigate("/virement-international")} 
-    style={{ cursor: 'pointer' }}
-  >
-    <Send size={20}/> Virement
-  </div>
-  
-  <div><PlusCircle size={20}/> Ajouter</div>
-  <div><Receipt size={20}/> Paiement</div>
-</div>
-
-      {/* HISTORIQUE */}
       <div className="transactions">
-
         <div className="transactions-header">
           <h3>Historique</h3>
-
-          <button 
-            className="filter-btn"
-            onClick={() => setShowFilters(!showFilters)}
-          >
+          <button className="filter-btn" onClick={() => setShowFilters(!showFilters)}>
             <Filter size={18}/>
           </button>
         </div>
 
-        {/* PANEL FILTRE */}
         {showFilters && (
           <div className="filters-panel">
-
-            <select onChange={(e)=>setFilter(e.target.value)}>
+            <select onChange={(e)=>setFilter(e.target.value)} value={filter}>
               <option value="all">Toutes</option>
               <option value="entrants">Entrées</option>
               <option value="sortants">Sorties</option>
             </select>
-
             <div className="date-field">
-  <label>Du</label>
-  <input 
-    type="date"
-    value={startDate}
-    onChange={(e)=>setStartDate(e.target.value)}
-  />
-</div>
-
-<div className="date-field">
-  <label>Au</label>
-  <input 
-    type="date"
-    value={endDate}
-    onChange={(e)=>setEndDate(e.target.value)}
-  />
-</div>
-
+              <label>Du</label>
+              <input type="date" value={startDate} onChange={(e)=>setStartDate(e.target.value)} />
+            </div>
+            <div className="date-field">
+              <label>Au</label>
+              <input type="date" value={endDate} onChange={(e)=>setEndDate(e.target.value)} />
+            </div>
             <button onClick={()=>setSortAsc(!sortAsc)}>
               {sortAsc ? "↑ Croissant" : "↓ Décroissant"}
             </button>
-
           </div>
         )}
 
-        
-
-{/* --- LISTE DES TRANSACTIONS (AVEC TYPE RÉTABLI) --- */}
-<div className="transactions-list">
-  {transactions.length === 0 ? (
-    <div className="empty-transactions">Aucune transaction disponible</div>
-  ) : (
-    transactions.map((tx, i) => (
-      <div 
-        key={tx._id || i} 
-        className="transaction"
-        
-        data-type={tx.type === "CREDIT" ? "Crédit" : "Débit"}
-      >
-        <div className="left">
-          {/* SEUL L'ICÔNE DÉCLENCHE LA PAGE DÉTAILS */}
-          <div 
-            onClick={() => setSelectedTx(tx)} 
-            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '5px' }}
-          >
-            {tx.type === "DEBIT" ? (
-              <Send size={18} />
-            ) : (
-              <PlusCircle size={18} color="#16a34a" />
-            )}
-          </div>
-
-          <div>
-            <div className="motif">{tx.label}</div> 
-            <div className="date">
-              {new Date(tx.createdAt).toLocaleDateString('fr-FR')}
+        <div className="transactions-list">
+          {transactions.length === 0 ? (
+            <div className="empty-transactions">
+                <p>Aucune transaction disponible</p>
+                <small style={{color: '#94a3b8'}}>Vérifiez vos filtres de date</small>
             </div>
+          ) : (
+            transactions.map((tx, i) => (
+              <div key={tx._id || i} className="transaction" onClick={() => setSelectedTx(tx)}>
+                <div className="left">
+                  <div className="icon-wrapper">
+                    {tx.type === "DEBIT" ? <Send size={18} /> : <PlusCircle size={18} color="#16a34a" />}
+                  </div>
+                  <div>
+                    <div className="motif">{tx.label}</div> 
+                    <div className="date">{new Date(tx.createdAt || tx.date).toLocaleDateString('fr-FR')}</div>
+                  </div>
+                </div>
+                <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
+                  {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* OVERLAY DETAILS */}
+      {selectedTx && (
+        <div className="tx-details-overlay">
+          <div className="tx-details-header">
+            <button onClick={() => setSelectedTx(null)}>← Retour</button>
+            <div className="header-title">Détails de l'opération</div>
+          </div>
+          <div className="tx-details-body">
+            <div className="tx-main-amount">
+                <div className={selectedTx.type === 'CREDIT' ? 'val plus' : 'val'}>
+                    {selectedTx.type === 'CREDIT' ? '+' : '-'}{selectedTx.amount.toLocaleString()} €
+                </div>
+                <div className="tx-label">{selectedTx.label}</div>
+            </div>
+            <DetailRow label="Statut" value="Comptabilisé" color="#16a34a" />
+            <DetailRow label="Date" value={new Date(selectedTx.createdAt || selectedTx.date).toLocaleDateString('fr-FR')} />
+            <DetailRow label="Type" value={selectedTx.type === 'CREDIT' ? 'Crédit' : 'Débit'} />
+            <DetailRow label="Référence" value={selectedTx._id?.toUpperCase() || "N/A"} />
           </div>
         </div>
+      )}
 
-        {/* Montant avec ses classes originales */}
-        <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
-          {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
-        </div>
-      </div>
-    ))
-  )}
-</div>
-
-{/* --- PAGE DE DÉTAILS (OVERLAY) --- */}
-{selectedTx && (
-  <div style={{
-    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-    backgroundColor: '#fff', zIndex: 9999, display: 'flex', flexDirection: 'column'
-  }}>
-    {/* HEADER DE LA PAGE DÉTAILS */}
-    <div style={{ 
-      padding: '20px', display: 'flex', alignItems: 'center', 
-      borderBottom: '1px solid #eee', background: '#f8fafc' 
-    }}>
-      <button 
-        onClick={() => setSelectedTx(null)}
-        style={{ background: 'none', border: 'none', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
-      >
-        ← Retour
-      </button>
-      <div style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginRight: '40px' }}>
-        Détails de l'opération
-      </div>
-    </div>
-
-    {/* CONTENU DE LA PAGE */}
-    <div style={{ padding: '24px', overflowY: 'auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-        <div style={{ fontSize: '32px', fontWeight: 'bold', color: selectedTx.type === 'CREDIT' ? '#16a34a' : '#1e293b' }}>
-          {selectedTx.type === 'CREDIT' ? '+' : '-'}{selectedTx.amount.toLocaleString()} €
-        </div>
-        <div style={{ color: '#64748b', marginTop: '8px' }}>{selectedTx.label}</div>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <DetailRow label="Statut" value="Comptabilisé" color="#16a34a" />
-        <DetailRow label="Date d'opération" value={new Date(selectedTx.createdAt).toLocaleDateString('fr-FR')} />
-        <DetailRow label="Date de valeur" value={new Date(selectedTx.createdAt).toLocaleDateString('fr-FR')} />
-        <DetailRow label="Type de paiement" value={selectedTx.type === 'CREDIT' ? 'Virement SEPA reçu' : 'Virement SEPA émis'} />
-        <DetailRow label="Référence interne" value={selectedTx._id.toUpperCase()} />
-        <DetailRow 
-          label="Description BPER" 
-          value={selectedTx.type === 'CREDIT' 
-            ? `Transaction de crédit autorisée par le service central. Identifiant : ${selectedTx._id.slice(-8)}`
-            : `Ordre de virement débité. Référence mandat : ${selectedTx._id.slice(-8)}`
-          } 
-        />
-      </div>
-    </div>
-  </div>
-)}
-      </div>
-
-      {/* CHARTS */}
       <div className="charts">
-        <div className="chart">
-          <Bar data={barData}/>
-        </div>
-        <div className="chart">
-          <Line data={lineData}/>
-        </div>
+        <div className="chart"><Bar data={barData} options={{ responsive: true }}/></div>
+        <div className="chart"><Line data={lineData} options={{ responsive: true }}/></div>
       </div>
-
     </div>
   );
 }
