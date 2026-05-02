@@ -337,101 +337,141 @@ white-space:nowrap;
 
 
 
-/* --- TON CSS MOBILE EXISTANT DOIT RESTER ICI --- */
-
+/* ============================================================
+   SECTION DESKTOP (Uniquement au-dessus de 1000px)
+   ============================================================ */
 @media screen and (min-width: 1000px) {
-    .desktop-layout {
-        display: flex;
-        background-color: #f4f7f9;
-        min-height: 100vh;
-    }
+  
+  /* On cache la structure mobile pour éviter les doubles scrolls */
+  .bank-app { display: none !important; }
 
-    /* Sidebar (Menu à gauche de l'image) */
-    .bper-sidebar {
-        width: 280px;
-        background: white;
-        border-right: 1px solid #e0e6ed;
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        height: 100vh;
-    }
+  .bper-desktop-layout {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    background-color: #f4f7f9;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+  }
 
-    .bper-logo {
-        padding: 30px;
-        font-size: 30px;
-        font-weight: 900;
-        color: #003a70;
-        border-bottom: 1px solid #f0f0f0;
-    }
+  /* Sidebar gauche (Dessin original) */
+  .bper-sidebar-left {
+    width: 280px;
+    background: #ffffff;
+    border-right: 1px solid #e0e6ed;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+  }
 
-    .bper-nav-menu {
-        padding: 20px 0;
-    }
+  .bper-brand {
+    padding: 30px;
+    font-size: 34px;
+    font-weight: 900;
+    color: #003a70; /* Bleu BPER */
+    letter-spacing: -1.5px;
+  }
 
-    .nav-item {
-        padding: 15px 30px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        cursor: pointer;
-        color: #556b82;
-        transition: 0.2s;
-    }
+  .bper-side-nav {
+    flex: 1;
+    padding: 10px 0;
+  }
 
-    .nav-item:hover { background: #f8f9fa; }
-    .nav-item.active {
-        background: #eef4ff;
-        color: #003a70;
-        border-right: 4px solid #003a70;
-        font-weight: 600;
-    }
+  .nav-link {
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #5d7185;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+  }
 
-    /* Main Content */
-    .desktop-main-content {
-        margin-left: 280px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
+  .nav-link:hover {
+    background: #f8fafd;
+    color: #003a70;
+  }
 
-    .bper-desktop-topbar {
-        height: 80px;
-        background: white;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 40px;
-        border-bottom: 1px solid #e0e6ed;
-    }
+  .nav-link.active {
+    background: #eef4ff;
+    color: #003a70;
+    border-right: 4px solid #003a70;
+    font-weight: 600;
+  }
 
-    .topbar-icons {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        color: #666;
-    }
+  /* Zone de contenu */
+  .bper-main-viewport {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
-    .user-avatar {
-        width: 40px;
-        height: 40px;
-        background: #eee;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+  .bper-top-bar {
+    height: 80px;
+    background: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    border-bottom: 1px solid #e0e6ed;
+  }
 
-    /* Ajustement du contenu pour desktop */
-    .page-content {
-        padding: 40px !important;
-        max-width: 1200px;
-    }
+  .bper-welcome { font-size: 18px; color: #333; }
 
-    /* On cache les éléments mobiles inutiles sur desktop */
-    .tabs-container, .balance-bar {
-        display: none !important;
-    }
+  .bper-header-tools {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: #888;
+  }
+
+  .user-avatar-circle {
+    width: 42px;
+    height: 42px;
+    background: #f0f2f5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bper-scroll-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px;
+  }
+
+  /* Grid des cartes sur Desktop */
+  .desktop-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+  }
+
+  .card-request-desktop {
+    background: white;
+    border: 2px dashed #cbd5e0;
+    border-radius: 20px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .card-request-desktop:hover {
+    border-color: #003a70;
+    background: #f8faff;
+  }
+}
+
+/* Force l'affichage mobile si écran < 1000px */
+@media screen and (max-width: 999px) {
+  .bper-desktop-layout { display: none !important; }
 }
 
 
