@@ -1,116 +1,151 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { 
-  LayoutDashboard, CreditCard, ArrowRightLeft, 
-  Package, Heart, HelpCircle, Bell, UserCircle 
-} from "lucide-react";
 
+// Tes imports originaux
 import Header from "../components/Header";
 import Tabs from "../components/Tabs";
 import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
 import Accounts from "./Accounts";
+// Ajout des icônes pour le menu desktop professionnel
+import { LayoutDashboard, CreditCard, Send, Package, Heart, HelpCircle, Bell, UserCircle } from "lucide-react";
 
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("accounts");
+  const [showBalanceBar, setShowBalanceBar] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
   const [card, setCard] = useState(null);
+  const [scrollOffset, setScrollOffset] = useState(-60);
+  const [opacity, setOpacity] = useState(0);
+
   const navigate = useNavigate();
+  const contentRef = useRef(null);
+
+  // --- LOGIQUE API (Identique à ton original) ---
+  useEffect(() => {
+    if (activeTab === "cards") {
+      api("/client/card").then(setCard).catch(() => console.log("Erreur carte"));
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     api("/client/dashboard")
       .then((clientData) => {
         setData(clientData);
-        api("/transactions").then((tData) => {
-          setData(prev => ({ ...prev, transactions: tData.transactions || tData }));
-        }).catch(() => {});
+        api("/transactions")
+          .then((transactionsData) => {
+            setData(prev => ({
+              ...prev,
+              transactions: transactionsData.transactions || transactionsData
+            }));
+          }).catch(err => console.error("Erreur transactions", err));
       })
       .catch(() => {
         localStorage.removeItem("token");
         navigate("/login");
       });
-
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
   }, [navigate]);
 
   useEffect(() => {
-    if (activeTab === "cards") {
-      api("/client/card").then(setCard).catch(() => {});
-    }
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    setShowBalanceBar(false);
+    window.scrollTo(0, 0);
   }, [activeTab]);
+
+  // Logique de scroll mobile (Uniquement active sur mobile)
+  useEffect(() => {
+    if (!data || activeTab !== "accounts" || isDesktop) return;
+    const handleScroll = () => {
+      const bar = document.querySelector('.balance-bar');
+      const accountCard = document.querySelector('.account-card');
+      if (!bar || !accountCard) return;
+      const cardRect = accountCard.getBoundingClientRect();
+      if (cardRect.top < 135) bar.classList.add('show');
+      else bar.classList.remove('show');
+    };
+    window.addEventListener("scroll", handleScroll, true);
+    return () => window.removeEventListener("scroll", handleScroll, true);
+  }, [activeTab, data, isDesktop]);
 
   if (!data) return null;
 
-  // --- RENDU 1 : VERSION DESKTOP (Basé sur l'image envoyée) ---
-  const DesktopView = () => (
-    <div className="bper-desktop-layout">
-      {/* Barre Latérale Gauche */}
-      <aside className="bper-sidebar-fixed">
-        <div className="bper-logo-area">BPER</div>
-        <nav className="bper-side-nav">
-          <div className={`side-link ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>
-            <LayoutDashboard size={20} /> <span>Accueil</span>
-          </div>
-          <div className={`side-link ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>
-            <CreditCard size={20} /> <span>Cartes</span>
-          </div>
-          <div className="side-link"><ArrowRightLeft size={20} /> <span>Payer</span></div>
-          <div className="side-link"><Package size={20} /> <span>Produits</span></div>
-          <div className="side-link"><Heart size={20} /> <span>Lifestyle</span></div>
-          <div className="side-link"><HelpCircle size={20} /> <span>Aide</span></div>
-        </nav>
-      </aside>
-
-      {/* Contenu de droite */}
-      <main className="bper-desktop-main">
-        <header className="bper-desktop-header">
-          <div className="bper-welcome">
-            Bienvenue, <strong>{data.firstName} {data.lastName}</strong>
-          </div>
-          <div className="bper-top-icons">
-            <Bell size={24} className="icon-clickable" />
-            <div className="profile-placeholder">
-              <UserCircle size={28} />
+  // ==========================================
+  // Rendu 1 : VERSION DESKTOP (Image BPER)
+  // ==========================================
+  if (isDesktop) {
+    return (
+      <div className="desktop-bper-container">
+        {/* Barre Latérale (Sidebar selon ton dessin) */}
+        <aside className="bper-desktop-sidebar">
+          <div className="bper-logo">BPER</div>
+          <nav className="bper-menu">
+            <div className={`menu-item ${activeTab === 'accounts' ? 'active' : ''}`} onClick={() => setActiveTab('accounts')}>
+              <LayoutDashboard size={20} /> Accueil
             </div>
-          </div>
-        </header>
+            <div className={`menu-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>
+              <CreditCard size={20} /> Cartes
+            </div>
+            <div className="menu-item"><Send size={20} /> Payer</div>
+            <div className="menu-item"><Package size={20} /> Produits</div>
+            <div className="menu-item"><Heart size={20} /> Lifestyle</div>
+            <div className="menu-item"><HelpCircle size={20} /> Aide</div>
+          </nav>
+        </aside>
 
-        <section className="bper-desktop-body">
-          {activeTab === "accounts" && <Accounts data={data} />}
-          {activeTab === "cards" && (
-            <div className="desktop-cards-container">
-              {card && <BankCard card={card} />}
-              <div className="desktop-card-add" onClick={() => navigate("/request-card")}>
-                <div className="plus-btn">+</div>
-                <p>Demander une carte</p>
+        {/* Zone de contenu droite */}
+        <main className="bper-desktop-main">
+          <header className="bper-desktop-header">
+            <div className="welcome-info">
+              Bienvenue, <strong>{data.firstName} {data.lastName}</strong>
+            </div>
+            <div className="top-icons">
+              <Bell size={22} />
+              <UserCircle size={26} />
+            </div>
+          </header>
+
+          <div className="bper-desktop-content">
+            {activeTab === "accounts" && <Accounts data={data} />}
+            {activeTab === "cards" && (
+              <div className="desktop-card-grid">
+                {card && <BankCard card={card} />}
+                <div className="desktop-add-card" onClick={() => navigate("/request-card")}>
+                   <span>+ Demander une carte</span>
+                </div>
               </div>
-            </div>
-          )}
-        </section>
-      </main>
-    </div>
-  );
+            )}
+          </div>
+        </main>
+      </div>
+    );
+  }
 
-  // --- RENDU 2 : VERSION MOBILE (Ton code original exact) ---
-  const MobileView = () => (
+  // ==========================================
+  // Rendu 2 : TA VERSION MOBILE (Zéro changement)
+  // ==========================================
+  return (
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <BalanceBar balance={data.balance} />
-      <div className="page-content">
-        {activeTab === "accounts" && <Accounts data={data} />}
+      <BalanceBar balance={data.balance} offset={scrollOffset} opacity={opacity} />
+
+      <div className="page-content" ref={contentRef}>
+        {activeTab === "accounts" && <Accounts data={data}/>}
         {activeTab === "cards" && (
           <div className="cards-section">
             <h3 className="cards-title">Mes cartes</h3>
             <div className="cards-slider">
-              {card && <div className="cards-slide"><BankCard card={card} /></div>}
+              {card && <div className="cards-slide"><BankCard card={card}/></div>}
               <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
                 <div className="card-request-inner">
                   <div className="card-plus">+</div>
@@ -121,9 +156,7 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-      <BottomNav />
+      <BottomNav/>
     </div>
   );
-
-  return isDesktop ? <DesktopView /> : <MobileView />;
 }

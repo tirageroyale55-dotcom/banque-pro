@@ -337,61 +337,62 @@ white-space:nowrap;
 
 
 
-/* --- AUCUNE MODIFICATION DU STYLE MOBILE AU DESSUS --- */
+/* --- LE RESTE DE TON CSS MOBILE RESTE EN HAUT --- */
 
 @media screen and (min-width: 1000px) {
-    /* Cache tout ce qui appartient au mobile par sécurité */
-    .bank-app, .bottom-nav, .tabs-container { display: none !important; }
+    /* Cache les éléments mobiles qui pourraient traîner */
+    .bank-app { display: none !important; }
 
-    .bper-desktop-layout {
+    .desktop-bper-container {
         display: flex;
         height: 100vh;
         width: 100vw;
-        background-color: #f0f2f5;
+        background-color: #f5f7f9;
         overflow: hidden;
     }
 
-    /* Sidebar - Gauche */
-    .bper-sidebar-fixed {
-        width: 250px;
+    /* Barre latérale (Sidebar) */
+    .bper-desktop-sidebar {
+        width: 260px;
         background: #ffffff;
-        border-right: 1px solid #ddd;
+        border-right: 1px solid #e0e0e0;
         display: flex;
         flex-direction: column;
+        padding-top: 20px;
     }
 
-    .bper-logo-area {
-        padding: 30px;
-        font-size: 30px;
-        font-weight: 900;
+    .bper-logo {
+        font-size: 28px;
+        font-weight: 800;
         color: #003a70;
-        border-bottom: 1px solid #eee;
+        padding: 20px 30px;
+        letter-spacing: -1px;
     }
 
-    .bper-side-nav {
-        flex: 1;
-        padding-top: 15px;
+    .bper-menu {
+        margin-top: 20px;
     }
 
-    .side-link {
-        padding: 15px 25px;
+    .menu-item {
+        padding: 15px 30px;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 15px;
         color: #555;
         cursor: pointer;
+        font-size: 16px;
         transition: 0.2s;
     }
 
-    .side-link:hover { background: #f8f9fa; }
-    .side-link.active {
-        background: #eef4ff;
+    .menu-item:hover { background: #f0f4f8; }
+    .menu-item.active {
         color: #003a70;
-        border-right: 5px solid #003a70;
-        font-weight: bold;
+        background: #eef4ff;
+        border-right: 4px solid #003a70;
+        font-weight: 600;
     }
 
-    /* Main Content - Droite */
+    /* Contenu principal */
     .bper-desktop-main {
         flex: 1;
         display: flex;
@@ -400,46 +401,42 @@ white-space:nowrap;
     }
 
     .bper-desktop-header {
-        height: 75px;
-        background: #fff;
-        padding: 0 40px;
+        height: 70px;
+        background: #ffffff;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid #ddd;
+        padding: 0 40px;
+        border-bottom: 1px solid #e0e0e0;
     }
 
-    .bper-welcome { font-size: 18px; color: #333; }
-    .bper-top-icons { display: flex; align-items: center; gap: 20px; color: #666; }
-
-    .bper-desktop-body {
+    .bper-desktop-content {
         padding: 40px;
-        max-width: 1200px;
-        margin: 0 auto;
-        width: 100%;
+        max-width: 1100px;
     }
 
-    /* Cards Desktop */
-    .desktop-cards-container {
+    .desktop-card-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-        gap: 25px;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
     }
 
-    .desktop-card-add {
-        border: 2px dashed #bbb;
-        border-radius: 20px;
+    .desktop-add-card {
+        border: 2px dashed #ccc;
+        border-radius: 15px;
         height: 200px;
-        background: #fff;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
+        background: white;
         cursor: pointer;
-        transition: 0.3s;
+        color: #003a70;
     }
-    
-    .desktop-card-add:hover { border-color: #003a70; background: #fafafa; }
+}
+
+/* Protection : si on est sur mobile, on cache tout le bloc desktop */
+@media screen and (max-width: 999px) {
+    .desktop-bper-container { display: none !important; }
 }
 
 
