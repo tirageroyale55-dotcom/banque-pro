@@ -33,23 +33,26 @@ function DetailRow({ label, value, color = '#1e293b' }) {
 }
 
 export default function Accounts({ data }) {
-  const navigate = useNavigate();
+  
+  const navigate = useNavigate(); 
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
   
   const today = new Date();
-  // MODIFICATION : On remonte à 3 mois en arrière par défaut pour être sûr de voir des transactions
-  const defaultStart = new Date();
-  defaultStart.setMonth(today.getMonth() - 3);
+
+  // --- CORRECTION : ON REMONTE À 2024 OU AU MOINS 6 MOIS PAR DÉFAUT ---
+  // Cela permet d'afficher les transactions même si elles ne sont pas de ce mois-ci.
+  const defaultStartDate = new Date();
+  defaultStartDate.setMonth(today.getMonth() - 6); 
 
   const formatDate = (date) => date.toISOString().split("T")[0];
 
-  const [startDate, setStartDate] = useState(formatDate(defaultStart));
+  const [startDate, setStartDate] = useState(formatDate(defaultStartDate)); // Changé ici
   const [endDate, setEndDate] = useState(formatDate(today));
   const [showFilters, setShowFilters] = useState(false);
+
   const [selectedTx, setSelectedTx] = useState(null); 
 
-  // 🔹 RECUPERATION DES DONNEES
   const rawTransactions = data.transactions || [];
 
   const copyToClipboard = (text) => {
@@ -64,14 +67,14 @@ export default function Accounts({ data }) {
     }).format(amount);
   };
 
-  // 🔹 FILTRAGE DES TRANSACTIONS
+  // Filtrage intelligent
   const transactions = rawTransactions
     .filter(tx => {
-      // On s'assure d'avoir une date valide
-      const dateString = tx.createdAt || tx.date; 
-      if (!dateString) return false;
+      // Sécurité : on vérifie que tx.createdAt existe
+      const dateVal = tx.createdAt || tx.date;
+      if (!dateVal) return false;
 
-      const txDate = new Date(dateString);
+      const txDate = new Date(dateVal);
       const txDateString = txDate.toISOString().split("T")[0];
 
       const matchType =
@@ -90,49 +93,71 @@ export default function Accounts({ data }) {
       return sortAsc ? dateA - dateB : dateB - dateA;
     });
 
-  // 🔹 LOGIQUE GRAPHIQUES
+  // Logique Graphes
   const grouped = {};
   transactions.forEach(tx => {
-    const d = new Date(tx.createdAt || tx.date);
-    const dateKey = d.toLocaleDateString('fr-FR');
-    if (!grouped[dateKey]) grouped[dateKey] = { in: 0, out: 0 };
-    
-    if (tx.type === "CREDIT") grouped[dateKey].in += tx.amount;
-    else grouped[dateKey].out += Math.abs(tx.amount);
+    const dateKey = new Date(tx.createdAt || tx.date).toLocaleDateString('fr-FR');
+    if (!grouped[dateKey]) {
+      grouped[dateKey] = { in: 0, out: 0 };
+    }
+    if (tx.type === "CREDIT") {
+      grouped[dateKey].in += tx.amount;
+    } else {
+      grouped[dateKey].out += Math.abs(tx.amount);
+    }
   });
 
-  const dates = Object.keys(grouped).sort((a, b) => 
-    new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-'))
+  const dates = Object.keys(grouped).sort(
+    (a, b) => new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-'))
   );
 
   const barData = {
     labels: dates,
     datasets: [
-      { label: "Entrées", data: dates.map(d => grouped[d].in), backgroundColor: "#16a34a" },
-      { label: "Sorties", data: dates.map(d => grouped[d].out), backgroundColor: "#dc2626" }
+      {
+        label: "Entrées",
+        data: dates.map(d => grouped[d]?.in || 0),
+        backgroundColor: "#16a34a"
+      },
+      {
+        label: "Sorties",
+        data: dates.map(d => grouped[d]?.out || 0),
+        backgroundColor: "#dc2626"
+      }
     ]
   };
 
-  let currentBalance = 0;
+  let runningBalance = 0;
   const balanceData = dates.map(d => {
-    currentBalance += (grouped[d].in - grouped[d].out);
-    return currentBalance;
+    runningBalance += (grouped[d]?.in || 0) - (grouped[d]?.out || 0);
+    return runningBalance;
   });
 
   const lineData = {
     labels: dates,
-    datasets: [{ label: "Solde", data: balanceData, borderColor: "#2563eb", tension: 0.3 }]
+    datasets: [
+      {
+        label: "Solde",
+        data: balanceData,
+        borderColor: "#2563eb",
+        tension: 0.3
+      }
+    ]
   };
 
   return (
     <div className="content">
-      {/* CARD SOLDE BPER */}
+
       <div className="account-card">
         <div className="balance">{formatBper(data.balance)} €</div>
-        <div className="owner">{data.firstName} {data.lastName}</div>
+        <div className="owner">{data.firstname} {data.lastname}</div>
+        
         <div className="iban" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {data.iban}
-          <button onClick={() => copyToClipboard(data.iban)} className="copy-btn">
+          <button 
+            onClick={() => copyToClipboard(data.iban)}
+            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', opacity: 0.8 }}
+          >
             <Copy size={14} />
           </button>
         </div>
@@ -161,14 +186,17 @@ export default function Accounts({ data }) {
               <option value="entrants">Entrées</option>
               <option value="sortants">Sorties</option>
             </select>
+
             <div className="date-field">
               <label>Du</label>
               <input type="date" value={startDate} onChange={(e)=>setStartDate(e.target.value)} />
             </div>
+
             <div className="date-field">
               <label>Au</label>
               <input type="date" value={endDate} onChange={(e)=>setEndDate(e.target.value)} />
             </div>
+
             <button onClick={()=>setSortAsc(!sortAsc)}>
               {sortAsc ? "↑ Croissant" : "↓ Décroissant"}
             </button>
@@ -177,15 +205,12 @@ export default function Accounts({ data }) {
 
         <div className="transactions-list">
           {transactions.length === 0 ? (
-            <div className="empty-transactions">
-                <p>Aucune transaction disponible</p>
-                <small style={{color: '#94a3b8'}}>Vérifiez vos filtres de date</small>
-            </div>
+            <div className="empty-transactions">Aucune transaction disponible</div>
           ) : (
             transactions.map((tx, i) => (
-              <div key={tx._id || i} className="transaction" onClick={() => setSelectedTx(tx)}>
+              <div key={tx._id || i} className="transaction" data-type={tx.type === "CREDIT" ? "Crédit" : "Débit"}>
                 <div className="left">
-                  <div className="icon-wrapper">
+                  <div onClick={() => setSelectedTx(tx)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '5px' }}>
                     {tx.type === "DEBIT" ? <Send size={18} /> : <PlusCircle size={18} color="#16a34a" />}
                   </div>
                   <div>
@@ -200,33 +225,37 @@ export default function Accounts({ data }) {
             ))
           )}
         </div>
+
+        {selectedTx && (
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#fff', zIndex: 9999, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ padding: '20px', display: 'flex', alignItems: 'center', borderBottom: '1px solid #eee', background: '#f8fafc' }}>
+              <button onClick={() => setSelectedTx(null)} style={{ background: 'none', border: 'none', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                ← Retour
+              </button>
+              <div style={{ flex: 1, textAlign: 'center', fontWeight: 'bold', marginRight: '40px' }}>Détails de l'opération</div>
+            </div>
+            <div style={{ padding: '24px', overflowY: 'auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                <div style={{ fontSize: '32px', fontWeight: 'bold', color: selectedTx.type === 'CREDIT' ? '#16a34a' : '#1e293b' }}>
+                  {selectedTx.type === 'CREDIT' ? '+' : '-'}{selectedTx.amount.toLocaleString()} €
+                </div>
+                <div style={{ color: '#64748b', marginTop: '8px' }}>{selectedTx.label}</div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <DetailRow label="Statut" value="Comptabilisé" color="#16a34a" />
+                <DetailRow label="Date d'opération" value={new Date(selectedTx.createdAt || selectedTx.date).toLocaleDateString('fr-FR')} />
+                <DetailRow label="Date de valeur" value={new Date(selectedTx.createdAt || selectedTx.date).toLocaleDateString('fr-FR')} />
+                <DetailRow label="Type de paiement" value={selectedTx.type === 'CREDIT' ? 'Virement SEPA reçu' : 'Virement SEPA émis'} />
+                <DetailRow label="Référence interne" value={selectedTx._id.toUpperCase()} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* OVERLAY DETAILS */}
-      {selectedTx && (
-        <div className="tx-details-overlay">
-          <div className="tx-details-header">
-            <button onClick={() => setSelectedTx(null)}>← Retour</button>
-            <div className="header-title">Détails de l'opération</div>
-          </div>
-          <div className="tx-details-body">
-            <div className="tx-main-amount">
-                <div className={selectedTx.type === 'CREDIT' ? 'val plus' : 'val'}>
-                    {selectedTx.type === 'CREDIT' ? '+' : '-'}{selectedTx.amount.toLocaleString()} €
-                </div>
-                <div className="tx-label">{selectedTx.label}</div>
-            </div>
-            <DetailRow label="Statut" value="Comptabilisé" color="#16a34a" />
-            <DetailRow label="Date" value={new Date(selectedTx.createdAt || selectedTx.date).toLocaleDateString('fr-FR')} />
-            <DetailRow label="Type" value={selectedTx.type === 'CREDIT' ? 'Crédit' : 'Débit'} />
-            <DetailRow label="Référence" value={selectedTx._id?.toUpperCase() || "N/A"} />
-          </div>
-        </div>
-      )}
-
       <div className="charts">
-        <div className="chart"><Bar data={barData} options={{ responsive: true }}/></div>
-        <div className="chart"><Line data={lineData} options={{ responsive: true }}/></div>
+        <div className="chart"><Bar data={barData}/></div>
+        <div className="chart"><Line data={lineData}/></div>
       </div>
     </div>
   );
