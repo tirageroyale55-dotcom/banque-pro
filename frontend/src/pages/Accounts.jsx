@@ -149,42 +149,49 @@ export default function Accounts({ data }) {
 
   return (
     <div className="content">
-
-      {/* CARD SOLDE - Mise à jour pour correspondre au dessin Desktop */}
-<div className="account-card">
-  <div className="card-main-info">
-    <div className="balance-label">Solde disponible <span>∨</span></div>
-    <div className="balance">{formatBper(data.balance)} €</div>
-    {/* Classe owner-name conservée pour le masquage CSS déjà configuré */}
-    <div className="owner owner-name">{data.firstname} {data.lastname}</div>
-    
-    <div className="iban-display-mobile">
-      {data.iban}
-      <button onClick={() => copyToClipboard(data.iban)} className="copy-btn">
-        <Copy size={14} />
-      </button>
-    </div>
-  </div>
-
-  {/* NOUVELLE SECTION : BOUTONS DESKTOP (Inspiré du dessin) */}
-  <div className="desktop-card-actions">
-    <button onClick={() => alert(data.iban)} className="d-btn">
-      <Eye size={18} /> Voir mon Iban
-    </button>
-    <button onClick={() => navigate("/virement-international")} className="d-btn">
-      <Send size={18} /> Effectuer un virement
-    </button>
-    <button onClick={() => navigate("/cards")} className="d-btn">
-      <CreditCard size={18} /> Voir ma cartes virtual
-    </button>
-  </div>
-</div>
-      <div className="quick-actions">
-        <div onClick={() => navigate("/virement-international")} style={{ cursor: 'pointer' }}>
-          <Send size={20}/> Virement
+      
+      {/* --- CARTE SOLDE DESKTOP (Basée sur ton dessin) --- */}
+      <div className="desktop-only-account-container">
+        <div className="desktop-balance-card">
+          <div className="balance-label">Solde disponible <Eye size={18} /></div>
+          <div className="main-balance">{formatBper(data.balance)} €</div>
+          
+          <div className="desktop-action-buttons">
+            <button className="oval-btn" onClick={() => copyToClipboard(data.iban)}>
+              <Copy size={18} /> Voir mon Iban
+            </button>
+            
+            <button className="oval-btn" onClick={() => navigate("/virement-international")}>
+              <Send size={18} /> Effectuer un virement
+            </button>
+            
+            <button className="oval-btn" onClick={() => navigate("/cards")}>
+              <CreditCard size={18} /> Voir ma cartes virtual
+            </button>
+          </div>
         </div>
-        <div><PlusCircle size={20}/> Ajouter</div>
-        <div><Receipt size={20}/> Paiement</div>
+      </div>
+
+      {/* --- CARTE SOLDE MOBILE (L'originale, reste intacte) --- */}
+      <div className="mobile-only-account-card">
+        <div className="account-card">
+          <div className="balance">{formatBper(data.balance)} €</div>
+          <div className="owner owner-name">{data.firstname} {data.lastname}</div>
+          <div className="iban" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {data.iban}
+            <button onClick={() => copyToClipboard(data.iban)} className="copy-icon-btn">
+              <Copy size={14} />
+            </button>
+          </div>
+        </div>
+
+        <div className="quick-actions">
+          <div onClick={() => navigate("/virement-international")} style={{ cursor: 'pointer' }}>
+            <Send size={20}/> Virement
+          </div>
+          <div><PlusCircle size={20}/> Ajouter</div>
+          <div><Receipt size={20}/> Paiement</div>
+        </div>
       </div>
 
       <div className="transactions">

@@ -497,89 +497,85 @@ white-space:nowrap;
 
 
 
-@media screen and (min-width: 1000px) {
-  
-  /* ... tes styles précédents ... */
+/* --- GESTION DES AFFICHAGES --- */
 
-  /* LA CARTE SOLDE HORIZONTALE (DESSIN) */
-  .account-card {
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-between;
-    align-items: center;
-    background: #ffffff;
-    border-radius: 24px;
-    padding: 40px !important;
-    border: 1px solid #e0e6ed;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    margin-bottom: 30px;
-    min-height: 180px;
+/* Par défaut (Mobile) */
+.desktop-only-account-container { display: none; }
+.mobile-only-account-card { display: block; }
+
+/* Desktop (1000px +) */
+@media screen and (min-width: 1000px) {
+  .mobile-only-account-card { display: none !important; }
+  .desktop-only-account-container { 
+    display: flex; 
+    justify-content: center; 
+    margin-bottom: 40px;
   }
 
-  .card-main-info {
-    text-align: left;
+  /* La Carte Solde selon ton dessin */
+  .desktop-balance-card {
+    background: white;
+    width: 100%;
+    max-width: 800px;
+    border-radius: 25px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border: 1px solid #eef2f6;
   }
 
   .balance-label {
-    color: #5d7185;
-    font-size: 16px;
-    margin-bottom: 10px;
+    font-size: 20px;
+    color: #64748b;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
+    margin-bottom: 10px;
   }
 
-  .account-card .balance {
-    font-size: 42px !important;
-    font-weight: 700;
+  .main-balance {
+    font-size: 48px;
+    font-weight: 800;
     color: #003a70;
-    margin: 0;
+    margin-bottom: 35px;
   }
 
-  /* Cacher les infos inutiles sur desktop dans la carte */
-  .iban-display-mobile { display: none; }
-
-  /* LES 3 BOUTONS DU DESSIN */
-  .desktop-card-actions {
-    display: flex !important;
+  /* Conteneur des boutons ovales */
+  .desktop-action-buttons {
+    display: flex;
     flex-direction: column;
-    gap: 12px;
-    min-width: 300px;
+    align-items: center;
+    gap: 15px;
   }
 
-  .d-btn {
-    background: #ffffff;
+  .oval-btn {
+    width: 100%;
+    max-width: 450px;
+    padding: 14px 25px;
+    border-radius: 50px; /* Donne l'aspect ovale du dessin */
     border: 1.5px solid #003a70;
+    background: white;
     color: #003a70;
-    padding: 12px 25px;
-    border-radius: 50px; /* Forme pilule du dessin */
+    font-size: 16px;
+    font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-weight: 600;
-    font-size: 14px;
+    justify-content: flex-start;
+    gap: 15px;
     cursor: pointer;
-    transition: 0.2s;
-    width: 100%;
+    transition: all 0.3s;
   }
 
-  .d-btn:hover {
+  .oval-btn:hover {
     background: #003a70;
     color: white;
+    transform: translateY(-2px);
   }
 
-  /* Cacher les anciennes actions rapides sur Desktop pour ne pas faire doublon */
-  .quick-actions { display: none !important; }
-}
-
-/* ============================================================
-   AJUSTEMENT MOBILE (POUR NE PAS CASSER L'EXISTANT)
-   ============================================================ */
-@media screen and (max-width: 999px) {
-  .desktop-card-actions {
-    display: none !important; /* On cache les boutons du dessin sur mobile */
+  .oval-btn svg {
+    color: inherit;
   }
-  .balance-label span { display: none; } /* On cache la petite flèche sur mobile */
 }
 
 
