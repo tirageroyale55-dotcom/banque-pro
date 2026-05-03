@@ -477,6 +477,23 @@ white-space:nowrap;
 
 
 
+/* --- GESTION DE L'AFFICHAGE DU NOM --- */
+
+/* Sur mobile (par défaut), on s'assure qu'il est bien visible */
+.owner-name {
+  display: block;
+}
+
+/* Sur Desktop (ordinateur), quand l'écran dépasse 1000px */
+@media (min-width: 1000px) {
+  .owner-name {
+    display: none !important; /* Cache le nom uniquement sur ordinateur */
+  }
+}
+
+
+
+
 
 
 

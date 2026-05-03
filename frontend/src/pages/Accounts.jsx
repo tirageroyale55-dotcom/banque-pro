@@ -152,7 +152,8 @@ export default function Accounts({ data }) {
 
       <div className="account-card">
         <div className="balance">{formatBper(data.balance)} €</div>
-        <div className="owner">{data.firstname} {data.lastname}</div>
+        {/* Dans Accounts.jsx, trouve cette ligne et ajoute la classe "owner-name" */}
+        <div className="owner owner-name">{data.firstname} {data.lastname}</div>
         
         <div className="iban" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {data.iban}
