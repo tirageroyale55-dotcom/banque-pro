@@ -135,7 +135,7 @@ export default function Dashboard() {
         <div className="bper-main-viewport">
           <header className="bper-top-bar">
             <div className="bper-welcome">
-              Bienvenue, <strong>{data.firstName} {data.lastName}</strong>
+              Bienvenue, <strong>{data.firstname} {data.lastname}</strong>
             </div>
             <div className="bper-header-tools">
               <Bell size={22} className="tool-icon" />
@@ -145,7 +145,7 @@ export default function Dashboard() {
 
           <div className="bper-scroll-content">
             {activeTab === "accounts" && <Accounts data={data}/>}
-            {activeTab === "accounts" && <Accounts data={data} hideName={true}/>}
+            
             {activeTab === "cards" && (
               <div className="cards-section-desktop">
                 <h3 className="cards-title">Mes cartes</h3>
