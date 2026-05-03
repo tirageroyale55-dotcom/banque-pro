@@ -118,7 +118,10 @@ export default function Dashboard() {
               <CreditCard size={20} /> <span>Cartes</span>
             </div>
             
-<div className={`nav-link ${activeTab === 'payer' ? 'active' : ''}`} onClick={() => setActiveTab('payer')}>
+<div 
+  className={`nav-link ${activeTab === 'payer' ? 'active' : ''}`} 
+  onClick={() => setActiveTab('payer')}
+>
   <Send size={20} /> <span>Payer</span>
 </div>
             <div className="nav-link">
@@ -161,24 +164,15 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* AJOUT ICI POUR LA PAGE PAYER */}
-  {activeTab === "payer" && (
-    <div className="cards-section-desktop"> 
-      <h3 className="cards-title">Effectuer un paiement</h3>
-      <div className="payer-container-desktop">
+            {activeTab === "payer" && (
+    <div className="cards-section-desktop">
+      <h3 className="cards-title">Payer</h3>
+      <div className="payer-desktop-wrapper">
         <Payer data={data} />
       </div>
     </div>
-  )}
-
-            {activeTab === "financing" && (
-              <div className="content">
-                <div className="account-card">
-                  <h3>Financements</h3>
-                  <p>Aucun financement disponible</p>
-                </div>
-              </div>
-            )}
+  )} 
+  
           </div>
         </div>
       </div>
