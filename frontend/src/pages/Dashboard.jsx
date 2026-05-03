@@ -118,9 +118,10 @@ export default function Dashboard() {
               <CreditCard size={20} /> <span>Cartes</span>
             </div>
             
-            <div className={`nav-link ${activeTab === 'payer' ? 'active' : ''}`} onClick={() => setActiveTab('payer')}>
-              <Send size={20} /> <span>Payer</span>
-            </div>
+            
+<div className={`nav-link ${activeTab === 'payer' ? 'active' : ''}`} onClick={() => setActiveTab('payer')}>
+  <Send size={20} /> <span>Payer</span>
+</div>
             <div className="nav-link">
               <Package size={20} /> <span>Produits</span>
             </div>
@@ -161,7 +162,11 @@ export default function Dashboard() {
               </div>
             )}
 
-            {activeTab === "payer" && <Payer />}
+            {activeTab === "payer" && (
+  <div className="payer-section-desktop">
+    <Payer />
+  </div>
+)}
           </div>
         </div>
       </div>
