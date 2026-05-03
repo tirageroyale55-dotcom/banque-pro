@@ -8,6 +8,7 @@ import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
 import Accounts from "./Accounts";
+import Payer from "./Payer";
 // Ajout de Profile si tu l'utilises
 // import Profile from "./Profile"; 
 
@@ -159,14 +160,10 @@ export default function Dashboard() {
               </div>
             )}
 
-            {activeTab === "financing" && (
-              <div className="content">
-                <div className="account-card">
-                  <h3>Financements</h3>
-                  <p>Aucun financement disponible</p>
-                </div>
-              </div>
-            )}
+            {/* Trouve cette partie dans ton rendu Desktop (isDesktop) */}
+{activeTab === "financing" && (
+  <Payer /> 
+)}
           </div>
         </div>
       </div>
