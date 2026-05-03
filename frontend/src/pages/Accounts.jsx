@@ -150,22 +150,35 @@ export default function Accounts({ data }) {
   return (
     <div className="content">
 
-      <div className="account-card">
-        <div className="balance">{formatBper(data.balance)} €</div>
-        {/* Dans Accounts.jsx, trouve cette ligne et ajoute la classe "owner-name" */}
-        <div className="owner owner-name">{data.firstname} {data.lastname}</div>
-        
-        <div className="iban" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {data.iban}
-          <button 
-            onClick={() => copyToClipboard(data.iban)}
-            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', opacity: 0.8 }}
-          >
-            <Copy size={14} />
-          </button>
-        </div>
-      </div>
+      {/* CARD SOLDE - Mise à jour pour correspondre au dessin Desktop */}
+<div className="account-card">
+  <div className="card-main-info">
+    <div className="balance-label">Solde disponible <span>∨</span></div>
+    <div className="balance">{formatBper(data.balance)} €</div>
+    {/* Classe owner-name conservée pour le masquage CSS déjà configuré */}
+    <div className="owner owner-name">{data.firstname} {data.lastname}</div>
+    
+    <div className="iban-display-mobile">
+      {data.iban}
+      <button onClick={() => copyToClipboard(data.iban)} className="copy-btn">
+        <Copy size={14} />
+      </button>
+    </div>
+  </div>
 
+  {/* NOUVELLE SECTION : BOUTONS DESKTOP (Inspiré du dessin) */}
+  <div className="desktop-card-actions">
+    <button onClick={() => alert(data.iban)} className="d-btn">
+      <Eye size={18} /> Voir mon Iban
+    </button>
+    <button onClick={() => navigate("/virement-international")} className="d-btn">
+      <Send size={18} /> Effectuer un virement
+    </button>
+    <button onClick={() => navigate("/cards")} className="d-btn">
+      <CreditCard size={18} /> Voir ma cartes virtual
+    </button>
+  </div>
+</div>
       <div className="quick-actions">
         <div onClick={() => navigate("/virement-international")} style={{ cursor: 'pointer' }}>
           <Send size={20}/> Virement
