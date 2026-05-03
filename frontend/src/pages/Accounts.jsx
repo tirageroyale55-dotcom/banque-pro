@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Send, PlusCircle, Receipt, Filter, Copy, CreditCard, Eye } from "lucide-react";
+import { Send, PlusCircle, Receipt, Filter, Copy, CreditCard, Eye, EyeOff } from "lucide-react";
 import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -48,6 +48,9 @@ export default function Accounts({ data }) {
   const [endDate, setEndDate] = useState(formatDate(today));
 
   const rawTransactions = data.transactions || [];
+
+  const [showBalance, setShowBalance] = useState(true);
+  const [showIban, setShowIban] = useState(false);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -109,40 +112,53 @@ export default function Accounts({ data }) {
   return (
     <div className="content">
       
-      {/* --- CARTE SOLDE MISE À JOUR (IMAGE WHATSAPP) --- */}
-      <div className="account-card-container">
-        <div className="account-card">
-          <div className="balance-section">
-            <div className="balance-label">Solde disponible <Eye size={16} style={{marginLeft: '5px', cursor: 'pointer'}} /></div>
-            <div className="balance">{formatBper(data.balance)} €</div>
-            <div className="owner owner-name">{data.firstname} {data.lastname}</div>
-            
-            {/* IBAN visible uniquement sur mobile dans la carte */}
-            <div className="iban mobile-only" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {data.iban}
-              <button onClick={() => copyToClipboard(data.iban)} className="copy-btn-clean">
-                <Copy size={14} />
-              </button>
-            </div>
-          </div>
-
-          {/* --- BOUTONS VERTICAUX (IMAGE WHATSAPP - DESKTOP ONLY) --- */}
-          <div className="desktop-only-actions">
-            <button className="bper-btn-outline" onClick={() => copyToClipboard(data.iban)}>
-              <div className="btn-icon-circle"><Eye size={18} /></div>
-              <span>Voir mon Iban</span>
-            </button>
-            <button className="bper-btn-outline" onClick={() => navigate("/virement-international")}>
-              <div className="btn-icon-circle"><Send size={18} /></div>
-              <span>Effectuer un virement</span>
-            </button>
-            <button className="bper-btn-outline" onClick={() => navigate("/cards")}>
-              <div className="btn-icon-circle"><CreditCard size={18} /></div>
-              <span>Voir mes cartes virtuelles</span>
-            </button>
-          </div>
-        </div>
+      {/* --- CARTE SOLDE MISE À JOUR --- */}
+<div className="account-card-container">
+  <div className="account-card">
+    <div className="balance-section">
+      <div className="balance-label">
+        Solde disponible 
+        {/* L'icône change selon l'état et bascule au clic */}
+        <span onClick={() => setShowBalance(!showBalance)} style={{ marginLeft: '8px', cursor: 'pointer' }}>
+          {showBalance ? <Eye size={18} /> : <EyeOff size={18} />}
+        </span>
       </div>
+
+      <div className="balance">
+        {/* Si showBalance est faux, on affiche des étoiles */}
+        {showBalance ? `${formatBper(data.balance)} €` : "•••••• €"}
+      </div>
+
+      <div className="owner owner-name">{data.firstname} {data.lastname}</div>
+      
+      {/* Affichage de l'IBAN (Mobile) */}
+      <div className="iban mobile-only">
+        {showIban ? data.iban : "IT** **** **** **** ****"}
+        <button onClick={() => { copyToClipboard(data.iban); setShowIban(true); }} className="copy-btn-clean">
+          <Copy size={14} />
+        </button>
+      </div>
+    </div>
+
+    {/* --- BOUTONS VERTICAUX (DESKTOP) --- */}
+    <div className="desktop-only-actions">
+      <button className="bper-btn-outline" onClick={() => setShowIban(!showIban)}>
+        <div className="btn-icon-circle"><Eye size={18} /></div>
+        <span>{showIban ? data.iban : "Voir mon Iban"}</span>
+      </button>
+
+      <button className="bper-btn-outline" onClick={() => navigate("/virement-international")}>
+        <div className="btn-icon-circle"><Send size={18} /></div>
+        <span>Effectuer un virement</span>
+      </button>
+
+      <button className="bper-btn-outline" onClick={() => navigate("/cards")}>
+        <div className="btn-icon-circle"><CreditCard size={18} /></div>
+        <span>Voir mes cartes virtuelles</span>
+      </button>
+    </div>
+  </div>
+</div>
 
       {/* --- ACTIONS RAPIDES (MOBILE ONLY) --- */}
       <div className="quick-actions mobile-only">
