@@ -32,7 +32,7 @@ function DetailRow({ label, value, color = '#1e293b' }) {
   );
 }
 
-export default function Accounts({ data }) {
+export default function Accounts({ data, setActiveTab }) {
   const navigate = useNavigate(); 
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
@@ -159,7 +159,7 @@ export default function Accounts({ data }) {
     <div className="btn-icon-circle"><CreditCard size={18} /></div>
     <span>Voir mes cartes virtuelles</span>
   </button>
-  
+
     </div>
   </div>
 </div>
