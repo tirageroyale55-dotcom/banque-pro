@@ -144,7 +144,7 @@ export default function Dashboard() {
           </header>
 
           <div className="bper-scroll-content">
-            {activeTab === "accounts" && <Accounts data={data}/>}
+            {activeTab === "accounts" && <Accounts data={data} setActiveTab={setActiveTab}/>}
             
             {activeTab === "cards" && (
               <div className="cards-section-desktop">

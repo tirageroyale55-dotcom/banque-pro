@@ -154,7 +154,7 @@ export default function Accounts({ data }) {
 
       <button 
     className="bper-btn-outline" 
-    onClick={() => navigate("/cards")} /* On utilise le même chemin que ton bouton Cartes principal */
+    onClick={() => setActiveTab("cards")} // On change l'onglet au lieu de naviguer
   >
     <div className="btn-icon-circle"><CreditCard size={18} /></div>
     <span>Voir mes cartes virtuelles</span>
