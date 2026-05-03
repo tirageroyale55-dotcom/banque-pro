@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Send, PlusCircle, Receipt, Filter, Copy } from "lucide-react";
+import { Send, PlusCircle, Receipt, Filter, Copy, CreditCard } from "lucide-react";
 import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -150,39 +150,21 @@ export default function Accounts({ data }) {
   return (
     <div className="content">
 
-      // Dans Accounts.jsx, remplace la section "CARD SOLDE" par celle-ci :
-
-<div className="account-card-container">
-  <div className="account-card">
-    {/* Titre et Solde */}
-    <div className="balance-section">
-      <div className="balance-label">Solde disponible 👁️</div>
-      <div className="balance-value">{formatBper(data.balance)} €</div>
-      <div className="owner-name">{data.firstname} {data.lastname}</div>
-    </div>
-
-    {/* Actions spécifiques Desktop (cachées sur mobile via CSS) */}
-    <div className="desktop-only-actions">
-      <button className="bper-btn-outline" onClick={() => copyToClipboard(data.iban)}>
-        <Copy size={18} /> Voir mon Iban
-      </button>
-      <button className="bper-btn-outline" onClick={() => navigate("/virement-international")}>
-        <Send size={18} /> Effectuer un virement
-      </button>
-      <button className="bper-btn-outline" onClick={() => navigate("/cards")}>
-        <CreditCard size={18} /> Voir mes cartes virtuelles
-      </button>
-    </div>
-
-    {/* L'IBAN classique reste pour le mobile */}
-    <div className="iban mobile-only">
-      {data.iban}
-      <button onClick={() => copyToClipboard(data.iban)} className="copy-btn">
-        <Copy size={14} />
-      </button>
-    </div>
-  </div>
-</div>
+      <div className="account-card">
+        <div className="balance">{formatBper(data.balance)} €</div>
+        {/* Dans Accounts.jsx, trouve cette ligne et ajoute la classe "owner-name" */}
+        <div className="owner owner-name">{data.firstname} {data.lastname}</div>
+        
+        <div className="iban" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {data.iban}
+          <button 
+            onClick={() => copyToClipboard(data.iban)}
+            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', opacity: 0.8 }}
+          >
+            <Copy size={14} />
+          </button>
+        </div>
+      </div>
 
       <div className="quick-actions">
         <div onClick={() => navigate("/virement-international")} style={{ cursor: 'pointer' }}>
