@@ -132,16 +132,23 @@ export default function Dashboard() {
         </aside>
 
         {/* Contenu de droite */}
-        <div className="bper-main-viewport">
-          <header className="bper-top-bar">
-            <div className="bper-welcome">
-              Bienvenue, <strong>{data.firstName} {data.lastName}</strong>
-            </div>
-            <div className="bper-header-tools">
-              <Bell size={22} className="tool-icon" />
-              <div className="user-avatar-circle"><User size={20} /></div>
-            </div>
-          </header>
+<div className="bper-main-viewport">
+  <header className="bper-top-bar">
+    <div className="bper-welcome">
+      {/* Utilisation de ?. pour la sécurité et mise en majuscule du nom pour le style BPER */}
+      Bienvenue, <strong>{data?.firstName} {data?.lastName?.toUpperCase()}</strong>
+    </div>
+    
+    <div className="bper-header-tools">
+      <div className="notification-badge">
+        <Bell size={22} className="tool-icon" />
+        <span className="dot"></span> {/* Petit point rouge pour le style */}
+      </div>
+      <div className="user-avatar-circle">
+        <User size={20} />
+      </div>
+    </div>
+  </header>
 
           <div className="bper-scroll-content">
             {activeTab === "accounts" && <Accounts data={data}/>}
