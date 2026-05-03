@@ -162,9 +162,9 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Dans Dashboard.jsx, à l'intérieur de bper-scroll-content (Desktop) */}
+            {/* Dans Dashboard.jsx (Rendu Desktop uniquement) */}
 {activeTab === "payer" && (
-  <div className="cards-section-desktop"> 
+  <div className="cards-section-desktop is-desktop-view"> 
     <h3 className="cards-title">Opérations</h3>
     <div className="payer-desktop-wrapper">
        <Payer />
