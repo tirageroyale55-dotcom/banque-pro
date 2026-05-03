@@ -117,7 +117,8 @@ export default function Dashboard() {
             <div className={`nav-link ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>
               <CreditCard size={20} /> <span>Cartes</span>
             </div>
-            <div className="nav-link" onClick={() => setActiveTab('financing')}>
+            
+            <div className={`nav-link ${activeTab === 'payer' ? 'active' : ''}`} onClick={() => setActiveTab('payer')}>
               <Send size={20} /> <span>Payer</span>
             </div>
             <div className="nav-link">
@@ -160,10 +161,7 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Trouve cette partie dans ton rendu Desktop (isDesktop) */}
-{activeTab === "financing" && (
-  <Payer /> 
-)}
+            {activeTab === "payer" && <Payer />}
           </div>
         </div>
       </div>
