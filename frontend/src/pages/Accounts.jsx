@@ -152,7 +152,7 @@ export default function Accounts({ data }) {
         <span>Effectuer un virement</span>
       </button>
 
-      <button className="bper-btn-outline" onClick={() => navigate("/request-card")}>
+      <button className="bper-btn-outline" onClick={() => navigate("/client/card")}>
         <div className="btn-icon-circle"><CreditCard size={18} /></div>
         <span>Voir mes cartes virtuelles</span>
       </button>
