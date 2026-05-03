@@ -162,9 +162,13 @@ export default function Dashboard() {
               </div>
             )}
 
-            {activeTab === "payer" && (
-  <div className="payer-section-desktop">
-    <Payer />
+            {/* Dans Dashboard.jsx, à l'intérieur de bper-scroll-content (Desktop) */}
+{activeTab === "payer" && (
+  <div className="cards-section-desktop"> 
+    <h3 className="cards-title">Opérations</h3>
+    <div className="payer-desktop-wrapper">
+       <Payer />
+    </div>
   </div>
 )}
           </div>

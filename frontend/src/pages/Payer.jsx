@@ -27,14 +27,11 @@ export default function Payer() {
 
   return (
     /* 1️⃣ On ajoute un wrapper "payer-full-container" qui va boucher le trou derrière */
-    <div className="payer-full-container">
-      
-      <div className="page-content payer-page">
-        <h2 className="page-title">Opérations</h2>
-
-        {/* SECTION 1: OPÉRATIONS FRÉQUENTES */}
-        <section className="ops-section">
-          <h3 className="section-label">Opérations fréquentes</h3>
+    <div className="payer-container-clean">
+    <div className="payer-sections-list">
+      {/* SECTION 1: OPÉRATIONS FRÉQUENTES */}
+      <section className="ops-section">
+        <h3 className="section-label">Opérations fréquentes</h3>
           <div className="menu-group">
             <MenuRow 
               icon={ArrowRightLeft} 

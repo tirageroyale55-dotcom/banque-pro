@@ -578,7 +578,22 @@ white-space:nowrap;
   .desktop-only-actions { display: none !important; }
 }
 
+@media screen and (min-width: 1000px) {
+  /* On s'assure que le contenu Payer s'aligne sur la grille Desktop */
+  .payer-desktop-wrapper {
+    background: white;
+    border-radius: 24px;
+    padding: 20px;
+    border: 1px solid #e0e6ed;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    margin-top: 20px;
+  }
 
+  /* On retire les styles de titre internes de Payer.jsx pour éviter les doublons */
+  .payer-desktop-wrapper .page-title {
+    display: none;
+  }
+}
 
 
 
