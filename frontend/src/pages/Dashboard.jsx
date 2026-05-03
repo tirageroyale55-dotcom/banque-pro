@@ -117,11 +117,9 @@ export default function Dashboard() {
             <div className={`nav-link ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>
               <CreditCard size={20} /> <span>Cartes</span>
             </div>
-            
-            
-<div className={`nav-link ${activeTab === 'payer' ? 'active' : ''}`} onClick={() => setActiveTab('payer')}>
-  <Send size={20} /> <span>Payer</span>
-</div>
+            <div className="nav-link" onClick={() => setActiveTab('financing')}>
+              <Send size={20} /> <span>Payer</span>
+            </div>
             <div className="nav-link">
               <Package size={20} /> <span>Produits</span>
             </div>
@@ -162,15 +160,14 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Dans Dashboard.jsx (Rendu Desktop uniquement) */}
-{activeTab === "payer" && (
-  <div className="cards-section-desktop is-desktop-view"> 
-    <h3 className="cards-title">Opérations</h3>
-    <div className="payer-desktop-wrapper">
-       <Payer />
-    </div>
-  </div>
-)}
+            {activeTab === "financing" && (
+              <div className="content">
+                <div className="account-card">
+                  <h3>Financements</h3>
+                  <p>Aucun financement disponible</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
