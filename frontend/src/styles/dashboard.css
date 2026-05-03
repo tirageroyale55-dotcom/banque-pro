@@ -479,104 +479,90 @@ white-space:nowrap;
 
 
 
-/* --- GESTION DE L'AFFICHAGE DU NOM --- */
-
-/* Sur mobile (par défaut), on s'assure qu'il est bien visible */
-.owner-name {
-  display: block;
-}
-
-/* Sur Desktop (ordinateur), quand l'écran dépasse 1000px */
-@media (min-width: 1000px) {
-  .owner-name {
-    display: none !important; /* Cache le nom uniquement sur ordinateur */
-  }
-}
-
-
-
-
-
-/* --- GESTION DES AFFICHAGES --- */
-
-/* Par défaut (Mobile) */
-.desktop-only-account-container { display: none; }
-.mobile-only-account-card { display: block; }
-
-/* Desktop (1000px +) */
 @media screen and (min-width: 1000px) {
-  .mobile-only-account-card { display: none !important; }
-  .desktop-only-account-container { 
-    display: flex; 
-    justify-content: center; 
+  
+  /* On cache les éléments mobiles inutiles sur PC */
+  .mobile-only, .quick-actions { display: none !important; }
+
+  /* Conteneur de la carte pour la centrer ou l'élargir */
+  .account-card-container {
+    max-width: 900px;
     margin-bottom: 40px;
   }
 
-  /* La Carte Solde selon ton dessin */
-  .desktop-balance-card {
-    background: white;
-    width: 100%;
-    max-width: 800px;
-    border-radius: 25px;
+  .account-card {
+    background: #ffffff;
+    border-radius: 24px;
     padding: 40px;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    border: 1px solid #eef2f6;
+    display: flex;
+    justify-content: space-between; /* Solde à gauche, boutons à droite */
+    align-items: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0,05);
+    border: 1px solid #e0e6ed;
+  }
+
+  .balance-section {
+    flex: 1;
   }
 
   .balance-label {
-    font-size: 20px;
-    color: #64748b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+    font-size: 16px;
+    color: #5d7185;
     margin-bottom: 10px;
   }
 
-  .main-balance {
+  .balance-value {
     font-size: 48px;
     font-weight: 800;
     color: #003a70;
-    margin-bottom: 35px;
   }
 
-  /* Conteneur des boutons ovales */
-  .desktop-action-buttons {
+  /* Colonne de boutons verticaux (Comme sur ton dessin) */
+  .desktop-only-actions {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 15px;
+    width: 350px;
   }
 
-  .oval-btn {
-    width: 100%;
-    max-width: 450px;
-    padding: 14px 25px;
-    border-radius: 50px; /* Donne l'aspect ovale du dessin */
-    border: 1.5px solid #003a70;
-    background: white;
-    color: #003a70;
-    font-size: 16px;
-    font-weight: 500;
+  .bper-btn-outline {
     display: flex;
     align-items: center;
     justify-content: flex-start;
     gap: 15px;
+    padding: 15px 25px;
+    background: transparent;
+    border: 1.5px solid #003a70;
+    color: #003a70;
+    border-radius: 50px; /* Boutons arrondis comme l'image */
+    font-weight: 600;
+    font-size: 15px;
     cursor: pointer;
     transition: all 0.3s;
   }
 
-  .oval-btn:hover {
+  .bper-btn-outline:hover {
     background: #003a70;
     color: white;
-    transform: translateY(-2px);
   }
 
-  .oval-btn svg {
-    color: inherit;
+  /* On s'assure que l'historique prend aussi de la place */
+  .transactions {
+    background: white;
+    border-radius: 24px;
+    padding: 30px;
+    border: 1px solid #e0e6ed;
   }
 }
+
+/* Sur Mobile, on cache les boutons desktop */
+@media screen and (max-width: 999px) {
+  .desktop-only-actions { display: none !important; }
+}
+
+
+
+
 
 
 
