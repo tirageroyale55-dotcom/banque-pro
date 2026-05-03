@@ -497,7 +497,86 @@ white-space:nowrap;
 
 
 
+@media screen and (min-width: 1000px) {
+  
+  /* On cache les éléments mobiles inutiles sur PC */
+  .mobile-only, .quick-actions { display: none !important; }
 
+  /* Conteneur de la carte pour la centrer ou l'élargir */
+  .account-card-container {
+    max-width: 900px;
+    margin-bottom: 40px;
+  }
+
+  .account-card {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between; /* Solde à gauche, boutons à droite */
+    align-items: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0,05);
+    border: 1px solid #e0e6ed;
+  }
+
+  .balance-section {
+    flex: 1;
+  }
+
+  .balance-label {
+    font-size: 16px;
+    color: #5d7185;
+    margin-bottom: 10px;
+  }
+
+  .balance-value {
+    font-size: 48px;
+    font-weight: 800;
+    color: #003a70;
+  }
+
+  /* Colonne de boutons verticaux (Comme sur ton dessin) */
+  .desktop-only-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 350px;
+  }
+
+  .bper-btn-outline {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+    padding: 15px 25px;
+    background: transparent;
+    border: 1.5px solid #003a70;
+    color: #003a70;
+    border-radius: 50px; /* Boutons arrondis comme l'image */
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .bper-btn-outline:hover {
+    background: #003a70;
+    color: white;
+  }
+
+  /* On s'assure que l'historique prend aussi de la place */
+  .transactions {
+    background: white;
+    border-radius: 24px;
+    padding: 30px;
+    border: 1px solid #e0e6ed;
+  }
+}
+
+/* Sur Mobile, on cache les boutons desktop */
+@media screen and (max-width: 999px) {
+  .desktop-only-actions { display: none !important; }
+}
 
 
 
