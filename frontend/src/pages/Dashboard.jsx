@@ -118,21 +118,22 @@ export default function Dashboard() {
               <CreditCard size={20} /> <span>Cartes</span>
             </div>
             
-<div 
-  className={`nav-link ${activeTab === 'payer' ? 'active' : ''}`} 
-  onClick={() => setActiveTab('payer')}
->
-  <Send size={20} /> <span>Payer</span>
+            <div 
+              className={`nav-link ${activeTab === 'payer' ? 'active' : ''}`} 
+              onClick={() => setActiveTab('payer')}
+            >
+              <Send size={20} /> <span>Payer</span>
+            </div>
+            
+            <div className={`nav-link ${activeTab === 'produits' ? 'active' : ''}`} onClick={() => setActiveTab('produits')}>
+  <Package size={20} /> <span>Produits</span>
 </div>
-            <div className="nav-link">
-              <Package size={20} /> <span>Produits</span>
-            </div>
-            <div className="nav-link">
-              <Heart size={20} /> <span>Lifestyle</span>
-            </div>
-            <div className="nav-link">
-              <HelpCircle size={20} /> <span>Aide</span>
-            </div>
+<div className={`nav-link ${activeTab === 'lifestyle' ? 'active' : ''}`} onClick={() => setActiveTab('lifestyle')}>
+  <Heart size={20} /> <span>Lifestyle</span>
+</div>
+<div className={`nav-link ${activeTab === 'aide' ? 'active' : ''}`} onClick={() => setActiveTab('aide')}>
+  <HelpCircle size={20} /> <span>Aide</span>
+</div>
           </nav>
         </aside>
 
@@ -164,16 +165,34 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Dans ton Dashboard.jsx, section Desktop */}
-{activeTab === "payer" && (
-  <div className="cards-section-desktop">
-    <h3 className="cards-title">Effectuer un paiement</h3>
-    {/* On passe isDesktop={true} pour nettoyer le style mobile */}
-    <div className="payer-desktop-wrapper">
-      <Payer isDesktop={true} />
+            
+            {activeTab === "payer" && (
+               <div className="cards-section-desktop">
+                <h3 className="cards-title">Effectuer un paiement</h3>   
+               <div className="payer-desktop-wrapper">
+                 <Payer isDesktop={true} />
+               </div>
+              </div>
+            )}
+
+
+{activeTab === "produits" && (
+    <div className="cards-section-desktop">
+      <Produits isDesktop={true} />
     </div>
-  </div>
-)}
+  )}
+
+  {activeTab === "lifestyle" && (
+    <div className="cards-section-desktop">
+      <Lifestyle isDesktop={true} />
+    </div>
+  )}
+
+  {activeTab === "aide" && (
+    <div className="cards-section-desktop">
+      <Aide isDesktop={true} />
+    </div>
+  )}
           </div>
         </div>
       </div>

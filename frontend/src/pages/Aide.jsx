@@ -1,6 +1,6 @@
-export default function Aide() {
+export default function Aide({ isDesktop = false }) {
   return (
-    <div className="page-content">
+    <div className={isDesktop ? "" : "page-content"}>
       <h2 className="cards-title">Besoin d'aide ?</h2>
       <div className="account-card">
         <div className="item">
