@@ -34,15 +34,6 @@ function DetailRow({ label, value, color = '#1e293b' }) {
 
 export default function Accounts({ data, setActiveTab }) {
   const navigate = useNavigate(); 
-
-  const userInfo = data.user || data || {};
-  const accountInfo = data.account || data || {};
-  
-  const firstName = userInfo.prenom || data.firstname || "";
-  const lastName = userInfo.nom || data.lastname || "";
-  const balance = accountInfo.balance ?? data.balance ?? 0;
-  const iban = accountInfo.iban || data.iban || "";
-  
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
@@ -60,7 +51,6 @@ export default function Accounts({ data, setActiveTab }) {
 
   const [showBalance, setShowBalance] = useState(true);
   const [showIban, setShowIban] = useState(false);
-  
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -135,19 +125,19 @@ export default function Accounts({ data, setActiveTab }) {
       </div>
 
       <div className="balance">
-  {showBalance ? `${formatBper(balance)} €` : "•••••• €"}
-</div>
+        {/* Si showBalance est faux, on affiche des étoiles */}
+        {showBalance ? `${formatBper(data.balance)} €` : "•••••• €"}
+      </div>
 
-<div className="owner owner-name">{firstName} {lastName}</div>
-
-<div className="iban mobile-only">
-  {showIban ? iban : "IT** **** **** **** ****"}
-  <button onClick={() => { copyToClipboard(iban); setShowIban(true); }} className="copy-btn-clean">
-    <Copy size={14} />
-  </button>
-</div>
-
-
+      <div className="owner owner-name">{data.firstname} {data.lastname}</div>
+      
+      {/* Affichage de l'IBAN (Mobile) */}
+      <div className="iban mobile-only">
+        {showIban ? data.iban : "IT** **** **** **** ****"}
+        <button onClick={() => { copyToClipboard(data.iban); setShowIban(true); }} className="copy-btn-clean">
+          <Copy size={14} />
+        </button>
+      </div>
     </div>
 
     {/* --- BOUTONS VERTICAUX (DESKTOP) --- */}
@@ -222,7 +212,7 @@ export default function Accounts({ data, setActiveTab }) {
                     {tx.type === "DEBIT" ? <Send size={18} /> : <PlusCircle size={18} color="#16a34a" />}
                   </div>
                   <div>
-                    <div className="motif">{tx.label || "Transaction bancaire"}</div> 
+                    <div className="motif">{tx.label}</div> 
                     <div className="date">{new Date(tx.createdAt || tx.date).toLocaleDateString('fr-FR')}</div>
                   </div>
                 </div>
