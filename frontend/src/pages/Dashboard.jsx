@@ -9,6 +9,9 @@ import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
 import Accounts from "./Accounts";
 import Payer from "./Payer";
+import Produits from "./Produits";  
+import Lifestyle from "./Lifestyle"; 
+import Aide from "./Aide";
 // Ajout de Profile si tu l'utilises
 // import Profile from "./Profile"; 
 
