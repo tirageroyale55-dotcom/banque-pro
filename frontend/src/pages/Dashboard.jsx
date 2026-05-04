@@ -12,8 +12,8 @@ import Payer from "./Payer";
 import Produits from "./Produits";  
 import Lifestyle from "./Lifestyle"; 
 import Aide from "./Aide";
-// Ajout de Profile si tu l'utilises
-// import Profile from "./Profile"; 
+import Profile from "./Profile";
+import Notifications from "./Notifications";
 
 // Icônes pour le menu Desktop Professionnel
 import { LayoutDashboard, CreditCard, Send, Package, Heart, HelpCircle, Bell, User } from "lucide-react";
@@ -129,28 +129,41 @@ export default function Dashboard() {
             </div>
             
             <div className={`nav-link ${activeTab === 'produits' ? 'active' : ''}`} onClick={() => setActiveTab('produits')}>
-  <Package size={20} /> <span>Produits</span>
-</div>
-<div className={`nav-link ${activeTab === 'lifestyle' ? 'active' : ''}`} onClick={() => setActiveTab('lifestyle')}>
-  <Heart size={20} /> <span>Lifestyle</span>
-</div>
-<div className={`nav-link ${activeTab === 'aide' ? 'active' : ''}`} onClick={() => setActiveTab('aide')}>
-  <HelpCircle size={20} /> <span>Aide</span>
-</div>
+               <Package size={20} /> <span>Produits</span>
+            </div>
+
+            <div className={`nav-link ${activeTab === 'lifestyle' ? 'active' : ''}`} onClick={() => setActiveTab('lifestyle')}>
+               <Heart size={20} /> <span>Lifestyle</span>
+            </div>
+
+            <div className={`nav-link ${activeTab === 'aide' ? 'active' : ''}`} onClick={() => setActiveTab('aide')}>
+               <HelpCircle size={20} /> <span>Aide</span>
+             </div>
           </nav>
         </aside>
 
         {/* Contenu de droite */}
         <div className="bper-main-viewport">
           <header className="bper-top-bar">
-            <div className="bper-welcome">
-              Bienvenue, <strong>{data.firstname} {data.lastname}</strong>
-            </div>
-            <div className="bper-header-tools">
-              <Bell size={22} className="tool-icon" />
-              <div className="user-avatar-circle"><User size={20} /></div>
-            </div>
-          </header>
+  <div className="bper-welcome">
+    Bienvenue, <strong>{data.firstname} {data.lastname}</strong>
+  </div>
+  <div className="bper-header-tools">
+    <Bell 
+      size={22} 
+      className={`tool-icon ${activeTab === 'notifications' ? 'active-icon' : ''}`} 
+      onClick={() => setActiveTab('notifications')} 
+      style={{cursor: 'pointer'}}
+    />
+    <div 
+      className={`user-avatar-circle ${activeTab === 'profile' ? 'active-avatar' : ''}`}
+      onClick={() => setActiveTab('profile')}
+      style={{cursor: 'pointer'}}
+    >
+      <User size={20} />
+    </div>
+  </div>
+</header>
 
           <div className="bper-scroll-content">
             {activeTab === "accounts" && <Accounts data={data} setActiveTab={setActiveTab}/>}
@@ -196,6 +209,18 @@ export default function Dashboard() {
       <Aide isDesktop={true} />
     </div>
   )}
+       
+    {activeTab === "notifications" && (
+    <div className="cards-section-desktop">
+      <Notifications isDesktop={true} />
+    </div>
+  )}
+
+  {activeTab === "profile" && (
+    <div className="cards-section-desktop">
+      <Profile data={data} isDesktop={true} />
+    </div>
+  )}   
           </div>
         </div>
       </div>

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../services/api"; 
 import "../styles/Profile.css";
 
-export default function Profile({ data: initialData }) {
+export default function Profile({ data: initialData, isDesktop = false }) {
   const navigate = useNavigate();
   const [data, setData] = useState(initialData);
   const [showDetails, setShowDetails] = useState(false);
@@ -127,21 +127,24 @@ const compressImage = async (file) => {
   };
 
   return (
-    <div className="bper-profile-container">
-      <div className="bper-header">
-        <button 
-          onClick={() => showDetails ? setShowDetails(false) : navigate(-1)} 
-          className="back-btn"
-        >
-          ←
-        </button>
-        <span className="header-title">
-          {showDetails ? "Données Personnelles" : "Mon Profil"}
-        </span>
-      </div>
+    <div className={isDesktop ? "profile-desktop-view" : "bper-profile-container"}>
+      {!isDesktop && (
+        <div className="bper-header">
+          <button 
+            onClick={() => showDetails ? setShowDetails(false) : navigate(-1)} 
+            className="back-btn"
+          >
+            ←
+          </button>
+          <span className="header-title">
+            {showDetails ? "Données Personnelles" : "Mon Profil"}
+          </span>
+        </div>
+      )}
 
       {!showDetails ? (
         <div className="fade-in">
+          {isDesktop && <h2 className="cards-title">Mon Profil</h2>}
           <div className="bper-card-blue" onClick={() => setShowDetails(true)}>
             <div className="bper-avatar-circle">
                {profileImage ? (
@@ -185,6 +188,11 @@ const compressImage = async (file) => {
         </div>
       ) : (
         <div className="bper-details-view fade-in">
+          {isDesktop && (
+              <button onClick={() => setShowDetails(false)} style={{marginBottom: '10px', cursor: 'pointer', border: 'none', background: 'none', color: '#005a64', fontWeight: 'bold'}}>
+                ← Retour au profil
+              </button>
+            )}
             <div className="details-header-block">
                 <h3>État Civil & Contact</h3>
                 <p>Données certifiées conformes à votre pièce d'identité</p>
