@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { 
   Settings, Shield, MessageCircle, TrendingUp, 
-  CreditCard, Umbrella, Edit, LogOut, ChevronRight, User, Globe, MapPin, Phone, Mail, Camera
+  CreditCard, Umbrella, Edit, LogOut, ChevronRight, User, Globe, MapPin, 
+  Phone, Mail, Camera, Briefcase, CalendarClock 
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../services/api"; 
@@ -187,29 +188,62 @@ const compressImage = async (file) => {
           </div>
         </div>
       ) : (
-        <div className="bper-details-view fade-in">
-          {isDesktop && (
-              <button onClick={() => setShowDetails(false)} style={{marginBottom: '10px', cursor: 'pointer', border: 'none', background: 'none', color: '#005a64', fontWeight: 'bold'}}>
-                ← Retour au profil
-              </button>
-            )}
-            <div className="details-header-block">
-                <h3>État Civil & Contact</h3>
-                <p>Données certifiées conformes à votre pièce d'identité</p>
-            </div>
-            <InfoRow label="NOM" value={nomUser} icon={<User size={16}/>} />
-            <InfoRow label="PRÉNOM" value={prenomUser} icon={<User size={16}/>} />
-            <InfoRow label="E-MAIL" value={userInfo.email} icon={<Mail size={16}/>} />
-            <InfoRow label="TÉLÉPHONE" value={userInfo.telephone} icon={<Phone size={16}/>} />
-            <InfoRow label="ADRESSE" value={userInfo.adresse} icon={<MapPin size={16}/>} />
-            <InfoRow label="VILLE" value={userInfo.ville} icon={<MapPin size={16}/>} />
-            <InfoRow label="NATIONALITÉ" value={userInfo.nationalite} icon={<Globe size={16}/>} />
-            <div className="client-footer">
-                <p>Référence Client : {data._id?.slice(-8).toUpperCase() || "BPER-00401"}</p>
-                <p>Compte actif - Certifié par BPER Banca</p>
-            </div>
-        </div>
-      )}
+  <div className="bper-details-view fade-in">
+    {isDesktop && (
+      <button onClick={() => setShowDetails(false)} className="back-to-profile-btn">
+        ← Retour au profil
+      </button>
+    )}
+
+    <div className="details-header-block">
+      <h3>Détails du compte</h3>
+      <p>Informations certifiées conformes aux documents d'identité.</p>
+    </div>
+
+    {/* BLOC 1 : ÉTAT CIVIL */}
+    <div className="details-section-group">
+      <h4 className="section-subtitle">Identité & État Civil</h4>
+      <div className="info-grid">
+        <InfoRow label="CIVILITÉ" value={userInfo.civilite} icon={<User size={16}/>} />
+        <InfoRow label="NOM" value={userInfo.nom} icon={<User size={16}/>} />
+        <InfoRow label="PRÉNOM" value={userInfo.prenom} icon={<User size={16}/>} />
+        <InfoRow label="DATE DE NAISSANCE" value={userInfo.dateNaissance} icon={<CalendarClock size={16}/>} />
+        <InfoRow label="LIEU DE NAISSANCE" value={userInfo.lieuNaissance} icon={<MapPin size={16}/>} />
+        <InfoRow label="NATIONALITÉ" value={userInfo.nationalite} icon={<Globe size={16}/>} />
+      </div>
+    </div>
+
+    {/* BLOC 2 : COORDONNÉES */}
+    <div className="details-section-group">
+      <h4 className="section-subtitle">Coordonnées & Adresse</h4>
+      <div className="info-grid">
+        <InfoRow label="E-MAIL" value={userInfo.email} icon={<Mail size={16}/>} />
+        <InfoRow label="TÉLÉPHONE" value={userInfo.telephone} icon={<Phone size={16}/>} />
+        <InfoRow label="ADRESSE" value={userInfo.adresse} icon={<MapPin size={16}/>} />
+        <InfoRow label="CODE POSTAL" value={userInfo.codePostal} icon={<MapPin size={16}/>} />
+        <InfoRow label="VILLE" value={userInfo.ville} icon={<MapPin size={16}/>} />
+        <InfoRow label="PAYS" value={userInfo.pays} icon={<Globe size={16}/>} />
+      </div>
+    </div>
+
+    {/* BLOC 3 : SITUATION FINANCIÈRE */}
+    <div className="details-section-group">
+      <h4 className="section-subtitle">Profil Professionnel & Financier</h4>
+      <div className="info-grid">
+        <InfoRow label="PROFESSION" value={userInfo.situationProfessionnelle} icon={<Briefcase size={16}/>} />
+        <InfoRow label="SOURCE DES REVENUS" value={userInfo.sourceRevenus} icon={<TrendingUp size={16}/>} />
+        <InfoRow label="REVENUS MENSUELS" value={`${userInfo.revenusMensuels} €`} icon={<CreditCard size={16}/>} />
+        <InfoRow label="RÉSIDENCE FISCALE" value={userInfo.residenceFiscale} icon={<Shield size={16}/>} />
+      </div>
+    </div>
+
+    <div className="client-footer">
+      <div className="status-badge-certified">COMPTE {userInfo.status || "ACTIVE"}</div>
+      <p className="ref-client">ID Client : {userInfo.personalId || userInfo._id?.slice(-8).toUpperCase()}</p>
+      <p>Certifié par BPER Banca le {new Date(userInfo.createdAt).toLocaleDateString()}</p>
+    </div>
+  </div>
+)}
     </div>
   );
 }
