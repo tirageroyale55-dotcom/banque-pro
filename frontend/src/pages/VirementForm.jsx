@@ -108,7 +108,7 @@ const confirmTransfer = async () => {
     <div className="virement-wrapper">
       <header className="virement-header">
         <div className="header-top">
-          <button className="btn-annuler" onClick={() => navigate("/payer")}>
+          <button className="btn-annuler" onClick={() => navigate("/accounts")}>
             {step === 4 ? "Fermer" : "Annuler"}
           </button>
           <span className="header-title">Virement</span>
