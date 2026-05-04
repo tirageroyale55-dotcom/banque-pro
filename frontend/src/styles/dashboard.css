@@ -579,7 +579,20 @@ white-space:nowrap;
 }
 
 
+/* Style pour les icônes actives dans la barre du haut */
+.tool-icon.active-icon {
+  color: #005a64;
+}
 
+.user-avatar-circle.active-avatar {
+  border: 2px solid #005a64;
+  background: #e6f2f3;
+}
+
+/* Conteneur pour le profil sur Desktop pour éviter qu'il soit trop large */
+.profile-desktop-view {
+  max-width: 600px;
+}
 
 
 
