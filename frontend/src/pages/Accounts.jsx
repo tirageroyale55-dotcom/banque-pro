@@ -208,11 +208,12 @@ export default function Accounts({ data, setActiveTab }) {
             transactions.map((tx, i) => (
               <div key={tx._id || i} className="transaction" data-type={tx.type === "CREDIT" ? "Crédit" : "Débit"}>
                 <div className="left">
+                  {/* LE CLIC EST ICI : Il ouvre l'overlay en dessous */}
                   <div onClick={() => setSelectedTx(tx)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '5px' }}>
                     {tx.type === "DEBIT" ? <Send size={18} /> : <PlusCircle size={18} color="#16a34a" />}
                   </div>
                   <div>
-                    <div className="motif">{tx.label}</div> 
+                    <div className="motif">{tx.label || "Transaction bancaire"}</div> 
                     <div className="date">{new Date(tx.createdAt || tx.date).toLocaleDateString('fr-FR')}</div>
                   </div>
                 </div>
@@ -231,11 +232,33 @@ export default function Accounts({ data, setActiveTab }) {
         <div className="chart"><Line data={lineData}/></div>
       </div>
 
-      {/* OVERLAY DETAILS (Copié de ton original) */}
+      {/* --- CET OVERLAY ÉTAIT VIDE DANS TON CODE PRÉCÉDENT --- */}
       {selectedTx && (
-        <div className="tx-overlay">
-           {/* ... Contenu de ton overlay existant ... */}
-           <button onClick={() => setSelectedTx(null)}>Retour</button>
+        <div className="tx-overlay" onClick={() => setSelectedTx(null)}>
+          <div className="tx-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="tx-modal-header">
+              <h4>Détails de l'opération</h4>
+              <button className="close-modal" onClick={() => setSelectedTx(null)}>×</button>
+            </div>
+            
+            <div className="tx-modal-body">
+              <div className="tx-amount-large" style={{ color: selectedTx.type === "CREDIT" ? "#16a34a" : "#dc2626", textAlign: 'center', fontSize: '24px', margin: '20px 0', fontWeight: 'bold' }}>
+                {selectedTx.type === "CREDIT" ? "+" : "-"}{selectedTx.amount.toLocaleString()} €
+              </div>
+              
+              <div className="tx-details-list">
+                <DetailRow label="Libellé / Motif" value={selectedTx.label || "Transaction BPER"} />
+                <DetailRow label="Date" value={new Date(selectedTx.createdAt || selectedTx.date).toLocaleString('fr-FR')} />
+                <DetailRow label="Type d'opération" value={selectedTx.type === "CREDIT" ? "CRÉDIT (Entrant)" : "DÉBIT (Sortant)"} />
+                <DetailRow label="Référence de transaction" value={selectedTx._id ? selectedTx._id.toUpperCase() : "EN COURS..."} />
+                <DetailRow label="État" value="Exécuté" color="#16a34a" />
+              </div>
+
+              <button className="bper-btn-full" style={{ marginTop: '20px', width: '100%', padding: '12px', background: '#005a64', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }} onClick={() => window.print()}>
+                Télécharger le justificatif
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
