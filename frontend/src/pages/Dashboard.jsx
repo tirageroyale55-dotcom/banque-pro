@@ -35,9 +35,13 @@ export default function Dashboard() {
   const contentRef = useRef(null);
 
   
-  const userInfo = data.user || data;
-  const initials = `${userInfo.firstname?.charAt(0) || ""}${userInfo.lastname?.charAt(0) || ""}`.toUpperCase() || "BC";
-  const profileImage = userInfo.profilePicture || null;
+  // Version sécurisée pour éviter le dashboard vide
+const userInfo = data?.user || data || {};
+const firstName = userInfo.firstname || userInfo.prenom || "";
+const lastName = userInfo.lastname || userInfo.nom || "";
+
+const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || "??";
+const profileImage = userInfo.profilePicture || null;
 
   useEffect(() => {
     if (activeTab === "cards") {
@@ -151,7 +155,7 @@ export default function Dashboard() {
         <div className="bper-main-viewport">
           <header className="bper-top-bar">
   <div className="bper-welcome">
-    Bienvenue, <strong>{data.firstname} {data.lastname}</strong>
+    Bienvenue, <strong>{firstName} {lastName}</strong>
   </div>
   <div className="bper-header-tools">
     <Bell 
@@ -161,16 +165,28 @@ export default function Dashboard() {
       style={{cursor: 'pointer'}}
     />
     <div 
-  className={`user-avatar-circle ${activeTab === 'profile' ? 'active-avatar' : ''}`}
-  onClick={() => setActiveTab('profile')}
-  style={{ cursor: 'pointer', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
->
-  {profileImage ? (
-    <img src={profileImage} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-  ) : (
-    <span style={{ fontSize: '14px', fontWeight: 'bold' }}>{initials}</span>
-  )}
-</div>
+      className={`user-avatar-circle ${activeTab === 'profile' ? 'active-avatar' : ''}`}
+      onClick={() => setActiveTab('profile')}
+      style={{
+        cursor: 'pointer', 
+        overflow: 'hidden', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: '#eee', // Fond gris si pas de photo
+        width: '40px',
+        height: '40px',
+        borderRadius: '50%'
+      }}
+    >
+      {profileImage ? (
+        <img src={profileImage} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      ) : (
+        <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#005a64' }}>
+          {initials}
+        </span>
+      )}
+    </div>
   </div>
 </header>
 
