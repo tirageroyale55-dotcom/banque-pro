@@ -317,3 +317,56 @@
 
 
 
+/* Bouton retour pro sur Desktop */
+.back-to-profile-btn {
+  color: #005a64;
+  background: none;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+}
+
+.back-to-profile-btn:hover {
+  text-decoration: underline;
+}
+
+/* Grille d'infos responsive */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+/* Divider propre entre les sections de menu */
+.section-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 15px 0;
+}
+
+/* Badge de statut */
+.status-badge-certified {
+  background: #e6f2f3;
+  color: #005a64;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+/* Animations */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

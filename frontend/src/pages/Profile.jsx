@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { 
   Settings, Shield, MessageCircle, TrendingUp, 
   CreditCard, Umbrella, Edit, LogOut, ChevronRight, User, Globe, MapPin, 
-  Phone, Mail, Camera, Briefcase, CalendarClock, Bell, Smartphone, Palette, 
-  Languages, Accessibility, Cookie 
+  Phone, Mail, Camera, Briefcase, CalendarClock, Bell, Smartphone, Palette, Wallet, Languages, Accessibility, Cookie
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../services/api"; 
@@ -12,8 +11,8 @@ import "../styles/Profile.css";
 export default function Profile({ data: initialData, isDesktop = false }) {
   const navigate = useNavigate();
   const [data, setData] = useState(initialData);
-  // view peut être: "menu", "details", ou "settings"
-  const [view, setView] = useState("menu"); 
+  // On utilise une string pour gérer plusieurs vues : "menu", "details", "settings"
+  const [view, setView] = useState("menu");
   const [photo, setPhoto] = useState(null);
 
   useEffect(() => {
@@ -22,12 +21,16 @@ export default function Profile({ data: initialData, isDesktop = false }) {
         .then(res => {
           setData(res);
           const user = res.user || res;
-          if (user.profilePicture) setPhoto(user.profilePicture);
+          if (user.profilePicture) {
+            setPhoto(user.profilePicture);
+          }
         })
         .catch(() => navigate("/login"));
     } else {
       const user = data.user || data;
-      if (user.profilePicture) setPhoto(user.profilePicture);
+      if (user.profilePicture) {
+        setPhoto(user.profilePicture);
+      }
     }
   }, [data, navigate]);
 
@@ -80,8 +83,8 @@ export default function Profile({ data: initialData, isDesktop = false }) {
     }
   };
 
-  const handleServiceUnavailable = () => {
-    alert("L'opérateur est indisponible pour le moment. Veuillez réessayer plus tard.");
+  const handleUnavailable = () => {
+    alert("L'opérateur est indisponible pour le moment, veuillez réessayer plus tard.");
   };
 
   if (!data) {
@@ -105,19 +108,24 @@ export default function Profile({ data: initialData, isDesktop = false }) {
     window.location.href = "/login";
   };
 
-  const renderHeader = (title) => (
-    !isDesktop && (
-      <div className="bper-header">
-        <button onClick={() => setView("menu")} className="back-btn">←</button>
-        <span className="header-title">{title}</span>
-      </div>
-    )
-  );
-
   return (
     <div className={isDesktop ? "profile-desktop-view" : "bper-profile-container"}>
-      
-      {/* --- VUE MENU PRINCIPAL --- */}
+      {/* HEADER MOBILE UNIFIÉ */}
+      {!isDesktop && (
+        <div className="bper-header">
+          <button 
+            onClick={() => view !== "menu" ? setView("menu") : navigate(-1)} 
+            className="back-btn"
+          >
+            ←
+          </button>
+          <span className="header-title">
+            {view === "details" ? "Données Personnelles" : view === "settings" ? "Paramètres" : "Mon Profil"}
+          </span>
+        </div>
+      )}
+
+      {/* VUE 1 : MENU PRINCIPAL */}
       {view === "menu" && (
         <div className="fade-in">
           {isDesktop && <h2 className="cards-title">Mon Profil</h2>}
@@ -158,35 +166,38 @@ export default function Profile({ data: initialData, isDesktop = false }) {
         </div>
       )}
 
-      {/* --- VUE PARAMÈTRES & CONFIDENTIALITÉ --- */}
+      {/* VUE 2 : PARAMÈTRES ET CONFIDENTIALITÉ */}
       {view === "settings" && (
-        <div className="fade-in">
-          {renderHeader("Paramètres")}
+        <div className="bper-details-view fade-in">
           {isDesktop && (
-            <button onClick={() => setView("menu")} className="back-to-profile-btn">← Retour au profil</button>
+            <button onClick={() => setView("menu")} className="back-to-profile-btn">
+              ← Retour au profil
+            </button>
           )}
           <div className="details-header-block">
             <h3>Paramètres et confidentialité</h3>
-            <p>Gérez vos préférences et la configuration de votre application.</p>
+            <p>Gérez vos préférences et la configuration de l'application.</p>
           </div>
-          <div className="bper-menu-section no-margin">
-            <div onClick={handleServiceUnavailable}><MenuRow icon={<Bell size={20}/>} title="Notifications" /></div>
-            <div onClick={handleServiceUnavailable}><MenuRow icon={<Smartphone size={20}/>} title="Gestion des smartphones" /></div>
-            <div onClick={handleServiceUnavailable}><MenuRow icon={<Palette size={20}/>} title="Personnaliser l'application" /></div>
-            <div onClick={handleServiceUnavailable}><MenuRow icon={<CreditCard size={20}/>} title="Paiements numériques" /></div>
-            <div onClick={handleServiceUnavailable}><MenuRow icon={<Languages size={20}/>} title="Langue de l'application" /></div>
-            <div onClick={handleServiceUnavailable}><MenuRow icon={<Accessibility size={20}/>} title="Accessibilité" /></div>
-            <div onClick={handleServiceUnavailable}><MenuRow icon={<Cookie size={20}/>} title="Cookies" /></div>
+          
+          <div className="bper-menu-section" style={{marginTop: '20px'}}>
+            <div onClick={handleUnavailable}><MenuRow icon={<Bell size={20}/>} title="Notifications" /></div>
+            <div onClick={handleUnavailable}><MenuRow icon={<Smartphone size={20}/>} title="Gestion des smartphones" /></div>
+            <div onClick={handleUnavailable}><MenuRow icon={<Palette size={20}/>} title="Personnaliser l'application" /></div>
+            <div onClick={handleUnavailable}><MenuRow icon={<Wallet size={20}/>} title="Paiements numériques" /></div>
+            <div onClick={handleUnavailable}><MenuRow icon={<Languages size={20}/>} title="Langue de l'application" /></div>
+            <div onClick={handleUnavailable}><MenuRow icon={<Accessibility size={20}/>} title="Accessibilité" /></div>
+            <div onClick={handleUnavailable}><MenuRow icon={<Cookie size={20}/>} title="Cookies" /></div>
           </div>
         </div>
       )}
 
-      {/* --- VUE DÉTAILS DU COMPTE --- */}
+      {/* VUE 3 : DÉTAILS DU COMPTE */}
       {view === "details" && (
         <div className="bper-details-view fade-in">
-          {renderHeader("Données Personnelles")}
           {isDesktop && (
-            <button onClick={() => setView("menu")} className="back-to-profile-btn">← Retour au profil</button>
+            <button onClick={() => setView("menu")} className="back-to-profile-btn">
+              ← Retour au profil
+            </button>
           )}
           <div className="details-header-block">
             <h3>Détails du compte</h3>
@@ -218,16 +229,19 @@ export default function Profile({ data: initialData, isDesktop = false }) {
           </div>
 
           <div className="details-section-group">
-            <h4 className="section-subtitle">Profil Financier</h4>
+            <h4 className="section-subtitle">Profil Professionnel & Financier</h4>
             <div className="info-grid">
-              <InfoRow label="SITUATION" value={userInfo.situationProfessionnelle} icon={<Briefcase size={16}/>} />
-              <InfoRow label="REVENUS" value={`${userInfo.revenusMensuels} €`} icon={<CreditCard size={16}/>} />
+              <InfoRow label="PROFESSION" value={userInfo.situationProfessionnelle} icon={<Briefcase size={16}/>} />
+              <InfoRow label="SOURCE DES REVENUS" value={userInfo.sourceRevenus} icon={<TrendingUp size={16}/>} />
+              <InfoRow label="REVENUS MENSUELS" value={`${userInfo.revenusMensuels} €`} icon={<CreditCard size={16}/>} />
+              <InfoRow label="RÉSIDENCE FISCALE" value={userInfo.residenceFiscale} icon={<Shield size={16}/>} />
             </div>
           </div>
 
           <div className="client-footer">
             <div className="status-badge-certified">COMPTE {userInfo.status || "ACTIVE"}</div>
             <p className="ref-client">ID Client : {userInfo.personalId || userInfo._id?.slice(-8).toUpperCase()}</p>
+            <p>Certifié par BPER Banca le {new Date(userInfo.createdAt).toLocaleDateString()}</p>
           </div>
         </div>
       )}
@@ -237,7 +251,7 @@ export default function Profile({ data: initialData, isDesktop = false }) {
 
 function MenuRow({ icon, title, color = "#1e293b" }) {
   return (
-    <div className="bper-row" style={{ cursor: "pointer" }}>
+    <div className="bper-row" style={{cursor: 'pointer'}}>
       <div className="row-icon" style={{ color: color }}>{icon}</div>
       <div className="row-title" style={{ color: color }}>{title}</div>
       <ChevronRight size={18} color="#cbd5e1" />
