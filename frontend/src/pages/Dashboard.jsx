@@ -34,6 +34,11 @@ export default function Dashboard() {
   const lastScrollRef = useRef(0);
   const contentRef = useRef(null);
 
+  
+  const userInfo = data.user || data;
+  const initials = `${userInfo.firstname?.charAt(0) || ""}${userInfo.lastname?.charAt(0) || ""}`.toUpperCase() || "BC";
+  const profileImage = userInfo.profilePicture || null;
+
   useEffect(() => {
     if (activeTab === "cards") {
       api("/client/card")
@@ -156,12 +161,16 @@ export default function Dashboard() {
       style={{cursor: 'pointer'}}
     />
     <div 
-      className={`user-avatar-circle ${activeTab === 'profile' ? 'active-avatar' : ''}`}
-      onClick={() => setActiveTab('profile')}
-      style={{cursor: 'pointer'}}
-    >
-      <User size={20} />
-    </div>
+  className={`user-avatar-circle ${activeTab === 'profile' ? 'active-avatar' : ''}`}
+  onClick={() => setActiveTab('profile')}
+  style={{ cursor: 'pointer', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+>
+  {profileImage ? (
+    <img src={profileImage} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+  ) : (
+    <span style={{ fontSize: '14px', fontWeight: 'bold' }}>{initials}</span>
+  )}
+</div>
   </div>
 </header>
 
