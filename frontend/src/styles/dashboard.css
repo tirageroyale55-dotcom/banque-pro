@@ -580,20 +580,35 @@ white-space:nowrap;
 
 
 
+/* Empêche la superposition vue sur tes captures */
 .bper-desktop-layout {
-  display: flex; /* Aligne la sidebar et le contenu côte à côte */
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100%;
   height: 100vh;
+  overflow: hidden;
 }
 
 .bper-sidebar-left {
-  width: 260px; /* Largeur fixe pour la sidebar */
+  width: 260px;
   flex-shrink: 0;
-  border-right: 1px solid #eee;
+  z-index: 10; /* La sidebar reste bien à sa place */
 }
 
 .bper-main-viewport {
-  flex-grow: 1; /* Le contenu prend tout le reste de la place sans être recouvert */
-  overflow-y: auto;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Style pour que Payer ressemble aux Cartes sur PC */
+.payer-desktop-wrapper {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  max-width: 800px;
 }
 
 

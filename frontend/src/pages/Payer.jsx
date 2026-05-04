@@ -11,10 +11,10 @@ import {
 } from "lucide-react";
 import "../styles/payer.css";
 
-export default function Payer() {
+// Ajoute "isDesktop" dans les arguments de la fonction
+export default function Payer({ isDesktop = false }) {
   const navigate = useNavigate();
 
-  // Fonction pour simplifier le rendu des lignes de menu
   const MenuRow = ({ icon: Icon, title, onClick }) => (
     <div className="menu-row" onClick={onClick}>
       <div className="menu-left">
@@ -27,12 +27,10 @@ export default function Payer() {
 
   return (
     /* 1️⃣ On ajoute un wrapper "payer-full-container" qui va boucher le trou derrière */
-    <div className="payer-full-container">
-      
-      <div className="page-content payer-page">
-        <h2 className="page-title">Opérations</h2>
+    <div className={isDesktop ? "payer-desktop-view" : "payer-full-container"}>
+      <div className={isDesktop ? "" : "page-content payer-page"}>
+        {!isDesktop && <h2 className="page-title">Opérations</h2>}
 
-        {/* SECTION 1: OPÉRATIONS FRÉQUENTES */}
         <section className="ops-section">
           <h3 className="section-label">Opérations fréquentes</h3>
           <div className="menu-group">
@@ -83,8 +81,7 @@ export default function Payer() {
           </div>
         </section>
         
-        {/* Espace vide en bas pour ne pas être caché par le BottomNav */}
-        <div style={{ height: "100px" }}></div>
+        {!isDesktop && <div style={{ height: "100px" }}></div>}
       </div>
     </div>
   );

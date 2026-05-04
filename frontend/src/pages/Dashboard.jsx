@@ -164,15 +164,16 @@ export default function Dashboard() {
               </div>
             )}
 
-            {activeTab === "payer" && (
-    <div className="cards-section-desktop">
-      <h3 className="cards-title">Payer</h3>
-      <div className="payer-desktop-wrapper">
-        <Payer data={data} />
-      </div>
+            {/* Dans ton Dashboard.jsx, section Desktop */}
+{activeTab === "payer" && (
+  <div className="cards-section-desktop">
+    <h3 className="cards-title">Effectuer un paiement</h3>
+    {/* On passe isDesktop={true} pour nettoyer le style mobile */}
+    <div className="payer-desktop-wrapper">
+      <Payer isDesktop={true} />
     </div>
-  )} 
-  
+  </div>
+)}
           </div>
         </div>
       </div>
