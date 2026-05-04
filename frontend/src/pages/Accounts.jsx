@@ -34,6 +34,15 @@ function DetailRow({ label, value, color = '#1e293b' }) {
 
 export default function Accounts({ data, setActiveTab }) {
   const navigate = useNavigate(); 
+
+  const userInfo = data.user || data || {};
+  const accountInfo = data.account || data || {};
+  
+  const firstName = userInfo.prenom || data.firstname || "";
+  const lastName = userInfo.nom || data.lastname || "";
+  const balance = accountInfo.balance ?? data.balance ?? 0;
+  const iban = accountInfo.iban || data.iban || "";
+  
   const [sortAsc, setSortAsc] = useState(false);
   const [filter, setFilter] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
@@ -51,6 +60,7 @@ export default function Accounts({ data, setActiveTab }) {
 
   const [showBalance, setShowBalance] = useState(true);
   const [showIban, setShowIban] = useState(false);
+  
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -125,19 +135,19 @@ export default function Accounts({ data, setActiveTab }) {
       </div>
 
       <div className="balance">
-        {/* Si showBalance est faux, on affiche des étoiles */}
-        {showBalance ? `${formatBper(data.balance)} €` : "•••••• €"}
-      </div>
+  {showBalance ? `${formatBper(balance)} €` : "•••••• €"}
+</div>
 
-      <div className="owner owner-name">{data.firstname} {data.lastname}</div>
-      
-      {/* Affichage de l'IBAN (Mobile) */}
-      <div className="iban mobile-only">
-        {showIban ? data.iban : "IT** **** **** **** ****"}
-        <button onClick={() => { copyToClipboard(data.iban); setShowIban(true); }} className="copy-btn-clean">
-          <Copy size={14} />
-        </button>
-      </div>
+<div className="owner owner-name">{firstName} {lastName}</div>
+
+<div className="iban mobile-only">
+  {showIban ? iban : "IT** **** **** **** ****"}
+  <button onClick={() => { copyToClipboard(iban); setShowIban(true); }} className="copy-btn-clean">
+    <Copy size={14} />
+  </button>
+</div>
+
+
     </div>
 
     {/* --- BOUTONS VERTICAUX (DESKTOP) --- */}
@@ -202,36 +212,28 @@ export default function Accounts({ data, setActiveTab }) {
         )}
 
         <div className="transactions-list">
-  {transactions.length === 0 ? (
-    <div className="empty-transactions">Aucune transaction disponible</div>
-  ) : (
-    transactions.map((tx, i) => {
-      // On s'assure d'avoir une date valide pour l'affichage
-      const dateObj = new Date(tx.createdAt || tx.date);
-      const displayDate = isNaN(dateObj.getTime()) ? "Date inconnue" : dateObj.toLocaleDateString('fr-FR');
-
-      return (
-        <div key={tx._id || i} className="transaction" data-type={tx.type === "CREDIT" ? "Crédit" : "Débit"}>
-          <div className="left">
-            {/* L'icône déclenche l'overlay avec les détails */}
-            <div onClick={() => setSelectedTx(tx)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '5px' }}>
-              {tx.type === "DEBIT" ? <Send size={18} /> : <PlusCircle size={18} color="#16a34a" />}
-            </div>
-            <div>
-              {/* C'est ici que le label doit s'afficher */}
-              <div className="motif">{tx.label || "Transaction bancaire"}</div> 
-              <div className="date">{displayDate}</div>
-            </div>
-          </div>
-          <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
-            {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
-          </div>
+          {transactions.length === 0 ? (
+            <div className="empty-transactions">Aucune transaction disponible</div>
+          ) : (
+            transactions.map((tx, i) => (
+              <div key={tx._id || i} className="transaction" data-type={tx.type === "CREDIT" ? "Crédit" : "Débit"}>
+                <div className="left">
+                  <div onClick={() => setSelectedTx(tx)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '5px' }}>
+                    {tx.type === "DEBIT" ? <Send size={18} /> : <PlusCircle size={18} color="#16a34a" />}
+                  </div>
+                  <div>
+                    <div className="motif">{tx.label || "Transaction bancaire"}</div> 
+                    <div className="date">{new Date(tx.createdAt || tx.date).toLocaleDateString('fr-FR')}</div>
+                  </div>
+                </div>
+                <div className={tx.type === "CREDIT" ? "amount plus" : "amount minus"}>
+                  {tx.type === "CREDIT" ? `+${tx.amount.toLocaleString()}` : `-${tx.amount.toLocaleString()}`} €
+                </div>
+              </div>
+            ))
+          )}
         </div>
-      );
-    })
-  )}
-</div>
-</div>
+      </div>
 
       {/* CHARTS */}
       <div className="charts">
