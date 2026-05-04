@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { 
   Settings, Shield, MessageCircle, TrendingUp, 
   CreditCard, Umbrella, Edit, LogOut, ChevronRight, User, Globe, MapPin, 
-  Phone, Mail, Camera, Briefcase, CalendarClock 
+  Phone, Mail, Camera, Briefcase, CalendarClock, Bell, Smartphone, Palette, 
+  Languages, Accessibility, Cookie 
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../services/api"; 
@@ -11,97 +12,76 @@ import "../styles/Profile.css";
 export default function Profile({ data: initialData, isDesktop = false }) {
   const navigate = useNavigate();
   const [data, setData] = useState(initialData);
-  const [showDetails, setShowDetails] = useState(false);
+  // view peut être: "menu", "details", ou "settings"
+  const [view, setView] = useState("menu"); 
   const [photo, setPhoto] = useState(null);
 
   useEffect(() => {
-  if (!data) {
-    api("/client/dashboard")
-      .then(res => {
-        setData(res);
-        // ✅ AJOUTE ÇA : Si le serveur renvoie une photo, on l'affiche
-        const user = res.user || res;
-        if (user.profilePicture) {
-          setPhoto(user.profilePicture);
-        }
-      })
-      .catch(() => navigate("/login"));
-  } else {
-    // ✅ AJOUTE ÇA AUSSI : Si data existe déjà (ex: passé par le Dashboard)
-    const user = data.user || data;
-    if (user.profilePicture) {
-      setPhoto(user.profilePicture);
+    if (!data) {
+      api("/client/dashboard")
+        .then(res => {
+          setData(res);
+          const user = res.user || res;
+          if (user.profilePicture) setPhoto(user.profilePicture);
+        })
+        .catch(() => navigate("/login"));
+    } else {
+      const user = data.user || data;
+      if (user.profilePicture) setPhoto(user.profilePicture);
     }
-  }
-}, [data, navigate]);
+  }, [data, navigate]);
 
-
-  // Fonction à ajouter en dehors de ton composant pour réduire la taille
-const compressImage = async (file) => {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 800; // On réduit la largeur à 800px
-        const scaleSize = MAX_WIDTH / img.width;
-        canvas.width = MAX_WIDTH;
-        canvas.height = img.height * scaleSize;
-        
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        
-        canvas.toBlob((blob) => {
-          resolve(new File([blob], file.name, { type: "image/jpeg" }));
-        }, "image/jpeg", 0.7); // Qualité à 70%
+  const compressImage = async (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob((blob) => {
+            resolve(new File([blob], file.name, { type: "image/jpeg" }));
+          }, "image/jpeg", 0.7);
+        };
       };
-    };
-  });
-};
+    });
+  };
 
-  // --- NOUVELLE FONCTION POUR ENREGISTRER LA PHOTO ---
   const handlePhotoChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    // 1. On affiche l'aperçu immédiatement (même si c'est le gros fichier)
     setPhoto(URL.createObjectURL(file));
-
     try {
-      // 2. On compresse l'image (cela prend un peu de temps)
       const compressedFile = await compressImage(file);
-
-      // 3. On prépare le formulaire d'envoi avec SEULEMENT le fichier compressé
       const formData = new FormData();
-      formData.append("photo", compressedFile); // Un seul append suffit ici
-
+      formData.append("photo", compressedFile);
       const token = localStorage.getItem("token");
-
-      // 4. Envoi vers le serveur
       const res = await fetch("/api/client/upload-profile-picture", {
         method: "POST",
-        headers: {
-          "Authorization": token ? `Bearer ${token}` : ""
-          // Rappel : Pas de "Content-Type" pour les fichiers
-        },
+        headers: { "Authorization": token ? `Bearer ${token}` : "" },
         body: formData
       });
-
       const result = await res.json();
-
       if (res.ok) {
-        setPhoto(result.url); // On remplace l'aperçu par l'URL Cloudinary finale
+        setPhoto(result.url);
         alert("Photo de profil enregistrée !");
       } else {
-        alert("Erreur " + res.status + " : " + (result.message || "Échec de l'enregistrement"));
+        alert("Erreur " + res.status + " : " + (result.message || "Échec"));
       }
     } catch (err) {
-      console.error("Erreur connexion:", err);
       alert("Problème de connexion au serveur.");
     }
+  };
+
+  const handleServiceUnavailable = () => {
+    alert("L'opérateur est indisponible pour le moment. Veuillez réessayer plus tard.");
   };
 
   if (!data) {
@@ -118,8 +98,6 @@ const compressImage = async (file) => {
   const prenomUser = userInfo.prenom || "";
   const displayName = `${prenomUser} ${nomUser}`.trim() || "Client BPER";
   const initials = `${prenomUser.charAt(0)}${nomUser.charAt(0)}`.toUpperCase() || "BC";
-
-  // On utilise la photo du serveur si elle existe, sinon celle qu'on vient de charger
   const profileImage = photo || userInfo.profilePicture || null;
 
   const handleLogout = () => {
@@ -127,39 +105,28 @@ const compressImage = async (file) => {
     window.location.href = "/login";
   };
 
+  const renderHeader = (title) => (
+    !isDesktop && (
+      <div className="bper-header">
+        <button onClick={() => setView("menu")} className="back-btn">←</button>
+        <span className="header-title">{title}</span>
+      </div>
+    )
+  );
+
   return (
     <div className={isDesktop ? "profile-desktop-view" : "bper-profile-container"}>
-      {!isDesktop && (
-        <div className="bper-header">
-          <button 
-            onClick={() => showDetails ? setShowDetails(false) : navigate(-1)} 
-            className="back-btn"
-          >
-            ←
-          </button>
-          <span className="header-title">
-            {showDetails ? "Données Personnelles" : "Mon Profil"}
-          </span>
-        </div>
-      )}
-
-      {!showDetails ? (
+      
+      {/* --- VUE MENU PRINCIPAL --- */}
+      {view === "menu" && (
         <div className="fade-in">
           {isDesktop && <h2 className="cards-title">Mon Profil</h2>}
-          <div className="bper-card-blue" onClick={() => setShowDetails(true)}>
+          <div className="bper-card-blue" onClick={() => setView("details")}>
             <div className="bper-avatar-circle">
-               {profileImage ? (
-                 <img src={profileImage} alt="avatar" className="avatar-img"/> 
-               ) : initials}
-               
+               {profileImage ? <img src={profileImage} alt="avatar" className="avatar-img"/> : initials}
                <label className="camera-badge" onClick={(e) => e.stopPropagation()}>
                   <Camera size={10} />
-                  <input 
-                    type="file" 
-                    hidden 
-                    accept="image/*"
-                    onChange={handlePhotoChange} 
-                  />
+                  <input type="file" hidden accept="image/*" onChange={handlePhotoChange} />
                </label>
             </div>
             <div className="profile-info-text">
@@ -171,14 +138,16 @@ const compressImage = async (file) => {
           </div>
 
           <div className="bper-menu-section">
-            <MenuRow icon={<Settings size={20}/>} title="Paramètres et confidentialité" />
+            <div onClick={() => setView("settings")}>
+              <MenuRow icon={<Settings size={20}/>} title="Paramètres et confidentialité" />
+            </div>
             <MenuRow icon={<Shield size={20}/>} title="Sécurité" />
             <MenuRow icon={<MessageCircle size={20}/>} title="Parlez-nous" />
             <div className="section-divider" />
             <MenuRow icon={<TrendingUp size={20}/>} title="Opérations d'investissement" />
             <MenuRow icon={<CreditCard size={20}/>} title="Financement" />
             <MenuRow icon={<Umbrella size={20}/>} title="Assurance et prévoyance" />
-            <div onClick={() => setShowDetails(true)}>
+            <div onClick={() => setView("details")}>
                 <MenuRow icon={<Edit size={20}/>} title="Détails du compte" />
             </div>
             <div className="section-divider" />
@@ -187,70 +156,88 @@ const compressImage = async (file) => {
             </div>
           </div>
         </div>
-      ) : (
-  <div className="bper-details-view fade-in">
-    {isDesktop && (
-      <button onClick={() => setShowDetails(false)} className="back-to-profile-btn">
-        ← Retour au profil
-      </button>
-    )}
+      )}
 
-    <div className="details-header-block">
-      <h3>Détails du compte</h3>
-      <p>Informations certifiées conformes aux documents d'identité.</p>
-    </div>
+      {/* --- VUE PARAMÈTRES & CONFIDENTIALITÉ --- */}
+      {view === "settings" && (
+        <div className="fade-in">
+          {renderHeader("Paramètres")}
+          {isDesktop && (
+            <button onClick={() => setView("menu")} className="back-to-profile-btn">← Retour au profil</button>
+          )}
+          <div className="details-header-block">
+            <h3>Paramètres et confidentialité</h3>
+            <p>Gérez vos préférences et la configuration de votre application.</p>
+          </div>
+          <div className="bper-menu-section no-margin">
+            <div onClick={handleServiceUnavailable}><MenuRow icon={<Bell size={20}/>} title="Notifications" /></div>
+            <div onClick={handleServiceUnavailable}><MenuRow icon={<Smartphone size={20}/>} title="Gestion des smartphones" /></div>
+            <div onClick={handleServiceUnavailable}><MenuRow icon={<Palette size={20}/>} title="Personnaliser l'application" /></div>
+            <div onClick={handleServiceUnavailable}><MenuRow icon={<CreditCard size={20}/>} title="Paiements numériques" /></div>
+            <div onClick={handleServiceUnavailable}><MenuRow icon={<Languages size={20}/>} title="Langue de l'application" /></div>
+            <div onClick={handleServiceUnavailable}><MenuRow icon={<Accessibility size={20}/>} title="Accessibilité" /></div>
+            <div onClick={handleServiceUnavailable}><MenuRow icon={<Cookie size={20}/>} title="Cookies" /></div>
+          </div>
+        </div>
+      )}
 
-    {/* BLOC 1 : ÉTAT CIVIL */}
-    <div className="details-section-group">
-      <h4 className="section-subtitle">Identité & État Civil</h4>
-      <div className="info-grid">
-        <InfoRow label="CIVILITÉ" value={userInfo.civilite} icon={<User size={16}/>} />
-        <InfoRow label="NOM" value={userInfo.nom} icon={<User size={16}/>} />
-        <InfoRow label="PRÉNOM" value={userInfo.prenom} icon={<User size={16}/>} />
-        <InfoRow label="DATE DE NAISSANCE" value={userInfo.dateNaissance} icon={<CalendarClock size={16}/>} />
-        <InfoRow label="LIEU DE NAISSANCE" value={userInfo.lieuNaissance} icon={<MapPin size={16}/>} />
-        <InfoRow label="NATIONALITÉ" value={userInfo.nationalite} icon={<Globe size={16}/>} />
-      </div>
-    </div>
+      {/* --- VUE DÉTAILS DU COMPTE --- */}
+      {view === "details" && (
+        <div className="bper-details-view fade-in">
+          {renderHeader("Données Personnelles")}
+          {isDesktop && (
+            <button onClick={() => setView("menu")} className="back-to-profile-btn">← Retour au profil</button>
+          )}
+          <div className="details-header-block">
+            <h3>Détails du compte</h3>
+            <p>Informations certifiées conformes aux documents d'identité.</p>
+          </div>
 
-    {/* BLOC 2 : COORDONNÉES */}
-    <div className="details-section-group">
-      <h4 className="section-subtitle">Coordonnées & Adresse</h4>
-      <div className="info-grid">
-        <InfoRow label="E-MAIL" value={userInfo.email} icon={<Mail size={16}/>} />
-        <InfoRow label="TÉLÉPHONE" value={userInfo.telephone} icon={<Phone size={16}/>} />
-        <InfoRow label="ADRESSE" value={userInfo.adresse} icon={<MapPin size={16}/>} />
-        <InfoRow label="CODE POSTAL" value={userInfo.codePostal} icon={<MapPin size={16}/>} />
-        <InfoRow label="VILLE" value={userInfo.ville} icon={<MapPin size={16}/>} />
-        <InfoRow label="PAYS" value={userInfo.pays} icon={<Globe size={16}/>} />
-      </div>
-    </div>
+          <div className="details-section-group">
+            <h4 className="section-subtitle">Identité & État Civil</h4>
+            <div className="info-grid">
+              <InfoRow label="CIVILITÉ" value={userInfo.civilite} icon={<User size={16}/>} />
+              <InfoRow label="NOM" value={userInfo.nom} icon={<User size={16}/>} />
+              <InfoRow label="PRÉNOM" value={userInfo.prenom} icon={<User size={16}/>} />
+              <InfoRow label="DATE DE NAISSANCE" value={userInfo.dateNaissance} icon={<CalendarClock size={16}/>} />
+              <InfoRow label="LIEU DE NAISSANCE" value={userInfo.lieuNaissance} icon={<MapPin size={16}/>} />
+              <InfoRow label="NATIONALITÉ" value={userInfo.nationalite} icon={<Globe size={16}/>} />
+            </div>
+          </div>
 
-    {/* BLOC 3 : SITUATION FINANCIÈRE */}
-    <div className="details-section-group">
-      <h4 className="section-subtitle">Profil Professionnel & Financier</h4>
-      <div className="info-grid">
-        <InfoRow label="PROFESSION" value={userInfo.situationProfessionnelle} icon={<Briefcase size={16}/>} />
-        <InfoRow label="SOURCE DES REVENUS" value={userInfo.sourceRevenus} icon={<TrendingUp size={16}/>} />
-        <InfoRow label="REVENUS MENSUELS" value={`${userInfo.revenusMensuels} €`} icon={<CreditCard size={16}/>} />
-        <InfoRow label="RÉSIDENCE FISCALE" value={userInfo.residenceFiscale} icon={<Shield size={16}/>} />
-      </div>
-    </div>
+          <div className="details-section-group">
+            <h4 className="section-subtitle">Coordonnées & Adresse</h4>
+            <div className="info-grid">
+              <InfoRow label="E-MAIL" value={userInfo.email} icon={<Mail size={16}/>} />
+              <InfoRow label="TÉLÉPHONE" value={userInfo.telephone} icon={<Phone size={16}/>} />
+              <InfoRow label="ADRESSE" value={userInfo.adresse} icon={<MapPin size={16}/>} />
+              <InfoRow label="CODE POSTAL" value={userInfo.codePostal} icon={<MapPin size={16}/>} />
+              <InfoRow label="VILLE" value={userInfo.ville} icon={<MapPin size={16}/>} />
+              <InfoRow label="PAYS" value={userInfo.pays} icon={<Globe size={16}/>} />
+            </div>
+          </div>
 
-    <div className="client-footer">
-      <div className="status-badge-certified">COMPTE {userInfo.status || "ACTIVE"}</div>
-      <p className="ref-client">ID Client : {userInfo.personalId || userInfo._id?.slice(-8).toUpperCase()}</p>
-      <p>Certifié par BPER Banca le {new Date(userInfo.createdAt).toLocaleDateString()}</p>
-    </div>
-  </div>
-)}
+          <div className="details-section-group">
+            <h4 className="section-subtitle">Profil Financier</h4>
+            <div className="info-grid">
+              <InfoRow label="SITUATION" value={userInfo.situationProfessionnelle} icon={<Briefcase size={16}/>} />
+              <InfoRow label="REVENUS" value={`${userInfo.revenusMensuels} €`} icon={<CreditCard size={16}/>} />
+            </div>
+          </div>
+
+          <div className="client-footer">
+            <div className="status-badge-certified">COMPTE {userInfo.status || "ACTIVE"}</div>
+            <p className="ref-client">ID Client : {userInfo.personalId || userInfo._id?.slice(-8).toUpperCase()}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 function MenuRow({ icon, title, color = "#1e293b" }) {
   return (
-    <div className="bper-row">
+    <div className="bper-row" style={{ cursor: "pointer" }}>
       <div className="row-icon" style={{ color: color }}>{icon}</div>
       <div className="row-title" style={{ color: color }}>{title}</div>
       <ChevronRight size={18} color="#cbd5e1" />
