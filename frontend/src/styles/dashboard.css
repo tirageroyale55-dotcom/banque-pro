@@ -580,7 +580,21 @@ white-space:nowrap;
 
 
 
+.bper-desktop-layout {
+  display: flex; /* Aligne la sidebar et le contenu côte à côte */
+  height: 100vh;
+}
 
+.bper-sidebar-left {
+  width: 260px; /* Largeur fixe pour la sidebar */
+  flex-shrink: 0;
+  border-right: 1px solid #eee;
+}
+
+.bper-main-viewport {
+  flex-grow: 1; /* Le contenu prend tout le reste de la place sans être recouvert */
+  overflow-y: auto;
+}
 
 
 
