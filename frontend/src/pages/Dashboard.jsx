@@ -154,41 +154,41 @@ const profileImage = userInfo.profilePicture || null;
         {/* Contenu de droite */}
         <div className="bper-main-viewport">
           <header className="bper-top-bar">
-  <div className="bper-welcome">
-    Bienvenue, <strong>{firstName} {lastName}</strong>
-  </div>
-  <div className="bper-header-tools">
-    <Bell 
-      size={22} 
-      className={`tool-icon ${activeTab === 'notifications' ? 'active-icon' : ''}`} 
-      onClick={() => setActiveTab('notifications')} 
-      style={{cursor: 'pointer'}}
-    />
-    <div 
-      className={`user-avatar-circle ${activeTab === 'profile' ? 'active-avatar' : ''}`}
-      onClick={() => setActiveTab('profile')}
-      style={{
-        cursor: 'pointer', 
-        overflow: 'hidden', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        background: '#eee', // Fond gris si pas de photo
-        width: '40px',
-        height: '40px',
-        borderRadius: '50%'
-      }}
-    >
-      {profileImage ? (
-        <img src={profileImage} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-      ) : (
-        <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#005a64' }}>
-          {initials}
-        </span>
-      )}
-    </div>
-  </div>
-</header>
+            <div className="bper-welcome">
+              Bienvenue, <strong>{firstName} {lastName}</strong>
+            </div>
+        <div className="bper-header-tools">
+        <Bell 
+          size={22} 
+          className={`tool-icon ${activeTab === 'notifications' ? 'active-icon' : ''}`} 
+          onClick={() => setActiveTab('notifications')} 
+          style={{cursor: 'pointer'}}
+        />
+        <div 
+          className={`user-avatar-circle ${activeTab === 'profile' ? 'active-avatar' : ''}`}
+          onClick={() => setActiveTab('profile')}
+        style={{
+          cursor: 'pointer', 
+          overflow: 'hidden', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          background: '#eee', // Fond gris si pas de photo
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%'
+         }}
+        >
+             {profileImage ? (
+             <img src={profileImage} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+            <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#005a64' }}>
+              {initials}
+            </span>
+           )}
+          </div>
+         </div>
+        </header>
 
           <div className="bper-scroll-content">
             {activeTab === "accounts" && <Accounts data={data} setActiveTab={setActiveTab}/>}
@@ -217,35 +217,35 @@ const profileImage = userInfo.profilePicture || null;
             )}
 
 
-{activeTab === "produits" && (
-    <div className="cards-section-desktop">
-      <Produits isDesktop={true} />
-    </div>
-  )}
+            {activeTab === "produits" && (
+               <div className="cards-section-desktop">
+                 <Produits isDesktop={true} />
+               </div>
+            )}
 
-  {activeTab === "lifestyle" && (
-    <div className="cards-section-desktop">
-      <Lifestyle isDesktop={true} />
-    </div>
-  )}
+            {activeTab === "lifestyle" && (
+               <div className="cards-section-desktop">
+                 <Lifestyle isDesktop={true} />
+               </div>
+            )}
 
-  {activeTab === "aide" && (
-    <div className="cards-section-desktop">
-      <Aide isDesktop={true} />
-    </div>
-  )}
+            {activeTab === "aide" && (
+              <div className="cards-section-desktop">
+                <Aide isDesktop={true} />
+              </div>
+            )}
        
-    {activeTab === "notifications" && (
-    <div className="cards-section-desktop">
-      <Notifications isDesktop={true} />
-    </div>
-  )}
+            {activeTab === "notifications" && (
+               <div className="cards-section-desktop">
+                 <Notifications isDesktop={true} />
+               </div>
+            )}
 
-  {activeTab === "profile" && (
-    <div className="cards-section-desktop">
-      <Profile data={data} isDesktop={true} />
-    </div>
-  )}   
+            {activeTab === "profile" && (
+               <div className="cards-section-desktop">
+                 <Profile data={data} isDesktop={true} />
+               </div>
+            )}   
           </div>
         </div>
       </div>

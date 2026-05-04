@@ -205,7 +205,7 @@ const compressImage = async (file) => {
             <InfoRow label="VILLE" value={userInfo.ville} icon={<MapPin size={16}/>} />
             <InfoRow label="NATIONALITÉ" value={userInfo.nationalite} icon={<Globe size={16}/>} />
             <div className="client-footer">
-                <p>Référence Client : {data._id?.slice(-8).toUpperCase() || "BPER-PRO-001"}</p>
+                <p>Référence Client : {data._id?.slice(-8).toUpperCase() || "BPER-00401"}</p>
                 <p>Compte actif - Certifié par BPER Banca</p>
             </div>
         </div>
