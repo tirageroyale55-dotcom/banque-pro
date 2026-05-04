@@ -1,39 +1,41 @@
 const Account = require("../models/Account");
 const Transaction = require("../models/Transaction");
-const User = require("../models/User"); // On ajoute l'import de User
+const User = require("../models/User");
 
 exports.getDashboard = async (req, res) => {
   try {
-    // .lean() permet de récupérer un objet JS pur, plus facile à manipuler
-    const account = await Account.findOne({ user: req.user.id })
-      .populate("user")
-      .lean();
+    // On garde ton .populate("user") habituel
+    const account = await Account.findOne({ user: req.user.id }).populate("user");
 
     if (!account) return res.status(404).json({ message: "Compte introuvable" });
 
-    // Récupère les transactions et transforme-les en JSON pur
+    // On récupère les transactions SANS les filtrer
     const transactions = await Transaction.find({ account: account._id })
       .sort({ createdAt: -1 })
-      .limit(10)
-      .lean();
+      .limit(10);
 
+    // ON ENVOIE EXACTEMENT CE QUE TES COMPOSANTS ATTENDENT
     res.json({
-      user: account.user, // Contient maintenant TOUT le profil (email, adresse, etc.)
+      // On envoie l'objet user COMPLET au lieu de juste nom/prenom
+      user: account.user, 
+      
       account: {
         balance: account.balance,
         iban: account.iban,
         accountNumber: account.accountNumber
       },
-      // Ces lignes assurent la compatibilité avec tes anciens composants
+
+      // On garde tes anciennes clés pour ne pas casser Accounts.jsx
       balance: account.balance, 
       iban: account.iban,
       firstname: account.user.prenom,
       lastname: account.user.nom,
       
-      transactions // Contient maintenant les objets avec le champ 'label'
+      // On envoie les transactions avec tous leurs champs (y compris label)
+      transactions: transactions 
     });
   } catch (err) {
-    console.error(err);
+    console.error("Erreur Dashboard:", err);
     res.status(500).json({ message: "Erreur" });
   }
 };
