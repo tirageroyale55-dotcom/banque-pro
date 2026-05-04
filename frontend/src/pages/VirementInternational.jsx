@@ -148,7 +148,7 @@ export default function VirementInternational() {
     <div className="virement-wrapper">
       <header className="virement-header">
         <div className="header-top">
-          <button className="btn-annuler" onClick={() => navigate("/payer")}>Annuler</button>
+          <button className="btn-annuler" onClick={() => navigate("/dashboard")}>Annuler</button>
           <span className="header-title">Virement International</span>
           <HelpCircle size={20} />
         </div>
