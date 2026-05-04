@@ -212,7 +212,10 @@ export default function Accounts({ data, setActiveTab }) {
                     {tx.type === "DEBIT" ? <Send size={18} /> : <PlusCircle size={18} color="#16a34a" />}
                   </div>
                   <div>
-                    <div className="motif">{tx.label}</div> 
+                    {/* Remplace <div className="motif">{tx.label}</div> par ceci : */}
+<div className="motif">
+  {tx.label || tx.description || tx.reference || "Transaction BPER"}
+</div>
                     <div className="date">{new Date(tx.createdAt || tx.date).toLocaleDateString('fr-FR')}</div>
                   </div>
                 </div>
