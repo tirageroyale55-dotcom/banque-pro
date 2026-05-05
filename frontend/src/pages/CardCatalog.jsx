@@ -1,7 +1,8 @@
 import { ChevronRight, ShieldCheck, Wifi, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const navigate = useNavigate();
+
+
 
 const BPER_MODELS = [
   {
