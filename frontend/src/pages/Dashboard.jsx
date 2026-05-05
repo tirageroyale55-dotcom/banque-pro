@@ -8,6 +8,7 @@ import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
 import Cards from "./Cards"; 
+import CardCatalog from "./CardCatalog"; // Juste après tes autres imports
 import Accounts from "./Accounts";
 import Payer from "./Payer";
 import Produits from "./Produits";  
@@ -195,18 +196,19 @@ const profileImage = userInfo.profilePicture || null;
             {activeTab === "accounts" && <Accounts data={data} setActiveTab={setActiveTab}/>}
             
             {activeTab === "cards" && (
-              <div className="cards-section-desktop">
-                <h3 className="cards-title">Mes cartes</h3>
-                <div className="desktop-cards-grid">
-                  {card && <BankCard card={card}/>}
-                  <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
-                    <div className="card-plus">+</div>
-                    <p>Demander une carte</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
+  <div className="cards-section-desktop">
+    <h3 className="cards-title">Mes cartes</h3>
+    <div className="desktop-cards-grid">
+      {card && <BankCard card={card}/>}
+      <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
+        <div className="card-plus">+</div>
+        <p>Demander une carte</p>
+      </div>
+    </div>
+    {/* ON AJOUTE LE CATALOGUE ICI */}
+    <CardCatalog /> 
+  </div>
+)}
             
             {activeTab === "payer" && (
                <div className="cards-section-desktop">
@@ -267,23 +269,25 @@ const profileImage = userInfo.profilePicture || null;
         {activeTab === "profile" && <div className="content">Mon Profil</div>}
 
         {activeTab === "cards" && (
-          <div className="cards-section">
-            <h3 className="cards-title">Mes cartes</h3>
-            <div className="cards-slider">
-              {card && (
-                <div className="cards-slide">
-                  <BankCard card={card}/>
-                </div>
-              )}
-              <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
-                <div className="card-request-inner">
-                  <div className="card-plus">+</div>
-                  <p>Demander une carte</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+  <div className="cards-section">
+    <h3 className="cards-title">Mes cartes</h3>
+    <div className="cards-slider">
+      {card && (
+        <div className="cards-slide">
+          <BankCard card={card}/>
+        </div>
+      )}
+      <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+        <div className="card-request-inner">
+          <div className="card-plus">+</div>
+          <p>Demander une carte</p>
+        </div>
+      </div>
+    </div>
+    {/* ON AJOUTE LE CATALOGUE ICI AUSSI */}
+    <CardCatalog />
+  </div>
+)}
 
         {activeTab === "financing" && (
           <div className="content">
