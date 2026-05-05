@@ -33,6 +33,7 @@ const BPER_MODELS = [
 export default function CardCatalog() {
   return (
     <div className="catalog-container">
+      {/* En-tête avec fond blanc et bordure BPER */}
       <div className="catalog-header">
         <h2>Catalogue Cartes BPER</h2>
         <p>Gérez vos paiements avec la technologie NFC sécurisée</p>
@@ -41,7 +42,6 @@ export default function CardCatalog() {
       <div className="catalog-grid">
         {BPER_MODELS.map((item) => (
           <div key={item.id} className="catalog-card-item">
-            {/* Rendu de la carte physique réaliste */}
             <div className="card-physical-container">
               <div className="card-body" style={{ background: item.bg }}>
                 <div className="card-gloss"></div>
@@ -69,14 +69,12 @@ export default function CardCatalog() {
               </div>
             </div>
 
-            {/* Infos produit & Features */}
             <div className="product-details">
               <div className="product-header">
                 <h4>{item.name}</h4>
                 <span className="price-tag">{item.price}<small>/mois</small></span>
               </div>
 
-              {/* SECTION DES FEATURES AVEC ICONES VERTES */}
               <ul className="features-list">
                 {item.features.map((feature, idx) => (
                   <li key={idx}>
@@ -95,7 +93,6 @@ export default function CardCatalog() {
       </div>
 
       <style jsx>{`
-        
         .catalog-container { 
           padding: 20px; 
           font-family: 'Inter', sans-serif; 
@@ -138,7 +135,6 @@ export default function CardCatalog() {
           border: 1px solid #f1f5f9;
           overflow: hidden;
           box-shadow: 0 10px 20px rgba(0,0,0,0.04);
-          transition: transform 0.3s ease;
         }
 
         .card-physical-container {
@@ -174,17 +170,15 @@ export default function CardCatalog() {
         .bper-logo small { font-size: 11px; font-weight: 400; opacity: 0.8; }
         .nfc-icon { opacity: 0.8; transform: rotate(90deg); color: white; }
 
-        /* Puce EMV Haute Définition */
         .emv-chip {
           width: 42px;
           height: 32px;
-          background: #eab308;
+          background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
           border-radius: 6px;
           position: relative;
           z-index: 2;
           border: 1px solid rgba(0,0,0,0.15);
           overflow: hidden;
-          background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
         }
         .chip-line { position: absolute; background: rgba(0,0,0,0.2); }
         .horizontal-1 { width: 100%; height: 1px; top: 33%; }
@@ -199,7 +193,6 @@ export default function CardCatalog() {
         .red { background: #eb001b; left: 0; }
         .yellow { background: #ff5f00; right: 0; opacity: 0.9; }
 
-        /* Détails & Features */
         .product-details { padding: 20px 24px 24px; }
         .product-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .product-header h4 { margin: 0; font-size: 16px; color: #1e293b; font-weight: 700; }
@@ -237,8 +230,7 @@ export default function CardCatalog() {
         .order-btn:hover { background: #003d44; box-shadow: 0 4px 12px rgba(0, 90, 100, 0.2); }
 
         @media (min-width: 1000px) {
-          .catalog-card-item:hover { transform: translateY(-8px); }
-          .catalog-grid { gap: 30px; }
+          .catalog-card-item:hover { transform: translateY(-8px); transition: 0.3s ease; }
         }
       `}</style>
     </div>
