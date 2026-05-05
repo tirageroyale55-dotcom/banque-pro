@@ -33,6 +33,21 @@ export default function Profile({ data: initialData, isDesktop = false }) {
     }
   }, [data, navigate]);
 
+  useEffect(() => {
+  // Au montage du composant : on cherche la BottomNav et on la cache
+  const nav = document.querySelector(".bottom-nav-container"); // Utilise la classe exacte de ta BottomNav
+  if (nav) {
+    nav.style.display = "none";
+  }
+
+  // Au démontage (quand on quitte le profil) : on la réaffiche
+  return () => {
+    if (nav) {
+      nav.style.display = "flex";
+    }
+  };
+}, []);
+
   const compressImage = async (file) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
