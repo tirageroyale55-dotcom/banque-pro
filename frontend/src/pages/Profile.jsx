@@ -11,7 +11,6 @@ import "../styles/Profile.css";
 export default function Profile({ data: initialData, isDesktop = false }) {
   const navigate = useNavigate();
   const [data, setData] = useState(initialData);
-  // On utilise une string pour gérer plusieurs vues : "menu", "details", "settings"
   const [view, setView] = useState("menu");
   const [photo, setPhoto] = useState(null);
 
@@ -110,7 +109,6 @@ export default function Profile({ data: initialData, isDesktop = false }) {
 
   return (
     <div className={isDesktop ? "profile-desktop-view" : "bper-profile-container"}>
-      {/* HEADER MOBILE UNIFIÉ */}
       {!isDesktop && (
         <div className="bper-header">
           <button 
@@ -149,7 +147,12 @@ export default function Profile({ data: initialData, isDesktop = false }) {
             <div onClick={() => setView("settings")}>
               <MenuRow icon={<Settings size={20}/>} title="Paramètres et confidentialité" />
             </div>
-            <MenuRow icon={<Shield size={20}/>} title="Sécurité" />
+            
+            {/* BOUTON SÉCURITÉ CORRIGÉ AVEC ALERTE */}
+            <div onClick={handleUnavailable}>
+              <MenuRow icon={<Shield size={20}/>} title="Sécurité" />
+            </div>
+
             <MenuRow icon={<MessageCircle size={20}/>} title="Parlez-nous" />
             <div className="section-divider" />
             <MenuRow icon={<TrendingUp size={20}/>} title="Opérations d'investissement" />
