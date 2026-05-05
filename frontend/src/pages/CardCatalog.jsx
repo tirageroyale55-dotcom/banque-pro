@@ -1,87 +1,94 @@
-import { ChevronRight, ShieldCheck, Globe } from "lucide-react";
+import { ChevronRight, ShieldCheck } from "lucide-react";
 
-const BPER_OFFERS = [
+const BPER_CARDS = [
   {
     id: "debit",
     name: "BPER Card Debit Online",
     type: "DEBIT",
-    price: "0,00 €",
-    theme: "#005a64", // Vert Sarcelle BPER
-    features: ["Paiements mondiaux", "Apple & Google Pay", "Sans frais de gestion"]
+    price: "0,00 €/mois",
+    bg: "linear-gradient(135deg, #005a64 0%, #002d32 100%)",
+    accent: "#00d1e0",
+    features: ["Apple/Google Pay", "Sans contact", "Gestion via App"]
   },
   {
     id: "classic",
     name: "BPER Card Classic",
     type: "CREDIT",
-    price: "3,50 €",
-    theme: "#1e293b", // Bleu Ardoise Profond
-    features: ["Débit différé", "Assurance achats", "Plafond évolutif"]
+    bg: "linear-gradient(135deg, #334155 0%, #0f172a 100%)",
+    accent: "#94a3b8",
+    price: "3,50 €/mois",
+    features: ["Débit différé", "Assurance achats", "Plafond élevé"]
   },
   {
     id: "gold",
     name: "BPER Card Gold",
     type: "PREMIUM",
-    price: "8,00 €",
-    theme: "linear-gradient(135deg, #b59410 0%, #8a6d0d 100%)", // Or Brossé
+    bg: "linear-gradient(135deg, #b59410 0%, #725e0a 100%)",
+    accent: "#ffd700",
+    price: "8,00 €/mois",
     features: ["Conciergerie 24/7", "Lounge VIP", "Assurance Voyage"]
   }
 ];
 
 export default function CardCatalog() {
   return (
-    <div className="bper-catalog-container">
+    <div className="catalog-container">
       <div className="catalog-header">
-        <h2>Catalogue Cartes BPER</h2>
-        <p>Une gamme complète pour chaque exigence.</p>
+        <h2 className="catalog-title">Catalogue BPER Banca</h2>
+        <p className="catalog-subtitle">Choisissez l'excellence pour vos paiements</p>
       </div>
 
       <div className="catalog-grid">
-        {BPER_OFFERS.map((card) => (
+        {BPER_CARDS.map((card) => (
           <div key={card.id} className="catalog-card-item">
             
-            {/* RÉPLICATION EXACTE D'UNE CARTE BPER */}
-            <div className="bper-card-visual" style={{ background: card.theme }}>
-              <div className="card-texture-overlay"></div>
-              
-              <div className="card-top">
-                <span className="bper-logo">BPER:</span>
-                <Globe size={18} className="contactless-icon" />
-              </div>
-
-              <div className="emv-chip">
-                <div className="chip-line"></div>
-                <div className="chip-line"></div>
-              </div>
-
-              <div className="card-number-dots">•••• •••• •••• 0000</div>
-
-              <div className="card-bottom">
-                <div className="card-holder">VALUED CUSTOMER</div>
-                <div className="card-brand">
-                  <div className="brand-circles">
-                    <span className="circle-red"></span>
-                    <span className="circle-yellow"></span>
-                  </div>
-                  <span className="brand-type">{card.type}</span>
+            {/* RENDU RÉALISTE DE LA CARTE */}
+            <div className="real-card-visual" style={{ background: card.bg }}>
+              <div className="card-top-row">
+                <span className="bper-logo-brand">BPER:</span>
+                <div className="card-wireless">
+                  <div className="wave"></div>
+                  <div className="wave"></div>
+                  <div className="wave"></div>
                 </div>
+              </div>
+
+              {/* PUCE EMV RÉALISTE */}
+              <div className="emv-chip">
+                <div className="chip-line-v"></div>
+                <div className="chip-line-h"></div>
+              </div>
+
+              <div className="card-number-placeholder">•••• •••• •••• 0000</div>
+
+              <div className="card-bottom-row">
+                <div className="card-holder-name">NOM PRÉNOM</div>
+                <div className="card-brand-logo">
+                  <div className="circle red"></div>
+                  <div className="circle orange"></div>
+                </div>
+              </div>
+              
+              <div className="card-type-badge" style={{ color: card.accent }}>
+                {card.type}
               </div>
             </div>
 
-            {/* DÉTAILS DE L'OFFRE */}
-            <div className="card-offer-details">
-              <div className="offer-title-row">
-                <h4>{card.name}</h4>
-                <div className="price-tag">{card.price}<span>/mois</span></div>
+            {/* INFORMATIONS BANCAIRES */}
+            <div className="catalog-details-content">
+              <div className="details-header">
+                <h3>{card.name}</h3>
+                <span className="card-price">{card.price}</span>
               </div>
               
-              <ul className="offer-list">
+              <ul className="details-list">
                 {card.features.map((f, i) => (
-                  <li key={i}><ShieldCheck size={14} /> {f}</li>
+                  <li key={i}><ShieldCheck size={14} className="check-icon" /> {f}</li>
                 ))}
               </ul>
 
-              <button className="offer-cta">
-                Détails <ChevronRight size={16} />
+              <button className="bper-cta-button">
+                Commander cette carte <ChevronRight size={16} />
               </button>
             </div>
           </div>
@@ -89,94 +96,113 @@ export default function CardCatalog() {
       </div>
 
       <style jsx>{`
-        .bper-catalog-container { padding: 25px; }
-        .catalog-header h2 { color: #005a64; font-weight: 800; margin-bottom: 5px; }
-        .catalog-header p { color: #64748b; font-size: 14px; margin-bottom: 30px; }
+        .catalog-container { padding: 25px 15px; background: #fcfcfc; }
+        .catalog-header { margin-bottom: 30px; }
+        .catalog-title { color: #005a64; font-size: 22px; font-weight: 800; }
+        .catalog-subtitle { color: #64748b; font-size: 14px; }
 
-        .catalog-grid { 
-          display: grid; 
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-          gap: 25px; 
-        }
+        .catalog-grid { display: flex; flex-direction: column; gap: 25px; }
 
         .catalog-card-item {
           background: white;
-          border-radius: 20px;
+          border-radius: 24px;
           border: 1px solid #f1f5f9;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
           overflow: hidden;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.06);
         }
 
-        /* STYLE PHYSIQUE DE LA CARTE */
-        .bper-card-visual {
+        /* STYLE DE LA CARTE BANCAIRE */
+        .real-card-visual {
           aspect-ratio: 1.58 / 1;
           margin: 15px;
           border-radius: 14px;
+          padding: 20px;
           position: relative;
           color: white;
-          padding: 20px;
-          box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-          overflow: hidden;
+          box-shadow: 0 8px 15px rgba(0,0,0,0.2);
         }
 
-        .card-texture-overlay {
-          position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-          background: linear-gradient(45deg, rgba(255,255,255,0.05) 0%, transparent 100%);
-          pointer-events: none;
-        }
+        .bper-logo-brand { font-weight: 900; font-size: 20px; letter-spacing: -1px; }
 
-        .bper-logo { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
-        .contactless-icon { float: right; opacity: 0.7; }
-
-        /* PUCE EMV */
         .emv-chip {
-          width: 38px; height: 28px;
-          background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
-          border-radius: 5px;
+          width: 42px;
+          height: 32px;
+          background: linear-gradient(135deg, #d4af37, #f9e29c);
+          border-radius: 6px;
           margin-top: 15px;
           position: relative;
+          overflow: hidden;
           border: 0.5px solid rgba(0,0,0,0.1);
         }
 
-        .card-number-dots {
-          margin-top: 20px;
-          font-family: 'Courier New', monospace;
-          font-size: 18px;
+        .chip-line-v { position: absolute; left: 50%; width: 1px; height: 100%; background: rgba(0,0,0,0.15); }
+        .chip-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: rgba(0,0,0,0.15); }
+
+        .card-number-placeholder { 
+          margin-top: 20px; 
+          font-family: 'Courier New', monospace; 
+          font-size: 18px; 
           letter-spacing: 2px;
-          text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+          opacity: 0.9;
         }
 
-        .card-bottom {
-          position: absolute; bottom: 20px; left: 20px; right: 20px;
-          display: flex; justify-content: space-between; align-items: flex-end;
+        .card-bottom-row { 
+          position: absolute; 
+          bottom: 20px; 
+          left: 20px; 
+          right: 20px; 
+          display: flex; 
+          justify-content: space-between; 
+          align-items: center; 
         }
 
-        .card-holder { font-size: 11px; font-weight: 600; opacity: 0.9; text-transform: uppercase; }
+        .card-holder-name { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
 
-        .brand-circles { display: flex; margin-bottom: 2px; }
-        .circle-red { width: 18px; height: 18px; background: #eb001b; border-radius: 50%; }
-        .circle-yellow { width: 18px; height: 18px; background: #f79e1b; border-radius: 50%; margin-left: -8px; opacity: 0.8; }
-        .brand-type { display: block; font-size: 8px; text-align: right; font-weight: 800; }
+        .card-brand-logo { display: flex; }
+        .circle { width: 24px; height: 24px; border-radius: 50%; }
+        .red { background: #eb001b; z-index: 1; }
+        .orange { background: #ff5f00; margin-left: -12px; opacity: 0.9; }
+
+        .card-type-badge {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 1px;
+        }
 
         /* DETAILS */
-        .card-offer-details { padding: 0 20px 20px; }
-        .offer-title-row { display: flex; justify-content: space-between; margin-bottom: 15px; }
-        .offer-title-row h4 { font-weight: 700; color: #1e293b; margin: 0; }
-        .price-tag { color: #005a64; font-weight: 800; font-size: 18px; }
-        .price-tag span { font-size: 11px; color: #94a3b8; font-weight: 400; }
+        .catalog-details-content { padding: 0 20px 20px; }
+        .details-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .details-header h3 { font-size: 16px; font-weight: 700; color: #1e293b; margin: 0; }
+        .card-price { color: #005a64; font-weight: 800; font-size: 15px; }
 
-        .offer-list { list-style: none; padding: 0; margin-bottom: 20px; }
-        .offer-list li { font-size: 13px; color: #475569; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .details-list { list-style: none; padding: 0; margin-bottom: 20px; }
+        .details-list li { font-size: 13px; color: #64748b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .check-icon { color: #10b981; }
 
-        .offer-cta {
-          width: 100%; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0;
-          border-radius: 12px; color: #005a64; font-weight: 700; cursor: pointer;
-          transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px;
+        .bper-cta-button {
+          width: 100%;
+          padding: 14px;
+          background: #005a64;
+          color: white;
+          border: none;
+          border-radius: 14px;
+          font-weight: 700;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
         }
-        .offer-cta:hover { background: #005a64; color: white; }
 
+        /* DESKTOP LAYOUT */
         @media (min-width: 1000px) {
-          .bper-catalog-container { max-width: 1100px; margin: 0 auto; }
+          .catalog-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 30px; 
+          }
         }
       `}</style>
     </div>
