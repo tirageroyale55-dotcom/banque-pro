@@ -105,7 +105,7 @@ export default function CardCatalog() {
           padding: 20px 25px; 
           border-radius: 16px; 
           margin-bottom: 30px; 
-          border-left: 5px solid #005a64; 
+          border-left: 5px solid #10b981;; 
           box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
 
