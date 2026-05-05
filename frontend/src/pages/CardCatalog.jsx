@@ -1,94 +1,94 @@
-import { ChevronRight, ShieldCheck } from "lucide-react";
+import { ChevronRight, ShieldCheck, Wifi } from "lucide-react";
 
-const BPER_CARDS = [
+const BPER_OFFERS = [
   {
     id: "debit",
     name: "BPER Card Debit Online",
     type: "DEBIT",
-    price: "0,00 €/mois",
-    bg: "linear-gradient(135deg, #005a64 0%, #002d32 100%)",
-    accent: "#00d1e0",
-    features: ["Apple/Google Pay", "Sans contact", "Gestion via App"]
+    price: "0,00 €",
+    color: "linear-gradient(135deg, #005a64 0%, #003d44 100%)",
+    chip: "#e2c275",
+    features: ["Paiements sans contact", "Apple & Google Pay", "Gestion via App"]
   },
   {
     id: "classic",
     name: "BPER Card Classic",
     type: "CREDIT",
-    bg: "linear-gradient(135deg, #334155 0%, #0f172a 100%)",
-    accent: "#94a3b8",
-    price: "3,50 €/mois",
-    features: ["Débit différé", "Assurance achats", "Plafond élevé"]
+    price: "3,50 €",
+    color: "linear-gradient(135deg, #2d3748 0%, #1a202c 100%)",
+    chip: "#d1d5db",
+    features: ["Débit différé", "Assurance achats", "Plafond évolutif"]
   },
   {
     id: "gold",
     name: "BPER Card Gold",
     type: "PREMIUM",
-    bg: "linear-gradient(135deg, #b59410 0%, #725e0a 100%)",
-    accent: "#ffd700",
-    price: "8,00 €/mois",
+    price: "8,00 €",
+    color: "linear-gradient(135deg, #b59410 0%, #8a6d0d 100%)",
+    chip: "#f3e5ab",
     features: ["Conciergerie 24/7", "Lounge VIP", "Assurance Voyage"]
   }
 ];
 
 export default function CardCatalog() {
   return (
-    <div className="catalog-container">
+    <div className="bper-catalog-container">
       <div className="catalog-header">
-        <h2 className="catalog-title">Catalogue BPER Banca</h2>
-        <p className="catalog-subtitle">Choisissez l'excellence pour vos paiements</p>
+        <h2>Catalogue BPER Banca</h2>
+        <p>Des solutions de paiement exclusives à portée de main.</p>
       </div>
 
-      <div className="catalog-grid">
-        {BPER_CARDS.map((card) => (
+      <div className="catalog-list">
+        {BPER_OFFERS.map((card) => (
           <div key={card.id} className="catalog-card-item">
             
-            {/* RENDU RÉALISTE DE LA CARTE */}
-            <div className="real-card-visual" style={{ background: card.bg }}>
-              <div className="card-top-row">
-                <span className="bper-logo-brand">BPER:</span>
-                <div className="card-wireless">
-                  <div className="wave"></div>
-                  <div className="wave"></div>
-                  <div className="wave"></div>
+            {/* --- CARTE RÉALISTE --- */}
+            <div className="card-physical-mockup" style={{ background: card.color }}>
+              <div className="card-texture"></div>
+              
+              <div className="card-top">
+                <span className="bper-logo-card">BPER:</span>
+                <Wifi size={20} className="nfc-icon" />
+              </div>
+
+              <div className="card-middle">
+                <div className="emv-chip" style={{ background: card.chip }}>
+                  <div className="chip-line"></div>
+                  <div className="chip-line"></div>
+                  <div className="chip-line"></div>
                 </div>
               </div>
 
-              {/* PUCE EMV RÉALISTE */}
-              <div className="emv-chip">
-                <div className="chip-line-v"></div>
-                <div className="chip-line-h"></div>
-              </div>
-
-              <div className="card-number-placeholder">•••• •••• •••• 0000</div>
-
-              <div className="card-bottom-row">
+              <div className="card-bottom">
                 <div className="card-holder-name">NOM PRÉNOM</div>
                 <div className="card-brand-logo">
-                  <div className="circle red"></div>
-                  <div className="circle orange"></div>
+                  <div className="mastercard-circles">
+                    <div className="circle red"></div>
+                    <div className="circle orange"></div>
+                  </div>
+                  <span className="card-type-text">{card.type}</span>
                 </div>
-              </div>
-              
-              <div className="card-type-badge" style={{ color: card.accent }}>
-                {card.type}
               </div>
             </div>
 
-            {/* INFORMATIONS BANCAIRES */}
-            <div className="catalog-details-content">
+            {/* --- INFOS ET PRIX --- */}
+            <div className="catalog-details">
               <div className="details-header">
                 <h3>{card.name}</h3>
-                <span className="card-price">{card.price}</span>
+                <div className="price-box">
+                  <span className="amount">{card.price}</span>
+                  <span className="unit">/mois</span>
+                </div>
               </div>
-              
-              <ul className="details-list">
+
+              <ul className="feature-list">
                 {card.features.map((f, i) => (
-                  <li key={i}><ShieldCheck size={14} className="check-icon" /> {f}</li>
+                  <li key={i}><ShieldCheck size={14} /> {f}</li>
                 ))}
               </ul>
 
-              <button className="bper-cta-button">
-                Commander cette carte <ChevronRight size={16} />
+              <button className="btn-request-bper">
+                Sélectionner <ChevronRight size={16} />
               </button>
             </div>
           </div>
@@ -96,113 +96,109 @@ export default function CardCatalog() {
       </div>
 
       <style jsx>{`
-        .catalog-container { padding: 25px 15px; background: #fcfcfc; }
+        .bper-catalog-container { padding: 20px; max-width: 1100px; margin: 0 auto; }
         .catalog-header { margin-bottom: 30px; }
-        .catalog-title { color: #005a64; font-size: 22px; font-weight: 800; }
-        .catalog-subtitle { color: #64748b; font-size: 14px; }
+        .catalog-header h2 { color: #005a64; font-size: 24px; font-weight: 800; }
+        .catalog-header p { color: #64748b; font-size: 14px; }
 
-        .catalog-grid { display: flex; flex-direction: column; gap: 25px; }
+        .catalog-list { display: flex; flex-direction: column; gap: 20px; }
 
         .catalog-card-item {
           background: white;
           border-radius: 24px;
           border: 1px solid #f1f5f9;
-          overflow: hidden;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+          padding: 15px;
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
 
-        /* STYLE DE LA CARTE BANCAIRE */
-        .real-card-visual {
+        /* RENDU RÉALISTE DE LA CARTE */
+        .card-physical-mockup {
+          width: 100%;
+          max-width: 320px;
           aspect-ratio: 1.58 / 1;
-          margin: 15px;
           border-radius: 14px;
+          position: relative;
           padding: 20px;
-          position: relative;
           color: white;
-          box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-        }
-
-        .bper-logo-brand { font-weight: 900; font-size: 20px; letter-spacing: -1px; }
-
-        .emv-chip {
-          width: 42px;
-          height: 32px;
-          background: linear-gradient(135deg, #d4af37, #f9e29c);
-          border-radius: 6px;
-          margin-top: 15px;
-          position: relative;
+          box-shadow: 0 15px 35px rgba(0,0,0,0.2);
           overflow: hidden;
-          border: 0.5px solid rgba(0,0,0,0.1);
+          margin: 0 auto;
         }
 
-        .chip-line-v { position: absolute; left: 50%; width: 1px; height: 100%; background: rgba(0,0,0,0.15); }
-        .chip-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: rgba(0,0,0,0.15); }
-
-        .card-number-placeholder { 
-          margin-top: 20px; 
-          font-family: 'Courier New', monospace; 
-          font-size: 18px; 
-          letter-spacing: 2px;
-          opacity: 0.9;
-        }
-
-        .card-bottom-row { 
-          position: absolute; 
-          bottom: 20px; 
-          left: 20px; 
-          right: 20px; 
-          display: flex; 
-          justify-content: space-between; 
-          align-items: center; 
-        }
-
-        .card-holder-name { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
-
-        .card-brand-logo { display: flex; }
-        .circle { width: 24px; height: 24px; border-radius: 50%; }
-        .red { background: #eb001b; z-index: 1; }
-        .orange { background: #ff5f00; margin-left: -12px; opacity: 0.9; }
-
-        .card-type-badge {
+        .card-texture {
           position: absolute;
-          top: 20px;
-          right: 20px;
-          font-size: 10px;
-          font-weight: 800;
-          letter-spacing: 1px;
+          top: 0; left: 0; width: 100%; height: 100%;
+          background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+          opacity: 0.1;
+          pointer-events: none;
         }
+
+        .card-top { display: flex; justify-content: space-between; align-items: center; }
+        .bper-logo-card { font-weight: 900; font-size: 20px; letter-spacing: -1px; }
+        .nfc-icon { opacity: 0.8; transform: rotate(90deg); }
+
+        .card-middle { margin-top: 20px; }
+        .emv-chip {
+          width: 45px;
+          height: 35px;
+          border-radius: 6px;
+          position: relative;
+          border: 1px solid rgba(0,0,0,0.1);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-evenly;
+          padding: 4px;
+        }
+        .chip-line { height: 1px; background: rgba(0,0,0,0.2); width: 100%; }
+
+        .card-bottom {
+          position: absolute;
+          bottom: 20px; left: 20px; right: 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+        }
+        .card-holder-name { font-size: 12px; font-family: 'Courier New', monospace; letter-spacing: 1px; opacity: 0.9; }
+
+        .mastercard-circles { display: flex; position: relative; height: 25px; width: 40px; }
+        .circle { width: 25px; height: 25px; border-radius: 50%; }
+        .circle.red { background: #eb001b; position: absolute; left: 0; }
+        .circle.orange { background: #ff5f00; position: absolute; right: 0; opacity: 0.8; }
+        .card-type-text { display: block; font-size: 8px; font-weight: bold; text-align: right; margin-top: 4px; }
 
         /* DETAILS */
-        .catalog-details-content { padding: 0 20px 20px; }
-        .details-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .details-header h3 { font-size: 16px; font-weight: 700; color: #1e293b; margin: 0; }
-        .card-price { color: #005a64; font-weight: 800; font-size: 15px; }
+        .catalog-details { flex: 1; }
+        .details-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .details-header h3 { font-size: 18px; color: #1e293b; margin: 0; }
+        .price-box { text-align: right; }
+        .amount { display: block; font-weight: 800; color: #005a64; font-size: 18px; }
+        .unit { font-size: 11px; color: #94a3b8; }
 
-        .details-list { list-style: none; padding: 0; margin-bottom: 20px; }
-        .details-list li { font-size: 13px; color: #64748b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .check-icon { color: #10b981; }
+        .feature-list { list-style: none; padding: 0; margin-bottom: 20px; }
+        .feature-list li { font-size: 13px; color: #64748b; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 
-        .bper-cta-button {
+        .btn-request-bper {
           width: 100%;
-          padding: 14px;
-          background: #005a64;
-          color: white;
-          border: none;
-          border-radius: 14px;
+          padding: 12px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          color: #005a64;
+          border-radius: 12px;
           font-weight: 700;
           display: flex;
           justify-content: center;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
         }
 
-        /* DESKTOP LAYOUT */
+        /* TABLET & DESKTOP */
         @media (min-width: 1000px) {
-          .catalog-grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 30px; 
-          }
+          .catalog-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; }
+          .catalog-card-item { flex-direction: row; padding: 25px; align-items: center; }
+          .card-physical-mockup { min-width: 300px; margin: 0; }
         }
       `}</style>
     </div>
