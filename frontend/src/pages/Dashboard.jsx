@@ -7,8 +7,8 @@ import Tabs from "../components/Tabs";
 import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
-import Cards from "./Cards"; 
-import CardCatalog from "./CardCatalog"; // Juste après tes autres imports
+ 
+import CardCatalog from "./CardCatalog"; 
 import Accounts from "./Accounts";
 import Payer from "./Payer";
 import Produits from "./Produits";  

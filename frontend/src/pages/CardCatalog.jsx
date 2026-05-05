@@ -1,137 +1,174 @@
-import { ChevronRight, ShieldCheck, Zap, Globe } from "lucide-react";
+import { ChevronRight, ShieldCheck, Globe, Zap } from "lucide-react";
 
-const BPER_CATALOG = [
+const BPER_OFFERS = [
   {
     id: "debit-online",
     name: "BPER Card Debit Online",
-    type: "DÉBIT",
+    type: "DEBIT",
     price: "0,00 €",
-    period: "/ mois",
-    color: "linear-gradient(135deg, #005a64 0%, #003d44 100%)",
-    desc: "La solution gratuite pour vos achats quotidiens et paiements en ligne sécurisés.",
-    features: ["Paiements sans contact", "Apple & Google Pay"]
+    period: "/mois",
+    theme: "#005a64", // Vert BPER
+    image: "https://www.bper.it/content/dam/bper/immagini/prodotti/carte/bper-card-debit-online.png",
+    features: ["Paiements sans contact", "Apple & Google Pay", "Zéro frais de gestion"]
   },
   {
     id: "classic",
     name: "BPER Card Classic",
-    type: "CRÉDIT",
+    type: "CREDIT",
     price: "3,50 €",
-    period: "/ mois",
-    color: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
-    desc: "Une carte de crédit polyvalente avec débit différé pour plus de liberté.",
-    features: ["Débit différé", "Assurance achats"]
+    period: "/mois",
+    theme: "#1e293b", // Slate
+    image: "https://www.bper.it/content/dam/bper/immagini/prodotti/carte/bper-card-classic.png",
+    features: ["Débit différé", "Assurance achats", "Plafond adaptable"]
   },
   {
     id: "gold",
     name: "BPER Card Gold",
     type: "PREMIUM",
     price: "8,00 €",
-    period: "/ mois",
-    color: "linear-gradient(135deg, #b59410 0%, #8a6d0d 100%)",
-    desc: "Le prestige BPER : plafonds élevés et services exclusifs d'assistance.",
-    features: ["Conciergerie 24/7", "Accès Lounge VIP"]
+    period: "/mois",
+    theme: "#b59410", // Gold
+    image: "https://www.bper.it/content/dam/bper/immagini/prodotti/carte/bper-card-gold.png",
+    features: ["Conciergerie 24/7", "Lounge VIP", "Assurance Voyage complète"]
   }
 ];
 
 export default function CardCatalog() {
-  const handleRequest = (cardName) => {
-    alert(`Demande pour la ${cardName} : Votre conseiller BPER vous contactera sous 24h.`);
-  };
-
   return (
-    <div className="bper-catalog-section" style={{ marginTop: '40px', paddingBottom: '40px' }}>
-      <div style={{ padding: '0 20px', marginBottom: '20px' }}>
-        <h3 style={{ color: '#005a64', fontSize: '22px', fontWeight: '800', margin: 0 }}>Découvrir nos offres</h3>
-        <p style={{ color: '#64748b', fontSize: '14px', marginTop: '5px' }}>Trouvez la carte BPER adaptée à votre style de vie.</p>
+    <section className="bper-catalog-wrapper">
+      <div className="catalog-header">
+        <h2>Catalogue BPER Banca</h2>
+        <p>Choisissez la solution de paiement qui vous ressemble.</p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '0 15px' }}>
-        {BPER_CATALOG.map((item) => (
-          <div key={item.id} style={{
-            background: 'white',
-            borderRadius: '24px',
-            overflow: 'hidden',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
-            border: '1px solid #f1f5f9'
-          }}>
-            {/* Visuel de la Carte BPER */}
-            <div style={{ 
-              background: item.color, 
-              height: '140px', 
-              padding: '20px', 
-              color: 'white', 
-              position: 'relative',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '1px' }}>BPER:</span>
-                <Globe size={20} style={{ opacity: 0.6 }} />
-              </div>
-              
-              <div style={{ width: '40px', height: '30px', background: 'rgba(255,255,255,0.2)', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.3)' }}></div>
-              
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                <span style={{ fontSize: '12px', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '1px' }}>{item.type}</span>
-                <img src="/mastercard_w.svg" alt="MC" style={{ height: '24px', opacity: 0.9 }} onError={(e) => e.target.style.display='none'}/>
+      <div className="catalog-grid">
+        {BPER_OFFERS.map((card) => (
+          <div key={card.id} className="catalog-item">
+            {/* Conteneur de la carte avec ratio bancaire exact */}
+            <div className="card-visual-container">
+              <div className="real-card-shape" style={{ background: card.theme }}>
+                <div className="card-overlay-chip"></div>
+                <div className="card-logo-text">BPER:</div>
+                <div className="card-type-label">{card.type}</div>
+                {/* Image de la carte réelle par-dessus le fond si l'URL est valide */}
+                <img src={card.image} alt={card.name} className="card-image-overlay" 
+                     onError={(e) => e.target.style.display = 'none'} />
               </div>
             </div>
 
-            {/* Détails de l'offre */}
-            <div style={{ padding: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <h4 style={{ margin: 0, fontSize: '18px', color: '#0f172a', fontWeight: '700' }}>{item.name}</h4>
-                <div style={{ textAlign: 'right' }}>
-                  <span style={{ color: '#005a64', fontWeight: '800', fontSize: '18px' }}>{item.price}</span>
-                  <span style={{ color: '#94a3b8', fontSize: '12px' }}>{item.period}</span>
+            <div className="card-info-content">
+              <div className="card-title-row">
+                <h4>{card.name}</h4>
+                <div className="card-price-tag">
+                  <span className="price">{card.price}</span>
+                  <span className="period">{card.period}</span>
                 </div>
               </div>
 
-              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: '1.5', marginBottom: '20px' }}>{item.desc}</p>
-
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
-                {item.features.map((feat, idx) => (
-                  <span key={idx} style={{
-                    fontSize: '11px',
-                    color: '#334155',
-                    background: '#f8fafc',
-                    padding: '6px 12px',
-                    borderRadius: '10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    border: '1px solid #e2e8f0'
-                  }}>
-                    <ShieldCheck size={14} color="#005a64" /> {feat}
-                  </span>
+              <ul className="card-features-list">
+                {card.features.map((f, i) => (
+                  <li key={i}><ShieldCheck size={14} className="icon-green" /> {f}</li>
                 ))}
-              </div>
+              </ul>
 
-              <button 
-                onClick={() => handleRequest(item.name)}
-                style={{
-                  width: '100%',
-                  padding: '16px',
-                  background: '#005a64',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '16px',
-                  fontWeight: '700',
-                  fontSize: '15px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '10px',
-                  boxShadow: '0 4px 12px rgba(0, 90, 100, 0.2)'
-                }}
-              >
-                Demander cette carte <ChevronRight size={18} />
+              <button className="bper-btn-primary">
+                Détails et Souscription <ChevronRight size={16} />
               </button>
             </div>
           </div>
         ))}
       </div>
-    </div>
+
+      <style jsx>{`
+        .bper-catalog-wrapper { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .catalog-header h2 { color: #005a64; font-size: 24px; font-weight: 800; margin-bottom: 5px; }
+        .catalog-header p { color: #64748b; margin-bottom: 30px; font-size: 15px; }
+
+        /* Grid adaptatif : 1 colonne mobile, 3 colonnes desktop */
+        .catalog-grid { 
+          display: grid; 
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+          gap: 25px; 
+        }
+
+        .catalog-item {
+          background: white;
+          border-radius: 20px;
+          border: 1px solid #eef2f6;
+          overflow: hidden;
+          transition: transform 0.3s ease;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .catalog-item:hover { transform: translateY(-5px); }
+
+        .card-visual-container {
+          padding: 20px;
+          background: #f8fafc;
+          display: flex;
+          justify-content: center;
+        }
+
+        /* Forme exacte d'une carte bancaire (ID-1 ISO/IEC 7810) */
+        .real-card-shape {
+          width: 100%;
+          max-width: 280px;
+          aspect-ratio: 1.58 / 1;
+          border-radius: 12px;
+          position: relative;
+          color: white;
+          padding: 15px;
+          box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .card-image-overlay {
+          position: absolute;
+          top: 0; left: 0; width: 100%; height: 100%;
+          object-fit: cover;
+          border-radius: 12px;
+        }
+
+        .card-logo-text { font-weight: 900; font-size: 18px; position: relative; z-index: 2; }
+        .card-type-label { 
+          position: absolute; bottom: 15px; right: 15px; 
+          font-size: 10px; font-weight: bold; opacity: 0.8; z-index: 2;
+        }
+
+        .card-info-content { padding: 20px; }
+        .card-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .card-title-row h4 { font-size: 17px; font-weight: 700; color: #1e293b; margin: 0; flex: 1; }
+        
+        .card-price-tag { display: flex; flex-direction: column; align-items: flex-end; }
+        .price { color: #005a64; font-weight: 800; font-size: 18px; }
+        .period { font-size: 11px; color: #94a3b8; }
+
+        .card-features-list { list-style: none; padding: 0; margin-bottom: 20px; }
+        .card-features-list li { 
+          font-size: 13px; color: #475569; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; 
+        }
+        .icon-green { color: #10b981; }
+
+        .bper-btn-primary {
+          width: 100%;
+          padding: 14px;
+          background: #005a64;
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-weight: 700;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
+          cursor: pointer;
+        }
+
+        /* Ajustements spécifiques Desktop */
+        @media (min-width: 1000px) {
+          .catalog-grid { gap: 30px; }
+          .bper-catalog-wrapper { padding: 40px 0; }
+        }
+      `}</style>
+    </section>
   );
 }
