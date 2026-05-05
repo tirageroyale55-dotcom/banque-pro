@@ -96,7 +96,7 @@ export default function CardCatalog() {
 
       <style jsx>{`
         
-        .catalog-container { 
+        .catalog-header { 
   padding: 20px; 
   font-family: 'Inter', sans-serif; 
   background: #ffffff; /* Fond blanc pur pour un aspect clean */
