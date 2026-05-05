@@ -6,7 +6,6 @@ import Header from "../components/Header";
 import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
 
-import "../styles/Cards.css"; // Assure-toi d'avoir ce fichier CSS
 
 export default function Cards() {
   const [card, setCard] = useState(null);
