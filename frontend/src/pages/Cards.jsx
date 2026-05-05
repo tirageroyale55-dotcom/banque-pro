@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
-import { ChevronRight, ShieldCheck, CreditCard as CardIcon } from "lucide-react";
+import { ChevronRight, ShieldCheck, CreditCard as CardIcon, Info } from "lucide-react";
 
 import Header from "../components/Header";
 import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
 
-// Catalogue des offres BPER
+// Catalogue des offres BPER Banca
 const BPER_CATALOG = [
   {
     id: "debit",
@@ -14,7 +14,7 @@ const BPER_CATALOG = [
     type: "DÉBIT",
     price: "0,00 € / mois",
     desc: "Parfaite pour vos achats quotidiens et vos paiements sécurisés en ligne.",
-    color: "#005a64",
+    color: "#005a64", // Vert BPER
     features: ["Apple/Google Pay", "Sans contact"]
   },
   {
@@ -23,7 +23,7 @@ const BPER_CATALOG = [
     type: "CRÉDIT",
     price: "3,50 € / mois",
     desc: "Liberté maximale avec débit différé et plafonds personnalisables.",
-    color: "#1e293b",
+    color: "#1e293b", // Bleu Ardoise
     features: ["Débit différé", "Assurance voyage"]
   },
   {
@@ -32,7 +32,7 @@ const BPER_CATALOG = [
     type: "PREMIUM",
     price: "8,00 € / mois",
     desc: "Le prestige BPER avec des services exclusifs et une couverture étendue.",
-    color: "#b59410",
+    color: "#b59410", // Or
     features: ["Conciergerie", "Accès Lounge"]
   }
 ];
@@ -43,7 +43,7 @@ export default function Cards() {
   useEffect(() => {
     api("/client/card")
       .then(setCard)
-      .catch(() => console.log("Erreur carte"));
+      .catch(() => console.log("Erreur chargement carte"));
   }, []);
 
   const handleAlert = (name) => {
@@ -51,93 +51,115 @@ export default function Cards() {
   };
 
   return (
-    <div className="bank-app">
+    <div className="bank-app" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <Header data={{}} />
 
-      {/* Conteneur avec défilement forcé pour voir le contenu sous la carte */}
-      <div className="page-content" style={{ paddingBottom: "100px", overflowY: "auto", height: "calc(100vh - 70px)" }}>
+      {/* Zone de contenu principale avec scroll indépendant */}
+      <main className="cards-scroll-area" style={{ 
+        flex: 1, 
+        overflowY: "auto", 
+        paddingBottom: "100px", 
+        backgroundColor: "#fcfcfc" 
+      }}>
         
-        {/* SECTION 1 : MA CARTE ACTUELLE */}
-        <div className="section-header-bper" style={{ padding: "20px 15px" }}>
-          <h2 style={{ fontSize: "20px", color: "#005a64", fontWeight: "bold" }}>Ma carte bancaire</h2>
-          <p style={{ fontSize: "13px", color: "#666" }}>Gérez votre carte actuelle et ses options.</p>
-        </div>
+        {/* SECTION 1 : CARTE DE L'UTILISATEUR */}
+        <div className="section-container" style={{ padding: "20px 15px" }}>
+          <div style={{ marginBottom: "15px" }}>
+            <h2 style={{ fontSize: "22px", color: "#005a64", fontWeight: "700", margin: 0 }}>Ma carte</h2>
+            <p style={{ fontSize: "14px", color: "#64748b" }}>Gérez votre moyen de paiement principal</p>
+          </div>
 
-        <div className="active-card-wrapper" style={{ padding: "0 15px 20px" }}>
-          {card ? (
-            <BankCard card={card} />
-          ) : (
-            <div className="no-card-info" style={{ textAlign: "center", padding: "30px", background: "#f8fafc", borderRadius: "12px" }}>
-              <CardIcon size={40} color="#cbd5e1" />
-              <p style={{ color: "#64748b", marginTop: "10px" }}>Chargement de vos données...</p>
-            </div>
-          )}
-        </div>
-
-        {/* SECTION 2 : CATALOGUE BPER */}
-        <div className="section-header-bper" style={{ padding: "10px 15px", borderTop: "8px solid #f1f5f9" }}>
-          <h2 style={{ fontSize: "18px", color: "#005a64", fontWeight: "bold", marginTop: "15px" }}>Découvrir nos cartes</h2>
-          <p style={{ fontSize: "13px", color: "#666" }}>Trouvez la carte qui correspond à vos besoins.</p>
-        </div>
-
-        <div className="bper-catalog-list" style={{ padding: "15px" }}>
-          {BPER_CATALOG.map((item) => (
-            <div key={item.id} className="catalog-item" style={{ 
-              background: "white", 
-              borderRadius: "16px", 
-              marginBottom: "20px", 
-              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-              border: "1px solid #eee",
-              overflow: "hidden"
-            }}>
-              {/* Visuel miniature de la carte */}
-              <div style={{ background: item.color, height: "100px", padding: "15px", color: "white", position: "relative" }}>
-                <div style={{ fontWeight: "bold", fontSize: "14px" }}>BPER:</div>
-                <div style={{ position: "absolute", bottom: "15px", left: "15px", fontSize: "10px", opacity: 0.8, letterSpacing: "1px" }}>
-                  {item.type}
-                </div>
-                <div style={{ width: "30px", height: "20px", background: "#ffd700", borderRadius: "3px", marginTop: "10px" }}></div>
+          <div className="active-card-display" style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
+            {card ? (
+              <BankCard card={card} />
+            ) : (
+              <div style={{ padding: "40px", textAlign: "center", background: "#fff", borderRadius: "16px", border: "1px dashed #cbd5e1", width: "100%" }}>
+                <CardIcon size={40} color="#94a3b8" />
+                <p style={{ color: "#64748b", marginTop: "10px" }}>Récupération des données sécurisées...</p>
               </div>
-
-              {/* Infos et Bouton */}
-              <div style={{ padding: "15px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <h4 style={{ margin: 0, fontSize: "16px", color: "#1e293b" }}>{item.name}</h4>
-                  <span style={{ color: "#005a64", fontWeight: "bold" }}>{item.price}</span>
-                </div>
-                <p style={{ fontSize: "13px", color: "#64748b", margin: "10px 0" }}>{item.desc}</p>
-                
-                <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
-                  {item.features.map((f, i) => (
-                    <span key={i} style={{ fontSize: "11px", background: "#f1f5f9", padding: "3px 8px", borderRadius: "5px", display: "flex", alignItems: "center", gap: "4px" }}>
-                      <ShieldCheck size={12} color="#005a64" /> {f}
-                    </span>
-                  ))}
-                </div>
-
-                <button 
-                  onClick={() => handleAlert(item.name)}
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    border: "1.5px solid #005a64",
-                    background: "white",
-                    color: "#005a64",
-                    borderRadius: "8px",
-                    fontWeight: "600",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: "8px"
-                  }}
-                >
-                  En savoir plus <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
-          ))}
+            )}
+          </div>
         </div>
-      </div>
+
+        {/* DIVISEUR VISUEL */}
+        <div style={{ height: "8px", background: "#f1f5f9" }}></div>
+
+        {/* SECTION 2 : CATALOGUE DE CARTES */}
+        <div className="section-container" style={{ padding: "25px 15px" }}>
+          <div style={{ marginBottom: "20px" }}>
+            <h2 style={{ fontSize: "20px", color: "#005a64", fontWeight: "700", margin: 0 }}>Offres BPER Banca</h2>
+            <p style={{ fontSize: "14px", color: "#64748b" }}>Découvrez notre gamme exclusive de cartes</p>
+          </div>
+
+          <div className="catalog-list" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {BPER_CATALOG.map((item) => (
+              <div key={item.id} className="bper-catalog-card" style={{ 
+                background: "white", 
+                borderRadius: "20px", 
+                border: "1px solid #e2e8f0", 
+                overflow: "hidden",
+                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)"
+              }}>
+                {/* Header Visuel de la carte promo */}
+                <div style={{ background: item.color, height: "110px", padding: "20px", color: "white", position: "relative" }}>
+                  <div style={{ fontSize: "18px", fontWeight: "900", letterSpacing: "1px" }}>BPER:</div>
+                  <div style={{ marginTop: "10px", width: "35px", height: "25px", background: "rgba(255,255,255,0.2)", borderRadius: "4px", border: "1px solid rgba(255,255,255,0.3)" }}></div>
+                  <div style={{ position: "absolute", bottom: "15px", right: "20px", fontSize: "10px", fontWeight: "bold", opacity: 0.7 }}>{item.type}</div>
+                </div>
+
+                {/* Corps de l'offre */}
+                <div style={{ padding: "20px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px" }}>
+                    <h4 style={{ margin: 0, fontSize: "17px", color: "#0f172a", fontWeight: "600" }}>{item.name}</h4>
+                    <span style={{ color: "#005a64", fontWeight: "700", fontSize: "15px" }}>{item.price}</span>
+                  </div>
+                  
+                  <p style={{ fontSize: "13px", color: "#475569", lineHeight: "1.5", marginBottom: "15px" }}>{item.desc}</p>
+                  
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "20px" }}>
+                    {item.features.map((feat, idx) => (
+                      <span key={idx} style={{ 
+                        fontSize: "11px", 
+                        background: "#f8fafc", 
+                        color: "#334155", 
+                        padding: "4px 10px", 
+                        borderRadius: "20px", 
+                        border: "1px solid #e2e8f0",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px"
+                      }}>
+                        <ShieldCheck size={12} color="#005a64" /> {feat}
+                      </span>
+                    ))}
+                  </div>
+
+                  <button 
+                    onClick={() => handleAlert(item.name)}
+                    style={{
+                      width: "100%",
+                      padding: "14px",
+                      background: "#005a64",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "12px",
+                      fontWeight: "600",
+                      fontSize: "14px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: "8px",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Demander cette carte <ChevronRight size={18} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
 
       <BottomNav />
     </div>
