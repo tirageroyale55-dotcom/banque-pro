@@ -195,17 +195,11 @@ const profileImage = userInfo.profilePicture || null;
             {activeTab === "accounts" && <Accounts data={data} setActiveTab={setActiveTab}/>}
             
             {activeTab === "cards" && (
-              <div className="cards-section-desktop">
-                <h3 className="cards-title">Mes cartes</h3>
-                <div className="desktop-cards-grid">
-                  {card && <BankCard card={card}/>}
-                  <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
-                    <div className="card-plus">+</div>
-                    <p>Demander une carte</p>
-                  </div>
-                </div>
-              </div>
-            )}
+          <div className="page-content-wrapper">
+             {/* ON APPELLE LE COMPOSANT CARDS COMPLET AU LIEU DE REFAIRE LE CODE ICI */}
+             <Cards />
+          </div>
+        )}
 
             
             {activeTab === "payer" && (

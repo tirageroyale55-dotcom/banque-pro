@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
-import { ChevronRight, Info, ShieldCheck, Zap, CreditCard as CardIcon } from "lucide-react";
-
-import Header from "../components/Header";
-import BottomNav from "../components/BottomNav";
+import { ChevronRight, ShieldCheck, CreditCard as CardIcon } from "lucide-react";
 import BankCard from "../components/BankCard";
 
-// Données du catalogue BPER
 const BPER_CARD_CATALOG = [
   {
     id: "debit-online",
@@ -47,38 +43,31 @@ export default function Cards() {
   }, []);
 
   const handleMoreInfo = (cardName) => {
-    alert(`Le service de consultation détaillée pour la ${cardName} est temporairement indisponible. Veuillez contacter votre conseiller.`);
+    alert(`Le service de consultation détaillée pour la ${cardName} est temporairement indisponible. Veuillez réessayer plus tard.`);
   };
 
   return (
-    <div className="bank-app">
-      <Header data={{}} />
-
-      <div className="cards-page" style={{ paddingBottom: '100px' }}>
+    <div className="cards-page-content fade-in">
         <div className="section-header-bper">
           <h2 className="cards-title">Mes cartes actives</h2>
           <p className="subtitle-bper">Gérez vos moyens de paiement et plafonds.</p>
         </div>
 
-        {/* SECTION CARTE ACTUELLE */}
         <div className="active-card-container">
           {card ? (
             <div className="cards-slide">
               <BankCard card={card} />
             </div>
           ) : (
-            <div className="no-card-placeholder">
-              <CardIcon size={40} opacity={0.3} />
-              <p>Recherche de vos cartes en cours...</p>
+            <div className="no-card-placeholder" style={{textAlign:'center', padding:'20px'}}>
+              <p>Chargement de votre carte...</p>
             </div>
           )}
         </div>
 
-        {/* SECTION CATALOGUE BPER */}
         <div className="catalog-section">
           <div className="section-header-bper" style={{ marginTop: '30px' }}>
             <h2 className="cards-title">Catalogue de cartes BPER</h2>
-            <p className="subtitle-bper">Découvrez l'offre adaptée à vos besoins.</p>
           </div>
 
           <div className="bper-cards-grid">
@@ -95,19 +84,8 @@ export default function Cards() {
                     <h4>{item.name}</h4>
                     <span className="card-price">{item.price}</span>
                   </div>
-                  
                   <p className="card-description">{item.description}</p>
-                  
-                  <div className="card-features-tags">
-                    {item.features.map((f, i) => (
-                      <span key={i} className="feature-tag"><ShieldCheck size={12}/> {f}</span>
-                    ))}
-                  </div>
-
-                  <button 
-                    className="btn-bper-outline"
-                    onClick={() => handleMoreInfo(item.name)}
-                  >
+                  <button className="btn-bper-outline" onClick={() => handleMoreInfo(item.name)}>
                     Voir plus <ChevronRight size={16} />
                   </button>
                 </div>
@@ -115,9 +93,6 @@ export default function Cards() {
             ))}
           </div>
         </div>
-      </div>
-
-      <BottomNav />
     </div>
   );
 }
