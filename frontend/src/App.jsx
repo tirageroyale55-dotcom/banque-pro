@@ -28,6 +28,7 @@ import Notifications from "./pages/Notifications";
 import Help from "./pages/Help";
 import Accounts from "./pages/Accounts";
 import Cards from "./pages/Cards";
+import CardDetails from "./pages/CardDetails"; 
 import Financing from "./pages/Financing";
 import Blocked from "./pages/Blocked";
 
@@ -126,6 +127,7 @@ export default function App() {
           <Route path="/aide" element={<Aide />} />
           <Route path="/accounts" element={<Accounts />} />
           <Route path="/cards" element={<Cards />} />
+          <Route path="/card-details" element={<CardDetails />} />
           <Route path="/financing" element={<Financing />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/profile" element={<Profile />} />
