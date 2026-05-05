@@ -35,6 +35,7 @@ const BPER_MODELS = [
 ];
 
 export default function CardCatalog() {
+    const navigate = useNavigate();
   return (
     <div className="catalog-container">
       {/* En-tête avec fond blanc et bordure BPER */}
