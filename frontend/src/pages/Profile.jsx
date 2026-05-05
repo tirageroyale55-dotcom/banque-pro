@@ -11,7 +11,7 @@ import "../styles/Profile.css";
 export default function Profile({ data: initialData, isDesktop = false }) {
   const navigate = useNavigate();
   const [data, setData] = useState(initialData);
-  const [view, setView] = useState("menu");
+  const [view, setView] = useState("menu"); // "menu", "details", "settings"
   const [photo, setPhoto] = useState(null);
 
   useEffect(() => {
@@ -82,6 +82,7 @@ export default function Profile({ data: initialData, isDesktop = false }) {
     }
   };
 
+  // Fonction d'alerte unifiée
   const handleUnavailable = () => {
     alert("L'opérateur est indisponible pour le moment, veuillez réessayer plus tard.");
   };
@@ -147,21 +148,21 @@ export default function Profile({ data: initialData, isDesktop = false }) {
             <div onClick={() => setView("settings")}>
               <MenuRow icon={<Settings size={20}/>} title="Paramètres et confidentialité" />
             </div>
+            <div onClick={handleUnavailable}><MenuRow icon={<Shield size={20}/>} title="Sécurité" /></div>
+            <div onClick={handleUnavailable}><MenuRow icon={<MessageCircle size={20}/>} title="Parlez-nous" /></div>
             
-            {/* BOUTON SÉCURITÉ CORRIGÉ AVEC ALERTE */}
-            <div onClick={handleUnavailable}>
-              <MenuRow icon={<Shield size={20}/>} title="Sécurité" />
-            </div>
-
-            <MenuRow icon={<MessageCircle size={20}/>} title="Parlez-nous" />
             <div className="section-divider" />
-            <MenuRow icon={<TrendingUp size={20}/>} title="Opérations d'investissement" />
-            <MenuRow icon={<CreditCard size={20}/>} title="Financement" />
-            <MenuRow icon={<Umbrella size={20}/>} title="Assurance et prévoyance" />
+            
+            <div onClick={handleUnavailable}><MenuRow icon={<TrendingUp size={20}/>} title="Opérations d'investissement" /></div>
+            <div onClick={handleUnavailable}><MenuRow icon={<CreditCard size={20}/>} title="Financement" /></div>
+            <div onClick={handleUnavailable}><MenuRow icon={<Umbrella size={20}/>} title="Assurance et prévoyance" /></div>
+            
             <div onClick={() => setView("details")}>
                 <MenuRow icon={<Edit size={20}/>} title="Détails du compte" />
             </div>
+            
             <div className="section-divider" />
+            
             <div onClick={handleLogout}>
               <MenuRow icon={<LogOut size={20} color="#dc2626"/>} title="Déconnecter" color="#dc2626" />
             </div>
