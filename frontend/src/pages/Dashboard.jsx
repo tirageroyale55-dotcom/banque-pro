@@ -7,6 +7,7 @@ import Tabs from "../components/Tabs";
 import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
+import Cards from "./pages/Cards";
 import Accounts from "./Accounts";
 import Payer from "./Payer";
 import Produits from "./Produits";  
