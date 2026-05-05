@@ -1177,6 +1177,149 @@ border-radius:18px;
 
 
 
+/* Entêtes de section */
+.section-header-bper {
+  padding: 20px 15px 10px;
+}
+
+.subtitle-bper {
+  color: #64748b;
+  font-size: 14px;
+  margin-top: -5px;
+}
+
+/* Styles du catalogue de cartes */
+.bper-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 15px;
+}
+
+.bper-card-promo {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border: 1px solid #f1f5f9;
+}
+
+.card-promo-visual {
+  height: 120px;
+  position: relative;
+  padding: 20px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-promo-visual .chip {
+  width: 35px;
+  height: 25px;
+  background: linear-gradient(135deg, #ffd700, #b8860b);
+  border-radius: 4px;
+}
+
+.card-brand {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.card-type-label {
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  opacity: 0.8;
+}
+
+.card-promo-content {
+  padding: 15px;
+}
+
+.card-promo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.card-promo-header h4 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 16px;
+}
+
+.card-price {
+  font-weight: bold;
+  color: #005a64;
+  font-size: 14px;
+}
+
+.card-description {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.4;
+  margin-bottom: 15px;
+}
+
+.card-features-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.feature-tag {
+  background: #f8fafc;
+  color: #475569;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Bouton professionnel BPER */
+.btn-bper-outline {
+  width: 100%;
+  padding: 10px;
+  border: 1.5px solid #005a64;
+  background: transparent;
+  color: #005a64;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-bper-outline:active {
+  background: #f0f9fa;
+  transform: scale(0.98);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

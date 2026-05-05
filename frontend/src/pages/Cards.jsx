@@ -1,11 +1,41 @@
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
-import { ChevronRight, CreditCard, ShieldCheck, Zap } from "lucide-react";
+import { ChevronRight, Info, ShieldCheck, Zap, CreditCard as CardIcon } from "lucide-react";
 
 import Header from "../components/Header";
 import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
 
+// Données du catalogue BPER
+const BPER_CARD_CATALOG = [
+  {
+    id: "debit-online",
+    name: "BPER Card Debit Online",
+    type: "DÉBIT",
+    price: "0,00 € / mois",
+    description: "La carte idéale pour vos achats quotidiens et vos paiements en ligne en toute sécurité.",
+    color: "#005a64",
+    features: ["Apple Pay / Google Pay", "Sans contact", "Gestion via App"]
+  },
+  {
+    id: "classic-visa",
+    name: "BPER Card Classic",
+    type: "CRÉDIT",
+    price: "3,50 € / mois",
+    description: "Liberté de paiement maximale avec débit différé et plafonds personnalisables.",
+    color: "#1e293b",
+    features: ["Paiement différé", "Assurance voyage", "Circuit Visa/Mastercard"]
+  },
+  {
+    id: "gold-mastercard",
+    name: "BPER Card Gold",
+    type: "CRÉDIT EXCLUSIF",
+    price: "8,00 € / mois",
+    description: "Le prestige BPER avec des services premium et une couverture d'assurance étendue.",
+    color: "#b59410",
+    features: ["Conciergerie 24/7", "Plafond élevé", "Accès Lounge aéroports"]
+  }
+];
 
 export default function Cards() {
   const [card, setCard] = useState(null);
@@ -16,80 +46,67 @@ export default function Cards() {
       .catch(() => console.log("Erreur carte"));
   }, []);
 
-  // Données des offres de cartes BPER
-  const cardOffers = [
-    {
-      id: "v-pay",
-      name: "BPER Card V-Pay",
-      type: "CARTE DE DÉBIT",
-      price: "0,00 € / an",
-      description: "La carte idéale pour vos achats quotidiens et retraits en Europe.",
-      color: "#005a64"
-    },
-    {
-      id: "mastercard-gold",
-      name: "BPER Classic Gold",
-      type: "CARTE DE CRÉDIT",
-      price: "30,50 € / an",
-      description: "Plafonds élevés et assurances voyage incluses pour une liberté totale.",
-      color: "#b08d57"
-    },
-    {
-      id: "payup",
-      name: "BPER PayUp",
-      type: "CARTE PRÉPAYÉE",
-      price: "5,00 € (Activation)",
-      description: "Parfaite pour vos achats en ligne en toute sécurité sans compte bancaire.",
-      color: "#4a4a4a"
-    }
-  ];
-
-  const handleLearnMore = (cardName) => {
-    alert(`L'opérateur est indisponible pour le moment pour les détails sur la ${cardName}. Veuillez réessayer plus tard.`);
+  const handleMoreInfo = (cardName) => {
+    alert(`Le service de consultation détaillée pour la ${cardName} est temporairement indisponible. Veuillez contacter votre conseiller.`);
   };
 
   return (
     <div className="bank-app">
       <Header data={{}} />
 
-      <div className="cards-page">
-        <section className="my-cards-section">
-          <h2 className="section-title">Ma carte active</h2>
+      <div className="cards-page" style={{ paddingBottom: '100px' }}>
+        <div className="section-header-bper">
+          <h2 className="cards-title">Mes cartes actives</h2>
+          <p className="subtitle-bper">Gérez vos moyens de paiement et plafonds.</p>
+        </div>
+
+        {/* SECTION CARTE ACTUELLE */}
+        <div className="active-card-container">
           {card ? (
-            <BankCard card={card} />
+            <div className="cards-slide">
+              <BankCard card={card} />
+            </div>
           ) : (
-            <div className="no-card-msg">Chargement de vos informations de carte...</div>
+            <div className="no-card-placeholder">
+              <CardIcon size={40} opacity={0.3} />
+              <p>Recherche de vos cartes en cours...</p>
+            </div>
           )}
-        </section>
+        </div>
 
-        <section className="catalog-section">
-          <h2 className="section-title">Nos solutions de paiement</h2>
-          <p className="section-subtitle">Découvrez la gamme BPER Banca adaptée à vos besoins.</p>
+        {/* SECTION CATALOGUE BPER */}
+        <div className="catalog-section">
+          <div className="section-header-bper" style={{ marginTop: '30px' }}>
+            <h2 className="cards-title">Catalogue de cartes BPER</h2>
+            <p className="subtitle-bper">Découvrez l'offre adaptée à vos besoins.</p>
+          </div>
 
-          <div className="offers-grid">
-            {cardOffers.map((offer) => (
-              <div key={offer.id} className="offer-card">
-                <div className="offer-header" style={{ borderLeft: `4px solid ${offer.color}` }}>
-                  <span className="offer-type">{offer.type}</span>
-                  <h3 className="offer-name">{offer.name}</h3>
+          <div className="bper-cards-grid">
+            {BPER_CARD_CATALOG.map((item) => (
+              <div key={item.id} className="bper-card-promo">
+                <div className="card-promo-visual" style={{ background: item.color }}>
+                  <div className="chip"></div>
+                  <div className="card-brand">BPER:</div>
+                  <div className="card-type-label">{item.type}</div>
                 </div>
                 
-                <div className="offer-body">
-                  <p className="offer-desc">{offer.description}</p>
-                  <div className="offer-price-tag">
-                    <span className="price-label">Frais de gestion</span>
-                    <span className="price-value">{offer.price}</span>
+                <div className="card-promo-content">
+                  <div className="card-promo-header">
+                    <h4>{item.name}</h4>
+                    <span className="card-price">{item.price}</span>
                   </div>
-                </div>
+                  
+                  <p className="card-description">{item.description}</p>
+                  
+                  <div className="card-features-tags">
+                    {item.features.map((f, i) => (
+                      <span key={i} className="feature-tag"><ShieldCheck size={12}/> {f}</span>
+                    ))}
+                  </div>
 
-                <div className="offer-footer">
-                  <div className="offer-perks">
-                    <span><ShieldCheck size={14} /> Sécurité</span>
-                    <span><Zap size={14} /> Sans contact</span>
-                  </div>
                   <button 
-                    className="learn-more-btn"
-                    onClick={() => handleLearnMore(offer.name)}
+                    className="btn-bper-outline"
+                    onClick={() => handleMoreInfo(item.name)}
                   >
                     Voir plus <ChevronRight size={16} />
                   </button>
@@ -97,7 +114,7 @@ export default function Cards() {
               </div>
             ))}
           </div>
-        </section>
+        </div>
       </div>
 
       <BottomNav />
