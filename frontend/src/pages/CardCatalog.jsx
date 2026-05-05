@@ -95,10 +95,33 @@ export default function CardCatalog() {
       </div>
 
       <style jsx>{`
-        .catalog-container { padding: 20px; font-family: 'Inter', sans-serif; }
-        .catalog-header { margin-bottom: 25px; border-left: 4px solid #642d00; padding-left: 15px; }
-        .catalog-header h2 { color: #005a64; font-weight: 800; font-size: 22px; margin: 0; }
-        .catalog-header p { color: #64748b; font-size: 14px; margin-top: 4px; }
+        
+        .catalog-container { 
+  padding: 20px; 
+  font-family: 'Inter', sans-serif; 
+  background: #ffffff; /* Fond blanc pur pour un aspect clean */
+  border-radius: 24px; /* Optionnel : pour adoucir les angles si intégré dans une section */
+  margin-top: 20px;
+}
+
+.catalog-header { 
+  margin-bottom: 25px; 
+  border-left: 4px solid #005a64; 
+  padding-left: 15px; 
+}
+
+.catalog-header h2 { 
+  color: #005a64; 
+  font-weight: 800; 
+  font-size: 22px; 
+  margin: 0; 
+}
+
+.catalog-header p { 
+  color: #64748b; 
+  font-size: 14px; 
+  margin-top: 4px; 
+}
 
         .catalog-grid { 
           display: grid; 
