@@ -1,114 +1,113 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CheckCircle2, ShieldCheck, Zap, Globe, ArrowLeft, Lock, Star, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Lock, Globe, ShieldCheck, Zap } from 'lucide-react';
 
 export default function CardDetails() {
   const location = useLocation();
   const navigate = useNavigate();
   const { card } = location.state || {};
 
-  // Remonter en haut de page à l'ouverture
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   if (!card) return <div className="p-10">Chargement...</div>;
 
-  // Configuration dynamique des visuels et détails selon la carte
-  const getCardSpecifics = () => {
-    switch (card.id) {
-      case 'debit':
-        return {
-          sceneImage: "https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&q=80&w=1200",
-          sceneAlt: "Femme élégante au bureau avec carte Débit",
-          description: "La liberté au quotidien avec un contrôle total sur vos dépenses en temps réel.",
-          longAdvantage: "Paiements internationaux sans frais cachés et gestion 100% mobile.",
-          securityDetail: "Verrouillage instantané depuis l'application en cas de perte."
-        };
-      case 'classic':
-        return {
-          sceneImage: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=1200",
-          sceneAlt: "Conseiller présentant la carte Classic à une cliente",
-          description: "Le parfait équilibre entre souplesse de paiement et protections d'assurance standard.",
-          longAdvantage: "Débit différé jusqu'à 30 jours pour une meilleure gestion de votre trésorerie.",
-          securityDetail: "Protection renforcée pour tous vos achats sur internet (3D Secure)."
-        };
-      case 'gold':
-        return {
-          sceneImage: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=1200",
-          sceneAlt: "Femme d'affaires présentant la carte Gold",
-          description: "L'excellence bancaire : plafonds élevés et services de conciergerie exclusifs.",
-          longAdvantage: "Assurances voyage premium et accès aux salons VIP dans les aéroports.",
-          securityDetail: "Garantie protection achat et extension de garantie constructeur incluse."
-        };
-      default:
-        return {};
+  // Configuration des assets locaux et textes spécifiques
+  const contentMap = {
+    debit: {
+      localImg: "/images/debit_scene.jpg", // Chemin vers ton dossier public
+      title: "Gestion Dynamique",
+      desc: "Contrôlez vos finances en temps réel avec la réactivité BPER."
+    },
+    classic: {
+      localImg: "/images/classic_scene.jpg",
+      title: "Sérénité Quotidienne",
+      desc: "Le partenaire idéal pour vos achats et vos projets personnels."
+    },
+    gold: {
+      localImg: "/images/gold_scene.jpg",
+      title: "Exclusivité Premium",
+      desc: "Accédez à un univers de services privilèges et de hautes protections."
     }
   };
 
-  const extra = getCardSpecifics();
+  const info = contentMap[card.id] || contentMap.debit;
 
   return (
     <div className="details-wrapper">
-      {/* Bouton Retour Flottant (Pas d'entête comme demandé) */}
-      <button className="back-floating-btn" onClick={() => navigate(-1)}>
+      {/* Retour rapide */}
+      <button className="back-btn" onClick={() => navigate(-1)}>
         <ArrowLeft size={24} />
       </button>
 
-      {/* SECTION 1 : PRÉSENTATION CARTE RÉALISTE */}
-      <section className="section-card-focus">
-        <div className="card-container-3d">
-          <div className="card-visual" style={{ background: card.bg }}>
-            <div className="card-gloss-effect"></div>
-            <div className="card-top">
-              <span className="bper-brand">BPER<span>:</span> <small>Banca</small></span>
-              <div className="contactless-wave"></div>
+      {/* SECTION 1 : FOCUS PRODUIT (VISIBLE IMMÉDIATEMENT) */}
+      <section className="product-hero-section">
+        <div className="card-presentation-box">
+          <div className="card-3d-render" style={{ background: card.bg }}>
+            <div className="card-inner-design">
+              <div className="card-top-header">
+                <span className="brand-logo">BPER<span>:</span> <small>Banca</small></span>
+                <div className="nfc-wave"></div>
+              </div>
+              <div className="emv-chip-gold"></div>
+              <div className="card-numbers-ghost">**** **** **** 8841</div>
+              <div className="card-holder-name">NOM DU TITULAIRE</div>
+              <div className="card-badge-type">{card.type}</div>
             </div>
-            <div className="card-chip"></div>
-            <div className="card-number">**** **** **** 4290</div>
-            <div className="card-holder">PREMIUM HOLDER</div>
-            <div className="card-type-label">{card.type}</div>
+            <div className="card-reflection"></div>
           </div>
         </div>
-        
-        <div className="card-briefing">
+
+        <div className="product-cta-block">
           <h1>{card.name}</h1>
-          <p className="hero-price">{card.price} <span>/ mois</span></p>
-          <button className="cta-order">Commander maintenant</button>
+          <div className="price-display">
+            <span className="amount">{card.price}</span>
+            <span className="label">/ mois</span>
+          </div>
+          <p className="hero-subtitle">Technologie de paiement sécurisée de nouvelle génération.</p>
+          <button className="btn-order-now">
+            Commander maintenant
+          </button>
         </div>
       </section>
 
-      {/* SECTION 2 : SCÈNE RÉALISTE (LIFESTYLE) */}
-      <section className="section-lifestyle">
-        <div className="lifestyle-image-box">
-          <img src={extra.sceneImage} alt={extra.sceneAlt} />
-          <div className="floating-card-mini" style={{ background: card.bg }}></div>
-        </div>
-        
-        <div className="lifestyle-content">
-          <h2 className="title-bper">L'expérience BPER à vos côtés</h2>
-          <p className="scene-desc">{extra.description}</p>
-          
-          <div className="features-grid-details">
-            <div className="feat-item">
-              <Globe className="feat-icon" />
-              <div>
-                <h4>Avantages</h4>
-                <p>{extra.longAdvantage}</p>
-              </div>
+      {/* SECTION 2 : LIFESTYLE & DÉTAILS (VISIBLE AU SCROLL) */}
+      <section className="experience-scroll-section">
+        <div className="lifestyle-grid">
+          <div className="image-side">
+            {/* Cette image provient de ton dossier public/images/ */}
+            <img src={info.localImg} alt="Scène bancaire réaliste" className="main-lifestyle-img" />
+            <div className="image-caption">
+              <span>Conseil Expert BPER Banca</span>
             </div>
-            <div className="feat-item">
-              <Lock className="feat-icon" />
-              <div>
-                <h4>Sécurité</h4>
-                <p>{extra.securityDetail}</p>
+          </div>
+
+          <div className="details-side">
+            <h2 className="section-title">{info.title}</h2>
+            <p className="section-text">{info.desc}</p>
+
+            <div className="benefits-stack">
+              <div className="benefit-card">
+                <ShieldCheck className="b-icon" />
+                <div>
+                  <h4>Sécurité Avancée</h4>
+                  <p>Protection contre la fraude et cryptage des données bancaires EMV.</p>
+                </div>
               </div>
-            </div>
-            <div className="feat-item">
-              <ShieldCheck className="feat-icon" />
-              <div>
-                <h4>Assurances</h4>
-                <p>Protection contre le vol et la fraude incluse 24h/24.</p>
+              <div className="benefit-card">
+                <Globe className="b-icon" />
+                <div>
+                  <h4>Usage International</h4>
+                  <p>Payez et retirez de l'argent partout dans le monde sans soucis.</p>
+                </div>
+              </div>
+              <div className="benefit-card">
+                <Zap className="b-icon" />
+                <div>
+                  <h4>Avantages Exclusifs</h4>
+                  <p>Accès aux programmes de fidélité et assurances voyage BPER.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -116,86 +115,85 @@ export default function CardDetails() {
       </section>
 
       <style jsx>{`
-        .details-wrapper { background: #ffffff; min-height: 100vh; overflow-x: hidden; }
+        .details-wrapper { background: #fff; }
 
-        .back-floating-btn {
-          position: fixed; top: 20px; left: 20px; z-index: 100;
-          background: rgba(255, 255, 255, 0.9); border: none; padding: 12px;
-          border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: pointer;
+        .back-btn {
+          position: fixed; top: 25px; left: 25px; z-index: 100;
+          background: #fff; border: 1px solid #e2e8f0; padding: 10px;
+          border-radius: 50%; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        /* Section 1 : Focus Carte */
-        .section-card-focus {
+        /* SECTION HERO (CARTE) */
+        .product-hero-section {
           height: 100vh; display: flex; flex-direction: column;
-          justify-content: center; align-items: center; padding: 20px;
-          background: radial-gradient(circle at center, #f8fafc 0%, #e2e8f0 100%);
+          align-items: center; justify-content: center;
+          background: #fcfdfe; padding: 20px;
         }
 
-        .card-container-3d { 
-          perspective: 1000px; margin-bottom: 40px; 
-          animation: float 4s ease-in-out infinite;
+        .card-3d-render {
+          width: 360px; aspect-ratio: 1.58/1; border-radius: 20px;
+          position: relative; padding: 30px; color: #fff;
+          box-shadow: 0 40px 80px rgba(0,0,0,0.25);
+          transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+          overflow: hidden;
         }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0) rotateX(5deg); }
-          50% { transform: translateY(-15px) rotateX(-5deg); }
-        }
-
-        .card-visual {
-          width: 340px; aspect-ratio: 1.58/1; border-radius: 18px;
-          position: relative; padding: 25px; color: white;
-          box-shadow: 0 30px 60px rgba(0,0,0,0.3); overflow: hidden;
-        }
-
-        .card-gloss-effect {
-          position: absolute; top: -100%; left: -100%; width: 300%; height: 300%;
-          background: linear-gradient(135deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 60%);
-          animation: shine 6s infinite;
-        }
-
-        @keyframes shine { 0% { transform: translateX(0); } 100% { transform: translateX(50%); } }
-
-        .bper-brand { font-size: 24px; font-weight: 900; }
-        .bper-brand span { color: #a3e635; }
-        .card-chip { width: 50px; height: 38px; background: linear-gradient(135deg, #facc15, #ca8a04); border-radius: 8px; margin-top: 20px; }
-        .card-number { margin-top: 30px; font-size: 18px; letter-spacing: 3px; font-family: 'Courier New', monospace; }
-        .card-type-label { position: absolute; bottom: 25px; right: 25px; font-weight: 800; letter-spacing: 2px; }
-
-        .card-briefing h1 { font-size: 28px; color: #005a64; font-weight: 800; margin-bottom: 10px; text-align: center; }
-        .hero-price { font-size: 32px; color: #1e293b; font-weight: 800; text-align: center; }
-        .cta-order {
-          margin-top: 20px; padding: 16px 40px; background: #005a64;
-          color: white; border: none; border-radius: 50px; font-weight: 700;
-          font-size: 16px; cursor: pointer; transition: 0.3s;
-        }
-
-        /* Section 2 : Lifestyle & Détails */
-        .section-lifestyle { padding: 80px 5%; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-
-        .lifestyle-image-box { position: relative; border-radius: 30px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-        .lifestyle-image-box img { width: 100%; height: 600px; object-fit: cover; }
         
-        .floating-card-mini {
-          position: absolute; bottom: 30px; right: 30px; width: 120px; aspect-ratio: 1.58/1;
-          border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
+        .card-3d-render:hover { transform: translateY(-10px) rotateX(5deg); }
+
+        .brand-logo { font-size: 26px; font-weight: 900; }
+        .brand-logo span { color: #a3e635; }
+        .emv-chip-gold { 
+          width: 55px; height: 42px; 
+          background: linear-gradient(135deg, #fde047, #a16207); 
+          border-radius: 8px; margin-top: 25px; 
+        }
+        .card-numbers-ghost { margin-top: 35px; font-size: 20px; font-family: monospace; letter-spacing: 4px; opacity: 0.9; }
+        .card-badge-type { position: absolute; bottom: 30px; right: 30px; font-weight: 800; letter-spacing: 2px; font-size: 14px; }
+
+        .product-cta-block { text-align: center; margin-top: 50px; }
+        .product-cta-block h1 { color: #005a64; font-size: 32px; font-weight: 800; margin-bottom: 10px; }
+        .price-display { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+        .amount { font-size: 38px; font-weight: 900; color: #1e293b; }
+        .label { color: #64748b; font-weight: 500; }
+        .hero-subtitle { color: #94a3b8; margin: 15px 0 30px; font-size: 16px; }
+
+        .btn-order-now {
+          background: #005a64; color: #fff; border: none;
+          padding: 18px 50px; border-radius: 100px; font-weight: 700;
+          font-size: 17px; cursor: pointer; transition: 0.3s;
+          box-shadow: 0 10px 25px rgba(0, 90, 100, 0.2);
+        }
+        .btn-order-now:hover { background: #00454d; transform: scale(1.05); }
+
+        /* SECTION LIFESTYLE (SCROLL) */
+        .experience-scroll-section { padding: 100px 5%; background: #fff; }
+        .lifestyle-grid { 
+          display: grid; grid-template-columns: 1.2fr 0.8fr; 
+          gap: 80px; align-items: center; max-width: 1200px; margin: 0 auto; 
         }
 
-        .title-bper { color: #005a64; font-size: 36px; font-weight: 800; margin-bottom: 20px; }
-        .scene-desc { font-size: 18px; color: #64748b; line-height: 1.6; margin-bottom: 40px; }
+        .main-lifestyle-img { 
+          width: 100%; border-radius: 40px; 
+          box-shadow: 0 30px 60px rgba(0,0,0,0.1); 
+          object-fit: cover; height: 650px;
+        }
 
-        .features-grid-details { display: grid; gap: 30px; }
-        .feat-item { display: flex; gap: 20px; align-items: flex-start; }
-        .feat-icon { color: #005a64; flex-shrink: 0; margin-top: 5px; }
-        .feat-item h4 { color: #1e293b; font-weight: 700; margin: 0 0 5px 0; }
-        .feat-item p { color: #64748b; font-size: 14px; margin: 0; line-height: 1.5; }
+        .section-title { color: #005a64; font-size: 42px; font-weight: 800; margin-bottom: 25px; }
+        .section-text { color: #64748b; font-size: 19px; line-height: 1.7; margin-bottom: 45px; }
 
-        /* Responsive Mobile */
+        .benefits-stack { display: grid; gap: 35px; }
+        .benefit-card { display: flex; gap: 20px; }
+        .b-icon { color: #005a64; flex-shrink: 0; }
+        .benefit-card h4 { color: #1e293b; font-weight: 700; margin-bottom: 5px; }
+        .benefit-card p { color: #64748b; font-size: 15px; margin: 0; }
+
+        /* Mobile */
         @media (max-width: 1000px) {
-          .section-lifestyle { grid-template-columns: 1fr; padding-top: 40px; }
-          .lifestyle-image-box img { height: 400px; }
-          .card-visual { width: 280px; }
-          .title-bper { font-size: 28px; }
-          .section-card-focus { height: auto; padding: 100px 20px; }
+          .lifestyle-grid { grid-template-columns: 1fr; gap: 40px; }
+          .main-lifestyle-img { height: 400px; }
+          .card-3d-render { width: 300px; }
+          .product-hero-section { height: auto; padding: 120px 20px 60px; }
+          .section-title { font-size: 32px; }
         }
       `}</style>
     </div>
