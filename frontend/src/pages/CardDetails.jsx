@@ -1,226 +1,192 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShieldCheck, Globe, Zap, Wifi } from 'lucide-react';
 
 export default function CardDetails() {
   const location = useLocation();
   const navigate = useNavigate();
+  const cardRef = useRef(null);
   const { card } = location.state || {};
 
-  // FORCE LE SCROLL TOUT EN HAUT IMMÉDIATEMENT
+  // 1. Correction du Scroll au montage
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    window.scrollTo(0, 0);
+    // Petit délai pour s'assurer que le DOM est prêt (utile avec les Layouts complexes)
+    const timer = setTimeout(() => window.scrollTo(0, 0), 10);
+    return () => clearTimeout(timer);
   }, []);
 
-  if (!card) return <div className="p-10">Chargement...</div>;
+  // 2. Logique de mouvement 3D Pro
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const cardNode = cardRef.current;
+    const rect = cardNode.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const rotateX = (y - centerY) / 10;
+    const rotateY = (centerX - x) / 10;
 
-  const getScene = () => {
-    switch (card.id) {
-      case 'debit': return { img: "/images/debit_scene.jpg", title: "Liberté Numérique" };
-      case 'classic': return { img: "/images/classic_scene.jpg", title: "Accompagnement Pro" };
-      case 'gold': return { img: "/images/gold_scene.jpg", title: "Privilège & Prestige" };
-      default: return { img: "/images/debit_scene.jpg", title: "Service BPER" };
-    }
+    cardNode.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
   };
 
-  const scene = getScene();
+  const handleMouseLeave = () => {
+    if (!cardRef.current) return;
+    cardRef.current.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+  };
+
+  if (!card) return null;
+
+  const scene = {
+    debit: { img: "/images/debit_scene.jpg", title: "Liberté Numérique" },
+    classic: { img: "/images/classic_scene.jpg", title: "Accompagnement Pro" },
+    gold: { img: "/images/gold_scene.jpg", title: "Privilège & Prestige" }
+  }[card.id] || { img: "/images/debit_scene.jpg", title: "Service BPER" };
 
   return (
-    <div className="details-wrapper-final">
-      {/* Retour flottant */}
-      <button className="back-btn-float" onClick={() => navigate(-1)}>
+    <div className="details-container-fixed">
+      <button className="btn-back-minimal" onClick={() => navigate(-1)}>
         <ArrowLeft size={24} />
       </button>
 
-      {/* SECTION 1 : VISIBLE IMMÉDIATEMENT (100% de la hauteur écran) */}
-      <section className="hero-card-viewport">
-        <div className="card-presentation-area">
-          {/* STYLE CARDCATALOG 100% IDENTIQUE */}
-          <div className="card-body-realist" style={{ background: card.bg }}>
-            <div className="card-gloss-overlay"></div>
-            
-            <div className="card-row-top">
-              <div className="bper-logo-detail" style={{ color: card.logoColor }}>
-                BPER<span>:</span> <small>Banca</small>
-              </div>
-              <Wifi size={24} className="nfc-icon-detail" strokeWidth={1.5} />
+      {/* SECTION CARTE : PREMIÈRE CHOSE VISIBLE */}
+      <div className="top-hero-section">
+        <div 
+          className="interactive-card-wrapper"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          ref={cardRef}
+        >
+          {/* STYLE EXACT CARDCATALOG */}
+          <div className="card-pro-visual" style={{ background: card.bg }}>
+            <div className="glass-shine"></div>
+            <div className="top-info">
+              <div className="bper-label-main">BPER<span>:</span> <small>Banca</small></div>
+              <Wifi size={24} className="nfc-icon-pro" />
             </div>
-
-            <div className="emv-chip-realist">
-              <div className="chip-line-h1"></div>
-              <div className="chip-line-h2"></div>
-              <div className="chip-line-v"></div>
+            <div className="chip-pro-gold">
+               <div className="chip-line-h1"></div><div className="chip-line-h2"></div><div className="chip-line-v"></div>
             </div>
-
-            <div className="card-row-bottom">
-              <div className="card-type-text">{card.type}</div>
-              <div className="mastercard-logo">
-                <div className="mc-circle mc-red"></div>
-                <div className="mc-circle mc-yellow"></div>
+            <div className="bottom-info">
+              <div className="type-tag-pro">{card.type}</div>
+              <div className="mc-logo-pro">
+                <div className="circle-red"></div><div className="circle-orange"></div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="hero-text-content">
+        <div className="cta-content-pro">
           <h1>{card.name}</h1>
-          <p className="hero-price-display">{card.price}<span>/mois</span></p>
-          <button className="btn-order-main">Commander maintenant</button>
-          
-          {/* Indicateur de scroll pour inviter à voir la suite */}
-          <div className="scroll-indicator">
-            <span>Détails & Avantages</span>
-            <div className="mouse-wheel"></div>
-          </div>
+          <div className="price-tag-pro">{card.price}<span>/mois</span></div>
+          <button className="btn-order-pro">Commander maintenant</button>
         </div>
-      </section>
+      </div>
 
-      {/* SECTION 2 : LIFESTYLE & DÉTAILS (VISIBLE UNIQUEMENT AU SCROLL) */}
-      <section className="lifestyle-content-section">
-        <div className="lifestyle-grid-container">
-          <div className="image-frame-pro">
-            <img src={scene.img} alt={scene.title} className="realist-photo-pro" />
+      {/* SECTION SCENE REALISTE (AU SCROLL) */}
+      <div className="bottom-experience-section">
+        <div className="content-split">
+          <div className="image-side-realist">
+            <img src={scene.img} alt="BPER Experience" />
           </div>
-
-          <div className="text-frame-pro">
-            <h2 className="bper-teal-title">{scene.title}</h2>
-            <p className="bper-description">
-              Découvrez un service bancaire conçu pour votre confort. La technologie BPER Banca 
-              vous assure une sécurité mondiale et une gestion simplifiée.
-            </p>
-
-            <div className="benefits-stack-pro">
-              <div className="benefit-row">
-                <ShieldCheck className="icon-bper" />
-                <div>
-                  <h4>Sécurité Totale</h4>
-                  <p>Technologie de cryptage EMV et authentification forte.</p>
-                </div>
-              </div>
-              <div className="benefit-row">
-                <Globe className="icon-bper" />
-                <div>
-                  <h4>Portée Mondiale</h4>
-                  <p>Acceptée dans plus de 200 pays et territoires.</p>
-                </div>
-              </div>
-              <div className="benefit-row">
-                <Zap className="icon-bper" />
-                <div>
-                  <h4>Services Exclusifs</h4>
-                  <p>Avantages et assistances dédiés à votre profil.</p>
-                </div>
-              </div>
+          <div className="text-side-realist">
+            <h2>{scene.title}</h2>
+            <p>L'excellence bancaire BPER Banca s'adapte à votre style de vie. Profitez d'une technologie sécurisée et d'un accompagnement personnalisé.</p>
+            
+            <div className="features-stack-pro">
+                <div className="item-pro"><ShieldCheck size={22}/> <span>Sécurité 3D Secure 2.0</span></div>
+                <div className="item-pro"><Globe size={22}/> <span>Paiements Internationaux</span></div>
+                <div className="item-pro"><Zap size={22}/> <span>Service Client Prioritaire</span></div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
       <style jsx>{`
-        .details-wrapper-final { 
-          background: #ffffff; 
-          width: 100%;
+        .details-container-fixed { background: #fff; width: 100%; position: relative; }
+        
+        .btn-back-minimal {
+          position: fixed; top: 20px; left: 20px; z-index: 100;
+          background: #fff; border: 1px solid #eee; padding: 10px;
+          border-radius: 50%; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        .back-btn-float {
-          position: fixed; top: 25px; left: 25px; z-index: 100;
-          background: #fff; border: 1px solid #f1f5f9; padding: 12px;
-          border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .top-hero-section {
+          min-height: 100vh; display: flex; flex-direction: column;
+          align-items: center; justify-content: center; background: #f9fbff;
+          padding: 80px 20px;
         }
 
-        /* SECTION 1 : FOCUS CARTE (FORCÉ À 100% DE LA HAUTEUR) */
-        .hero-card-viewport {
-          height: 100vh;
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          background: #f8fafc;
-          position: relative;
-          padding-top: 40px;
+        /* MOUVEMENT PRO 3D */
+        .interactive-card-wrapper {
+          transition: transform 0.1s ease-out;
+          will-change: transform;
+          cursor: pointer;
+          margin-bottom: 40px;
         }
 
-        .card-presentation-area { perspective: 1000px; margin-bottom: 40px; }
-
-        .card-body-realist {
-          width: 350px; aspect-ratio: 1.58 / 1; border-radius: 16px;
+        .card-pro-visual {
+          width: 350px; aspect-ratio: 1.58 / 1; border-radius: 18px;
           position: relative; padding: 25px; overflow: hidden;
-          box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+          box-shadow: 0 40px 80px rgba(0,0,0,0.2);
           display: flex; flex-direction: column; justify-content: space-between;
+          color: white;
         }
 
-        .card-gloss-overlay {
+        .glass-shine {
           position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-          background: linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.08) 48%, rgba(255,255,255,0) 52%);
+          background: linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.1) 48%, rgba(255,255,255,0) 52%);
         }
 
-        .card-row-top { display: flex; justify-content: space-between; align-items: center; z-index: 2; }
-        .bper-logo-detail { font-weight: 900; font-size: 22px; letter-spacing: -0.5px; }
-        .bper-logo-detail span { color: #a3e635; }
-        .bper-logo-detail small { font-size: 11px; font-weight: 400; opacity: 0.8; }
-        .nfc-icon-detail { color: white; transform: rotate(90deg); opacity: 0.8; }
+        .top-info { display: flex; justify-content: space-between; align-items: center; }
+        .bper-label-main { font-weight: 900; font-size: 22px; }
+        .bper-label-main span { color: #a3e635; }
+        .nfc-icon-pro { transform: rotate(90deg); opacity: 0.8; }
 
-        .emv-chip-realist {
-          width: 50px; height: 38px; background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
-          border-radius: 6px; position: relative; z-index: 2; border: 1px solid rgba(0,0,0,0.1);
+        .chip-pro-gold {
+          width: 50px; height: 38px; background: linear-gradient(135deg, #facc15, #ca8a04);
+          border-radius: 6px; position: relative; border: 1px solid rgba(0,0,0,0.1);
         }
-        .chip-line-h1 { position: absolute; background: rgba(0,0,0,0.2); width: 100%; height: 1px; top: 33%; }
-        .chip-line-h2 { position: absolute; background: rgba(0,0,0,0.2); width: 100%; height: 1px; top: 66%; }
+        .chip-line-h1, .chip-line-h2 { position: absolute; background: rgba(0,0,0,0.2); width: 100%; height: 1px; }
+        .chip-line-h1 { top: 33%; } .chip-line-h2 { top: 66%; }
         .chip-line-v { position: absolute; background: rgba(0,0,0,0.2); height: 100%; width: 1px; left: 50%; }
 
-        .card-row-bottom { display: flex; justify-content: space-between; align-items: flex-end; z-index: 2; }
-        .card-type-text { font-size: 12px; font-weight: 800; color: white; letter-spacing: 1.5px; }
+        .bottom-info { display: flex; justify-content: space-between; align-items: flex-end; }
+        .type-tag-pro { font-weight: 800; letter-spacing: 2px; font-size: 12px; }
+        .mc-logo-pro { display: flex; position: relative; width: 40px; height: 25px; }
+        .circle-red, .circle-orange { width: 25px; height: 25px; border-radius: 50%; position: absolute; }
+        .circle-red { background: #eb001b; } .circle-orange { background: #ff5f00; right: 0; opacity: 0.9; }
 
-        .mastercard-logo { display: flex; position: relative; width: 40px; height: 25px; }
-        .mc-circle { width: 25px; height: 25px; border-radius: 50%; position: absolute; }
-        .mc-red { background: #eb001b; left: 0; }
-        .mc-yellow { background: #ff5f00; right: 0; opacity: 0.9; }
+        .cta-content-pro { text-align: center; }
+        .cta-content-pro h1 { color: #005a64; font-size: 32px; margin-bottom: 5px; }
+        .price-tag-pro { font-size: 28px; font-weight: 800; color: #1e293b; }
+        .price-tag-pro span { font-size: 14px; color: #94a3b8; margin-left: 5px; }
 
-        .hero-text-content { text-align: center; }
-        .hero-text-content h1 { color: #005a64; font-size: 34px; font-weight: 800; margin-bottom: 5px; }
-        .hero-price-display { font-size: 28px; font-weight: 800; color: #1e293b; }
-        .hero-price-display span { font-size: 14px; color: #94a3b8; margin-left: 4px; }
-
-        .btn-order-main {
-          margin-top: 25px; padding: 18px 60px; background: #005a64;
+        .btn-order-pro {
+          margin-top: 30px; padding: 18px 60px; background: #005a64;
           color: white; border: none; border-radius: 100px; font-weight: 700;
-          font-size: 16px; cursor: pointer; transition: 0.3s;
-          box-shadow: 0 10px 20px rgba(0, 90, 100, 0.2);
+          font-size: 16px; cursor: pointer; box-shadow: 0 10px 25px rgba(0,90,100,0.2);
         }
 
-        .scroll-indicator {
-          position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-          display: flex; flex-direction: column; align-items: center; gap: 10px;
-          color: #94a3b8; font-size: 12px; font-weight: 600;
-        }
-
-        /* SECTION 2 : LIFESTYLE */
-        .lifestyle-content-section { padding: 100px 5%; background: white; }
-        .lifestyle-grid-container { 
-          display: grid; grid-template-columns: 1.1fr 0.9fr; 
-          gap: 70px; max-width: 1200px; margin: 0 auto; align-items: center;
-        }
-
-        .realist-photo-pro { 
-          width: 100%; height: 600px; object-fit: cover; 
-          border-radius: 40px; box-shadow: 0 25px 50px rgba(0,0,0,0.12); 
-        }
-
-        .bper-teal-title { color: #005a64; font-size: 40px; font-weight: 800; margin-bottom: 20px; }
-        .bper-description { font-size: 18px; color: #64748b; line-height: 1.7; margin-bottom: 40px; }
-
-        .benefits-stack-pro { display: grid; gap: 35px; }
-        .benefit-row { display: flex; gap: 20px; }
-        .icon-bper { color: #005a64; flex-shrink: 0; margin-top: 4px; }
-        .benefit-row h4 { font-weight: 700; color: #1e293b; margin-bottom: 4px; }
-        .benefit-row p { color: #64748b; font-size: 15px; margin: 0; }
+        .bottom-experience-section { padding: 100px 5%; background: white; }
+        .content-split { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 60px; align-items: center; max-width: 1200px; margin: 0 auto; }
+        .image-side-realist img { width: 100%; height: 600px; object-fit: cover; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        
+        .text-side-realist h2 { font-size: 38px; color: #005a64; margin-bottom: 20px; font-weight: 800; }
+        .text-side-realist p { font-size: 18px; color: #64748b; line-height: 1.7; margin-bottom: 35px; }
+        
+        .features-stack-pro { display: grid; gap: 20px; }
+        .item-pro { display: flex; align-items: center; gap: 15px; color: #1e293b; font-weight: 600; }
+        .item-pro :global(svg) { color: #10b981; }
 
         @media (max-width: 1000px) {
-          .hero-card-viewport { height: auto; min-height: 100vh; padding: 100px 20px; }
-          .card-body-realist { width: 300px; }
-          .lifestyle-grid-container { grid-template-columns: 1fr; }
-          .realist-photo-pro { height: 400px; }
+          .top-hero-section { min-height: auto; padding: 100px 20px; }
+          .content-split { grid-template-columns: 1fr; }
+          .image-side-realist img { height: 400px; }
+          .card-pro-visual { width: 300px; }
         }
       `}</style>
     </div>
