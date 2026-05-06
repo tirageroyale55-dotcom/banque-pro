@@ -1,45 +1,41 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, Lock, Globe, ShieldCheck, Zap, Wifi } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Globe, Zap, Wifi } from 'lucide-react';
 
 export default function CardDetails() {
   const location = useLocation();
   const navigate = useNavigate();
   const { card } = location.state || {};
 
+  // FORCE LE SCROLL TOUT EN HAUT IMMÉDIATEMENT
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, []);
 
   if (!card) return <div className="p-10">Chargement...</div>;
 
-  // Configuration des images locales et des scènes spécifiques
   const getScene = () => {
     switch (card.id) {
-      case 'debit':
-        return { img: "/images/debit_scene.jpg", title: "Liberté Numérique" };
-      case 'classic':
-        return { img: "/images/classic_scene.jpg", title: "Accompagnement Pro" };
-      case 'gold':
-        return { img: "/images/gold_scene.jpg", title: "Privilège & Prestige" };
-      default:
-        return { img: "/images/debit_scene.jpg", title: "Service BPER" };
+      case 'debit': return { img: "/images/debit_scene.jpg", title: "Liberté Numérique" };
+      case 'classic': return { img: "/images/classic_scene.jpg", title: "Accompagnement Pro" };
+      case 'gold': return { img: "/images/gold_scene.jpg", title: "Privilège & Prestige" };
+      default: return { img: "/images/debit_scene.jpg", title: "Service BPER" };
     }
   };
 
   const scene = getScene();
 
   return (
-    <div className="details-wrapper">
+    <div className="details-wrapper-final">
       {/* Retour flottant */}
       <button className="back-btn-float" onClick={() => navigate(-1)}>
         <ArrowLeft size={24} />
       </button>
 
-      {/* SECTION 1 : LA CARTE (VISIBLE DE SUITE) */}
-      <section className="hero-card-section">
-        <div className="card-focus-container">
-          {/* REPRODUCTION EXACTE DU STYLE CARDCATALOG */}
+      {/* SECTION 1 : VISIBLE IMMÉDIATEMENT (100% de la hauteur écran) */}
+      <section className="hero-card-viewport">
+        <div className="card-presentation-area">
+          {/* STYLE CARDCATALOG 100% IDENTIQUE */}
           <div className="card-body-realist" style={{ background: card.bg }}>
             <div className="card-gloss-overlay"></div>
             
@@ -66,44 +62,50 @@ export default function CardDetails() {
           </div>
         </div>
 
-        <div className="hero-cta-area">
+        <div className="hero-text-content">
           <h1>{card.name}</h1>
-          <p className="hero-price-tag">{card.price}<span>/mois</span></p>
-          <button className="btn-order-bper">Commander maintenant</button>
+          <p className="hero-price-display">{card.price}<span>/mois</span></p>
+          <button className="btn-order-main">Commander maintenant</button>
+          
+          {/* Indicateur de scroll pour inviter à voir la suite */}
+          <div className="scroll-indicator">
+            <span>Détails & Avantages</span>
+            <div className="mouse-wheel"></div>
+          </div>
         </div>
       </section>
 
-      {/* SECTION 2 : IMAGE LIFESTYLE & DÉTAILS (AU SCROLL) */}
-      <section className="lifestyle-details-section">
-        <div className="lifestyle-layout">
-          <div className="image-frame">
-            <img src={scene.img} alt={scene.title} className="realist-photo" />
+      {/* SECTION 2 : LIFESTYLE & DÉTAILS (VISIBLE UNIQUEMENT AU SCROLL) */}
+      <section className="lifestyle-content-section">
+        <div className="lifestyle-grid-container">
+          <div className="image-frame-pro">
+            <img src={scene.img} alt={scene.title} className="realist-photo-pro" />
           </div>
 
-          <div className="text-content-frame">
+          <div className="text-frame-pro">
             <h2 className="bper-teal-title">{scene.title}</h2>
             <p className="bper-description">
               Découvrez un service bancaire conçu pour votre confort. La technologie BPER Banca 
               vous assure une sécurité mondiale et une gestion simplifiée.
             </p>
 
-            <div className="benefits-list-pro">
-              <div className="benefit-item-pro">
-                <ShieldCheck className="icon-teal" />
+            <div className="benefits-stack-pro">
+              <div className="benefit-row">
+                <ShieldCheck className="icon-bper" />
                 <div>
                   <h4>Sécurité Totale</h4>
                   <p>Technologie de cryptage EMV et authentification forte.</p>
                 </div>
               </div>
-              <div className="benefit-item-pro">
-                <Globe className="icon-teal" />
+              <div className="benefit-row">
+                <Globe className="icon-bper" />
                 <div>
                   <h4>Portée Mondiale</h4>
                   <p>Acceptée dans plus de 200 pays et territoires.</p>
                 </div>
               </div>
-              <div className="benefit-item-pro">
-                <Zap className="icon-teal" />
+              <div className="benefit-row">
+                <Zap className="icon-bper" />
                 <div>
                   <h4>Services Exclusifs</h4>
                   <p>Avantages et assistances dédiés à votre profil.</p>
@@ -115,7 +117,10 @@ export default function CardDetails() {
       </section>
 
       <style jsx>{`
-        .details-wrapper { background: #ffffff; }
+        .details-wrapper-final { 
+          background: #ffffff; 
+          width: 100%;
+        }
 
         .back-btn-float {
           position: fixed; top: 25px; left: 25px; z-index: 100;
@@ -123,19 +128,25 @@ export default function CardDetails() {
           border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        /* SECTION 1 : CARTE */
-        .hero-card-section {
-          height: 100vh; display: flex; flex-direction: column;
-          align-items: center; justify-content: center; background: #f8fafc;
+        /* SECTION 1 : FOCUS CARTE (FORCÉ À 100% DE LA HAUTEUR) */
+        .hero-card-viewport {
+          height: 100vh;
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: #f8fafc;
+          position: relative;
+          padding-top: 40px;
         }
 
-        .card-focus-container { perspective: 1000px; margin-bottom: 50px; }
+        .card-presentation-area { perspective: 1000px; margin-bottom: 40px; }
 
-        /* REPRODUCTION STYLE EXACT CARDCATALOG */
         .card-body-realist {
           width: 350px; aspect-ratio: 1.58 / 1; border-radius: 16px;
           position: relative; padding: 25px; overflow: hidden;
-          box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+          box-shadow: 0 30px 60px rgba(0,0,0,0.2);
           display: flex; flex-direction: column; justify-content: space-between;
         }
 
@@ -166,26 +177,32 @@ export default function CardDetails() {
         .mc-red { background: #eb001b; left: 0; }
         .mc-yellow { background: #ff5f00; right: 0; opacity: 0.9; }
 
-        .hero-cta-area { text-align: center; }
-        .hero-cta-area h1 { color: #005a64; font-size: 34px; font-weight: 800; margin-bottom: 5px; }
-        .hero-price-tag { font-size: 28px; font-weight: 800; color: #1e293b; }
-        .hero-price-tag span { font-size: 14px; color: #94a3b8; margin-left: 4px; }
+        .hero-text-content { text-align: center; }
+        .hero-text-content h1 { color: #005a64; font-size: 34px; font-weight: 800; margin-bottom: 5px; }
+        .hero-price-display { font-size: 28px; font-weight: 800; color: #1e293b; }
+        .hero-price-display span { font-size: 14px; color: #94a3b8; margin-left: 4px; }
 
-        .btn-order-bper {
+        .btn-order-main {
           margin-top: 25px; padding: 18px 60px; background: #005a64;
           color: white; border: none; border-radius: 100px; font-weight: 700;
           font-size: 16px; cursor: pointer; transition: 0.3s;
           box-shadow: 0 10px 20px rgba(0, 90, 100, 0.2);
         }
 
+        .scroll-indicator {
+          position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+          display: flex; flex-direction: column; align-items: center; gap: 10px;
+          color: #94a3b8; font-size: 12px; font-weight: 600;
+        }
+
         /* SECTION 2 : LIFESTYLE */
-        .lifestyle-details-section { padding: 100px 5%; background: white; }
-        .lifestyle-layout { 
+        .lifestyle-content-section { padding: 100px 5%; background: white; }
+        .lifestyle-grid-container { 
           display: grid; grid-template-columns: 1.1fr 0.9fr; 
           gap: 70px; max-width: 1200px; margin: 0 auto; align-items: center;
         }
 
-        .realist-photo { 
+        .realist-photo-pro { 
           width: 100%; height: 600px; object-fit: cover; 
           border-radius: 40px; box-shadow: 0 25px 50px rgba(0,0,0,0.12); 
         }
@@ -193,17 +210,17 @@ export default function CardDetails() {
         .bper-teal-title { color: #005a64; font-size: 40px; font-weight: 800; margin-bottom: 20px; }
         .bper-description { font-size: 18px; color: #64748b; line-height: 1.7; margin-bottom: 40px; }
 
-        .benefits-list-pro { display: grid; gap: 35px; }
-        .benefit-item-pro { display: flex; gap: 20px; }
-        .icon-teal { color: #005a64; flex-shrink: 0; margin-top: 4px; }
-        .benefit-item-pro h4 { font-weight: 700; color: #1e293b; margin-bottom: 4px; }
-        .benefit-item-pro p { color: #64748b; font-size: 15px; margin: 0; }
+        .benefits-stack-pro { display: grid; gap: 35px; }
+        .benefit-row { display: flex; gap: 20px; }
+        .icon-bper { color: #005a64; flex-shrink: 0; margin-top: 4px; }
+        .benefit-row h4 { font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+        .benefit-row p { color: #64748b; font-size: 15px; margin: 0; }
 
         @media (max-width: 1000px) {
-          .hero-card-section { height: auto; padding: 120px 20px 60px; }
+          .hero-card-viewport { height: auto; min-height: 100vh; padding: 100px 20px; }
           .card-body-realist { width: 300px; }
-          .lifestyle-layout { grid-template-columns: 1fr; }
-          .realist-photo { height: 400px; }
+          .lifestyle-grid-container { grid-template-columns: 1fr; }
+          .realist-photo-pro { height: 400px; }
         }
       `}</style>
     </div>
