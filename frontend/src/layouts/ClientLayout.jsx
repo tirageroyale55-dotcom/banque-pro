@@ -1,9 +1,9 @@
-import { Outlet, useLocation } from "react-router-dom"; // On ajoute useLocation
+import { Outlet, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import BottomNav from "../components/BottomNav";
 
 export default function ClientLayout() {
-  const location = useLocation(); // On récupère l'URL actuelle
+  const location = useLocation();
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
 
   useEffect(() => {
@@ -12,8 +12,9 @@ export default function ClientLayout() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // On vérifie si la route actuelle est le profil
+  // Vérification des pages où le menu doit être CACHÉ
   const isProfilePage = location.pathname === "/profile";
+  const isCardDetailsPage = location.pathname === "/card-details"; // Nouvelle condition
 
   return (
     <div className="bank-layout">
@@ -21,13 +22,12 @@ export default function ClientLayout() {
         <Outlet />
       </div>
 
-      {/* 
-          MODIFICATION ICI : 
-          Le menu s'affiche seulement si :
+      {/* Le menu s'affiche seulement si :
           1. On est sur mobile (!isDesktop)
-          2. ET qu'on n'est PAS sur la page profil (!isProfilePage)
+          2. ET qu'on n'est PAS sur le profil (!isProfilePage)
+          3. ET qu'on n'est PAS sur les détails de carte (!isCardDetailsPage)
       */}
-      {!isDesktop && !isProfilePage && <BottomNav />}
+      {!isDesktop && !isProfilePage && !isCardDetailsPage && <BottomNav />}
     </div>
   );
 }
