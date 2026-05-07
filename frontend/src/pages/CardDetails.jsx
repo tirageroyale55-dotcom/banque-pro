@@ -7,9 +7,10 @@ export default function CardDetails() {
   const navigate = useNavigate();
   const { card } = location.state || {};
 
-  // FORCE LE SCROLL TOUT EN HAUT IMMÉDIATEMENT
+  // Force le retour en haut sans bloquer le layout global
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    const mainContent = document.querySelector('main') || window;
+    mainContent.scrollTo(0, 0);
   }, []);
 
   if (!card) return <div className="p-10">Chargement...</div>;
@@ -26,89 +27,82 @@ export default function CardDetails() {
   const scene = getScene();
 
   return (
-    <div className="details-wrapper-final">
-      {/* Retour flottant */}
-      <button className="back-btn-float" onClick={() => navigate(-1)}>
-        <ArrowLeft size={24} />
+    <div className="details-container-fix">
+      {/* Retour */}
+      <button className="back-action-btn" onClick={() => navigate(-1)}>
+        <ArrowLeft size={24} /> <span>Retour</span>
       </button>
 
-      {/* SECTION 1 : VISIBLE IMMÉDIATEMENT (100% de la hauteur écran) */}
-      <section className="hero-card-viewport">
-        <div className="card-presentation-area">
-          {/* STYLE CARDCATALOG 100% IDENTIQUE */}
-          <div className="card-body-realist" style={{ background: card.bg }}>
-            <div className="card-gloss-overlay"></div>
-            
-            <div className="card-row-top">
-              <div className="bper-logo-detail" style={{ color: card.logoColor }}>
-                BPER<span>:</span> <small>Banca</small>
+      {/* SECTION 1 : LA CARTE AVEC MOUVEMENT */}
+      <section className="section-hero-product">
+        <div className="card-perspective-wrapper">
+          <div className="card-floating-animation">
+            <div className="card-body-bper" style={{ background: card.bg }}>
+              <div className="card-gloss-shine"></div>
+              
+              <div className="card-layout-top">
+                <div className="bper-brand-logo" style={{ color: card.logoColor }}>
+                  BPER<span>:</span> <small>Banca</small>
+                </div>
+                <Wifi size={24} className="nfc-icon-svg" strokeWidth={1.5} />
               </div>
-              <Wifi size={24} className="nfc-icon-detail" strokeWidth={1.5} />
-            </div>
 
-            <div className="emv-chip-realist">
-              <div className="chip-line-h1"></div>
-              <div className="chip-line-h2"></div>
-              <div className="chip-line-v"></div>
-            </div>
+              <div className="emv-chip-pro">
+                <div className="chip-line-h"></div>
+                <div className="chip-line-v"></div>
+              </div>
 
-            <div className="card-row-bottom">
-              <div className="card-type-text">{card.type}</div>
-              <div className="mastercard-logo">
-                <div className="mc-circle mc-red"></div>
-                <div className="mc-circle mc-yellow"></div>
+              <div className="card-layout-bottom">
+                <div className="card-type-label">{card.type}</div>
+                <div className="mc-logo-wrap">
+                  <div className="mc-c mc-1"></div>
+                  <div className="mc-c mc-2"></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="hero-text-content">
+        <div className="hero-product-info">
           <h1>{card.name}</h1>
-          <p className="hero-price-display">{card.price}<span>/mois</span></p>
-          <button className="btn-order-main">Commander maintenant</button>
-          
-          {/* Indicateur de scroll pour inviter à voir la suite */}
-          <div className="scroll-indicator">
-            <span>Détails & Avantages</span>
-            <div className="mouse-wheel"></div>
-          </div>
+          <p className="hero-price-tag">{card.price} <span>/ mois</span></p>
+          <button className="order-main-btn">Commander maintenant</button>
         </div>
       </section>
 
-      {/* SECTION 2 : LIFESTYLE & DÉTAILS (VISIBLE UNIQUEMENT AU SCROLL) */}
-      <section className="lifestyle-content-section">
-        <div className="lifestyle-grid-container">
-          <div className="image-frame-pro">
-            <img src={scene.img} alt={scene.title} className="realist-photo-pro" />
+      {/* SECTION 2 : IMAGE & DÉTAILS */}
+      <section className="section-lifestyle-pro">
+        <div className="lifestyle-pro-grid">
+          <div className="image-side-pro">
+            <img src={scene.img} alt={scene.title} className="scene-img-realist" />
           </div>
 
-          <div className="text-frame-pro">
-            <h2 className="bper-teal-title">{scene.title}</h2>
-            <p className="bper-description">
-              Découvrez un service bancaire conçu pour votre confort. La technologie BPER Banca 
-              vous assure une sécurité mondiale et une gestion simplifiée.
+          <div className="content-side-pro">
+            <h2 className="bper-teal-headline">{scene.title}</h2>
+            <p className="bper-subtext">
+              Une expertise bancaire premium pour sécuriser vos transactions et accompagner vos projets partout dans le monde.
             </p>
 
-            <div className="benefits-stack-pro">
-              <div className="benefit-row">
-                <ShieldCheck className="icon-bper" />
+            <div className="features-stack-pro">
+              <div className="feat-row">
+                <ShieldCheck className="feat-icon-bper" />
                 <div>
-                  <h4>Sécurité Totale</h4>
-                  <p>Technologie de cryptage EMV et authentification forte.</p>
+                  <h4>Sécurité Maximale</h4>
+                  <p>Authentification forte et cryptage EMV de pointe.</p>
                 </div>
               </div>
-              <div className="benefit-row">
-                <Globe className="icon-bper" />
+              <div className="feat-row">
+                <Globe className="feat-icon-bper" />
                 <div>
-                  <h4>Portée Mondiale</h4>
-                  <p>Acceptée dans plus de 200 pays et territoires.</p>
+                  <h4>Globalité</h4>
+                  <p>Utilisation sans frontières dans le réseau Mastercard.</p>
                 </div>
               </div>
-              <div className="benefit-row">
-                <Zap className="icon-bper" />
+              <div className="feat-row">
+                <Zap className="feat-icon-bper" />
                 <div>
-                  <h4>Services Exclusifs</h4>
-                  <p>Avantages et assistances dédiés à votre profil.</p>
+                  <h4>Avantages BPER</h4>
+                  <p>Services exclusifs et assistance dédiée 24/7.</p>
                 </div>
               </div>
             </div>
@@ -117,110 +111,98 @@ export default function CardDetails() {
       </section>
 
       <style jsx>{`
-        .details-wrapper-final { 
-          background: #ffffff; 
-          width: 100%;
+        .details-container-fix { background: #fff; padding: 20px; }
+
+        .back-action-btn {
+          display: flex; align-items: center; gap: 8px;
+          background: none; border: none; color: #005a64;
+          font-weight: 700; cursor: pointer; margin-bottom: 30px;
         }
 
-        .back-btn-float {
-          position: fixed; top: 25px; left: 25px; z-index: 100;
-          background: #fff; border: 1px solid #f1f5f9; padding: 12px;
-          border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        /* SECTION CARTE */
+        .section-hero-product {
+          display: flex; flex-direction: column; align-items: center;
+          padding: 40px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 60px;
         }
 
-        /* SECTION 1 : FOCUS CARTE (FORCÉ À 100% DE LA HAUTEUR) */
-        .hero-card-viewport {
-          height: 100vh;
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          background: #f8fafc;
-          position: relative;
-          padding-top: 40px;
+        /* ANIMATION DE MOUVEMENT (FLOTTEMENT ET INCLINAISON) */
+        .card-perspective-wrapper { perspective: 1000px; }
+        
+        .card-floating-animation {
+          animation: cardFloat 5s ease-in-out infinite;
+          transform-style: preserve-3d;
         }
 
-        .card-presentation-area { perspective: 1000px; margin-bottom: 40px; }
+        @keyframes cardFloat {
+          0% { transform: rotateY(-5deg) rotateX(5deg) translateY(0); }
+          50% { transform: rotateY(5deg) rotateX(-5deg) translateY(-15px); }
+          100% { transform: rotateY(-5deg) rotateX(5deg) translateY(0); }
+        }
 
-        .card-body-realist {
-          width: 350px; aspect-ratio: 1.58 / 1; border-radius: 16px;
+        .card-body-bper {
+          width: 340px; aspect-ratio: 1.58 / 1; border-radius: 16px;
           position: relative; padding: 25px; overflow: hidden;
-          box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+          box-shadow: 0 25px 50px rgba(0,0,0,0.15);
           display: flex; flex-direction: column; justify-content: space-between;
         }
 
-        .card-gloss-overlay {
+        .card-gloss-shine {
           position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-          background: linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.08) 48%, rgba(255,255,255,0) 52%);
+          background: linear-gradient(135deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 70%);
         }
 
-        .card-row-top { display: flex; justify-content: space-between; align-items: center; z-index: 2; }
-        .bper-logo-detail { font-weight: 900; font-size: 22px; letter-spacing: -0.5px; }
-        .bper-logo-detail span { color: #a3e635; }
-        .bper-logo-detail small { font-size: 11px; font-weight: 400; opacity: 0.8; }
-        .nfc-icon-detail { color: white; transform: rotate(90deg); opacity: 0.8; }
+        .card-layout-top { display: flex; justify-content: space-between; align-items: center; z-index: 2; }
+        .bper-brand-logo { font-weight: 900; font-size: 22px; letter-spacing: -0.5px; }
+        .bper-brand-logo span { color: #a3e635; }
+        .bper-brand-logo small { font-size: 11px; font-weight: 400; opacity: 0.8; }
+        .nfc-icon-svg { color: white; transform: rotate(90deg); opacity: 0.8; }
 
-        .emv-chip-realist {
-          width: 50px; height: 38px; background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
+        .emv-chip-pro {
+          width: 48px; height: 36px; background: linear-gradient(135deg, #fde047 0%, #ca8a04 100%);
           border-radius: 6px; position: relative; z-index: 2; border: 1px solid rgba(0,0,0,0.1);
         }
-        .chip-line-h1 { position: absolute; background: rgba(0,0,0,0.2); width: 100%; height: 1px; top: 33%; }
-        .chip-line-h2 { position: absolute; background: rgba(0,0,0,0.2); width: 100%; height: 1px; top: 66%; }
-        .chip-line-v { position: absolute; background: rgba(0,0,0,0.2); height: 100%; width: 1px; left: 50%; }
 
-        .card-row-bottom { display: flex; justify-content: space-between; align-items: flex-end; z-index: 2; }
-        .card-type-text { font-size: 12px; font-weight: 800; color: white; letter-spacing: 1.5px; }
+        .card-layout-bottom { display: flex; justify-content: space-between; align-items: flex-end; z-index: 2; }
+        .card-type-label { font-size: 12px; font-weight: 800; color: white; letter-spacing: 1.5px; }
 
-        .mastercard-logo { display: flex; position: relative; width: 40px; height: 25px; }
-        .mc-circle { width: 25px; height: 25px; border-radius: 50%; position: absolute; }
-        .mc-red { background: #eb001b; left: 0; }
-        .mc-yellow { background: #ff5f00; right: 0; opacity: 0.9; }
+        .mc-logo-wrap { display: flex; position: relative; width: 40px; height: 25px; }
+        .mc-c { width: 25px; height: 25px; border-radius: 50%; position: absolute; }
+        .mc-1 { background: #eb001b; left: 0; }
+        .mc-2 { background: #ff5f00; right: 0; opacity: 0.9; }
 
-        .hero-text-content { text-align: center; }
-        .hero-text-content h1 { color: #005a64; font-size: 34px; font-weight: 800; margin-bottom: 5px; }
-        .hero-price-display { font-size: 28px; font-weight: 800; color: #1e293b; }
-        .hero-price-display span { font-size: 14px; color: #94a3b8; margin-left: 4px; }
+        .hero-product-info { text-align: center; margin-top: 40px; }
+        .hero-product-info h1 { color: #1e293b; font-size: 30px; font-weight: 800; }
+        .hero-price-tag { font-size: 26px; font-weight: 800; color: #005a64; margin-top: 10px; }
+        .hero-price-tag span { font-size: 14px; color: #94a3b8; }
 
-        .btn-order-main {
-          margin-top: 25px; padding: 18px 60px; background: #005a64;
-          color: white; border: none; border-radius: 100px; font-weight: 700;
+        .order-main-btn {
+          margin-top: 25px; padding: 16px 50px; background: #005a64;
+          color: white; border: none; border-radius: 12px; font-weight: 700;
           font-size: 16px; cursor: pointer; transition: 0.3s;
-          box-shadow: 0 10px 20px rgba(0, 90, 100, 0.2);
         }
 
-        .scroll-indicator {
-          position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-          display: flex; flex-direction: column; align-items: center; gap: 10px;
-          color: #94a3b8; font-size: 12px; font-weight: 600;
+        /* SECTION LIFESTYLE */
+        .section-lifestyle-pro { padding: 40px 0; }
+        .lifestyle-pro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+
+        .scene-img-realist { 
+          width: 100%; height: 500px; object-fit: cover; 
+          border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
         }
 
-        /* SECTION 2 : LIFESTYLE */
-        .lifestyle-content-section { padding: 100px 5%; background: white; }
-        .lifestyle-grid-container { 
-          display: grid; grid-template-columns: 1.1fr 0.9fr; 
-          gap: 70px; max-width: 1200px; margin: 0 auto; align-items: center;
-        }
+        .bper-teal-headline { color: #005a64; font-size: 36px; font-weight: 800; margin-bottom: 20px; }
+        .bper-subtext { font-size: 17px; color: #64748b; line-height: 1.6; margin-bottom: 35px; }
 
-        .realist-photo-pro { 
-          width: 100%; height: 600px; object-fit: cover; 
-          border-radius: 40px; box-shadow: 0 25px 50px rgba(0,0,0,0.12); 
-        }
+        .features-stack-pro { display: grid; gap: 30px; }
+        .feat-row { display: flex; gap: 20px; }
+        .feat-icon-bper { color: #005a64; flex-shrink: 0; }
+        .feat-row h4 { font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+        .feat-row p { color: #64748b; font-size: 14px; margin: 0; }
 
-        .bper-teal-title { color: #005a64; font-size: 40px; font-weight: 800; margin-bottom: 20px; }
-        .bper-description { font-size: 18px; color: #64748b; line-height: 1.7; margin-bottom: 40px; }
-
-        .benefits-stack-pro { display: grid; gap: 35px; }
-        .benefit-row { display: flex; gap: 20px; }
-        .icon-bper { color: #005a64; flex-shrink: 0; margin-top: 4px; }
-        .benefit-row h4 { font-weight: 700; color: #1e293b; margin-bottom: 4px; }
-        .benefit-row p { color: #64748b; font-size: 15px; margin: 0; }
-
-        @media (max-width: 1000px) {
-          .hero-card-viewport { height: auto; min-height: 100vh; padding: 100px 20px; }
-          .card-body-realist { width: 300px; }
-          .lifestyle-grid-container { grid-template-columns: 1fr; }
-          .realist-photo-pro { height: 400px; }
+        @media (max-width: 900px) {
+          .lifestyle-pro-grid { grid-template-columns: 1fr; }
+          .scene-img-realist { height: 350px; }
+          .card-body-bper { width: 290px; }
         }
       `}</style>
     </div>
