@@ -21,7 +21,7 @@ export default function CardDetails() {
 
   const getScene = () => {
     switch (card.id) {
-      case 'debit': return { img: "/images/debit_scene.jpg", title: "Liberté Numérique" };
+      case 'debit': return { img: "/debit_scene.png", title: "Liberté Numérique" };
       case 'classic': return { img: "/images/classic_scene.jpg", title: "Accompagnement Pro" };
       case 'gold': return { img: "/images/gold_scene.jpg", title: "Privilège & Prestige" };
       default: return { img: "/images/debit_scene.jpg", title: "Service BPER" };

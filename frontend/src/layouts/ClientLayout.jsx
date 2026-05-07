@@ -15,7 +15,7 @@ export default function ClientLayout() {
   // Vérification des pages où le menu doit être CACHÉ
   const isProfilePage = location.pathname === "/profile";
   const isCardDetailsPage = location.pathname === "/card-details"; 
-  const isCardCatalogPage = location.pathname === "/request-card";
+  
 
   return (
     <div className="bank-layout">
@@ -28,7 +28,7 @@ export default function ClientLayout() {
           2. ET qu'on n'est PAS sur le profil (!isProfilePage)
           3. ET qu'on n'est PAS sur les détails de carte (!isCardDetailsPage)
       */}
-      {!isDesktop && !isProfilePage && !isCardDetailsPage && !isCardCatalogPage && <BottomNav />}
+      {!isDesktop && !isProfilePage && !isCardDetailsPage && <BottomNav />}
     </div>
   );
 }
