@@ -23,7 +23,7 @@ export default function CardDetails() {
     switch (card.id) {
       case 'debit': return { img: "/debit_scene.png", title: "Liberté Numérique" };
       case 'classic': return { img: "/classic_scene.png", title: "Accompagnement Pro" };
-      case 'gold': return { img: "/images/gold_scene.jpg", title: "Privilège & Prestige" };
+      case 'gold': return { img: "/gold_scene.png", title: "Privilège & Prestige" };
       default: return { img: "/images/debit_scene.jpg", title: "Service BPER" };
     }
   };
