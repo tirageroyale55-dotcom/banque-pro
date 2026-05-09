@@ -1,17 +1,14 @@
-// ... tes imports ...
 import React, { useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom'; // navigate est déjà importé
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShieldCheck, Globe, Zap, Wifi } from 'lucide-react';
 
 export default function CardDetails() {
-  // ... tes hooks ...
   const location = useLocation();
   const navigate = useNavigate();
   const { card } = location.state || {};
   const topRef = useRef(null);
 
   useEffect(() => {
-    // ... ton useEffect existant ...
     window.scrollTo(0, 0);
     if (topRef.current) {
       topRef.current.scrollIntoView({ behavior: 'instant', block: 'start' });
@@ -22,16 +19,13 @@ export default function CardDetails() {
 
   if (!card) return <div className="p-10">Chargement...</div>;
 
-  // AJOUTE CETTE FONCTION POUR GÉRER LE CLIC
   const handleOrderClick = () => {
     console.log("Clic sur commander pour:", card.name);
-    // Redirection vers la nouvelle page de confirmation
-    // On passe les données de la carte pour qu'elles soient disponibles là-bas
+    
     navigate('/order-confirmation', { state: { card } });
   };
 
   const getScene = () => {
-    // ... ta fonction existante ...
     switch (card.id) {
       case 'debit': return { img: "/debit_scene.png", title: "Liberté Numérique" };
       case 'classic': return { img: "/classic_scene.png", title: "Accompagnement Pro" };
@@ -44,18 +38,19 @@ export default function CardDetails() {
 
   return (
     <div className="details-container-fix" ref={topRef}>
-      {/* ... ton code existant ... */}
+      {/* Retour bouton */}
       <button className="back-action-btn" onClick={() => navigate(-1)}>
         <ArrowLeft size={24} /> <span>Retour</span>
       </button>
 
+      {/* SECTION 1 : LA CARTE (AVEC LE STYLE STRICT DE CARDCATALOG) */}
       <section className="section-hero-product">
         <div className="card-perspective-wrapper">
           <div className="card-floating-animation">
-            {/* ... ton style de carte strict ... */}
+            
+            {/* ICI : COPIE CONFORME DU RECOUVREMENT GRIS DE CARDCATALOG */}
             <div className="card-physical-container">
               <div className="card-body" style={{ background: card.bg }}>
-                {/* ... contenu de la carte ... */}
                 <div className="card-gloss"></div>
                 
                 <div className="card-top-row">
@@ -80,21 +75,20 @@ export default function CardDetails() {
                 </div>
               </div>
             </div>
+
           </div>
         </div>
 
         <div className="hero-product-info">
           <h1>{card.name}</h1>
           <p className="hero-price-tag">{card.price} <span>/ mois</span></p>
-          
-          {/* AJOUTE LE onClick ICI SUR LE BOUTON EXISTANT */}
           <button className="order-main-btn" onClick={handleOrderClick}>
             Commander maintenant
           </button>
         </div>
       </section>
 
-      {/* SECTION 2 ... le reste de ton code existant ... */}
+      {/* SECTION 2 : IMAGE & DÉTAILS (RESTE INTACT) */}
       <section className="section-lifestyle-pro">
         <div className="lifestyle-pro-grid">
           <div className="image-side-pro">
@@ -135,7 +129,6 @@ export default function CardDetails() {
       </section>
 
       <style jsx>{`
-        // ... tout ton CSS existant ...
         .details-container-fix { 
           background: #fff; 
           padding: 20px;
