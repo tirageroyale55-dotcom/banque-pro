@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Assure-toi d'avoir axios installé
+
+// IMPORTE TON SERVICE API EXISTANT ICI
+import { api } from "../services/api"; 
+
 import { 
   ArrowLeft, ShieldCheck, Landmark, User, 
   MapPin, Send, Wifi, ChevronRight, AlertTriangle 
@@ -19,26 +22,20 @@ export default function CardOrderConfirmation() {
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    // RÉCUPÉRATION DES VRAIES INFOS DEPUIS TON BACKEND
+    // RÉCUPÉRATION DES VRAIES INFOS VIA TON SERVICE API
     const fetchRealData = async () => {
       try {
-        const token = localStorage.getItem('token'); // Récupère le jeton d'authentification
-        if (!token) {
-          navigate('/login'); // Redirige si pas connecté
-          return;
-        }
+        // Utilisation de ton service api() pour appeler /api/dashboard
+        // Ton service api() gère déjà le token et la redirection login en cas d'erreur
+        const responseData = await api("/dashboard");
 
-        // Appel à ta route existante : router.get("/dashboard", auth, getDashboard);
-        const response = await axios.get('/api/dashboard', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        // Ton controller renvoie { user: {...}, account: {...}, ... }
-        // On stocke ces vraies infos
-        setDbData(response.data);
+        // Stocke les vraies données renvoyées par ton controller
+        setDbData(responseData);
       } catch (err) {
-        console.error("Erreur récupération données:", err);
-        setError("Impossible de charger vos informations sécurisées. Veuillez réessayer.");
+        // Ton service api() gère déjà la plupart des erreurs d'auth, 
+        // mais on attrape ici les erreurs réseau ou serveur
+        console.error("Erreur récupération données confirmation:", err);
+        setError("Une erreur technique est survenue lors de la sécurisation de votre demande.");
       } finally {
         setLoading(false);
       }
@@ -49,29 +46,33 @@ export default function CardOrderConfirmation() {
 
   if (!card) return null; // Redirection si on arrive ici sans carte sélectionnée
 
-  // ÉCRANS DE CHARGEMENT ET D'ERREUR PROFESSIONNELS
+  // ÉCRANS DE CHARGEMENT ET D'ERREUR BPER PRO
   if (loading) {
     return (
-      <div className="status-screen loading">
-        <div className="spinner"></div>
-        <p>Authentification et sécurisation de la session BPER...</p>
+      <div className="bper-order-page flex-center">
+        <div className="status-screen">
+          <div className="bper-spinner"></div>
+          <p>Initialisation du protocole de demande sécurisé BPER Banca...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="status-screen error">
-        <AlertTriangle size={48} />
-        <p>{error}</p>
-        <button onClick={() => window.location.reload()}>Réessayer</button>
+      <div className="bper-order-page flex-center">
+        <div className="status-screen error">
+          <AlertTriangle size={48} />
+          <p>{error}</p>
+          <button onClick={() => window.location.reload()}>Réessayer</button>
+        </div>
       </div>
     );
   }
 
-  // ALIAS POUR UNE LECTURE PLUS FACILE (Mappage direct sur tes schémas)
-  const realUser = dbData.user;       // Correspont à User.js complet
-  const realAccount = dbData.account; // Correspont à Account.js simplifié du controller
+  // ALIAS POUR UNE LECTURE PLUS FACILE (Mappage direct sur User.js et Account.js)
+  const realUser = dbData.user;       
+  const realAccount = dbData.account; 
 
   return (
     <div className="bper-order-page">
@@ -83,7 +84,7 @@ export default function CardOrderConfirmation() {
         </button>
         <div className="security-tag">
           <ShieldCheck size={16} />
-          <span>Cryptage SSL 256-bit actif</span>
+          <span>Cryptage SSL BPER Banca actif</span>
         </div>
       </header>
 
@@ -91,13 +92,13 @@ export default function CardOrderConfirmation() {
         <div className="content-container">
           
           <section className="page-intro">
-            <h1>Validation de votre demande</h1>
-            <p>Conformément aux réglementations bancaires, vérifiez l'exactitude des informations ci-dessous.</p>
+            <h1>Confirmation de votre commande</h1>
+            <p>Conformément aux réglementations bancaires, veuillez vérifier l'exactitude des informations ci-dessous.</p>
           </section>
 
           <div className="order-grid">
             
-            {/* COLONNE GAUCHE (420px sur Desktop) */}
+            {/* COLONNE GAUCHE (CARTE & COMPTE) */}
             <div className="left-column">
               
               {/* LA CARTE (STYLE STRICT CARDDETAILS) */}
@@ -131,8 +132,8 @@ export default function CardOrderConfirmation() {
                 </div>
               </div>
 
-              {/* INFOS COMPTE (ACCOUNT.JS RÉEL) */}
-              <div className="info-block">
+              {/* INFOS COMPTE (ACCOUNT.JS RÉEL DE LA DB) */}
+              <div className="info-block account-block">
                 <div className="block-title">
                   <Landmark size={18} />
                   <h2>Compte de prélèvement</h2>
@@ -148,51 +149,51 @@ export default function CardOrderConfirmation() {
               </div>
             </div>
 
-            {/* COLONNE DROITE (FLEX sur Desktop) */}
+            {/* COLONNE DROITE (USER & ADRESSE) */}
             <div className="right-column">
               
-              {/* INFOS PERSONNELLES (USER.JS RÉEL) */}
+              {/* INFOS PERSONNELLES (USER.JS RÉEL DE LA DB) */}
               <div className="info-block">
                 <div className="block-title">
                   <User size={18} />
                   <h2>Titulaire de la carte</h2>
                 </div>
-                <div className="data-row">
+                <div className="data-row titular-row">
                   <span className="label">Nom complet</span>
-                  {/* Récupère civilite, nom, prenom réels du schéma */}
+                  {/* Récupère civilite, nom, prenom réels du schéma Mongoose */}
                   <span className="value">{realUser.civilite} {realUser.nom} {realUser.prenom}</span>
                 </div>
                 <div className="data-row">
-                  <span className="label">Identifiant de connexion (Email)</span>
-                  <span className="value">{realUser.email}</span>
+                  <span className="label">Identifiant Client (Email)</span>
+                  <span className="value email-value">{realUser.email}</span>
                 </div>
                 <div className="data-row">
-                  <span className="label">Numéro de téléphone</span>
+                  <span className="label">Numéro de téléphone lié</span>
                   <span className="value">{realUser.telephone}</span>
                 </div>
               </div>
 
-              {/* ADRESSE (USER.JS RÉEL) */}
+              {/* ADRESSE (USER.JS RÉEL DE LA DB) */}
               <div className="info-block">
                 <div className="block-title">
                   <MapPin size={18} />
                   <h2>Adresse d'expédition</h2>
                 </div>
                 <p className="address-display">
-                  {/* Récupère adresse, codePostal, ville, pays réels du schéma */}
+                  {/* Récupère adresse, codePostal, ville, pays réels du schéma Mongoose */}
                   {realUser.adresse}<br />
                   {realUser.codePostal}, {realUser.ville}<br />
                   {realUser.pays}
                 </p>
                 <div className="info-note">
-                  Carte envoyée par courrier recommandé avec accusé de réception.
+                  La carte sera expédiée sous 3 jours ouvrés par courrier recommandé.
                 </div>
               </div>
 
               {/* ACTION FINALE SÉCURISÉE */}
               <div className="final-action-card">
                 <p className="terms-text">
-                  En validant cette demande, vous confirmez l'exactitude des données ci-dessus 
+                  En validant cette demande, vous certifiez l'exactitude des données ci-dessus 
                   et autorisez BPER Banca à émettre la carte {card.name} associée au compte cité ci-contre.
                 </p>
                 <button className="bper-submit-btn">
@@ -216,13 +217,15 @@ export default function CardOrderConfirmation() {
           padding-bottom: 60px;
         }
 
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+
         .content-container {
           max-width: 1120px;
           margin: 0 auto;
           padding: 0 24px;
         }
 
-        /* HEADER FIXE PROFESSIONNEL */
+        /* HEADER FIXE PROFESSIONNEL BPER */
         .order-header {
           background: #fff;
           padding: 16px 24px;
@@ -243,19 +246,19 @@ export default function CardOrderConfirmation() {
 
         .security-tag {
           display: flex; align-items: center; gap: 7px;
-          font-size: 12px; color: #059669; font-weight: 600;
-          background: #ecfdf5; padding: 7px 14px; border-radius: 20px;
+          font-size: 11px; color: #059669; font-weight: 600;
+          background: #ecfdf5; padding: 6px 12px; border-radius: 20px;
           border: 1px solid #d1fae5;
         }
 
         /* ÉCRANS DE STATUT */
         .status-screen {
-          display: flex; flex-direction: column; align-items: center; justify-content: center;
-          height: 80vh; text-align: center; color: #64748b; gap: 20px;
+          text-align: center; color: #64748b;
+          display: flex; flex-direction: column; align-items: center; gap: 15px;
         }
-        .spinner {
-          width: 40px; height: 40px; border: 4px solid #f3f3f3;
-          border-top: 4px solid #005a64; border-radius: 50%;
+        .bper-spinner {
+          width: 35px; height: 35px; border: 3px solid #f3f3f3;
+          border-top: 3px solid #005a64; border-radius: 50%;
           animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -267,8 +270,8 @@ export default function CardOrderConfirmation() {
 
         /* INTRO PAGE */
         .page-intro { padding: 48px 0; text-align: left; }
-        .page-intro h1 { font-size: 30px; font-weight: 800; color: #0f172a; margin-bottom: 10px; letter-spacing: -0.5px; }
-        .page-intro p { color: #64748b; font-size: 16px; line-height: 1.5; }
+        .page-intro h1 { font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 10px; letter-spacing: -0.5px; }
+        .page-intro p { color: #64748b; font-size: 15px; line-height: 1.5; max-width: 700px; }
 
         /* GRID SYSTEM (DESKTOP) */
         .order-grid {
@@ -278,43 +281,44 @@ export default function CardOrderConfirmation() {
           align-items: start;
         }
 
-        /* BLOCS D'INFORMATION ÉPURÉS */
+        /* BLOCS D'INFORMATION ÉPURÉS CORPORATE */
         .info-block {
           background: #fff;
-          border-radius: 16px;
-          padding: 28px;
+          border-radius: 12px;
+          padding: 24px;
           border: 1px solid #e2e8f0;
           margin-bottom: 24px;
           box-shadow: 0 1px 2px rgba(0,0,0,0.01);
         }
 
         .block-title {
-          display: flex; align-items: center; gap: 12px;
-          margin-bottom: 24px; color: #005a64;
-          border-bottom: 1px solid #f1f5f9; padding-bottom: 16px;
+          display: flex; align-items: center; gap: 10px;
+          margin-bottom: 20px; color: #005a64;
+          border-bottom: 1px solid #f1f5f9; padding-bottom: 14px;
         }
 
-        .block-title h2 { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.75px; }
+        .block-title h2 { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.75px; }
 
         .data-row {
           display: flex; justify-content: space-between; align-items: center;
-          padding: 14px 0; border-bottom: 1px solid #f1f5f9; gap: 20px;
+          padding: 12px 0; border-bottom: 1px solid #f1f5f9; gap: 15px;
         }
         .data-row:last-child { border-bottom: none; }
 
-        .label { color: #64748b; font-size: 13px; flex-shrink: 0; }
+        .label { color: #64748b; font-size: 13px; flex-shrink: 0; font-weight: 500; }
         .value { color: #1e293b; font-weight: 600; font-size: 14px; text-align: right; }
-        .iban-style { font-family: 'Roboto Mono', 'Courier New', monospace; color: #005a64; letter-spacing: -0.5px; font-size: 13px; }
+        .iban-style { font-family: 'Roboto Mono', 'Courier New', monospace; color: #005a64; letter-spacing: -0.5px; font-size: 12.5px; }
+        .email-value { word-break: break-all; } /* Empêche le débordement d'un email long */
 
-        /* CARTE VISUELLE (STYLE CORPORATE) */
+        /* CARTE VISUELLE (STYLE STRICT CARDDETAILS) */
         .card-summary-box {
-          background: linear-gradient(135deg, #005a64 0%, #003a41 100%);
-          border-radius: 24px; padding: 32px; margin-bottom: 24px;
+          background: linear-gradient(135deg, #005a64 0%, #003d44 100%);
+          border-radius: 20px; padding: 28px; margin-bottom: 24px;
           color: white; text-align: center;
           box-shadow: 0 10px 20px rgba(0, 90, 100, 0.1);
         }
 
-        .card-visual-wrapper { display: flex; justify-content: center; margin-bottom: 28px; }
+        .card-visual-wrapper { display: flex; justify-content: center; margin-bottom: 24px; }
 
         .card-body-strict {
           width: 290px; aspect-ratio: 1.58/1; border-radius: 12px;
@@ -350,48 +354,52 @@ export default function CardOrderConfirmation() {
         .red { background: #eb001b; left: 0; }
         .yellow { background: #ff5f00; right: 0; opacity: 0.9; }
 
-        .card-specs h3 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
-        .price-main { font-size: 24px; font-weight: 800; color: #a3e635; }
+        .card-specs h3 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+        .price-main { font-size: 22px; font-weight: 800; color: #a3e635; }
         .price-main span { font-size: 12px; opacity: 0.8; }
 
         /* ADRESSE ET NOTES */
-        .address-display { font-size: 14px; color: #1e293b; line-height: 1.7; font-weight: 500; margin-bottom: 20px; }
-        .info-note { font-size: 12px; color: #64748b; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .address-display { font-size: 14px; color: #1e293b; line-height: 1.7; font-weight: 600; margin-bottom: 20px; }
+        .info-note { font-size: 12px; color: #64748b; background: #f8fafc; padding: 10px 12px; border-radius: 8px; border: 1px solid #e2e8f0; }
 
-        /* ACTION FINALE */
-        .final-action-card { background: #fff; padding: 28px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        .terms-text { font-size: 12px; color: #64748b; line-height: 1.6; margin-bottom: 24px; }
+        /* ACTION FINALE SÉCURISÉE BPER */
+        .final-action-card { background: #fff; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .terms-text { font-size: 12px; color: #64748b; line-height: 1.6; margin-bottom: 20px; }
 
         .bper-submit-btn {
           width: 100%; background: linear-gradient(135deg, #005a64 0%, #00454d 100%);
-          color: white; border: none; padding: 18px; border-radius: 12px;
+          color: white; border: none; padding: 16px; border-radius: 10px;
           font-weight: 700; font-size: 16px; cursor: pointer;
-          display: flex; justify-content: center; align-items: center; gap: 12px;
+          display: flex; justify-content: center; align-items: center; gap: 10px;
           transition: all 0.2s ease;
-          box-shadow: 0 8px 20px rgba(0, 90, 100, 0.2);
+          box-shadow: 0 8px 20px rgba(0, 90, 100, 0.15);
         }
 
-        .bper-submit-btn:hover { background: #00454d; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0, 90, 100, 0.25); }
+        .bper-submit-btn:hover { background: #00454d; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0, 90, 100, 0.2); }
 
-        /* RESPONSIVE MEDIA QUERIES */
+        /* RESPONSIVE MEDIA QUERIES CORPORATE */
         @media (max-width: 1024px) {
           .order-grid { grid-template-columns: 1fr; gap: 24px; }
-          .back-btn span { display: none; } /* Cache le texte du bouton retour */
+          .back-btn span { display: none; } /* Cache le texte du bouton retour sur tablette/mobile */
           .page-intro { padding: 32px 0; }
           .content-container { padding: 0 16px; }
         }
 
         @media (max-width: 640px) {
-          .order-header { padding: 12px 16px; }
-          .page-intro h1 { font-size: 24px; }
+          .order-header { padding: 10px 16px; }
+          .page-intro h1 { font-size: 22px; }
           .page-intro p { font-size: 14px; }
-          .info-block { padding: 20px; }
-          .data-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+          .info-block { padding: 16px; border-radius: 10px; }
+          .data-row { flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px 0; }
           .value { text-align: left; }
-          .iban-row { display: block; overflow-x: auto; white-space: nowrap; } /* Autorise le scroll de l'IBAN si trop long */
-          .iban-style { font-size: 12px; display: inline-block; padding-bottom: 5px; }
-          .card-summary-box { padding: 24px; }
+          .iban-row { display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; } /* Autorise le scroll de l'IBAN si trop long */
+          .iban-style { font-size: 11.5px; display: inline-block; padding-bottom: 4px; }
+          .titular-row { flex-direction: row; align-items: center; justify-content: space-between; gap: 15px; } /* Garde civilite et nom sur la même ligne */
+          .titular-row .value { text-align: right; }
+          .card-summary-box { padding: 20px; border-radius: 16px; }
           .card-body-strict { width: 100%; max-width: 270px; }
+          .card-perspective-wrapper { display: flex; justify-content: center; }
+          .card-visual-wrapper { margin-bottom: 18px; }
         }
       `}</style>
     </div>
