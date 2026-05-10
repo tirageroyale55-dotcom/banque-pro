@@ -17,7 +17,9 @@ import Aide from "./Aide";
 import Profile from "./Profile";
 import Notifications from "./Notifications";
 
-import { LayoutDashboard, CreditCard, Send, Package, Heart, HelpCircle, Bell } from "lucide-react";
+// Icônes pour le menu Desktop Professionnel
+import { LayoutDashboard, CreditCard, Send, Package, Heart, HelpCircle, Bell, User } from "lucide-react";
+
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
@@ -31,17 +33,28 @@ export default function Dashboard() {
   const [opacity, setOpacity] = useState(0);
 
   const navigate = useNavigate();
+  const lastScrollRef = useRef(0);
   const contentRef = useRef(null);
 
-  // 1. CHARGEMENT DE LA CARTE EN COURS (CORRIGÉ : Au niveau supérieur)
-  useEffect(() => {
-    const savedRequest = localStorage.getItem("pending_card_request");
-    if (savedRequest) {
-      setPendingCard(JSON.parse(savedRequest));
-    }
-  }, []);
+  
+  
 
-  // 2. CHARGEMENT DES DONNÉES UTILISATEUR
+useEffect(() => {
+  const savedRequest = localStorage.getItem("pending_card_request");
+  if (savedRequest) {
+    setPendingCard(JSON.parse(savedRequest));
+  }
+}, []);
+
+
+  useEffect(() => {
+    if (activeTab === "cards") {
+      api("/client/card")
+        .then(setCard)
+        .catch(() => console.log("Erreur carte"));
+    }
+  }, [activeTab]);
+
   useEffect(() => {
     api("/client/dashboard")
       .then((clientData) => {
@@ -56,23 +69,16 @@ export default function Dashboard() {
           .catch(err => console.error("L'historique n'a pas pu être chargé :", err));
       })
       .catch((err) => {
+        console.error("Session expirée ou erreur profil");
         localStorage.removeItem("token");
         navigate("/login");
       });
   }, [navigate]);
 
-  // 3. CHARGEMENT DE LA CARTE BANCAIRE EXISTANTE
   useEffect(() => {
-    if (activeTab === "cards") {
-      api("/client/card")
-        .then(setCard)
-        .catch(() => console.log("Erreur carte"));
-    }
-  }, [activeTab]);
-
-  // 4. GESTION DU RESIZE ET SCROLL
-  useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1000);
+    };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -83,7 +89,11 @@ export default function Dashboard() {
   }, [activeTab]);
 
   useEffect(() => {
-    if (!data || activeTab !== "accounts") return;
+    if (!data || activeTab !== "accounts") {
+      const bar = document.querySelector('.balance-bar');
+      if (bar) bar.classList.remove('show');
+      return;
+    }
 
     const handleScroll = () => {
       const bar = document.querySelector('.balance-bar');
@@ -91,7 +101,9 @@ export default function Dashboard() {
       if (!bar || !accountCard) return;
 
       const cardRect = accountCard.getBoundingClientRect();
-      if (cardRect.top < 135) {
+      const triggerPoint = 135; 
+
+      if (cardRect.top < triggerPoint) {
         bar.classList.add('show');
       } else {
         bar.classList.remove('show');
@@ -99,21 +111,28 @@ export default function Dashboard() {
     };
 
     window.addEventListener("scroll", handleScroll, true);
-    return () => window.removeEventListener("scroll", handleScroll, true);
+    handleScroll();
+    return () => {
+      window.removeEventListener("scroll", handleScroll, true);
+    };
   }, [activeTab, data]);
 
   if (!data) return null;
+  
+  // Version sécurisée pour éviter le dashboard vide
+const userInfo = data?.user || data || {};
+const firstName = userInfo.firstname || userInfo.prenom || "";
+const lastName = userInfo.lastname || userInfo.nom || "";
 
-  const userInfo = data?.user || data || {};
-  const firstName = userInfo.firstname || userInfo.prenom || "";
-  const lastName = userInfo.lastname || userInfo.nom || "";
-  const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || "??";
-  const profileImage = userInfo.profilePicture || null;
+const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || "??";
+const profileImage = userInfo.profilePicture || null;
 
-  // --- RENDU DESKTOP ---
+
+  // --- RENDU CONDITIONNEL : DESKTOP ---
   if (isDesktop) {
     return (
       <div className="bper-desktop-layout">
+        {/* Barre latérale (Sidebar) - Inspirée de WhatsApp Image 2026-04-12 at 19.24.15.jpeg */}
         <aside className="bper-sidebar-left">
           <div className="bper-brand">BPER</div>
           <nav className="bper-side-nav">
@@ -123,67 +142,139 @@ export default function Dashboard() {
             <div className={`nav-link ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>
               <CreditCard size={20} /> <span>Cartes</span>
             </div>
-            <div className={`nav-link ${activeTab === 'payer' ? 'active' : ''}`} onClick={() => setActiveTab('payer')}>
+            
+            <div 
+              className={`nav-link ${activeTab === 'payer' ? 'active' : ''}`} 
+              onClick={() => setActiveTab('payer')}
+            >
               <Send size={20} /> <span>Payer</span>
             </div>
+            
             <div className={`nav-link ${activeTab === 'produits' ? 'active' : ''}`} onClick={() => setActiveTab('produits')}>
                <Package size={20} /> <span>Produits</span>
             </div>
+
             <div className={`nav-link ${activeTab === 'lifestyle' ? 'active' : ''}`} onClick={() => setActiveTab('lifestyle')}>
                <Heart size={20} /> <span>Lifestyle</span>
             </div>
+
             <div className={`nav-link ${activeTab === 'aide' ? 'active' : ''}`} onClick={() => setActiveTab('aide')}>
                <HelpCircle size={20} /> <span>Aide</span>
              </div>
           </nav>
         </aside>
 
+        {/* Contenu de droite */}
         <div className="bper-main-viewport">
           <header className="bper-top-bar">
-            <div className="bper-welcome">Bienvenue, <strong>{firstName} {lastName}</strong></div>
-            <div className="bper-header-tools">
-              <Bell size={22} className="tool-icon" onClick={() => setActiveTab('notifications')} />
-              <div className="user-avatar-circle" onClick={() => setActiveTab('profile')}>
-                {profileImage ? <img src={profileImage} alt="Avatar" /> : <span>{initials}</span>}
-              </div>
+            <div className="bper-welcome">
+              Bienvenue, <strong>{firstName} {lastName}</strong>
             </div>
-          </header>
+        <div className="bper-header-tools">
+        <Bell 
+          size={22} 
+          className={`tool-icon ${activeTab === 'notifications' ? 'active-icon' : ''}`} 
+          onClick={() => setActiveTab('notifications')} 
+          style={{cursor: 'pointer'}}
+        />
+        <div 
+          className={`user-avatar-circle ${activeTab === 'profile' ? 'active-avatar' : ''}`}
+          onClick={() => setActiveTab('profile')}
+        style={{
+          cursor: 'pointer', 
+          overflow: 'hidden', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          background: '#eee', // Fond gris si pas de photo
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%'
+         }}
+        >
+             {profileImage ? (
+             <img src={profileImage} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+            <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#005a64' }}>
+              {initials}
+            </span>
+           )}
+          </div>
+         </div>
+        </header>
 
           <div className="bper-scroll-content">
             {activeTab === "accounts" && <Accounts data={data} setActiveTab={setActiveTab}/>}
+            
             {activeTab === "cards" && (
-              <div className="cards-section-desktop">
-                <h3 className="cards-title">Mes cartes</h3>
-                <div className="desktop-cards-grid">
-                  {card && <BankCard card={card}/>}
-                  {pendingCard ? (
-                    <div style={{ position: 'relative' }}>
-                      <BankCard card={pendingCard} />
-                      <div className="status-badge-pending">EN COURS</div>
-                    </div>
-                  ) : (
-                    <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
-                      <div className="card-plus">+</div>
-                      <p>Demander une carte</p>
-                    </div>
-                  )}
-                </div>
-                <CardCatalog /> 
+  <div className="cards-section-desktop">
+    <h3 className="cards-title">Mes cartes</h3>
+    <div className="desktop-cards-grid">
+      {card && <BankCard card={card}/>}
+      
+      {/* SI UNE CARTE EST EN COURS, ON L'AFFICHE, SINON LE BOUTON + */}
+      {pendingCard ? (
+        <div style={{ position: 'relative' }}>
+          <BankCard card={pendingCard} />
+          <div className="status-badge-pending">EN COURS</div>
+        </div>
+      ) : (
+        <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
+          <div className="card-plus">+</div>
+          <p>Demander une carte</p>
+        </div>
+      )}
+    </div>
+    <CardCatalog /> 
+  </div>
+)}
+            
+            {activeTab === "payer" && (
+               <div className="cards-section-desktop">
+                <h3 className="cards-title">Effectuer un paiement</h3>   
+               <div className="payer-desktop-wrapper">
+                 <Payer isDesktop={true} />
+               </div>
               </div>
             )}
-            {activeTab === "payer" && <div className="cards-section-desktop"><Payer isDesktop={true} /></div>}
-            {activeTab === "produits" && <div className="cards-section-desktop"><Produits isDesktop={true} /></div>}
-            {activeTab === "lifestyle" && <div className="cards-section-desktop"><Lifestyle isDesktop={true} /></div>}
-            {activeTab === "aide" && <div className="cards-section-desktop"><Aide isDesktop={true} /></div>}
-            {activeTab === "notifications" && <div className="cards-section-desktop"><Notifications isDesktop={true} /></div>}
-            {activeTab === "profile" && <div className="cards-section-desktop"><Profile data={data} isDesktop={true} /></div>}
+
+
+            {activeTab === "produits" && (
+               <div className="cards-section-desktop">
+                 <Produits isDesktop={true} />
+               </div>
+            )}
+
+            {activeTab === "lifestyle" && (
+               <div className="cards-section-desktop">
+                 <Lifestyle isDesktop={true} />
+               </div>
+            )}
+
+            {activeTab === "aide" && (
+              <div className="cards-section-desktop">
+                <Aide isDesktop={true} />
+              </div>
+            )}
+       
+            {activeTab === "notifications" && (
+               <div className="cards-section-desktop">
+                 <Notifications isDesktop={true} />
+               </div>
+            )}
+
+            {activeTab === "profile" && (
+               <div className="cards-section-desktop">
+                 <Profile data={data} isDesktop={true} />
+               </div>
+            )}   
           </div>
         </div>
       </div>
     );
   }
 
-  // --- RENDU MOBILE ---
+  // --- RENDU : TA VERSION MOBILE ORIGINALE (INTACTE) ---
   return (
     <div className="bank-app">
       <Header data={data} />
@@ -192,28 +283,45 @@ export default function Dashboard() {
 
       <div className="page-content" ref={contentRef}>
         {activeTab === "accounts" && <Accounts data={data}/>}
+        
+        {/* Section Profile (Si présente) */}
         {activeTab === "profile" && <div className="content">Mon Profil</div>}
 
         {activeTab === "cards" && (
-          <div className="cards-section">
-            <h3 className="cards-title">Mes cartes</h3>
-            <div className="cards-slider">
-              {card && <div className="cards-slide"><BankCard card={card}/></div>}
-              {pendingCard ? (
-                <div className="cards-slide" style={{ position: 'relative' }}>
-                  <BankCard card={pendingCard} />
-                  <div className="status-badge-pending">EN COURS</div>
-                </div>
-              ) : (
-                <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
-                  <div className="card-request-inner">
-                    <div className="card-plus">+</div>
-                    <p>Demander une carte</p>
-                  </div>
-                </div>
-              )}
+  <div className="cards-section">
+    <h3 className="cards-title">Mes cartes</h3>
+    <div className="cards-slider">
+      {card && (
+        <div className="cards-slide">
+          <BankCard card={card}/>
+        </div>
+      )}
+
+      {/* VERSION MOBILE : CARTE EN COURS OU BOUTON + */}
+      {pendingCard ? (
+        <div className="cards-slide" style={{ position: 'relative' }}>
+          <BankCard card={pendingCard} />
+          <div className="status-badge-pending">EN COURS</div>
+        </div>
+      ) : (
+        <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+          <div className="card-request-inner">
+            <div className="card-plus">+</div>
+            <p>Demander une carte</p>
+          </div>
+        </div>
+      )}
+    </div>
+    <CardCatalog />
+  </div>
+)}
+
+        {activeTab === "financing" && (
+          <div className="content">
+            <div className="account-card">
+              <h3>Financements</h3>
+              <p>Aucun financement disponible</p>
             </div>
-            <CardCatalog />
           </div>
         )}
       </div>
