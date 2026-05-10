@@ -967,6 +967,25 @@ top:80px;
 
 
 
+/* À ajouter dans ton fichier dashboard.css */
+.status-badge-pending {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #f59e0b; /* Orange pro */
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+
+
+
 
 
 
