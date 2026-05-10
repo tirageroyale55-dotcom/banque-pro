@@ -17,20 +17,24 @@ import Aide from "./Aide";
 import Profile from "./Profile";
 import Notifications from "./Notifications";
 
-import { LayoutDashboard, CreditCard, Send, Package, Heart, HelpCircle, Bell } from "lucide-react";
+import { LayoutDashboard, CreditCard, Send, Package, Heart, HelpCircle, Bell, User } from "lucide-react";
 import "../styles/dashboard.css";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("accounts");
+  const [showBalanceBar, setShowBalanceBar] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
   const [card, setCard] = useState(null);
-  const [pendingCard, setPendingCard] = useState(null);
+  const [pendingCard, setPendingCard] = useState(null); // Pour la nouvelle carte
+
+  const [scrollOffset, setScrollOffset] = useState(-60); 
+  const [opacity, setOpacity] = useState(0);
 
   const navigate = useNavigate();
+  const lastScrollRef = useRef(0);
   const contentRef = useRef(null);
 
-  // Sécurisation des noms
   const userInfo = data?.user || data || {};
   const firstName = userInfo.firstname || userInfo.prenom || "";
   const lastName = userInfo.lastname || userInfo.nom || "";
@@ -38,16 +42,15 @@ export default function Dashboard() {
   const profileImage = userInfo.profilePicture || null;
 
   useEffect(() => {
-    // Charger la carte existante
+    // Vérification de la carte en attente
+    const saved = localStorage.getItem("pending_card_request");
+    if (saved) setPendingCard(JSON.parse(saved));
+
     if (activeTab === "cards") {
       api("/client/card")
         .then(setCard)
-        .catch(() => console.log("Pas de carte active"));
+        .catch(() => console.log("Erreur carte"));
     }
-
-    // Charger une éventuelle demande en cours
-    const saved = localStorage.getItem("pending_card_request");
-    if (saved) setPendingCard(JSON.parse(saved));
   }, [activeTab]);
 
   useEffect(() => {
@@ -56,10 +59,15 @@ export default function Dashboard() {
         setData(clientData); 
         api("/transactions")
           .then((transactionsData) => {
-            setData(prev => ({ ...prev, transactions: transactionsData.transactions || transactionsData }));
-          }).catch(err => console.error("Erreur transactions", err));
+            setData(prev => ({
+              ...prev,
+              transactions: transactionsData.transactions || transactionsData 
+            }));
+          })
+          .catch(err => console.error("L'historique n'a pas pu être chargé :", err));
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Session expirée");
         localStorage.removeItem("token");
         navigate("/login");
       });
@@ -71,34 +79,52 @@ export default function Dashboard() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    setShowBalanceBar(false);
+    window.scrollTo(0, 0);
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (!data || activeTab !== "accounts") return;
+    const handleScroll = () => {
+      const bar = document.querySelector('.balance-bar');
+      const accountCard = document.querySelector('.account-card');
+      if (!bar || !accountCard) return;
+      const cardRect = accountCard.getBoundingClientRect();
+      if (cardRect.top < 135) bar.classList.add('show');
+      else bar.classList.remove('show');
+    };
+    window.addEventListener("scroll", handleScroll, true);
+    return () => window.removeEventListener("scroll", handleScroll, true);
+  }, [activeTab, data]);
+
   if (!data) return null;
 
-  // Composant interne pour gérer l'affichage conditionnel des cartes (Bouton + ou Carte en cours)
-  const CardsListContent = ({ desktopMode }) => (
-    <div className={desktopMode ? "desktop-cards-grid" : "cards-slider"}>
-      {/* Carte Active (Base de données) */}
+  // Rendu de la liste des cartes (Desktop ou Mobile)
+  const renderCardsList = (isDesktopView) => (
+    <div className={isDesktopView ? "desktop-cards-grid" : "cards-slider"}>
+      {/* 1. Carte existante (Base de données) */}
       {card && (
-        <div className={desktopMode ? "" : "cards-slide"}>
+        <div className={isDesktopView ? "" : "cards-slide"}>
           <BankCard card={card}/>
         </div>
       )}
 
-      {/* Carte en attente OU Bouton Demander */}
+      {/* 2. Affichage dynamique : Soit la carte en cours, soit le bouton + */}
       {pendingCard ? (
-        <div className={desktopMode ? "" : "cards-slide"} style={{ position: 'relative' }}>
-          <BankCard card={pendingCard} />
-          <div style={{
-            position: 'absolute', top: '15px', right: '15px',
-            background: '#f59e0b', color: 'white', padding: '5px 12px',
-            borderRadius: '20px', fontSize: '10px', fontWeight: '900', zIndex: 10,
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)', letterSpacing: '0.5px'
-          }}>
-            EN COURS
-          </div>
+        <div className={isDesktopView ? "" : "cards-slide"} style={{position:'relative'}}>
+           <BankCard card={pendingCard}/>
+           <div style={{
+             position:'absolute', top:'10px', right:'10px', 
+             background:'#f59e0b', color:'#fff', padding:'4px 10px', 
+             borderRadius:'20px', fontSize:'10px', fontWeight:'900', zIndex:'5'
+           }}>
+             EN COURS
+           </div>
         </div>
       ) : (
-        <div className={desktopMode ? "card-request-desktop" : "cards-slide card-request"} onClick={() => navigate("/request-card")}>
-          <div className={desktopMode ? "" : "card-request-inner"}>
+        <div className={isDesktopView ? "card-request-desktop" : "cards-slide card-request"} onClick={() => navigate("/request-card")}>
+          <div className={isDesktopView ? "" : "card-request-inner"}>
             <div className="card-plus">+</div>
             <p>Demander une carte</p>
           </div>
@@ -126,9 +152,9 @@ export default function Dashboard() {
           <header className="bper-top-bar">
             <div className="bper-welcome">Bienvenue, <strong>{firstName} {lastName}</strong></div>
             <div className="bper-header-tools">
-              <Bell size={22} className="tool-icon" onClick={() => setActiveTab('notifications')} />
-              <div className="user-avatar-circle" onClick={() => setActiveTab('profile')}>
-                {profileImage ? <img src={profileImage} alt="Avatar" /> : <span>{initials}</span>}
+              <Bell size={22} className={`tool-icon ${activeTab === 'notifications' ? 'active-icon' : ''}`} onClick={() => setActiveTab('notifications')} style={{cursor: 'pointer'}}/>
+              <div className={`user-avatar-circle ${activeTab === 'profile' ? 'active-avatar' : ''}`} onClick={() => setActiveTab('profile')} style={{cursor: 'pointer', overflow: 'hidden', display:'flex', alignItems:'center', justifyContent:'center', background:'#eee', width:'40px', height:'40px', borderRadius:'50%'}}>
+                {profileImage ? <img src={profileImage} alt="Avatar" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <span style={{fontSize:'14px', fontWeight:'bold', color:'#005a64'}}>{initials}</span>}
               </div>
             </div>
           </header>
@@ -138,11 +164,11 @@ export default function Dashboard() {
             {activeTab === "cards" && (
               <div className="cards-section-desktop">
                 <h3 className="cards-title">Mes cartes</h3>
-                <CardsListContent desktopMode={true} />
+                {renderCardsList(true)}
                 <CardCatalog /> 
               </div>
             )}
-            {activeTab === "payer" && <div className="cards-section-desktop"><Payer isDesktop={true} /></div>}
+            {activeTab === "payer" && <div className="cards-section-desktop"><h3 className="cards-title">Paiement</h3><Payer isDesktop={true} /></div>}
             {activeTab === "produits" && <div className="cards-section-desktop"><Produits isDesktop={true} /></div>}
             {activeTab === "lifestyle" && <div className="cards-section-desktop"><Lifestyle isDesktop={true} /></div>}
             {activeTab === "aide" && <div className="cards-section-desktop"><Aide isDesktop={true} /></div>}
@@ -158,12 +184,13 @@ export default function Dashboard() {
     <div className="bank-app">
       <Header data={data} />
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      <BalanceBar balance={data.balance} offset={scrollOffset} opacity={opacity} />
       <div className="page-content" ref={contentRef}>
         {activeTab === "accounts" && <Accounts data={data}/>}
         {activeTab === "cards" && (
           <div className="cards-section">
             <h3 className="cards-title">Mes cartes</h3>
-            <CardsListContent desktopMode={false} />
+            {renderCardsList(false)}
             <CardCatalog />
           </div>
         )}
