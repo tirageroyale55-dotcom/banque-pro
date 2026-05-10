@@ -40,9 +40,10 @@ export default function CardOrderConfirmation() {
 
   const { user, account } = dbData;
 
-  const handleFinalSubmit = async () => {
-    // Création de l'objet carte "En cours"
+  const handleFinalSubmit = () => {
     const expiry = generateExpiry();
+    
+    // Création de l'objet carte avec les infos générées
     const newCardRequest = {
       ...card,
       number: generateCardNumber(),
@@ -52,33 +53,36 @@ export default function CardOrderConfirmation() {
       requestDate: new Date().toISOString()
     };
 
-    // Simulation de sauvegarde (Local et/ou API)
+    // On stocke dans le localStorage pour que le Dashboard le récupère
     localStorage.setItem("pending_card_request", JSON.stringify(newCardRequest));
     
-    // Affichage du message de succès
+    // On affiche l'écran de succès
     setIsSuccess(true);
   };
 
-  // Rendu de l'écran de succès
   if (isSuccess) {
     return (
-      <div className="bper-confirmation-screen" style={{display:'flex', alignItems:'center', justifyContent:'center'}}>
-        <div className="data-card" style={{textAlign:'center', maxWidth:'400px', padding:'40px'}}>
-          <div style={{background:'#ecfdf5', width:'60px', height:'60px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 20px'}}>
-            <ShieldCheck size={32} color="#059669" />
+      <div className="bper-confirmation-screen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
+        <div style={{ textAlign: 'center', padding: '40px', background: '#fff', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.05)', maxWidth: '400px', margin: '20px' }}>
+          <div style={{ background: '#f0fdf4', width: '80px', height: '80px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+            <ShieldCheck size={40} color="#059669" />
           </div>
-          <h2 style={{color:'#0f172a', marginBottom:'15px'}}>Demande envoyée avec succès !</h2>
-          <p style={{color:'#64748b', fontSize:'14px', lineHeight:'1.6', marginBottom:'25px'}}>
-            Vous recevrez un message de validation après l'investigation des conditions et des règles de sécurité de BPER Banca.
+          <h2 style={{ color: '#0f172a', fontWeight: '800', marginBottom: '15px' }}>Demande envoyée !</h2>
+          <p style={{ color: '#64748b', fontSize: '14px', lineHeight: '1.6', marginBottom: '30px' }}>
+            Votre demande est en cours de traitement. Vous recevrez une validation après l'investigation des conditions de sécurité.
           </p>
-          <button className="btn-submit-order" onClick={() => navigate("/dashboard")}>
+          <button 
+            className="btn-submit-order" 
+            onClick={() => navigate("/dashboard")}
+            style={{ width: '100%', cursor: 'pointer' }}
+          >
             OK
           </button>
         </div>
       </div>
     );
   }
-
+  
   return (
     <div className="bper-confirmation-screen">
       {/* HEADER FIXE */}
