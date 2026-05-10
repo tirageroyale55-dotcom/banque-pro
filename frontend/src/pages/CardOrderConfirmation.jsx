@@ -24,22 +24,17 @@ export default function CardOrderConfirmation() {
 
     // RÉCUPÉRATION DES VRAIES INFOS VIA TON SERVICE API
     const fetchRealData = async () => {
-      try {
-        // Utilisation de ton service api() pour appeler /api/dashboard
-        // Ton service api() gère déjà le token et la redirection login en cas d'erreur
-        const responseData = await api("/dashboard");
-
-        // Stocke les vraies données renvoyées par ton controller
-        setDbData(responseData);
-      } catch (err) {
-        // Ton service api() gère déjà la plupart des erreurs d'auth, 
-        // mais on attrape ici les erreurs réseau ou serveur
-        console.error("Erreur récupération données confirmation:", err);
-        setError("Une erreur technique est survenue lors de la sécurisation de votre demande.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  try {
+    // Utilisation du chemin exact défini dans tes routes : /client/dashboard
+    const responseData = await api("/client/dashboard");
+    setDbData(responseData);
+  } catch (err) {
+    console.error("Erreur récupération données confirmation:", err);
+    setError("Une erreur technique est survenue lors de la sécurisation de votre demande.");
+  } finally {
+    setLoading(false);
+  }
+};
 
     fetchRealData();
   }, [navigate]);
