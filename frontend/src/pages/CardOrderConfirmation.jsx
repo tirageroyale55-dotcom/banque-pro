@@ -19,6 +19,7 @@ export default function CardOrderConfirmation() {
     window.scrollTo(0, 0);
     const loadData = async () => {
       try {
+        // Appel à ton service API existant
         const res = await api("/client/dashboard");
         setDbData(res);
       } catch (err) {
@@ -31,321 +32,276 @@ export default function CardOrderConfirmation() {
   }, []);
 
   if (!card) return null;
-  if (loading) return <div className="bper-loading-state">Chargement sécurisé...</div>;
+  if (loading) return <div className="p-10 text-center">Chargement sécurisé...</div>;
 
   const { user, account } = dbData;
 
   return (
-    <div className="bper-confirmation-screen">
-      {/* HEADER FIXE */}
-      <nav className="bper-top-nav">
-        <div className="nav-container">
-          <button className="btn-back" onClick={() => navigate(-1)}>
-            <ArrowLeft size={18} />
-            <span>Annuler</span>
-          </button>
-          <div className="security-badge">
-            <ShieldCheck size={14} />
-            <span>Transaction sécurisée</span>
-          </div>
+    <div className="details-container-fix">
+      {/* HEADER NAVIGATION */}
+      <nav className="bper-order-nav">
+        <button className="back-action-btn" onClick={() => navigate(-1)}>
+          <ArrowLeft size={24} /> <span>Retour</span>
+        </button>
+        <div className="security-badge">
+          <ShieldCheck size={16} />
+          <span>CRYPTAGE BANCAIRE SSL</span>
         </div>
       </nav>
 
-      <main className="bper-content">
-        <div className="layout-container">
+      <main className="order-main-content">
+        <div className="layout-grid-pro">
           
-          <header className="content-header">
-            <h1>Finaliser ma commande</h1>
-            <p>Vérifiez vos informations de livraison et confirmez votre demande de carte <strong>{card.name}</strong>.</p>
-          </header>
+          {/* SECTION 1 : LA CARTE (COPIE STRICTE DE CARDDETAILS) */}
+          <aside className="section-hero-product">
+            <div className="card-perspective-wrapper">
+              <div className="card-floating-animation">
+                <div className="card-physical-container">
+                  <div className="card-body" style={{ background: card.bg }}>
+                    <div className="card-gloss"></div>
+                    
+                    <div className="card-top-row">
+                      <div className="bper-logo" style={{ color: card.logoColor }}>
+                        BPER<span>:</span> <small>Banca</small>
+                      </div>
+                      <Wifi size={20} className="nfc-icon" strokeWidth={1.5} />
+                    </div>
 
-          <div className="main-grid">
-            
-            {/* COLONNE GAUCHE : VISUEL (STICKY SUR DESKTOP) */}
-            <aside className="visual-sidebar">
-              <div className="sticky-wrapper">
-                <div className="card-display-box">
-                  <div className="perspective-container">
-                    <div className="card-animate-float">
-                      <div className="card-object" style={{ background: card.bg }}>
-                        <div className="card-inner-gloss"></div>
-                        <div className="card-row-top">
-                          <div className="logo-bper" style={{ color: card.logoColor }}>
-                            BPER<span>:</span> <small>Banca</small>
-                          </div>
-                          <Wifi size={22} className="nfc" />
-                        </div>
-                        <div className="chip-emv">
-                          <div className="chip-line h1"></div>
-                          <div className="chip-line h2"></div>
-                          <div className="chip-line v1"></div>
-                        </div>
-                        <div className="card-row-bottom">
-                          <div className="type-label">{card.type}</div>
-                          <div className="mc-brand">
-                            <div className="c-red"></div>
-                            <div className="c-yellow"></div>
-                          </div>
-                        </div>
+                    <div className="emv-chip">
+                      <div className="chip-line horizontal-1"></div>
+                      <div className="chip-line horizontal-2"></div>
+                      <div className="chip-line vertical"></div>
+                    </div>
+
+                    <div className="card-bottom-row">
+                      <div className="card-label">{card.type}</div>
+                      <div className="mc-symbol">
+                        <div className="circle red"></div>
+                        <div className="circle yellow"></div>
                       </div>
                     </div>
                   </div>
-                  <div className="card-meta">
-                    <h2>{card.name}</h2>
-                    <p className="price">{card.price} <span>/ mois</span></p>
-                  </div>
-                </div>
-
-                <div className="summary-card small">
-                  <div className="summary-title"><Landmark size={16}/> Compte de débit</div>
-                  <div className="summary-row">
-                    <span>Compte N°</span>
-                    <span className="bold">{account.accountNumber}</span>
-                  </div>
-                  <div className="summary-row">
-                    <span>IBAN</span>
-                    <span className="bold mono">{account.iban}</span>
-                  </div>
                 </div>
               </div>
-            </aside>
+            </div>
+            
+            <div className="hero-product-info">
+              <h1>{card.name}</h1>
+              <p className="hero-price-tag">{card.price} <span>/ mois</span></p>
+            </div>
 
-            {/* COLONNE DROITE : FORMULAIRES */}
-            <section className="form-section">
-              
-              <div className="info-group">
-                <div className="group-header">
-                  <User size={18} />
-                  <h3>Détails du titulaire</h3>
+            {/* COMPTE DE DÉBIT RÉEL */}
+            <div className="account-summary-mini">
+              <div className="summary-title"><Landmark size={16}/> Compte lié</div>
+              <div className="summary-row">
+                <span>N° Compte</span>
+                <span className="bold">{account.accountNumber}</span>
+              </div>
+              <div className="summary-row">
+                <span>IBAN</span>
+                <span className="bold mono">{account.iban}</span>
+              </div>
+            </div>
+          </aside>
+
+          {/* SECTION 2 : FORMULAIRE ET COORDONNÉES */}
+          <section className="form-data-scroll">
+            
+            <div className="info-group">
+              <div className="group-header">
+                <User size={18} />
+                <h3>Coordonnées Titulaire</h3>
+              </div>
+              <div className="user-details">
+                <div className="det-row">
+                  <label>Identité</label>
+                  <p>{user.civilite} {user.nom} {user.prenom}</p>
                 </div>
-                <div className="info-grid">
-                  <div className="info-item">
-                    <label>Nom et Prénom</label>
-                    <p>{user.civilite} {user.nom} {user.prenom}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>E-mail associé</label>
-                    <p>{user.email}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Téléphone</label>
-                    <p>{user.telephone}</p>
-                  </div>
+                <div className="det-row">
+                  <label>E-mail</label>
+                  <p>{user.email}</p>
+                </div>
+                <div className="det-row">
+                  <label>Mobile</label>
+                  <p>{user.telephone}</p>
                 </div>
               </div>
+            </div>
 
-              <div className="info-group">
-                <div className="group-header">
-                  <MapPin size={18} />
-                  <h3>Adresse d'expédition</h3>
-                </div>
-                <div className="address-box">
-                  <p className="main-address">{user.adresse}</p>
-                  <p className="sub-address">{user.codePostal}, {user.ville} - {user.pays}</p>
-                  <div className="delivery-notice">
-                    <Info size={14} />
-                    <span>Livraison par courrier recommandé sous 3 à 5 jours ouvrés.</span>
-                  </div>
-                </div>
+            <div className="info-group">
+              <div className="group-header">
+                <MapPin size={18} />
+                <h3>Lieu de livraison</h3>
               </div>
-
-              <div className="info-group">
-                <div className="group-header">
-                  <MessageSquare size={18} />
-                  <h3>Note ou demande particulière</h3>
-                </div>
-                <textarea 
-                  className="bper-input-text"
-                  placeholder="Ex: Je souhaite être contacté par mon conseiller avant l'envoi..."
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  rows="4"
-                />
+              <div className="address-display">
+                <p className="primary">{user.adresse}</p>
+                <p className="secondary">{user.codePostal}, {user.ville} - {user.pays}</p>
               </div>
+            </div>
 
-              <div className="confirmation-footer">
-                <div className="legal-box">
-                  En cliquant sur le bouton ci-dessous, vous acceptez les conditions générales liées à l'utilisation de la carte {card.name}.
-                </div>
-                <button className="btn-submit-order">
-                  <span>Confirmer la commande</span>
-                  <ChevronRight size={20} />
-                </button>
+            <div className="info-group">
+              <div className="group-header">
+                <MessageSquare size={18} />
+                <h3>Note additionnelle</h3>
               </div>
+              <textarea 
+                className="bper-textarea"
+                placeholder="Une précision sur la livraison ?"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                rows="4"
+              />
+            </div>
 
-            </section>
-          </div>
+            <div className="final-checkout-action">
+              <div className="legal-info">
+                <Info size={14} />
+                <span>En validant, vous acceptez le prélèvement mensuel de {card.price} sur votre compte courant.</span>
+              </div>
+              <button className="order-main-btn large">
+                Confirmer la commande
+                <ChevronRight size={20} />
+              </button>
+            </div>
+
+          </section>
         </div>
       </main>
 
       <style jsx>{`
-        /* VARIABLES & RESET */
-        .bper-confirmation-screen {
-          background-color: #f8fafc;
-          min-height: 100vh;
-          font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        .details-container-fix { 
+          background: #f8fafc; min-height: 100vh;
+          font-family: 'Inter', sans-serif;
         }
 
-        .layout-container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 20px;
+        .bper-order-nav {
+          background: #fff; padding: 15px 20px;
+          display: flex; justify-content: space-between; align-items: center;
+          border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100;
         }
 
-        /* NAVIGATION */
-        .bper-top-nav {
-          background: #ffffff;
-          border-bottom: 1px solid #e2e8f0;
-          padding: 15px 0;
-          position: sticky;
-          top: 0;
-          z-index: 100;
-        }
-        .nav-container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 20px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-        .btn-back {
-          background: none; border: none; color: #005a64;
+        .back-action-btn {
           display: flex; align-items: center; gap: 8px;
-          font-weight: 700; cursor: pointer; transition: 0.2s;
+          background: none; border: none; color: #005a64;
+          font-weight: 700; cursor: pointer;
         }
-        .btn-back:hover { opacity: 0.7; }
+
         .security-badge {
           display: flex; align-items: center; gap: 6px;
-          color: #059669; background: #f0fdf4;
-          padding: 6px 12px; border-radius: 20px;
-          font-size: 12px; font-weight: 600; border: 1px solid #dcfce7;
+          font-size: 11px; color: #059669; font-weight: 800;
+          background: #ecfdf5; padding: 6px 12px; border-radius: 4px;
         }
 
-        /* HEADER */
-        .content-header { padding: 40px 0; }
-        .content-header h1 { font-size: 32px; color: #0f172a; font-weight: 800; margin-bottom: 10px; }
-        .content-header p { color: #64748b; font-size: 16px; }
-
-        /* GRID DESKTOP */
-        .main-grid {
-          display: grid;
-          grid-template-columns: 400px 1fr;
-          gap: 50px;
-          padding-bottom: 80px;
+        .order-main-content { padding: 40px 0; }
+        .layout-grid-pro {
+          max-width: 1100px; margin: 0 auto; padding: 0 20px;
+          display: grid; grid-template-columns: 380px 1fr; gap: 60px;
         }
 
-        .sticky-wrapper {
-          position: sticky;
-          top: 100px;
+        /* --- STYLE STRICT DE CARDDETAILS.JSX --- */
+        .section-hero-product { 
+          display: flex; flex-direction: column; align-items: center;
         }
-
-        /* CARD STYLING (ANIMATION EXACTE CARDDETAILS) */
-        .card-display-box {
-          background: #005a64;
-          padding: 40px;
-          border-radius: 24px;
-          color: white;
-          margin-bottom: 20px;
-          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        .perspective-container { perspective: 1000px; }
-        .card-animate-float {
-          animation: float 6s ease-in-out infinite;
+        
+        .card-perspective-wrapper { perspective: 1000px; }
+        
+        .card-floating-animation {
+          animation: cardFloat 5s ease-in-out infinite;
           transform-style: preserve-3d;
         }
-        @keyframes float {
-          0%, 100% { transform: translateY(0) rotateX(2deg) rotateY(-5deg); }
-          50% { transform: translateY(-15px) rotateX(-2deg) rotateY(5deg); }
+
+        @keyframes cardFloat {
+          0% { transform: rotateY(-5deg) rotateX(4deg) translateY(0); }
+          50% { transform: rotateY(5deg) rotateX(-4deg) translateY(-8px); }
+          100% { transform: rotateY(-5deg) rotateX(4deg) translateY(0); }
         }
-        .card-object {
-          width: 100%; aspect-ratio: 1.58/1; border-radius: 15px;
+
+        .card-physical-container {
+          padding: 30px; background: #fff; border-radius: 24px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; justify-content: center;
+        }
+
+        .card-body {
+          width: 280px; aspect-ratio: 1.58 / 1; border-radius: 14px;
           position: relative; padding: 20px; overflow: hidden;
-          box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.25);
           display: flex; flex-direction: column; justify-content: space-between;
         }
-        .card-inner-gloss {
+
+        .card-gloss {
           position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-          background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%);
+          background: linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.08) 48%, rgba(255,255,255,0) 52%);
         }
-        .card-row-top { display: flex; justify-content: space-between; }
-        .logo-bper { font-weight: 900; font-size: 20px; }
-        .logo-bper span { color: #a3e635; }
-        .chip-emv {
-          width: 45px; height: 35px; background: #fbbf24; border-radius: 6px;
-          position: relative; border: 1px solid rgba(0,0,0,0.1);
+
+        .card-top-row { display: flex; justify-content: space-between; align-items: center; z-index: 2; }
+        .bper-logo { font-weight: 900; font-size: 20px; letter-spacing: -0.5px; }
+        .bper-logo span { color: #a3e635; }
+        .bper-logo small { font-size: 11px; font-weight: 400; opacity: 0.8; }
+        .nfc-icon { opacity: 0.8; transform: rotate(90deg); color: white; }
+
+        .emv-chip {
+          width: 42px; height: 32px; background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
+          border-radius: 6px; position: relative; z-index: 2; border: 1px solid rgba(0,0,0,0.15);
         }
-        .card-row-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
-        .type-label { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
-        .mc-brand { display: flex; position: relative; width: 40px; height: 25px; }
-        .mc-brand div { width: 25px; height: 25px; border-radius: 50%; position: absolute; }
-        .c-red { background: #eb001b; left: 0; }
-        .c-yellow { background: #ff5f00; right: 0; opacity: 0.85; }
+        .chip-line { position: absolute; background: rgba(0,0,0,0.2); }
+        .horizontal-1 { width: 100%; height: 1px; top: 33%; }
+        .horizontal-2 { width: 100%; height: 1px; top: 66%; }
+        .vertical { height: 100%; width: 1px; left: 50%; }
 
-        .card-meta { margin-top: 25px; text-align: center; }
-        .card-meta h2 { font-size: 24px; font-weight: 800; }
-        .price { font-size: 26px; font-weight: 800; color: #a3e635; margin-top: 5px; }
-        .price span { font-size: 14px; color: #cbd5e1; }
+        .card-bottom-row { display: flex; justify-content: space-between; align-items: flex-end; z-index: 2; }
+        .card-label { font-size: 11px; font-weight: 800; opacity: 0.9; color: white; letter-spacing: 1px; }
 
-        /* BLOCS INFO */
+        .mc-symbol { display: flex; position: relative; width: 36px; height: 22px; }
+        .circle { width: 22px; height: 22px; border-radius: 50%; position: absolute; }
+        .red { background: #eb001b; left: 0; }
+        .yellow { background: #ff5f00; right: 0; opacity: 0.9; }
+
+        .hero-product-info { text-align: center; margin: 25px 0; }
+        .hero-product-info h1 { color: #1e293b; font-size: 24px; font-weight: 800; }
+        .hero-price-tag { font-size: 24px; font-weight: 800; color: #005a64; }
+
+        /* --- BLOCS FORMULAIRE --- */
         .info-group {
-          background: white; border: 1px solid #e2e8f0;
-          border-radius: 16px; padding: 30px; margin-bottom: 24px;
+          background: white; border: 1px solid #e2e8f0; border-radius: 16px;
+          padding: 30px; margin-bottom: 25px;
         }
         .group-header {
-          display: flex; align-items: center; gap: 12px;
-          margin-bottom: 25px; color: #005a64;
-          border-bottom: 1px solid #f1f5f9; padding-bottom: 15px;
+          display: flex; align-items: center; gap: 10px;
+          margin-bottom: 20px; color: #005a64; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px;
         }
-        .group-header h3 { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .group-header h3 { font-size: 14px; font-weight: 800; text-transform: uppercase; }
 
-        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
-        .info-item label { display: block; font-size: 12px; color: #64748b; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; }
-        .info-item p { font-size: 15px; color: #1e293b; font-weight: 700; }
+        .det-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dotted #f1f5f9; }
+        .det-row label { color: #64748b; font-size: 13px; }
+        .det-row p { font-weight: 700; color: #1e293b; font-size: 14px; }
 
-        .address-box .main-address { font-size: 18px; font-weight: 700; color: #1e293b; }
-        .address-box .sub-address { color: #64748b; margin-top: 4px; }
-        .delivery-notice {
-          display: flex; align-items: center; gap: 8px;
-          margin-top: 20px; padding: 12px; background: #f8fafc;
-          border-radius: 8px; color: #475569; font-size: 13px;
+        .address-display .primary { font-size: 16px; font-weight: 700; color: #1e293b; }
+        .address-display .secondary { color: #64748b; font-size: 14px; }
+
+        .bper-textarea {
+          width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0;
+          background: #f8fafc; font-family: inherit; resize: none;
         }
 
-        .bper-input-text {
-          width: 100%; border: 1px solid #e2e8f0; background: #f8fafc;
-          border-radius: 12px; padding: 15px; font-family: inherit;
-          resize: none; transition: 0.2s;
+        .order-main-btn {
+          background: #005a64; color: white; border: none; border-radius: 12px;
+          padding: 18px; font-weight: 800; font-size: 16px; width: 100%;
+          cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        .bper-input-text:focus { border-color: #005a64; outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(0, 90, 100, 0.05); }
 
-        /* FOOTER ACTION */
-        .confirmation-footer { margin-top: 40px; }
-        .legal-box { font-size: 12px; color: #94a3b8; margin-bottom: 20px; line-height: 1.6; }
-        .btn-submit-order {
-          width: 100%; background: #005a64; color: white; border: none;
-          padding: 20px; border-radius: 14px; font-weight: 800; font-size: 16px;
-          display: flex; justify-content: center; align-items: center; gap: 10px;
-          cursor: pointer; transition: 0.3s;
-          box-shadow: 0 10px 15px -3px rgba(0, 90, 100, 0.2);
+        .legal-info { display: flex; align-items: center; gap: 8px; color: #94a3b8; font-size: 12px; margin-bottom: 15px; }
+
+        .account-summary-mini {
+          width: 100%; background: #fff; border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px;
         }
-        .btn-submit-order:hover { background: #00454d; transform: translateY(-2px); }
+        .summary-title { font-size: 12px; font-weight: 800; color: #005a64; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .summary-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+        .mono { font-family: 'Roboto Mono', monospace; color: #005a64; }
 
-        /* SUMMARY COMPTE */
-        .summary-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; }
-        .summary-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: #005a64; margin-bottom: 15px; }
-        .summary-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
-        .bold { font-weight: 700; color: #1e293b; }
-        .mono { font-family: 'Roboto Mono', monospace; font-size: 11px; color: #005a64; }
-
-        /* --- MOBILE ADAPTATION --- */
+        /* RESPONSIVE */
         @media (max-width: 1000px) {
-          .main-grid { grid-template-columns: 1fr; gap: 30px; }
-          .content-header h1 { font-size: 26px; }
-          .visual-sidebar { order: -1; }
-          .sticky-wrapper { position: static; }
-          .info-grid { grid-template-columns: 1fr; gap: 15px; }
-          .card-display-box { padding: 30px 20px; }
-          .card-object { width: 280px; margin: 0 auto; }
+          .layout-grid-pro { grid-template-columns: 1fr; }
+          .section-hero-product { margin-bottom: 20px; }
         }
       `}</style>
     </div>
