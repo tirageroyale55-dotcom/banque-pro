@@ -40,25 +40,38 @@ export default function CardOrderConfirmation() {
 
   const { user, account } = dbData;
 
-  const handleFinalSubmit = () => {
-    const expiry = generateExpiry();
-    
-    // Création de l'objet carte avec les infos générées
-    const newCardRequest = {
-      ...card,
-      number: generateCardNumber(),
-      expiry: `${expiry.month}/${expiry.year}`,
-      cvv: generateCVV(),
-      status: "En cours",
-      requestDate: new Date().toISOString()
-    };
-
-    // On stocke dans le localStorage pour que le Dashboard le récupère
-    localStorage.setItem("pending_card_request", JSON.stringify(newCardRequest));
-    
-    // On affiche l'écran de succès
-    setIsSuccess(true);
+  // Remplace ta fonction handleFinalSubmit par celle-ci :
+const handleFinalSubmit = async () => {
+  const expiry = generateExpiry();
+  const cardData = {
+    cardName: card.name,
+    number: generateCardNumber(),
+    expiry: `${expiry.month}/${expiry.year}`,
+    cvv: generateCVV(),
+    bg: card.bg,
+    logoColor: card.logoColor,
+    comment: comment
   };
+
+  try {
+    // 1. Envoi à la base de données MongoDB via ton API
+    await api("/client/request-card", {
+      method: "POST",
+      body: JSON.stringify(cardData)
+    });
+
+    // 2. Stockage local pour un affichage instantané (UI Feedback)
+    localStorage.setItem("pending_card_request", JSON.stringify({
+      ...cardData,
+      name: card.name, // pour la compatibilité affichage
+      status: "En cours"
+    }));
+    
+    setIsSuccess(true);
+  } catch (err) {
+    alert("Une erreur technique est survenue lors de l'émission de la demande.");
+  }
+};
 
   if (isSuccess) {
     return (
@@ -82,7 +95,7 @@ export default function CardOrderConfirmation() {
       </div>
     );
   }
-  
+
   return (
     <div className="bper-confirmation-screen">
       {/* HEADER FIXE */}

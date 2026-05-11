@@ -39,16 +39,29 @@ export default function Dashboard() {
   
   
 
+
 useEffect(() => {
-    const savedRequest = localStorage.getItem("pending_card_request");
-    if (savedRequest) {
-      try {
-        setPendingCard(JSON.parse(savedRequest));
-      } catch (e) {
-        console.error("Erreur lecture carte en attente");
+  const savedRequest = localStorage.getItem("pending_card_request");
+  if (savedRequest) {
+    setPendingCard(JSON.parse(savedRequest));
+  }
+
+  api("/client/current-request")
+    .then(res => {
+      if (res && res.cardNumber) {
+        const formattedCard = {
+          ...res,
+          number: res.cardNumber, 
+          name: res.cardType,
+          bg: res.cardBg,
+          status: res.status
+        };
+        setPendingCard(formattedCard);
+        localStorage.setItem("pending_card_request", JSON.stringify(formattedCard));
       }
-    }
-  }, []);
+    })
+    .catch(() => console.log("Aucune demande en attente trouvée en BDD"));
+}, []);
 
 
   useEffect(() => {
@@ -131,34 +144,7 @@ const lastName = userInfo.lastname || userInfo.nom || "";
 const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || "??";
 const profileImage = userInfo.profilePicture || null;
 
-const renderCardSlot = (isDesktopView) => {
-    if (pendingCard) {
-      return (
-        <div className={isDesktopView ? "" : "cards-slide"} style={{ position: 'relative' }}>
-          {/* On passe l'objet complet de la carte choisie au composant BankCard */}
-          <BankCard card={pendingCard} />
-          
-          {/* Badge de statut professionnel */}
-          <div className="status-badge-pending">
-            EN COURS
-          </div>
-        </div>
-      );
-    }
 
-    return (
-      <div 
-        className={isDesktopView ? "card-request-desktop" : "cards-slide card-request"} 
-        onClick={() => navigate("/request-card")}
-      >
-        <div className={isDesktopView ? "" : "card-request-inner"}>
-          <div className="card-plus">+</div>
-          <p>Demander une carte</p>
-        </div>
-      </div>
-    );
-  };
-  
   // --- RENDU CONDITIONNEL : DESKTOP ---
   if (isDesktop) {
     return (
@@ -243,18 +229,20 @@ const renderCardSlot = (isDesktopView) => {
     <div className="desktop-cards-grid">
       {card && <BankCard card={card}/>}
       
-      {/* SI UNE CARTE EST EN COURS, ON L'AFFICHE, SINON LE BOUTON + */}
-      {pendingCard ? (
-        <div style={{ position: 'relative' }}>
-          <BankCard card={pendingCard} />
-          <div className="status-badge-pending">EN COURS</div>
-        </div>
-      ) : (
-        <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
-          <div className="card-plus">+</div>
-          <p>Demander une carte</p>
-        </div>
-      )}
+      
+{pendingCard ? (
+  <div style={{ position: 'relative' }}>
+    <BankCard card={pendingCard} />
+    <div className="status-badge-pending">
+       {pendingCard.status === "Validée" ? "VALIDÉE" : "EN COURS"}
+    </div>
+  </div>
+) : (
+  <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
+    <div className="card-plus">+</div>
+    <p>Demander une carte</p>
+  </div>
+)}
     </div>
     <CardCatalog /> 
   </div>
