@@ -43,27 +43,36 @@ export default function CardOrderConfirmation() {
   const handleFinalSubmit = async () => {
   const expiry = generateExpiry();
   
+  // Structure exacte pour correspondre au backend
   const cardData = {
     cardName: card.name,
     number: generateCardNumber(),
     expiry: `${expiry.month}/${expiry.year}`,
     cvv: generateCVV(),
     bg: card.bg,
-    logoColor: card.logoColor
+    logoColor: card.logoColor,
+    comment: comment
   };
 
   try {
-    // ENVOI RÉEL AU BACKEND
-    await api("/client/request-card", {
+    // ENVOI AU BACKEND (MongoDB)
+    const response = await api("/client/request-card", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(cardData)
     });
 
-    // Stockage local pour l'affichage immédiat
-    localStorage.setItem("pending_card_request", JSON.stringify(cardData));
-    setIsSuccess(true);
+    if (response) {
+      // Sauvegarde locale pour l'affichage immédiat
+      localStorage.setItem("pending_card_request", JSON.stringify({
+        ...cardData,
+        status: "En cours d'investigation"
+      }));
+      setIsSuccess(true);
+    }
   } catch (err) {
-    console.error("Erreur API");
+    console.error("Erreur MongoDB:", err);
+    alert("Impossible d'enregistrer la demande dans la base de données.");
   }
 };
 

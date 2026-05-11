@@ -40,10 +40,12 @@ export default function Dashboard() {
   
 
 
+// Dans Dashboard.jsx, remplace ton useEffect de récupération par celui-ci
 useEffect(() => {
-  api("/client/current-request")
-    .then(res => {
-      if (res) {
+  const fetchMyCard = async () => {
+    try {
+      const res = await api("/client/current-request");
+      if (res && res.cardNumber) {
         setPendingCard({
           bg: res.cardBg,
           logoColor: res.logoColor,
@@ -53,13 +55,15 @@ useEffect(() => {
           status: res.status
         });
       }
-    })
-    .catch(() => {
-       // Si 404, on regarde le localstorage (optionnel)
-       const local = localStorage.getItem("pending_card_request");
-       if(local) setPendingCard(JSON.parse(local));
-    });
-}, []);
+    } catch (err) {
+      // Si l'API ne renvoie rien, on nettoie le local
+      setPendingCard(null);
+      localStorage.removeItem("pending_card_request");
+    }
+  };
+
+  if (data) fetchMyCard(); // Ne s'exécute que si l'utilisateur est chargé
+}, [data]);
 
   useEffect(() => {
     if (activeTab === "cards") {
@@ -227,17 +231,22 @@ const profileImage = userInfo.profilePicture || null;
       {/* 1. CARTE PRINCIPALE (Inchangée) */}
       {card && <BankCard card={card}/>}
       
+      {/* 2. LOGIQUE DEMANDE EN COURS (CardRequest) */}
       {pendingCard ? (
-  <div style={{ position: 'relative' }}>
-    <BankCard card={pendingCard} />
-    <div className="status-badge-pending">EN COURS</div>
-  </div>
-) : (
-  <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
-    <div className="card-plus">+</div>
-    <p>Demander une carte</p>
-  </div>
-)}
+        <div className="pending-card-container" style={{ position: 'relative' }}>
+          <BankCard card={pendingCard} />
+          <div className="bper-status-overlay">
+            <span className="status-dot"></span>
+            {pendingCard.status.toUpperCase()}
+          </div>
+        </div>
+      ) : (
+        /* Si aucune demande, on affiche le bouton de création */
+        <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
+          <div className="card-plus">+</div>
+          <p>Demander une carte</p>
+        </div>
+      )}
     </div>
     <CardCatalog /> 
   </div>
@@ -312,17 +321,23 @@ const profileImage = userInfo.profilePicture || null;
         </div>
       )}
 
+      {/* Remplacement du bouton + par la carte choisie dans CardOrderConfirmation */}
       {pendingCard ? (
-  <div style={{ position: 'relative' }}>
-    <BankCard card={pendingCard} />
-    <div className="status-badge-pending">EN COURS</div>
-  </div>
-) : (
-  <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
-    <div className="card-plus">+</div>
-    <p>Demander une carte</p>
-  </div>
-)}
+        <div className="cards-slide" style={{ position: 'relative' }}>
+          <BankCard card={pendingCard} />
+          <div className="bper-status-overlay">
+            <span className="status-dot"></span>
+            {pendingCard.status.toUpperCase()}
+          </div>
+        </div>
+      ) : (
+        <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+          <div className="card-request-inner">
+            <div className="card-plus">+</div>
+            <p>Demander une carte</p>
+          </div>
+        </div>
+      )}
     </div>
     <CardCatalog />
   </div>

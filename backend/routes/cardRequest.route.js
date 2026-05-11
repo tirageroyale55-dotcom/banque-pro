@@ -1,34 +1,39 @@
 const router = require("express").Router();
-const CardRequest = require("../models/CardRequest");
+const CardRequest = require("../models/CardRequest"); // Vérifie que le modèle existe
 const auth = require("../middleware/auth.middleware");
 
-// 1. POST : Enregistrer la demande (Seulement pour l'utilisateur connecté)
+// 1. ROUTE POUR ENREGISTRER LA DEMANDE (Appelée par CardOrderConfirmation)
 router.post("/client/request-card", auth, async (req, res) => {
   try {
-    // On force l'ID de l'utilisateur issu du token (req.user.id)
+    const { cardName, number, expiry, cvv, bg, logoColor, comment } = req.body;
+
+    // Suppression d'une ancienne demande si elle existe pour cet utilisateur uniquement
+    await CardRequest.deleteMany({ user: req.user.id });
+
     const newRequest = new CardRequest({
-      user: req.user.id, 
-      cardType: req.body.cardName,
-      cardNumber: req.body.number,
-      expiry: req.body.expiry,
-      cvv: req.body.cvv,
-      cardBg: req.body.bg,
-      logoColor: req.body.logoColor,
+      user: req.user.id, // L'ID vient du token, donc c'est personnel à l'utilisateur
+      cardType: cardName,
+      cardNumber: number,
+      expiry: expiry,
+      cvv: cvv,
+      cardBg: bg,
+      logoColor: logoColor,
+      comment: comment,
       status: "En cours d'investigation"
     });
 
     await newRequest.save();
-    res.status(201).json(newRequest);
+    res.status(201).json({ message: "Demande enregistrée dans MongoDB" });
   } catch (e) {
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).json({ error: e.message });
   }
 });
 
-// 2. GET : Récupérer UNIQUEMENT la demande de cet utilisateur
+// 2. ROUTE POUR RÉCUPÉRER LA DEMANDE (Appelée par le Dashboard)
 router.get("/client/current-request", auth, async (req, res) => {
   try {
-    // FILTRE CRUCIAL : On ne cherche que les cartes de l'USER ID connecté
-    const request = await CardRequest.findOne({ user: req.user.id }).sort({ requestDate: -1 });
+    // On cherche UNIQUEMENT la demande liée à l'ID de l'utilisateur connecté
+    const request = await CardRequest.findOne({ user: req.user.id });
     if (!request) return res.status(404).json({ message: "Aucune demande" });
     res.json(request);
   } catch (e) {
