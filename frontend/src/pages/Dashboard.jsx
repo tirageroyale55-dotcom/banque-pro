@@ -40,10 +40,10 @@ export default function Dashboard() {
   
 
 
-// Dans Dashboard.jsx, remplace ton useEffect de récupération par celui-ci
 useEffect(() => {
-  const fetchMyCard = async () => {
+  const loadMyPendingCard = async () => {
     try {
+      // Cette route utilise ton token (auth), donc MongoDB renverra UNIQUEMENT ta carte
       const res = await api("/client/current-request");
       if (res && res.cardNumber) {
         setPendingCard({
@@ -56,13 +56,13 @@ useEffect(() => {
         });
       }
     } catch (err) {
-      // Si l'API ne renvoie rien, on nettoie le local
+      // Si 404 (pas de carte pour cet utilisateur), on vide l'affichage
       setPendingCard(null);
-      localStorage.removeItem("pending_card_request");
     }
   };
 
-  if (data) fetchMyCard(); // Ne s'exécute que si l'utilisateur est chargé
+  // On lance l'appel dès que les données utilisateur (data) sont là
+  if (data) loadMyPendingCard();
 }, [data]);
 
   useEffect(() => {

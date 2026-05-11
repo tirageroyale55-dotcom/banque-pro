@@ -42,8 +42,6 @@ export default function CardOrderConfirmation() {
 
   const handleFinalSubmit = async () => {
   const expiry = generateExpiry();
-  
-  // Structure exacte pour correspondre au backend
   const cardData = {
     cardName: card.name,
     number: generateCardNumber(),
@@ -55,24 +53,21 @@ export default function CardOrderConfirmation() {
   };
 
   try {
-    // ENVOI AU BACKEND (MongoDB)
+    // Utilise cette syntaxe précise (si ton api() est un wrapper de fetch)
     const response = await api("/client/request-card", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(cardData)
+      body: JSON.stringify(cardData) // Pas besoin de headers si ton wrapper les gère déjà
     });
 
-    if (response) {
-      // Sauvegarde locale pour l'affichage immédiat
-      localStorage.setItem("pending_card_request", JSON.stringify({
-        ...cardData,
-        status: "En cours d'investigation"
-      }));
-      setIsSuccess(true);
-    }
+    // On ne sauvegarde en local QUE si le serveur a répondu OK
+    localStorage.setItem("pending_card_request", JSON.stringify({
+      ...cardData,
+      status: "En cours d'investigation"
+    }));
+    setIsSuccess(true);
   } catch (err) {
     console.error("Erreur MongoDB:", err);
-    alert("Impossible d'enregistrer la demande dans la base de données.");
+    alert("Impossible d'enregistrer la demande. Vérifiez la console.");
   }
 };
 
