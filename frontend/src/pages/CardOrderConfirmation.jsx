@@ -40,36 +40,30 @@ export default function CardOrderConfirmation() {
 
   const { user, account } = dbData;
 
-  // Remplace ta fonction handleFinalSubmit par celle-ci :
-const handleFinalSubmit = async () => {
+  const handleFinalSubmit = async () => {
   const expiry = generateExpiry();
+  
   const cardData = {
     cardName: card.name,
     number: generateCardNumber(),
     expiry: `${expiry.month}/${expiry.year}`,
     cvv: generateCVV(),
     bg: card.bg,
-    logoColor: card.logoColor,
-    comment: comment
+    logoColor: card.logoColor
   };
 
   try {
-    // 1. Envoi à la base de données MongoDB via ton API
+    // ENVOI RÉEL AU BACKEND
     await api("/client/request-card", {
       method: "POST",
       body: JSON.stringify(cardData)
     });
 
-    // 2. Stockage local pour un affichage instantané (UI Feedback)
-    localStorage.setItem("pending_card_request", JSON.stringify({
-      ...cardData,
-      name: card.name, // pour la compatibilité affichage
-      status: "En cours"
-    }));
-    
+    // Stockage local pour l'affichage immédiat
+    localStorage.setItem("pending_card_request", JSON.stringify(cardData));
     setIsSuccess(true);
   } catch (err) {
-    alert("Une erreur technique est survenue lors de l'émission de la demande.");
+    console.error("Erreur API");
   }
 };
 
