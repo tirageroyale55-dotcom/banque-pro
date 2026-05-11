@@ -967,21 +967,38 @@ top:80px;
 
 
 
-.status-badge-pending {
+.bper-status-overlay {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(245, 158, 11, 0.9); /* Orange ambre semi-transparent */
+  bottom: 20px;
+  right: 20px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
   color: white;
-  padding: 5px 12px;
-  border-radius: 12px;
+  padding: 6px 12px;
+  border-radius: 8px;
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  backdrop-filter: blur(4px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  z-index: 5;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  background: #fbbf24; /* Orange investigation */
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
 }
 
 

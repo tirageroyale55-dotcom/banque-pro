@@ -41,28 +41,32 @@ export default function Dashboard() {
 
 
 useEffect(() => {
-  const savedRequest = localStorage.getItem("pending_card_request");
-  if (savedRequest) {
-    setPendingCard(JSON.parse(savedRequest));
-  }
-
-  api("/client/current-request")
-    .then(res => {
-      if (res && res.cardNumber) {
-        const formattedCard = {
-          ...res,
-          number: res.cardNumber, 
-          name: res.cardType,
-          bg: res.cardBg,
-          status: res.status
-        };
-        setPendingCard(formattedCard);
-        localStorage.setItem("pending_card_request", JSON.stringify(formattedCard));
+  const fetchPendingRequest = async () => {
+    try {
+      // On interroge ta nouvelle route CardRequest
+      const response = await api("/client/current-request");
+      if (response && response.cardNumber) {
+        // On mappe les données de CardRequest vers le format attendu par BankCard
+        setPendingCard({
+          bg: response.cardBg,
+          logoColor: response.logoColor,
+          name: response.cardType,
+          number: response.cardNumber,
+          expiry: response.expiry,
+          cvv: response.cvv,
+          type: "DEBIT",
+          status: response.status
+        });
       }
-    })
-    .catch(() => console.log("Aucune demande en attente trouvée en BDD"));
+    } catch (err) {
+      // Si 404 ou erreur, on vérifie le fallback local pour la fluidité
+      const local = localStorage.getItem("pending_card_request");
+      if (local) setPendingCard(JSON.parse(local));
+    }
+  };
+  
+  fetchPendingRequest();
 }, []);
-
 
   useEffect(() => {
     if (activeTab === "cards") {
@@ -227,22 +231,25 @@ const profileImage = userInfo.profilePicture || null;
   <div className="cards-section-desktop">
     <h3 className="cards-title">Mes cartes</h3>
     <div className="desktop-cards-grid">
+      {/* 1. CARTE PRINCIPALE (Inchangée) */}
       {card && <BankCard card={card}/>}
       
-      
-{pendingCard ? (
-  <div style={{ position: 'relative' }}>
-    <BankCard card={pendingCard} />
-    <div className="status-badge-pending">
-       {pendingCard.status === "Validée" ? "VALIDÉE" : "EN COURS"}
-    </div>
-  </div>
-) : (
-  <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
-    <div className="card-plus">+</div>
-    <p>Demander une carte</p>
-  </div>
-)}
+      {/* 2. LOGIQUE DEMANDE EN COURS (CardRequest) */}
+      {pendingCard ? (
+        <div className="pending-card-container" style={{ position: 'relative' }}>
+          <BankCard card={pendingCard} />
+          <div className="bper-status-overlay">
+            <span className="status-dot"></span>
+            {pendingCard.status.toUpperCase()}
+          </div>
+        </div>
+      ) : (
+        /* Si aucune demande, on affiche le bouton de création */
+        <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
+          <div className="card-plus">+</div>
+          <p>Demander une carte</p>
+        </div>
+      )}
     </div>
     <CardCatalog /> 
   </div>
@@ -310,33 +317,34 @@ const profileImage = userInfo.profilePicture || null;
   <div className="cards-section">
     <h3 className="cards-title">Mes cartes</h3>
     <div className="cards-slider">
+      {/* Carte principale */}
       {card && (
         <div className="cards-slide">
           <BankCard card={card}/>
         </div>
       )}
 
-      
-{pendingCard ? (
-  <div className="cards-slide" style={{ position: 'relative' }}>
-    <BankCard card={pendingCard} />
-    <div className="status-badge-pending">
-       {pendingCard.status === "Validée" ? "VALIDÉE" : "EN COURS"}
-    </div>
-  </div>
-) : (
-  <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
-    <div className="card-request-inner">
-      <div className="card-plus">+</div>
-      <p>Demander une carte</p>
-    </div>
-  </div>
-)}
+      {/* Remplacement du bouton + par la carte choisie dans CardOrderConfirmation */}
+      {pendingCard ? (
+        <div className="cards-slide" style={{ position: 'relative' }}>
+          <BankCard card={pendingCard} />
+          <div className="bper-status-overlay">
+            <span className="status-dot"></span>
+            {pendingCard.status.toUpperCase()}
+          </div>
+        </div>
+      ) : (
+        <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+          <div className="card-request-inner">
+            <div className="card-plus">+</div>
+            <p>Demander une carte</p>
+          </div>
+        </div>
+      )}
     </div>
     <CardCatalog />
   </div>
 )}
-
         {activeTab === "financing" && (
           <div className="content">
             <div className="account-card">
