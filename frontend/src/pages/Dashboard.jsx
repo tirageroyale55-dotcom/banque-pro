@@ -316,20 +316,22 @@ const profileImage = userInfo.profilePicture || null;
         </div>
       )}
 
-      {/* VERSION MOBILE : CARTE EN COURS OU BOUTON + */}
-      {pendingCard ? (
-        <div className="cards-slide" style={{ position: 'relative' }}>
-          <BankCard card={pendingCard} />
-          <div className="status-badge-pending">EN COURS</div>
-        </div>
-      ) : (
-        <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
-          <div className="card-request-inner">
-            <div className="card-plus">+</div>
-            <p>Demander une carte</p>
-          </div>
-        </div>
-      )}
+      
+{pendingCard ? (
+  <div className="cards-slide" style={{ position: 'relative' }}>
+    <BankCard card={pendingCard} />
+    <div className="status-badge-pending">
+       {pendingCard.status === "Validée" ? "VALIDÉE" : "EN COURS"}
+    </div>
+  </div>
+) : (
+  <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+    <div className="card-request-inner">
+      <div className="card-plus">+</div>
+      <p>Demander une carte</p>
+    </div>
+  </div>
+)}
     </div>
     <CardCatalog />
   </div>
