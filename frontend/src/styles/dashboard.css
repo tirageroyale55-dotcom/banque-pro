@@ -967,20 +967,21 @@ top:80px;
 
 
 
-/* À ajouter dans ton fichier dashboard.css */
 .status-badge-pending {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  background: #f59e0b; /* Orange pro */
-  color: #fff;
-  padding: 4px 12px;
-  border-radius: 20px;
+  top: 12px;
+  right: 12px;
+  background: rgba(245, 158, 11, 0.9); /* Orange ambre semi-transparent */
+  color: white;
+  padding: 5px 12px;
+  border-radius: 12px;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  z-index: 10;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 5;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 

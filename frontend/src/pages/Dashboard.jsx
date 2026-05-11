@@ -40,11 +40,15 @@ export default function Dashboard() {
   
 
 useEffect(() => {
-  const savedRequest = localStorage.getItem("pending_card_request");
-  if (savedRequest) {
-    setPendingCard(JSON.parse(savedRequest));
-  }
-}, []);
+    const savedRequest = localStorage.getItem("pending_card_request");
+    if (savedRequest) {
+      try {
+        setPendingCard(JSON.parse(savedRequest));
+      } catch (e) {
+        console.error("Erreur lecture carte en attente");
+      }
+    }
+  }, []);
 
 
   useEffect(() => {
@@ -127,7 +131,34 @@ const lastName = userInfo.lastname || userInfo.nom || "";
 const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || "??";
 const profileImage = userInfo.profilePicture || null;
 
+const renderCardSlot = (isDesktopView) => {
+    if (pendingCard) {
+      return (
+        <div className={isDesktopView ? "" : "cards-slide"} style={{ position: 'relative' }}>
+          {/* On passe l'objet complet de la carte choisie au composant BankCard */}
+          <BankCard card={pendingCard} />
+          
+          {/* Badge de statut professionnel */}
+          <div className="status-badge-pending">
+            EN COURS
+          </div>
+        </div>
+      );
+    }
 
+    return (
+      <div 
+        className={isDesktopView ? "card-request-desktop" : "cards-slide card-request"} 
+        onClick={() => navigate("/request-card")}
+      >
+        <div className={isDesktopView ? "" : "card-request-inner"}>
+          <div className="card-plus">+</div>
+          <p>Demander une carte</p>
+        </div>
+      </div>
+    );
+  };
+  
   // --- RENDU CONDITIONNEL : DESKTOP ---
   if (isDesktop) {
     return (
