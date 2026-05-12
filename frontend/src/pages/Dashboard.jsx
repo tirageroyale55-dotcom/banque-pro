@@ -7,7 +7,7 @@ import Tabs from "../components/Tabs";
 import BalanceBar from "../components/BalanceBar";
 import BottomNav from "../components/BottomNav";
 import BankCard from "../components/BankCard";
-import PendingCardView from "../components/PendingCardView";
+
  
 import CardCatalog from "./CardCatalog"; 
 import Accounts from "./Accounts";
@@ -232,19 +232,22 @@ const profileImage = userInfo.profilePicture || null;
       {/* 1. CARTE PRINCIPALE (Inchangée) */}
       {card && <BankCard card={card}/>}
       
+      {/* 2. LOGIQUE DEMANDE EN COURS (CardRequest) */}
       {pendingCard ? (
-  <div className="pending-card-container-desktop">
-    <PendingCardView card={pendingCard} />
-    <div className="bper-status-overlay">
-      <span className="status-dot"></span>
-      {pendingCard.status.toUpperCase()}
-    </div>
-  </div>
-) : (
-  <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
-    {/* ... ton bouton + ... */}
-  </div>
-)}
+        <div className="pending-card-container" style={{ position: 'relative' }}>
+          <BankCard card={pendingCard} />
+          <div className="bper-status-overlay">
+            <span className="status-dot"></span>
+            {pendingCard.status.toUpperCase()}
+          </div>
+        </div>
+      ) : (
+        /* Si aucune demande, on affiche le bouton de création */
+        <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
+          <div className="card-plus">+</div>
+          <p>Demander une carte</p>
+        </div>
+      )}
     </div>
     <CardCatalog /> 
   </div>
@@ -319,19 +322,23 @@ const profileImage = userInfo.profilePicture || null;
         </div>
       )}
 
+      {/* Remplacement du bouton + par la carte choisie dans CardOrderConfirmation */}
       {pendingCard ? (
-  <div className="cards-slide">
-    <PendingCardView card={pendingCard} />
-    <div className="bper-status-overlay" style={{ marginTop: '-20px' }}>
-      <span className="status-dot"></span>
-      {pendingCard.status.toUpperCase()}
-    </div>
-  </div>
-) : (
-  <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
-    {/* ... ton bouton + ... */}
-  </div>
-)}
+        <div className="cards-slide" style={{ position: 'relative' }}>
+          <BankCard card={pendingCard} />
+          <div className="bper-status-overlay">
+            <span className="status-dot"></span>
+            {pendingCard.status.toUpperCase()}
+          </div>
+        </div>
+      ) : (
+        <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+          <div className="card-request-inner">
+            <div className="card-plus">+</div>
+            <p>Demander une carte</p>
+          </div>
+        </div>
+      )}
     </div>
     <CardCatalog />
   </div>
