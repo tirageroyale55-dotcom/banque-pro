@@ -41,10 +41,10 @@ export default function Dashboard() {
 
 
 useEffect(() => {
-  const loadMyPendingCard = async () => {
+  const fetchMyCard = async () => {
     try {
-      // Cette route utilise ton token (auth), donc MongoDB renverra UNIQUEMENT ta carte
-      const res = await api("/client/current-request");
+      // On appelle le serveur. S'il n'y a pas de demande pour cet ID, il répondra 404
+      const res = await api("/client/current-request", "GET");
       if (res && res.cardNumber) {
         setPendingCard({
           bg: res.cardBg,
@@ -56,14 +56,13 @@ useEffect(() => {
         });
       }
     } catch (err) {
-      // Si 404 (pas de carte pour cet utilisateur), on vide l'affichage
+      // Si erreur ou 404, on nettoie tout pour ne rien afficher par erreur
       setPendingCard(null);
     }
   };
 
-  // On lance l'appel dès que les données utilisateur (data) sont là
-  if (data) loadMyPendingCard();
-}, [data]);
+  if (data) fetchMyCard();
+}, [data, activeTab]); // On recharge si on change d'onglet pour être sûr
 
   useEffect(() => {
     if (activeTab === "cards") {

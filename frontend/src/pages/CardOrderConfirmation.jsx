@@ -53,21 +53,19 @@ export default function CardOrderConfirmation() {
   };
 
   try {
-    // Utilise cette syntaxe précise (si ton api() est un wrapper de fetch)
-    const response = await api("/client/request-card", {
-      method: "POST",
-      body: JSON.stringify(cardData) // Pas besoin de headers si ton wrapper les gère déjà
-    });
+    // SYNTAXE EXACTE POUR TON WRAPPER : URL, MÉTHODE, CORPS
+    const response = await api("/client/request-card", "POST", cardData);
 
-    // On ne sauvegarde en local QUE si le serveur a répondu OK
-    localStorage.setItem("pending_card_request", JSON.stringify({
-      ...cardData,
-      status: "En cours d'investigation"
-    }));
-    setIsSuccess(true);
+    if (response) {
+      localStorage.setItem("pending_card_request", JSON.stringify({
+        ...cardData,
+        status: "En cours d'investigation"
+      }));
+      setIsSuccess(true);
+    }
   } catch (err) {
     console.error("Erreur MongoDB:", err);
-    alert("Impossible d'enregistrer la demande. Vérifiez la console.");
+    alert("Impossible d'enregistrer la demande.");
   }
 };
 
