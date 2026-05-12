@@ -47,13 +47,14 @@ useEffect(() => {
       const res = await api("/client/current-request", "GET");
       if (res && res.cardNumber) {
         setPendingCard({
-          bg: res.cardBg,
-          logoColor: res.logoColor,
-          name: res.cardType,
-          number: res.cardNumber,
-          expiry: res.expiry,
-          status: res.status
-        });
+  bg: res.cardBg,
+  logoColor: res.logoColor,
+  name: res.cardType,
+  number: res.cardNumber,
+  expiry: res.expiry,
+  status: res.status,
+  holder: `${firstName} ${lastName}` 
+});
       }
     } catch (err) {
       // Si erreur ou 404, on nettoie tout pour ne rien afficher par erreur
