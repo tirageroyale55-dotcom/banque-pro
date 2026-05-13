@@ -59,7 +59,7 @@ export default function CardOrderConfirmation() {
     if (response) {
       localStorage.setItem("pending_card_request", JSON.stringify({
         ...cardData,
-        status: "En"
+        status: "En cours d'investigation"
       }));
       setIsSuccess(true);
     }
