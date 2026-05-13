@@ -10,8 +10,8 @@ const CardRequestSchema = new mongoose.Schema({
   logoColor: { type: String },
   status: { 
     type: String, 
-    enum: ["En cours d'investigation", "Validée", "Rejetée"], 
-    default: "En cours d'investigation" 
+    enum: ["En ", "Validée", "Rejetée"], 
+    default: "En " 
   },
   comment: { type: String }, // Note laissée par l'utilisateur
   requestDate: { type: Date, default: Date.now },
