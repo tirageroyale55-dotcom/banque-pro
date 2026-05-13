@@ -236,10 +236,7 @@ const profileImage = userInfo.profilePicture || null;
       {pendingCard ? (
         <div className="pending-card-container" style={{ position: 'relative' }}>
           <BankCard card={pendingCard} />
-          <div className="bper-status-overlay">
-            <span className="status-dot"></span>
-            {pendingCard.status.toUpperCase()}
-          </div>
+          
         </div>
       ) : (
         /* Si aucune demande, on affiche le bouton de création */
@@ -327,8 +324,7 @@ const profileImage = userInfo.profilePicture || null;
         <div className="cards-slide" style={{ position: 'relative' }}>
           <BankCard card={pendingCard} />
           <div className="bper-status-overlay">
-            <span className="status-dot"></span>
-            {pendingCard.status.toUpperCase()}
+            
           </div>
         </div>
       ) : (
