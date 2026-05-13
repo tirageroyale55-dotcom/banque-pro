@@ -235,7 +235,7 @@ const profileImage = userInfo.profilePicture || null;
       {/* 2. LOGIQUE DEMANDE EN COURS (CardRequest) */}
       {pendingCard ? (
         <div className="pending-card-container" style={{ position: 'relative' }}>
-          <BankCard card={pendingCard} user={dbData.user}/>
+          <BankCard card={pendingCard} />
           <div className="bper-status-overlay">
             <span className="status-dot"></span>
             {pendingCard.status.toUpperCase()}
@@ -325,7 +325,7 @@ const profileImage = userInfo.profilePicture || null;
       {/* Remplacement du bouton + par la carte choisie dans CardOrderConfirmation */}
       {pendingCard ? (
         <div className="cards-slide" style={{ position: 'relative' }}>
-          <BankCard card={pendingCard} user={dbData.user}/>
+          <BankCard card={pendingCard} />
           <div className="bper-status-overlay">
             <span className="status-dot"></span>
             {pendingCard.status.toUpperCase()}
