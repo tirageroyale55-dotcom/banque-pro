@@ -234,14 +234,10 @@ const profileImage = userInfo.profilePicture || null;
       
       {/* 2. LOGIQUE DEMANDE EN COURS (CardRequest) */}
       {pendingCard ? (
-        <div className="pending-card-container" style={{ position: 'relative' }}>
-          <BankCard card={pendingCard} />
-          <div className="bper-status-overlay">
-            <span className="status-dot"></span>
-            {pendingCard.status.toUpperCase()}
-          </div>
-        </div>
-      ) : (
+  <div className="cards-slide"> {/* Supprimé le style relative et l'overlay ici */}
+    <BankCard card={pendingCard} />
+  </div>
+) : (
         /* Si aucune demande, on affiche le bouton de création */
         <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
           <div className="card-plus">+</div>
@@ -324,14 +320,10 @@ const profileImage = userInfo.profilePicture || null;
 
       {/* Remplacement du bouton + par la carte choisie dans CardOrderConfirmation */}
       {pendingCard ? (
-        <div className="cards-slide" style={{ position: 'relative' }}>
-          <BankCard card={pendingCard} />
-          <div className="bper-status-overlay">
-            <span className="status-dot"></span>
-            {pendingCard.status.toUpperCase()}
-          </div>
-        </div>
-      ) : (
+  <div className="cards-slide"> {/* Supprimé le style relative et l'overlay ici */}
+    <BankCard card={pendingCard} />
+  </div>
+) : (
         <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
           <div className="card-request-inner">
             <div className="card-plus">+</div>
