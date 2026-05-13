@@ -100,50 +100,7 @@ export default function BankCard({ card }) {
         </div>
       </div>
 
-      <style jsx>{`
-        /* EFFETS ET LOGOS DU DESIGN "CUSTOM" */
-        .card-gloss-effect {
-          position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-          background: linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.08) 48%, rgba(255,255,255,0) 52%);
-          pointer-events: none;
-        }
-        .card-top-row-custom { display: flex; justify-content: space-between; align-items: center; z-index: 2; }
-        .bper-logo-custom { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; }
-        .bper-logo-custom span { color: #a3e635; }
-        .bper-logo-custom small { font-size: 10px; font-weight: 400; opacity: 0.8; color: white; }
-        .nfc-icon-custom { opacity: 0.8; transform: rotate(90deg); color: white; }
-
-        .emv-chip-custom {
-          width: 38px; height: 28px;
-          background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
-          border-radius: 4px; position: relative; z-index: 2; border: 1px solid rgba(0,0,0,0.1);
-        }
-        .chip-line-h1, .chip-line-h2 { position: absolute; background: rgba(0,0,0,0.2); width: 100%; height: 1px; }
-        .chip-line-h1 { top: 33%; } .chip-line-h2 { top: 66%; }
-        .chip-line-v { position: absolute; background: rgba(0,0,0,0.2); height: 100%; width: 1px; left: 50%; }
-
-        .card-mid-row-custom { 
-          z-index: 2; color: white; font-family: 'Courier New', monospace; 
-          font-size: 17px; letter-spacing: 1px; margin: 10px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
-
-        .card-bottom-row-custom { display: flex; justify-content: space-between; align-items: flex-end; z-index: 2; }
-        .label-custom { display: block; font-size: 7px; color: rgba(255,255,255,0.7); margin-bottom: 2px; }
-        .value-custom { display: block; font-size: 11px; color: white; font-weight: 600; text-transform: uppercase; }
-
-        /* SYMBOLE MASTERCARD CSS */
-        .mc-symbol-custom { display: flex; position: relative; width: 32px; height: 20px; }
-        .circle-red, .circle-yellow { width: 20px; height: 20px; border-radius: 50%; position: absolute; }
-        .circle-red { background: #eb001b; left: 0; }
-        .circle-yellow { background: #ff5f00; right: 0; opacity: 0.85; }
-
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-          .card-mid-row-custom { font-size: 14px; }
-          .value-custom { font-size: 9px; }
-          .emv-chip-custom { width: 32px; height: 24px; }
-        }
-      `}</style>
+      
     </div>
   );
 }
