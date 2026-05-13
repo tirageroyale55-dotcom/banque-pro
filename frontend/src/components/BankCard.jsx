@@ -3,14 +3,17 @@ import { Wifi } from 'lucide-react';
 
 export default function BankCard({ card }) {
   const [flipped, setFlipped] = useState(false);
+
   if (!card) return null;
 
+  // Formatage du numéro (ex: •••• •••• •••• 4444)
   const formatNumber = (num) => {
     if (!num) return "•••• •••• •••• ••••";
     const last4 = num.toString().slice(-4);
     return `•••• •••• •••• ${last4}`;
   };
 
+  // Détection du type de design
   const isCustomCard = !!card.bg;
 
   return (
@@ -19,52 +22,58 @@ export default function BankCard({ card }) {
       onClick={() => setFlipped(!flipped)}
     >
       <div className="card-inner">
-        {/* FACE AVANT */}
+        {/* --- FACE AVANT (FRONT) --- */}
         <div 
           className="card-front" 
-          style={isCustomCard ? { background: card.bg, padding: '20px', overflow: 'hidden' } : {}}
+          style={isCustomCard ? { 
+            background: card.bg, 
+            padding: '20px', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'space-between',
+            overflow: 'hidden'
+          } : {}}
         >
           {isCustomCard ? (
-            <div className="custom-layout">
-              <div className="card-gloss-overlay"></div>
+            /* DESIGN EXACT : CARDORDERCONFIRMATION */
+            <>
+              <div className="card-gloss-effect"></div>
               
-              <div className="top-section">
-                <div className="bper-logo-auth" style={{ color: card.logoColor }}>
+              <div className="card-top-row-custom">
+                <div className="bper-logo-custom" style={{ color: card.logoColor }}>
                   BPER<span>:</span> <small>Banca</small>
                 </div>
-                <Wifi size={20} className="nfc-icon-auth" />
+                <Wifi size={20} className="nfc-icon-custom" strokeWidth={1.5} />
               </div>
 
-              <div className="emv-chip-auth">
-                <div className="chip-line-h"></div>
+              <div className="emv-chip-custom">
+                <div className="chip-line-h1"></div>
+                <div className="chip-line-h2"></div>
                 <div className="chip-line-v"></div>
               </div>
 
-              <div className="card-number-auth">
+              <div className="card-mid-row-custom">
                 {formatNumber(card.number)}
               </div>
 
-              <div className="bottom-section">
-                <div className="user-details">
-                  <div className="detail-block">
-                    <span className="label">TITULAIRE</span>
-                    <span className="value">{card.holder || "NOM CLIENT"}</span>
-                  </div>
-                  <div className="detail-block">
-                    <span className="label">EXP</span>
-                    <span className="value">{card.expiry || "MM/AA"}</span>
-                  </div>
+              <div className="card-bottom-row-custom">
+                <div className="holder-info-custom">
+                  <span className="label-custom">TITULAIRE</span>
+                  <span className="value-custom">{card.holder || "NOM CLIENT"}</span>
                 </div>
-
-                {/* LOGO MASTERCARD CSS - TAILLE ET FORME IDENTIQUE À L'SVG */}
-                <div className="mastercard-logo-css">
-                  <div className="mc-circle mc-red"></div>
-                  <div className="mc-circle mc-orange"></div>
+                <div className="exp-info-custom">
+                  <span className="label-custom">EXP</span>
+                  <span className="value-custom">{card.expiry || `${card.exp_month}/${card.exp_year}`}</span>
                 </div>
+                {/* LOGO MASTERCARD EXACT */}
+                <div className="mc-symbol-custom">
+  <div className="mc-circle mc-red"></div>
+  <div className="mc-circle mc-orange"></div>
+</div>
               </div>
-            </div>
+            </>
           ) : (
-            /* VERSION PAR DÉFAUT */
+            /* DESIGN PAR DÉFAUT (INCHANGÉ) */
             <>
               <div className="card-header">
                 <div className="card-bank">BPER</div>
@@ -81,7 +90,7 @@ export default function BankCard({ card }) {
           )}
         </div>
 
-        {/* FACE ARRIÈRE */}
+        {/* --- FACE ARRIÈRE (BACK) --- */}
         <div className="card-back" style={isCustomCard ? { background: card.bg } : {}}>
           <div className="magnetic"></div>
           <div className="cvv-box">
@@ -92,76 +101,54 @@ export default function BankCard({ card }) {
       </div>
 
       <style jsx>{`
-        .custom-layout {
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          position: relative;
-          z-index: 2;
-        }
+  /* LOGO MASTERCARD CSS - TAILLE ET FORME EXACTE */
+  .mc-symbol-custom {
+    position: relative;
+    width: 32px;    /* Largeur exacte du logo SVG standard */
+    height: 20px;   /* Hauteur exacte */
+    display: flex;
+    align-items: center;
+    z-index: 2;
+  }
 
-        .card-gloss-overlay {
-          position: absolute; top: -20px; left: -20px; width: 150%; height: 150%;
-          background: linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.06) 48%, rgba(255,255,255,0) 52%);
-          pointer-events: none;
-        }
+  .mc-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: absolute;
+  }
 
-        .bper-logo-auth { font-weight: 900; font-size: 19px; }
-        .bper-logo-auth span { color: #a3e635; }
-        .bper-logo-auth small { font-size: 10px; opacity: 0.8; font-weight: 400; color: white; }
+  .mc-red {
+    background-color: #eb001b;
+    left: 0;
+    z-index: 1;
+  }
 
-        .top-section { display: flex; justify-content: space-between; align-items: center; }
-        .nfc-icon-auth { transform: rotate(90deg); color: white; opacity: 0.7; }
+  .mc-orange {
+    background-color: #ff5f00;
+    right: 0;
+    z-index: 2;
+    /* Pour créer l'effet d'intersection propre au logo Mastercard */
+    opacity: 0.92; 
+  }
 
-        .emv-chip-auth {
-          width: 40px; height: 30px;
-          background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
-          border-radius: 5px; border: 0.5px solid rgba(0,0,0,0.2);
-          position: relative;
-        }
+  /* Ajustement pour que le logo soit bien calé en bas à droite */
+  .card-bottom-row-custom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+    padding-top: 5px;
+  }
 
-        .card-number-auth {
-          font-family: 'Courier New', monospace;
-          font-size: 18px; color: white; letter-spacing: 1.5px;
-          text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
-        }
-
-        .bottom-section { display: flex; justify-content: space-between; align-items: flex-end; }
-        .label { display: block; font-size: 7px; color: rgba(255,255,255,0.6); margin-bottom: 2px; }
-        .value { display: block; font-size: 11px; color: white; font-weight: 700; }
-
-        /* --- LOGO MASTERCARD CSS RÉGLÉ SUR TAILLE SVG --- */
-        .mastercard-logo-css {
-          position: relative;
-          width: 38px;  /* Taille exacte du logo par défaut */
-          height: 24px;
-          display: flex;
-        }
-        .mc-circle {
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          position: absolute;
-        }
-        .mc-red {
-          background: #eb001b;
-          left: 0;
-          z-index: 1;
-        }
-        .mc-orange {
-          background: #ff5f00;
-          right: 0;
-          z-index: 2;
-          opacity: 0.92; /* Pour l'effet de superposition */
-        }
-
-        @media (max-width: 768px) {
-          .card-number-auth { font-size: 15px; }
-          .mastercard-logo-css { width: 34px; height: 21px; }
-          .mc-circle { width: 21px; height: 21px; }
-        }
-      `}</style>
+  /* Si tu veux que le logo soit un peu plus petit sur mobile comme l'original */
+  @media (max-width: 480px) {
+    .mc-symbol-custom {
+      transform: scale(0.85);
+      transform-origin: bottom right;
+    }
+  }
+`}</style>
     </div>
   );
 }
