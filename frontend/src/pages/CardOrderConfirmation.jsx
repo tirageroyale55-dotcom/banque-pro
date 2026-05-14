@@ -18,16 +18,24 @@ export default function CardOrderConfirmation() {
   const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [hasPendingRequest, setHasPendingRequest] = useState(false); // État pour l'alerte
 
-  
   useEffect(() => {
     window.scrollTo(0, 0);
     const loadData = async () => {
       try {
+        // 1. Charger les données du dashboard
         const res = await api("/client/dashboard");
         setDbData(res);
+
+        // 2. Vérifier si une demande de carte existe déjà sur le serveur
+        const checkCard = await api("/client/current-request", "GET");
+        if (checkCard && checkCard.status) {
+          setHasPendingRequest(true);
+        }
       } catch (err) {
-        console.error("Erreur de chargement", err);
+        // Si 404, cela signifie qu'aucune demande n'est en cours, donc on continue
+        console.log("Aucune demande en cours, accès autorisé.");
       } finally {
         setLoading(false);
       }
@@ -35,12 +43,39 @@ export default function CardOrderConfirmation() {
     loadData();
   }, []);
 
+  // --- ÉCRAN D'ALERTE : DEMANDE DÉJÀ EN COURS ---
+  if (hasPendingRequest) {
+    return (
+      <div className="bper-confirmation-screen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f8fafc' }}>
+        <div style={{ textAlign: 'center', padding: '40px', background: '#fff', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.08)', maxWidth: '420px', margin: '20px', border: '1px solid #e2e8f0' }}>
+          <div style={{ background: '#fff7ed', width: '80px', height: '80px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <Info size={40} color="#ea580c" />
+          </div>
+          <h2 style={{ color: '#0f172a', fontWeight: '800', marginBottom: '16px', fontSize: '22px' }}>Demande déjà en cours</h2>
+          <p style={{ color: '#64748b', fontSize: '15px', lineHeight: '1.6', marginBottom: '32px' }}>
+            Vous avez déjà une demande de carte active pour le moment. Une seule demande peut être traitée à la fois par nos services de sécurité.
+          </p>
+          <button 
+            className="btn-submit-order" 
+            onClick={() => navigate("/dashboard")}
+            style={{ width: '100%', cursor: 'pointer', background: '#0f172a' }}
+          >
+            Retour au Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!card) return null;
-  if (loading) return <div className="bper-loading-state">Chargement sécurisé...</div>;
+  if (loading) return <div className="bper-loading-state">Vérification de votre compte...</div>;
+
+  
 
   const { user, account } = dbData;
 
   const handleFinalSubmit = async () => {
+    if (hasPendingRequest) return;
   const expiry = generateExpiry();
   const cardData = {
     cardName: card.name,
