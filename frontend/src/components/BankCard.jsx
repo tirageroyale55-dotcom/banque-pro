@@ -136,14 +136,14 @@ export default function BankCard({ card }) {
         @keyframes blink-status { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
         .emv-chip-real {
-          width: 40px; height: 30px;
+          width: 42px; height: 32px;
           background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
-          border-radius: 5px; position: relative;
-          border: 0.5px solid rgba(0,0,0,0.2);
+          border-radius: 6px; position: relative; z-index: 2; border: 1px solid rgba(0,0,0,0.15);
         }
-        .chip-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: rgba(0,0,0,0.2); }
-        .chip-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: rgba(0,0,0,0.2); }
-
+        .chip-line { position: absolute; background: rgba(0,0,0,0.2); }
+        .horizontal-1 { width: 100%; height: 1px; top: 33%; }
+        .horizontal-2 { width: 100%; height: 1px; top: 66%; }
+        .vertical { height: 100%; width: 1px; left: 50%; }
         /* TAILLE EXACTE MASTERCARD */
         .mastercard-fixed-layout {
           position: relative; width: 45px; height: 28px;
