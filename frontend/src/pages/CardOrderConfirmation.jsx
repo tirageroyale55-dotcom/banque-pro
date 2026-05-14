@@ -34,7 +34,7 @@ export default function CardOrderConfirmation() {
           setHasPendingRequest(true);
         }
       } catch (err) {
-        // Si 404, cela signifie qu'aucune demande n'est en cours, donc on continue
+        
         console.log("Aucune demande en cours, accès autorisé.");
       } finally {
         setLoading(false);
@@ -43,24 +43,42 @@ export default function CardOrderConfirmation() {
     loadData();
   }, []);
 
-  // --- ÉCRAN D'ALERTE : DEMANDE DÉJÀ EN COURS ---
+  // --- ÉCRAN D'ALERTE PROFESSIONNEL : DEMANDE DÉJÀ EN COURS ---
   if (hasPendingRequest) {
     return (
       <div className="bper-confirmation-screen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f8fafc' }}>
-        <div style={{ textAlign: 'center', padding: '40px', background: '#fff', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.08)', maxWidth: '420px', margin: '20px', border: '1px solid #e2e8f0' }}>
-          <div style={{ background: '#fff7ed', width: '80px', height: '80px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-            <Info size={40} color="#ea580c" />
+        <div style={{ textAlign: 'center', padding: '48px 30px', background: '#fff', borderRadius: '28px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.08)', maxWidth: '400px', width: '90%', margin: '20px', border: '1px solid #f1f5f9' }}>
+          
+          <div style={{ background: '#fff7ed', width: '70px', height: '70px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <Info size={32} color="#f97316" strokeWidth={2.5} />
           </div>
-          <h2 style={{ color: '#0f172a', fontWeight: '800', marginBottom: '16px', fontSize: '22px' }}>Demande déjà en cours</h2>
-          <p style={{ color: '#64748b', fontSize: '15px', lineHeight: '1.6', marginBottom: '32px' }}>
-            Vous avez déjà une demande de carte active pour le moment. Une seule demande peut être traitée à la fois par nos services de sécurité.
+
+          <h2 style={{ color: '#0f172a', fontWeight: '900', fontSize: '22px', marginBottom: '12px', letterSpacing: '-0.5px' }}>
+            Demande en cours
+          </h2>
+
+          <p style={{ color: '#64748b', fontSize: '15px', lineHeight: '1.6', marginBottom: '32px', fontWeight: '500' }}>
+            Une demande est déjà associée à votre compte. Veuillez patienter jusqu'à la validation de celle-ci avant d'en soumettre une nouvelle.
           </p>
+
           <button 
-            className="btn-submit-order" 
             onClick={() => navigate("/dashboard")}
-            style={{ width: '100%', cursor: 'pointer', background: '#0f172a' }}
+            style={{ 
+              width: '100%', 
+              background: '#005a64', 
+              color: 'white', 
+              border: 'none', 
+              padding: '16px', 
+              borderRadius: '14px', 
+              fontSize: '16px', 
+              fontWeight: '900', 
+              letterSpacing: '1px',
+              cursor: 'pointer',
+              boxShadow: '0 10px 20px rgba(0, 90, 100, 0.15)',
+              transition: 'transform 0.2s ease'
+            }}
           >
-            Retour au Dashboard
+            OK
           </button>
         </div>
       </div>
