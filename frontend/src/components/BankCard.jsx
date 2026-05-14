@@ -12,7 +12,6 @@ export default function BankCard({ card }) {
     return `•••• •••• •••• ${last4}`;
   };
 
-  // --- LOGIQUE DE STATUT (Simplifiée selon ta demande) ---
   const rawStatus = card.status || "inactive";
   const isPending = rawStatus === "En cours d'investigation" || rawStatus === "EN COURS";
   const displayStatus = isPending ? "EN COURS" : rawStatus;
@@ -32,15 +31,13 @@ export default function BankCard({ card }) {
       onClick={() => setFlipped(!flipped)}
     >
       <div className="card-inner">
-        
-        {/* --- FACE AVANT (RECTO) : Identique Mobile & Desktop --- */}
+        {/* --- FACE AVANT (RECTO) --- */}
         <div 
           className="card-front" 
           style={isCustomCard ? { background: card.bg } : {}}
         >
           {isCustomCard && <div className="card-gloss-overlay"></div>}
 
-          {/* 1. HEADER : Logo + Wifi (OBLIGATOIRE SUR LES DEUX) */}
           <div className="card-header">
             {isCustomCard ? (
               <div className="bper-logo-custom" style={{ color: card.logoColor }}>
@@ -49,10 +46,9 @@ export default function BankCard({ card }) {
             ) : (
               <div className="card-bank">BPER</div>
             )}
-            <Wifi size={22} className="nfc-icon-fixed" />
+            <Wifi size={22} className="nfc-icon-all" />
           </div>
 
-          {/* 2. PUCE EMV : Style Vrai Guichet (OBLIGATOIRE SUR LES DEUX) */}
           <div className="chip-area">
             <div className="emv-chip-real">
               <div className="chip-line-h"></div>
@@ -60,12 +56,10 @@ export default function BankCard({ card }) {
             </div>
           </div>
 
-          {/* 3. NUMÉRO DE CARTE */}
           <div className="card-number">
             {formatNumber(card.number)}
           </div>
 
-          {/* 4. FOOTER : Titulaire, Statut, Exp, Mastercard */}
           <div className="card-footer">
             <div className="footer-left-group">
               <div className="holder-section">
@@ -73,7 +67,6 @@ export default function BankCard({ card }) {
                 <strong>{card.holder || "NOM CLIENT"}</strong>
               </div>
 
-              {/* STATUT : Bouton allumé déplacé sous le nom */}
               <div className={`status-badge-bper ${displayStatus.toLowerCase().replace(/\s/g, '-')}`}>
                 <span className="dot-light"></span>
                 {statusText[displayStatus] || displayStatus}
@@ -85,39 +78,44 @@ export default function BankCard({ card }) {
               <strong>{card.expiry || `${card.exp_month}/${card.exp_year}`}</strong>
             </div>
 
-            {/* LOGO MASTERCARD : Taille/Forme exacte (RECTO UNIQUEMENT) */}
-            <div className="mastercard-layout-fixed">
-              
+            {/* LOGO MASTERCARD : PRÉSENT UNIQUEMENT ICI (RECTO) */}
+            <div className="mastercard-fixed-layout">
+              <div className="mc-circle mc-red"></div>
               <div className="mc-circle mc-orange"></div>
             </div>
           </div>
         </div>
 
-        {/* --- FACE ARRIÈRE (VERSO) : Mastercard Interdit ici --- */}
+        {/* --- FACE ARRIÈRE (VERSO) : LOGO MASTERCARD SUPPRIMÉ --- */}
         <div className="card-back" style={isCustomCard ? { background: card.bg } : {}}>
           <div className="magnetic"></div>
           <div className="cvv-box">
             <span>CVV</span>
             <strong>{card.cvv || "•••"}</strong>
           </div>
+          {/* Le logo Mastercard a été retiré d'ici */}
         </div>
       </div>
 
       <style jsx>{`
-        /* STYLE VERROUILLÉ MOBILE & DESKTOP */
         .footer-left-group { display: flex; flex-direction: column; gap: 5px; flex: 1; }
         
-        /* BADGE STATUT LUMINEUX */
         .status-badge-bper {
-          display: inline-flex; align-items: center; gap: 6px;
-          padding: 3px 10px; background: rgba(0, 0, 0, 0.4);
-          border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
-          font-size: 8px; font-weight: 800; color: white; width: fit-content;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 3px 10px;
+          background: rgba(0, 0, 0, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          font-size: 8px;
+          font-weight: 800;
+          color: white;
+          width: fit-content;
         }
 
         .dot-light { width: 6px; height: 6px; border-radius: 50%; }
 
-        /* Animation Point Allumé */
         .en-cours .dot-light, .active .dot-light { 
           animation: blink-status 2s infinite; 
           box-shadow: 0 0 6px currentColor;
@@ -129,17 +127,16 @@ export default function BankCard({ card }) {
 
         @keyframes blink-status { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* PUCE EMV RÉALISTE */
         .emv-chip-real {
           width: 40px; height: 30px;
           background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
-          border-radius: 5px; position: relative; border: 0.5px solid rgba(0,0,0,0.2);
+          border-radius: 5px; position: relative;
+          border: 0.5px solid rgba(0,0,0,0.2);
         }
         .chip-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: rgba(0,0,0,0.2); }
         .chip-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: rgba(0,0,0,0.2); }
 
-        /* LOGO MASTERCARD CSS (FORME ET TAILLE EXACTE) */
-        .mastercard-layout-fixed {
+        .mastercard-fixed-layout {
           position: relative; width: 45px; height: 28px;
           display: flex; align-items: center; margin-left: 10px;
         }
@@ -147,8 +144,7 @@ export default function BankCard({ card }) {
         .mc-red { background: #eb001b; left: 0; z-index: 1; }
         .mc-orange { background: #ff5f00; right: 0; z-index: 2; opacity: 0.92; }
 
-        /* AUTRES FIXES */
-        .nfc-icon-fixed { opacity: 0.8; transform: rotate(90deg); color: white; }
+        .nfc-icon-all { opacity: 0.8; transform: rotate(90deg); color: white; }
         .bper-logo-custom { font-weight: 900; font-size: 19px; }
         .bper-logo-custom span { color: #a3e635; }
         .card-gloss-overlay {
