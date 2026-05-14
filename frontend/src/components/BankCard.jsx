@@ -27,68 +27,68 @@ export default function BankCard({ card }) {
 
   return (
     <div
-      className={`card-container-fixed ${flipped ? "flipped" : ""}`}
+      className={`card-3d-container ${flipped ? "flipped" : ""} ${rawStatus}`}
       onClick={() => setFlipped(!flipped)}
     >
-      <div className="card-inner">
+      <div className="card-inner-3d">
         {/* --- FACE AVANT --- */}
         <div 
-          className="card-front" 
+          className="card-front-side" 
           style={isCustomCard ? { background: card.bg } : {}}
         >
-          {isCustomCard && <div className="card-gloss-overlay"></div>}
+          {isCustomCard && <div className="gloss-effect"></div>}
 
-          <div className="card-header">
+          <div className="card-header-row">
             {isCustomCard ? (
-              <div className="bper-logo-custom" style={{ color: card.logoColor }}>
+              <div className="bper-logo-custom">
                 BPER<span>:</span> <small>Banca</small>
               </div>
             ) : (
-              <div className="card-bank">BPER</div>
+              <div className="card-bank-default">BPER</div>
             )}
-            <Wifi size={22} className="nfc-icon-all" />
+            <Wifi size={24} className="wifi-icon" />
           </div>
 
-          <div className="chip-area">
+          <div className="chip-container">
             <div className="emv-chip-real">
               <div className="chip-line-h"></div>
               <div className="chip-line-v"></div>
             </div>
           </div>
 
-          <div className="card-number">
+          <div className="card-number-display">
             {formatNumber(card.number)}
           </div>
 
-          <div className="card-footer">
-            <div className="footer-left-group">
-              <div className="holder-section">
-                <span>TITULAIRE</span>
-                <strong>{card.holder || "NOM CLIENT"}</strong>
+          <div className="card-footer-row">
+            <div className="info-group">
+              <div className="holder-box">
+                <span className="label">TITULAIRE</span>
+                <strong className="value">{card.holder || "NOM CLIENT"}</strong>
               </div>
 
-              <div className={`status-badge-bper ${displayStatus.toLowerCase().replace(/\s/g, '-')}`}>
-                <span className="dot-light"></span>
+              <div className={`status-pill ${displayStatus.toLowerCase().replace(/\s/g, '-')}`}>
+                <span className="status-dot"></span>
                 {statusText[displayStatus] || displayStatus}
               </div>
             </div>
 
-            <div className="exp-section">
-              <span>EXP</span>
-              <strong>{card.expiry || `${card.exp_month}/${card.exp_year}`}</strong>
+            <div className="exp-box">
+              <span className="label">EXP</span>
+              <strong className="value">{card.expiry || `${card.exp_month}/${card.exp_year}`}</strong>
             </div>
 
-            <div className="mastercard-fixed-layout">
-              <div className="mc-circle mc-red"></div>
-              <div className="mc-circle mc-orange"></div>
+            <div className="mastercard-logo-css">
+              <div className="circle-red"></div>
+              <div className="circle-orange"></div>
             </div>
           </div>
         </div>
 
         {/* --- FACE ARRIÈRE --- */}
-        <div className="card-back" style={isCustomCard ? { background: card.bg } : {}}>
-          <div className="magnetic"></div>
-          <div className="cvv-box">
+        <div className="card-back-side" style={isCustomCard ? { background: card.bg } : {}}>
+          <div className="mag-stripe"></div>
+          <div className="cvv-area">
             <span>CVV</span>
             <strong>{card.cvv || "•••"}</strong>
           </div>
@@ -96,94 +96,98 @@ export default function BankCard({ card }) {
       </div>
 
       <style jsx>{`
-        /* FIX IPHONE : Perspective et Stabilité 3D */
-        .card-container-fixed {
+        /* FIX IPHONE : Dimensions forcées pour éviter le désordre */
+        .card-3d-container {
           width: 100%;
-          max-width: 360px;
-          height: 220px;
+          max-width: 340px;
+          aspect-ratio: 1.58 / 1; /* Format carte bancaire standard */
           perspective: 1000px;
-          -webkit-perspective: 1000px;
-          cursor: pointer;
           margin: 0 auto;
         }
 
-        .card-inner {
+        .card-inner-3d {
           position: relative;
           width: 100%;
           height: 100%;
-          transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: transform 0.6s;
           transform-style: preserve-3d;
-          -webkit-transform-style: preserve-3d;
         }
 
-        .card-container-fixed.flipped .card-inner {
-          transform: rotateY(180deg);
-          -webkit-transform: rotateY(180deg);
-        }
+        .card-3d-container.flipped .card-inner-3d { transform: rotateY(180deg); }
 
-        .card-front, .card-back {
+        .card-front-side, .card-back-side {
           position: absolute;
           width: 100%;
           height: 100%;
-          -webkit-backface-visibility: hidden; /* FIX IPHONE : empêche de voir l'envers */
           backface-visibility: hidden;
-          border-radius: 15px;
-          overflow: hidden;
+          border-radius: 12px;
+          padding: 18px;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          padding: 20px;
+          box-sizing: border-box; /* Crucial pour iPhone */
+          overflow: hidden;
           box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
-        .card-back {
-          transform: rotateY(180deg);
-          -webkit-transform: rotateY(180deg);
-          background: #1a1a1a;
-          justify-content: flex-start;
-          padding: 0;
-        }
+        .card-back-side { transform: rotateY(180deg); background: #222; }
 
-        /* ÉLÉMENTS GRAPHIQUES (Fixés pour être identiques partout) */
-        .footer-left-group { display: flex; flex-direction: column; gap: 5px; }
-        
-        .status-badge-bper {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 3px 10px;
-          background: rgba(0, 0, 0, 0.4);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          border-radius: 12px;
-          font-size: 8px;
-          font-weight: 800;
-          color: white;
-          width: fit-content;
-        }
+        /* HEADER */
+        .card-header-row { display: flex; justify-content: space-between; align-items: center; }
+        .bper-logo-custom { font-weight: 900; font-size: 18px; color: white; }
+        .bper-logo-custom span { color: #a3e635; }
+        .card-bank-default { font-weight: bold; font-size: 20px; color: white; }
+        .wifi-icon { color: white; transform: rotate(90deg); opacity: 0.9; }
 
-        .dot-light { width: 6px; height: 6px; border-radius: 50%; }
-        .en-cours .dot-light { background: #fbbf24; color: #fbbf24; box-shadow: 0 0 5px #fbbf24; animation: blink 2s infinite; }
-        .active .dot-light { background: #4ade80; color: #4ade80; box-shadow: 0 0 5px #4ade80; animation: blink 2s infinite; }
-        
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
+        /* PUCE */
         .emv-chip-real {
           width: 40px; height: 30px;
           background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
-          border-radius: 5px; position: relative;
+          border-radius: 4px; position: relative;
         }
 
-        .mastercard-fixed-layout {
-          position: relative; width: 45px; height: 28px;
-          display: flex; align-items: center;
+        /* NUMÉRO */
+        .card-number-display {
+          font-family: 'Courier New', monospace;
+          font-size: clamp(16px, 5vw, 20px);
+          color: white;
+          letter-spacing: 2px;
+          margin-top: 10px;
         }
-        .mc-circle { width: 28px; height: 28px; border-radius: 50%; position: absolute; }
-        .mc-red { background: #eb001b; left: 0; }
-        .mc-orange { background: #ff5f00; right: 0; opacity: 0.92; }
 
-        .nfc-icon-all { opacity: 0.8; transform: rotate(90deg); color: white; }
-        .bper-logo-custom { font-weight: 900; font-size: 19px; }
-        .bper-logo-custom span { color: #a3e635; }
+        /* FOOTER & STATUT */
+        .card-footer-row { display: flex; justify-content: space-between; align-items: flex-end; }
+        .info-group { display: flex; flex-direction: column; gap: 8px; }
+        .label { font-size: 8px; opacity: 0.7; color: white; display: block; }
+        .value { font-size: 11px; color: white; display: block; }
+
+        .status-pill {
+          display: inline-flex; align-items: center; gap: 5px;
+          padding: 2px 8px; background: rgba(0,0,0,0.5);
+          border-radius: 10px; border: 0.5px solid rgba(255,255,255,0.2);
+          font-size: 8px; font-weight: bold; color: white; width: fit-content;
+        }
+        .status-dot { width: 5px; height: 5px; border-radius: 50%; }
+        .en-cours .status-dot { background: #fbbf24; box-shadow: 0 0 5px #fbbf24; animation: blink 2s infinite; }
+        .active .status-dot { background: #4ade80; box-shadow: 0 0 5px #4ade80; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* MASTERCARD LOGO CSS EXACT */
+        .mastercard-logo-css { position: relative; width: 42px; height: 26px; margin-left: auto; }
+        .circle-red, .circle-orange { width: 26px; height: 26px; border-radius: 50%; position: absolute; }
+        .circle-red { background: #eb001b; left: 0; }
+        .circle-orange { background: #ff5f00; right: 0; opacity: 0.92; }
+
+        /* VERSO */
+        .mag-stripe { background: #000; height: 40px; width: 100%; margin: 10px -18px; }
+        .cvv-area { background: white; padding: 5px 10px; border-radius: 4px; color: black; text-align: right; width: 60px; margin-left: auto; }
+
+        .gloss-effect {
+          position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+          background: linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.1) 48%, rgba(255,255,255,0) 52%);
+          pointer-events: none;
+        }
       `}</style>
     </div>
   );
