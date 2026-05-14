@@ -13,8 +13,7 @@ export default function BankCard({ card }) {
   };
 
   const rawStatus = card.status || "inactive";
-  const isPending = rawStatus === "En cours d'investigation" || rawStatus === "EN COURS";
-  const displayStatus = isPending ? "EN COURS" : rawStatus;
+  const displayStatus = (rawStatus === "En cours d'investigation" || rawStatus === "EN COURS") ? "EN COURS" : rawStatus;
 
   const statusText = {
     inactive: "Carte inactive",
@@ -27,68 +26,73 @@ export default function BankCard({ card }) {
 
   return (
     <div
-      className={`card-3d-container ${flipped ? "flipped" : ""} ${rawStatus}`}
+      className={`card-3d ${flipped ? "flipped" : ""} ${rawStatus}`}
       onClick={() => setFlipped(!flipped)}
     >
-      <div className="card-inner-3d">
+      <div className="card-inner">
         {/* --- FACE AVANT --- */}
         <div 
-          className="card-front-side" 
+          className="card-front" 
           style={isCustomCard ? { background: card.bg } : {}}
         >
-          {isCustomCard && <div className="gloss-effect"></div>}
+          {isCustomCard && <div className="card-gloss-overlay"></div>}
 
-          <div className="card-header-row">
+          {/* HEADER FIXE */}
+          <div className="card-header-fixed">
             {isCustomCard ? (
-              <div className="bper-logo-custom">
+              <div className="bper-logo-custom" style={{ color: card.logoColor }}>
                 BPER<span>:</span> <small>Banca</small>
               </div>
             ) : (
               <div className="card-bank-default">BPER</div>
             )}
-            <Wifi size={24} className="wifi-icon" />
+            <Wifi size={20} className="wifi-icon-fixed" />
           </div>
 
-          <div className="chip-container">
+          {/* PUCE EMV (Taille bloquée pour éviter le désordre) */}
+          <div className="chip-container-fixed">
             <div className="emv-chip-real">
               <div className="chip-line-h"></div>
               <div className="chip-line-v"></div>
             </div>
           </div>
 
-          <div className="card-number-display">
+          <div className="card-number-fixed">
             {formatNumber(card.number)}
           </div>
 
-          <div className="card-footer-row">
-            <div className="info-group">
+          <div className="card-footer-fixed">
+            {/* BLOC TITULAIRE + STATUT */}
+            <div className="footer-left-side">
               <div className="holder-box">
-                <span className="label">TITULAIRE</span>
-                <strong className="value">{card.holder || "NOM CLIENT"}</strong>
+                <span className="label-mini">TITULAIRE</span>
+                <strong className="value-text">{card.holder || "NOM CLIENT"}</strong>
               </div>
 
-              <div className={`status-pill ${displayStatus.toLowerCase().replace(/\s/g, '-')}`}>
-                <span className="status-dot"></span>
+              <div className={`status-pill-bper ${displayStatus.toLowerCase().replace(/\s/g, '-')}`}>
+                <span className="dot-light"></span>
                 {statusText[displayStatus] || displayStatus}
               </div>
             </div>
 
+            {/* EXPIRATION */}
             <div className="exp-box">
-              <span className="label">EXP</span>
-              <strong className="value">{card.expiry || `${card.exp_month}/${card.exp_year}`}</strong>
+              <span className="label-mini">EXP</span>
+              <strong className="value-text">{card.expiry || `${card.exp_month}/${card.exp_year}`}</strong>
             </div>
 
-            <div className="mastercard-logo-css">
-              <div className="circle-red"></div>
-              <div className="circle-orange"></div>
+            {/* MASTERCARD (Dimensions strictes) */}
+            <div className="mastercard-fixed-box">
+              <div className="mc-c mc-r"></div>
+              <div className="mc-c mc-o"></div>
             </div>
           </div>
         </div>
 
-        {/* --- FACE ARRIÈRE --- */}
-        <div className="card-back-side" style={isCustomCard ? { background: card.bg } : {}}>
-          <div className="mag-stripe"></div>
-          <div className="cvv-area">
+        {/* --- FACE ARRIÈRE (SANS LOGOS) --- */}
+        <div className="card-back" style={isCustomCard ? { background: card.bg } : {}}>
+          <div className="magnetic-strip"></div>
+          <div className="cvv-section">
             <span>CVV</span>
             <strong>{card.cvv || "•••"}</strong>
           </div>
@@ -96,97 +100,73 @@ export default function BankCard({ card }) {
       </div>
 
       <style jsx>{`
-        /* FIX IPHONE : Dimensions forcées pour éviter le désordre */
-        .card-3d-container {
-          width: 100%;
-          max-width: 340px;
-          aspect-ratio: 1.58 / 1; /* Format carte bancaire standard */
-          perspective: 1000px;
-          margin: 0 auto;
+        /* RESET LOCAL POUR ÉVITER LE DÉSORDRE MOBILE */
+        .card-front, .card-front * { box-sizing: border-box; }
+        
+        .card-front {
+          padding: 18px !important;
+          display: flex !important;
+          flex-direction: column !important;
+          justify-content: space-between !important;
         }
 
-        .card-inner-3d {
-          position: relative;
-          width: 100%;
-          height: 100%;
-          transition: transform 0.6s;
-          transform-style: preserve-3d;
-        }
+        .card-header-fixed { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .card-bank-default { font-weight: bold; font-size: 18px; color: white; }
+        .wifi-icon-fixed { transform: rotate(90deg); color: white; opacity: 0.9; }
 
-        .card-3d-container.flipped .card-inner-3d { transform: rotateY(180deg); }
-
-        .card-front-side, .card-back-side {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          backface-visibility: hidden;
-          border-radius: 12px;
-          padding: 18px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          box-sizing: border-box; /* Crucial pour iPhone */
-          overflow: hidden;
-          box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-
-        .card-back-side { transform: rotateY(180deg); background: #222; }
-
-        /* HEADER */
-        .card-header-row { display: flex; justify-content: space-between; align-items: center; }
-        .bper-logo-custom { font-weight: 900; font-size: 18px; color: white; }
-        .bper-logo-custom span { color: #a3e635; }
-        .card-bank-default { font-weight: bold; font-size: 20px; color: white; }
-        .wifi-icon { color: white; transform: rotate(90deg); opacity: 0.9; }
-
-        /* PUCE */
+        .chip-container-fixed { margin-top: 5px; }
         .emv-chip-real {
-          width: 40px; height: 30px;
+          width: 38px; height: 28px;
           background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
-          border-radius: 4px; position: relative;
+          border-radius: 4px; position: relative; border: 0.5px solid rgba(0,0,0,0.2);
         }
+        .chip-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: rgba(0,0,0,0.2); }
+        .chip-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: rgba(0,0,0,0.2); }
 
-        /* NUMÉRO */
-        .card-number-display {
-          font-family: 'Courier New', monospace;
-          font-size: clamp(16px, 5vw, 20px);
+        .card-number-fixed {
+          font-size: 17px;
+          letter-spacing: 1.5px;
           color: white;
-          letter-spacing: 2px;
-          margin-top: 10px;
+          font-family: 'Courier New', monospace;
+          margin: 10px 0;
         }
 
-        /* FOOTER & STATUT */
-        .card-footer-row { display: flex; justify-content: space-between; align-items: flex-end; }
-        .info-group { display: flex; flex-direction: column; gap: 8px; }
-        .label { font-size: 8px; opacity: 0.7; color: white; display: block; }
-        .value { font-size: 11px; color: white; display: block; }
+        .card-footer-fixed {
+          display: flex !important;
+          align-items: flex-end !important;
+          justify-content: space-between !important;
+          width: 100% !important;
+        }
 
-        .status-pill {
+        .footer-left-side { display: flex; flex-direction: column; gap: 6px; }
+        .label-mini { display: block; font-size: 7px; opacity: 0.7; margin-bottom: 2px; color: white; }
+        .value-text { font-size: 10px; color: white; text-transform: uppercase; }
+
+        /* STATUT PILULE */
+        .status-pill-bper {
           display: inline-flex; align-items: center; gap: 5px;
-          padding: 2px 8px; background: rgba(0,0,0,0.5);
-          border-radius: 10px; border: 0.5px solid rgba(255,255,255,0.2);
-          font-size: 8px; font-weight: bold; color: white; width: fit-content;
+          padding: 2px 8px; background: rgba(0,0,0,0.3);
+          border-radius: 12px; font-size: 8px; font-weight: bold; color: white;
+          border: 0.5px solid rgba(255,255,255,0.1);
         }
-        .status-dot { width: 5px; height: 5px; border-radius: 50%; }
-        .en-cours .status-dot { background: #fbbf24; box-shadow: 0 0 5px #fbbf24; animation: blink 2s infinite; }
-        .active .status-dot { background: #4ade80; box-shadow: 0 0 5px #4ade80; }
-
+        .dot-light { width: 5px; height: 5px; border-radius: 50%; }
+        .en-cours .dot-light, .active .dot-light { animation: blink 2s infinite; box-shadow: 0 0 5px currentColor; }
+        .en-cours .dot-light { background: #fbbf24; color: #fbbf24; }
+        .active .dot-light { background: #4ade80; color: #4ade80; }
+        .blocked .dot-light { background: #f87171; color: #f87171; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* MASTERCARD LOGO CSS EXACT */
-        .mastercard-logo-css { position: relative; width: 42px; height: 26px; margin-left: auto; }
-        .circle-red, .circle-orange { width: 26px; height: 26px; border-radius: 50%; position: absolute; }
-        .circle-red { background: #eb001b; left: 0; }
-        .circle-orange { background: #ff5f00; right: 0; opacity: 0.92; }
+        /* MASTERCARD LOGO */
+        .mastercard-fixed-box { position: relative; width: 42px; height: 26px; min-width: 42px; }
+        .mc-c { width: 26px; height: 26px; border-radius: 50%; position: absolute; }
+        .mc-r { background: #eb001b; left: 0; z-index: 1; }
+        .mc-o { background: #ff5f00; right: 0; z-index: 2; opacity: 0.9; }
 
-        /* VERSO */
-        .mag-stripe { background: #000; height: 40px; width: 100%; margin: 10px -18px; }
-        .cvv-area { background: white; padding: 5px 10px; border-radius: 4px; color: black; text-align: right; width: 60px; margin-left: auto; }
-
-        .gloss-effect {
-          position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-          background: linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.1) 48%, rgba(255,255,255,0) 52%);
-          pointer-events: none;
+        /* FIX POUR MOBILE */
+        @media (max-width: 768px) {
+          .card-number-fixed { font-size: 15px; }
+          .value-text { font-size: 9px; }
+          .card-front { padding: 15px !important; }
         }
       `}</style>
     </div>
