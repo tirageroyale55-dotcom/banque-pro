@@ -154,30 +154,32 @@ export default function BankCard({ card }) {
           pointer-events: none; z-index: 1;
         }
 
-        /* Ajoute ou modifie ces règles dans ton bloc <style jsx> */
-
+        /* 1. Force la séparation des faces pour Safari */
 .card-inner {
   position: relative;
   width: 100%;
   height: 100%;
   transition: transform 0.6s;
-  transform-style: preserve-3d; /* Indispensable pour le 3D */
+  transform-style: preserve-3d; /* CRITIQUE */
 }
 
+/* 2. Cache l'envers de chaque face pendant la rotation */
 .card-front, .card-back {
   position: absolute;
   width: 100%;
   height: 100%;
-  -webkit-backface-visibility: hidden; /* Pour Safari/iPhone */
-  backface-visibility: hidden;         /* Cache la face quand elle est retournée */
-  overflow: hidden;                     /* Empêche les débordements de logo */
+  -webkit-backface-visibility: hidden; /* CRITIQUE POUR IPHONE */
+  backface-visibility: hidden;         /* CRITIQUE */
+  -webkit-transform-style: preserve-3d;
 }
 
+/* 3. Assure-toi que la face arrière est bien retournée par défaut */
 .card-back {
-  transform: rotateY(180deg); /* Le verso doit être retourné de base */
+  transform: rotateY(180deg);
+  z-index: 1;
 }
 
-/* Force le logo à rester sur son plan */
+/* 4. Correction spécifique pour le logo Mastercard qui "flotte" */
 .mastercard-fixed-layout {
   position: relative; 
   width: 45px; 
@@ -185,7 +187,8 @@ export default function BankCard({ card }) {
   display: flex; 
   align-items: center; 
   margin-left: 10px;
-  transform: translateZ(1px); /* Force le logo à être "posé" sur le recto */
+  /* Ajoute ceci pour éviter que le logo ne reste au-dessus du verso */
+  transform: translateZ(1px); 
 }
       `}</style>
     </div>
