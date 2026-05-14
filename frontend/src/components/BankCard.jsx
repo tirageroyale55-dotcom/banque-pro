@@ -13,7 +13,6 @@ export default function BankCard({ card }) {
   };
 
   const rawStatus = card.status || "inactive";
-  // On s'assure que "En cours d'investigation" devient bien "EN COURS"
   const isPending = rawStatus === "En cours d'investigation" || rawStatus === "EN COURS";
   const displayStatus = isPending ? "EN COURS" : rawStatus;
 
@@ -32,7 +31,7 @@ export default function BankCard({ card }) {
       onClick={() => setFlipped(!flipped)}
     >
       <div className="card-inner">
-        {/* --- FACE AVANT (RECTO) --- */}
+        {/* --- FACE AVANT (RECTO) : LOGO MASTERCARD PRÉSENT --- */}
         <div 
           className="card-front" 
           style={isCustomCard ? { background: card.bg } : {}}
@@ -79,7 +78,7 @@ export default function BankCard({ card }) {
               <strong>{card.expiry || `${card.exp_month}/${card.exp_year}`}</strong>
             </div>
 
-            {/* LOGO MASTERCARD CSS : Taille et forme exactes */}
+            {/* LOGO MASTERCARD : UNIQUEMENT ICI SUR LE RECTO */}
             <div className="mastercard-fixed-layout">
               <div className="mc-circle mc-red"></div>
               <div className="mc-circle mc-orange"></div>
@@ -87,58 +86,18 @@ export default function BankCard({ card }) {
           </div>
         </div>
 
-        {/* --- FACE ARRIÈRE (VERSO) --- */}
-        {/* Ici, on ne met ABSOLUMENT RIEN qui ressemble à un logo */}
+        {/* --- FACE ARRIÈRE (VERSO) : AUCUN LOGO MASTERCARD --- */}
         <div className="card-back" style={isCustomCard ? { background: card.bg } : {}}>
           <div className="magnetic"></div>
           <div className="cvv-box">
             <span>CVV</span>
             <strong>{card.cvv || "•••"}</strong>
           </div>
-          {/* NETTOYAGE COMPLET DU VERSO */}
+          {/* Le logo Mastercard a été supprimé d'ici pour toutes les versions */}
         </div>
       </div>
 
-      <style jsx>{`
-        /* Style identique Mobile & Desktop */
-        .footer-left-group { display: flex; flex-direction: column; gap: 5px; flex: 1; }
-        
-        .status-badge-bper {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 3px 10px;
-          background: rgba(0, 0, 0, 0.4);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 12px;
-          font-size: 8px;
-          font-weight: 800;
-          color: white;
-        }
-
-        .dot-light { width: 6px; height: 6px; border-radius: 50%; }
-        .en-cours .dot-light { background: #fbbf24; animation: blink 2s infinite; }
-        .active .dot-light { background: #4ade80; animation: blink 2s infinite; }
-        
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        .emv-chip-real {
-          width: 40px; height: 30px;
-          background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
-          border-radius: 5px; position: relative;
-        }
-
-        /* LOGO MASTERCARD CSS : Positionné uniquement dans le footer du recto */
-        .mastercard-fixed-layout {
-          position: relative; width: 45px; height: 28px;
-          display: flex; align-items: center;
-        }
-        .mc-circle { width: 28px; height: 28px; border-radius: 50%; position: absolute; }
-        .mc-red { background: #eb001b; left: 0; z-index: 1; }
-        .mc-orange { background: #ff5f00; right: 0; z-index: 2; opacity: 0.92; }
-
-        .nfc-icon-all { opacity: 0.8; transform: rotate(90deg); color: white; }
-      `}</style>
+      
     </div>
   );
 }
