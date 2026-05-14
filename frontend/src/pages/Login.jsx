@@ -58,8 +58,6 @@ export default function Login() {
   setLoading(true); 
   setError("");     
 
-  const timer = new Promise((resolve) => setTimeout(resolve, 5000));
-  
   try {
     const res = await api("/auth/login", "POST", { personalId, pin });
     
