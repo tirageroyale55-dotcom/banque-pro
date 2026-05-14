@@ -157,63 +157,56 @@ export default function BankCard({ card }) {
         }
 
         /* 1. Force la séparation des faces pour Safari */
-.card-3d {
-    perspective: 1000px; /* Ajoute de la profondeur */
-    width: 100%;
-    max-width: 340px;
-    height: 200px;
-  }
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d; /* CRITIQUE */
+}
 
-  .card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-style: preserve-3d;
-    /* Force l'iPhone à créer un nouveau contexte de rendu */
-    isolation: isolate; 
-  }
+/* 2. Cache l'envers de chaque face pendant la rotation */
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* CRITIQUE POUR IPHONE */
+  backface-visibility: hidden;         /* CRITIQUE */
+  -webkit-transform-style: preserve-3d;
+}
 
-  .flipped .card-inner {
-    transform: rotateY(180deg);
-  }
+/* 3. Assure-toi que la face arrière est bien retournée par défaut */
+.card-back {
+  transform: rotateY(180deg);
+  z-index: 1;
+}
 
-  .card-front, .card-back {
-    position: absolute;
-    inset: 0; /* Prend toute la place */
-    -webkit-backface-visibility: hidden !important;
-    backface-visibility: hidden !important;
-    border-radius: 15px;
-    overflow: hidden;
-    /* Empêche les fuites de pixels sur Safari */
-    -webkit-transform-style: preserve-3d;
-    transform-style: preserve-3d;
-  }
+/* 4. Correction spécifique pour le logo Mastercard qui "flotte" */
+.mastercard-fixed-layout {
+  position: relative; 
+  width: 45px; 
+  height: 28px;
+  display: flex; 
+  align-items: center; 
+  margin-left: 10px;
+  opacity: 0.99;
+  
+  /* --- CORRECTION ULTIME DESYNCHRO IPHONE --- */
+  
+  /* 1. On le rend invisible mais présent (ne retire pas du DOM) */
+  visibility: visible; 
+  
+  /* 2. Cache l'envers, critique pour Safari */
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+  
+  /* 3. Force une couche de rendu distincte pour chaque face */
+  -webkit-transform: translateZ(1px);
+  transform: translateZ(1px); 
 
-  .card-front {
-    z-index: 2;
-    transform: rotateY(0deg);
-  }
-
-  .card-back {
-    z-index: 1;
-    transform: rotateY(180deg);
-  }
-
-  /* LE LOGO : On lui donne sa propre couche isolée */
-  .mastercard-fixed-layout {
-    position: relative;
-    width: 45px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    margin-left: 10px;
-    /* Indique à l'iPhone de ne pas mettre cet élément en cache avec le fond */
-    will-change: transform, opacity;
-    /* On l'enfonce très légèrement dans la carte */
-    transform: translateZ(0.1px); 
-    -webkit-transform: translateZ(0.1px);
-  }
+  /* 4. Désactive les interactions pour éviter les bugs de clic */
+  pointer-events: none; 
+}
       `}</style>
     </div>
   );
