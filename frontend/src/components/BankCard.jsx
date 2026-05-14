@@ -31,8 +31,7 @@ export default function BankCard({ card }) {
       onClick={() => setFlipped(!flipped)}
     >
       <div className="card-inner">
-        
-        {/* --- FACE AVANT (RECTO) --- */}
+        {/* --- FACE AVANT (RECTO) : Identique partout --- */}
         <div 
           className="card-front" 
           style={isCustomCard ? { background: card.bg } : {}}
@@ -74,13 +73,12 @@ export default function BankCard({ card }) {
               </div>
             </div>
 
-            {/* EXP : Ajouté et fixé pour la carte personnalisée */}
             <div className="exp-section">
               <span>EXP</span>
               <strong>{card.expiry || `${card.exp_month}/${card.exp_year}`}</strong>
             </div>
 
-            {/* Logo Mastercard : PRÉSENT UNIQUEMENT ICI */}
+            {/* Mastercard UNIQUEMENT sur le RECTO */}
             <div className="mastercard-css-wrapper">
               <div className="mc-circle mc-red"></div>
               <div className="mc-circle mc-orange"></div>
@@ -95,12 +93,20 @@ export default function BankCard({ card }) {
             <span>CVV</span>
             <strong>{card.cvv || "•••"}</strong>
           </div>
-          {/* Le logo Mastercard est volontairement absent ici pour la sécurité */}
+          {/* Le logo Mastercard a été retiré d'ici pour respecter tes consignes */}
         </div>
       </div>
 
       <style jsx>{`
-        /* STYLE IDENTIQUE MOBILE & DESKTOP */
+        /* FORCER LE MÊME STYLE MOBILE ET DESKTOP */
+        .card-front, .card-back {
+          padding: 20px !important;
+          display: flex !important;
+          flex-direction: column !important;
+          justify-content: space-between !important;
+          box-sizing: border-box !important;
+        }
+
         .footer-left-group { display: flex; flex-direction: column; gap: 6px; flex: 1; }
         
         .status-badge-bper {
@@ -118,17 +124,25 @@ export default function BankCard({ card }) {
         }
 
         .dot-light { width: 6px; height: 6px; border-radius: 50%; }
-        .en-cours .dot-light, .active .dot-light { animation: blink 2s infinite; box-shadow: 0 0 6px currentColor; }
+
+        .en-cours .dot-light, .active .dot-light { 
+          animation: blink 2s infinite;
+          box-shadow: 0 0 6px currentColor;
+        }
         .en-cours .dot-light { background: #fbbf24; color: #fbbf24; }
         .active .dot-light { background: #4ade80; color: #4ade80; }
-        
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .blocked .dot-light { background: #f87171; color: #f87171; }
+
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
         .emv-chip-real {
           width: 40px; height: 30px;
           background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
           border-radius: 6px; position: relative;
+          border: 0.5px solid rgba(0,0,0,0.2);
         }
+        .chip-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: rgba(0,0,0,0.2); }
+        .chip-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: rgba(0,0,0,0.2); }
 
         .mastercard-css-wrapper {
           position: relative; width: 45px; height: 28px;
@@ -141,14 +155,16 @@ export default function BankCard({ card }) {
         .nfc-icon-custom { opacity: 0.8; transform: rotate(90deg); color: white; }
         .bper-logo-custom { font-weight: 900; font-size: 19px; }
         .bper-logo-custom span { color: #a3e635; }
-        
-        .exp-section span { display: block; font-size: 8px; opacity: 0.8; margin-bottom: 2px; }
-        .exp-section strong { font-size: 11px; color: white; }
 
-        /* Synchronisation parfaite Mobile/Desktop */
-        @media (max-width: 1000px) {
-          .card-front, .card-back { padding: 20px; }
-          .card-number { font-size: 1.1rem; letter-spacing: 2px; }
+        .card-gloss-overlay {
+          position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+          background: linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.08) 48%, rgba(255,255,255,0) 52%);
+          pointer-events: none; z-index: 1;
+        }
+
+        /* Désactiver les changements de padding sur mobile pour garder l'unité */
+        @media (max-width: 768px) {
+          .card-front, .card-back { padding: 20px !important; }
         }
       `}</style>
     </div>
