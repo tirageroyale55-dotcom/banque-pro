@@ -10,6 +10,8 @@ export default function Login() {
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
+  
+  const [loading, setLoading] = useState(false); 
 
   const handleForgotId = () => {
     navigate("/forgot-id");
@@ -51,36 +53,38 @@ export default function Login() {
 
   // ===== LOGIN PIN SUBMIT =====
   const submitPin = async () => {
-    if (pin.length !== 5) return;
+  if (pin.length !== 5) return;
 
-    try {
-      const res = await api("/auth/login", "POST", { personalId, pin });
-      
-      console.log("LOGIN RESPONSE:", res);
+  setLoading(true); // 1. On lance le chargement
+  setError("");     // On efface les erreurs précédentes
 
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("user", JSON.stringify(res.user));
+  try {
+    const res = await api("/auth/login", "POST", { personalId, pin });
+    
+    // Si succès, on stocke et on redirige
+    localStorage.setItem("token", res.token);
+    localStorage.setItem("user", JSON.stringify(res.user));
 
-      if (res.user.role === "ADMIN") {
-        navigate("/admin");
-      } else {
-        navigate("/welcome", { state: { user: res.user } });
-      }
+    if (res.user.role === "ADMIN") {
+      navigate("/admin");
+    } else {
+      navigate("/welcome", { state: { user: res.user } });
+    }
+    // Note : Pas besoin de remettre loading à false ici car on change de page
+  } catch (err) {
+    const message = err.message || "Erreur";
+    
+    setLoading(false); // 2. En cas d'erreur, on arrête le chargement pour montrer l'erreur
+    
+    if (err.status === 403 && message.includes("bloqué")) {
+      navigate("/blocked");
+      return;
+    }
 
-    } catch (err) {
-
-  const message = err.message || "Erreur";
-
-  // 🚨 SI BLOQUÉ → REDIRECTION
-  if (err.status === 403 && message.includes("bloqué")) {
-    navigate("/blocked");
-    return;
+    setError(message);
+    setPin("");
   }
-
-  setError(message);
-  setPin("");
-}
-  };
+};
 
   // ===== AUTOMATIQUE : dès 5 chiffres, submit =====
   useEffect(() => {
@@ -88,6 +92,46 @@ export default function Login() {
       submitPin();
     }
   }, [pin, step]); // déclenche submit automatiquement
+
+  if (loading) {
+  return (
+    <div className="bper-confirmation-screen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f8fafc' }}>
+      <div style={{ textAlign: 'center' }}>
+        <svg 
+          width="80" height="80" viewBox="0 0 24 24" fill="none" 
+          stroke="#005a64" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+          className="drawing-svg"
+        >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" className="draw-path shield-path" />
+          <path d="m9 12 2 2 4-4" className="draw-path check-path" />
+        </svg>
+        <p style={{ marginTop: '20px', color: '#005a64', fontWeight: '800', fontSize: '14px', letterSpacing: '1px', textTransform: 'uppercase' }}>
+          Vérification de votre compte...
+        </p>
+      </div>
+      <style>{`
+        .drawing-svg { filter: drop-shadow(0 4px 6px rgba(0, 90, 100, 0.1)); }
+        .draw-path { stroke-dasharray: 100; stroke-dashoffset: 100; animation: draw 2.5s ease-in-out infinite; }
+        .shield-path { animation-delay: 0s; }
+        .check-path { stroke-dasharray: 20; stroke-dashoffset: 20; animation: draw-check 2.5s ease-in-out infinite; animation-delay: 0.5s; }
+        @keyframes draw { 
+          0% { stroke-dashoffset: 100; opacity: 0; } 
+          20% { opacity: 1; } 
+          50% { stroke-dashoffset: 0; } 
+          80% { opacity: 1; } 
+          100% { stroke-dashoffset: 0; opacity: 0; } 
+        }
+        @keyframes draw-check { 
+          0% { stroke-dashoffset: 20; opacity: 0; } 
+          30% { stroke-dashoffset: 20; opacity: 0; } 
+          60% { stroke-dashoffset: 0; opacity: 1; } 
+          80% { opacity: 1; } 
+          100% { stroke-dashoffset: 0; opacity: 0; } 
+        }
+      `}</style>
+    </div>
+  );
+}
 
   return (
     <div className="apply-bg login-page">
