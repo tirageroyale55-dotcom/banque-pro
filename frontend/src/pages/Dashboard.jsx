@@ -308,26 +308,31 @@ const profileImage = userInfo.profilePicture || null;
         {activeTab === "profile" && <div className="content">Mon Profil</div>}
 
         {activeTab === "cards" && (
-  <div className="cards-section-desktop">
+  <div className="cards-section">
     <h3 className="cards-title">Mes cartes</h3>
-    <div className="desktop-cards-grid">
-      {/* 1. CARTE PRINCIPALE (Inchangée) */}
-      {card && <BankCard card={card}/>}
-      
-      {/* 2. LOGIQUE DEMANDE EN COURS (CardRequest) */}
+    <div className="cards-slider">
+      {/* Carte principale */}
+      {card && (
+        <div className="cards-slide">
+          <BankCard card={card}/>
+        </div>
+      )}
+
+      {/* Remplacement du bouton + par la carte choisie dans CardOrderConfirmation */}
       {pendingCard ? (
   <div className="cards-slide"> {/* Supprimé le style relative et l'overlay ici */}
     <BankCard card={pendingCard} />
   </div>
 ) : (
-        /* Si aucune demande, on affiche le bouton de création */
-        <div className="card-request-desktop" onClick={() => navigate("/request-card")}>
-          <div className="card-plus">+</div>
-          <p>Demander une carte</p>
+        <div className="cards-slide card-request" onClick={() => navigate("/request-card")}>
+          <div className="card-request-inner">
+            <div className="card-plus">+</div>
+            <p>Demander une carte</p>
+          </div>
         </div>
       )}
     </div>
-    <CardCatalog /> 
+    <CardCatalog />
   </div>
 )}
         {activeTab === "financing" && (
