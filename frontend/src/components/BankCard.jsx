@@ -31,7 +31,7 @@ export default function BankCard({ card }) {
       onClick={() => setFlipped(!flipped)}
     >
       <div className="card-inner">
-        {/* --- FACE AVANT (RECTO) --- */}
+        {/* --- FACE AVANT (RECTO) : LOGO MASTERCARD PRÉSENT --- */}
         <div 
           className="card-front" 
           style={isCustomCard ? { background: card.bg } : {}}
@@ -78,31 +78,26 @@ export default function BankCard({ card }) {
               <strong>{card.expiry || `${card.exp_month}/${card.exp_year}`}</strong>
             </div>
 
-            {/* LOGO MASTERCARD POSITIONNÉ DANS LE RECTO */}
-            <div className="mastercard-front-only">
+            {/* LOGO MASTERCARD : UNIQUEMENT ICI SUR LE RECTO */}
+            <div className="mastercard-fixed-layout">
               <div className="mc-circle mc-red"></div>
               <div className="mc-circle mc-orange"></div>
             </div>
           </div>
         </div>
 
-        {/* --- FACE ARRIÈRE (VERSO) --- */}
+        {/* --- FACE ARRIÈRE (VERSO) : AUCUN LOGO MASTERCARD --- */}
         <div className="card-back" style={isCustomCard ? { background: card.bg } : {}}>
           <div className="magnetic"></div>
           <div className="cvv-box">
             <span>CVV</span>
             <strong>{card.cvv || "•••"}</strong>
           </div>
-          {/* LOGO MASTERCARD SUPPRIMÉ DU HTML ICI */}
+          {/* Le logo Mastercard a été supprimé d'ici pour toutes les versions */}
         </div>
       </div>
 
       <style jsx>{`
-        /* SOLUTION : On s'assure que le logo ne peut pas exister au verso */
-        .card-back .mastercard-front-only {
-          display: none !important;
-        }
-
         .footer-left-group { display: flex; flex-direction: column; gap: 5px; flex: 1; }
         
         .status-badge-bper {
@@ -116,6 +111,7 @@ export default function BankCard({ card }) {
           font-size: 8px;
           font-weight: 800;
           color: white;
+          width: fit-content;
         }
 
         .dot-light { width: 6px; height: 6px; border-radius: 50%; }
@@ -127,10 +123,10 @@ export default function BankCard({ card }) {
         .en-cours .dot-light { background: #fbbf24; color: #fbbf24; }
         .active .dot-light { background: #4ade80; color: #4ade80; }
         .blocked .dot-light { background: #f87171; color: #f87171; }
+        .inactive .dot-light { background: #94a3b8; }
 
         @keyframes blink-status { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* DESIGN PUCE EMV */
         .emv-chip-real {
           width: 40px; height: 30px;
           background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
@@ -140,8 +136,8 @@ export default function BankCard({ card }) {
         .chip-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: rgba(0,0,0,0.2); }
         .chip-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: rgba(0,0,0,0.2); }
 
-        /* DESIGN MASTERCARD (RECTO SEULEMENT) */
-        .mastercard-front-only {
+        /* TAILLE EXACTE MASTERCARD */
+        .mastercard-fixed-layout {
           position: relative; width: 45px; height: 28px;
           display: flex; align-items: center; margin-left: 10px;
         }
@@ -152,18 +148,10 @@ export default function BankCard({ card }) {
         .nfc-icon-all { opacity: 0.8; transform: rotate(90deg); color: white; }
         .bper-logo-custom { font-weight: 900; font-size: 19px; }
         .bper-logo-custom span { color: #a3e635; }
-
-        /* Glossy overlay */
         .card-gloss-overlay {
           position: absolute; top: 0; left: 0; width: 100%; height: 100%;
           background: linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.08) 48%, rgba(255,255,255,0) 52%);
-          pointer-events: none;
-        }
-
-        /* IDENTITÉ STRICTE MOBILE/DESKTOP */
-        @media (max-width: 1000px) {
-           /* On s'assure qu'aucun style mobile ne fait réapparaître le logo au verso */
-           .card-back .mastercard-front-only { display: none !important; }
+          pointer-events: none; z-index: 1;
         }
       `}</style>
     </div>
