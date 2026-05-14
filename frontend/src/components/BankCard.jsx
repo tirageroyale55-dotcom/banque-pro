@@ -13,7 +13,7 @@ export default function BankCard({ card }) {
   };
 
   const rawStatus = card.status || "inactive";
-  const isPending = rawStatus === "En cours d'investigation" || rawStatus === "EN COURS";
+  const isPending = rawStatus === "En cours d'investigation" || rawStatus === "EN COURS" || rawStatus === "pending";
   const displayStatus = isPending ? "EN COURS" : rawStatus;
 
   const statusText = {
@@ -27,71 +27,73 @@ export default function BankCard({ card }) {
 
   return (
     <div
-      className={`card-3d ${flipped ? "flipped" : ""} ${rawStatus}`}
+      className={`bank-card-container ${flipped ? "flipped" : ""} ${rawStatus}`}
       onClick={() => setFlipped(!flipped)}
     >
-      <div className="card-inner">
+      <div className="card-inner-3d">
         {/* --- FRONT --- */}
         <div 
-          className="card-front" 
+          className="card-face-front" 
           style={isCustomCard ? { background: card.bg } : {}}
         >
-          {isCustomCard && <div className="card-gloss-overlay"></div>}
+          {isCustomCard && <div className="gloss-overlay"></div>}
 
-          <div className="card-header">
+          {/* HEADER : Logo + Wifi */}
+          <div className="card-top-header">
             {isCustomCard ? (
-              <div className="bper-logo-custom" style={{ color: card.logoColor }}>
+              <div className="bper-brand-custom" style={{ color: card.logoColor }}>
                 BPER<span>:</span> <small>Banca</small>
               </div>
             ) : (
-              <div className="card-bank">BPER</div>
+              <div className="card-bank-label">BPER</div>
             )}
-            <Wifi size={22} className="nfc-icon-all" />
+            <Wifi size={24} className="nfc-icon-fixed" />
           </div>
 
-          <div className="chip-area">
-            <div className="emv-chip-real">
+          {/* PUCE EMV RÉALISTE */}
+          <div className="chip-container">
+            <div className="real-emv-chip">
               <div className="chip-line-h"></div>
               <div className="chip-line-v"></div>
             </div>
           </div>
 
-          <div className="card-number">
+          {/* NUMÉRO DE CARTE */}
+          <div className="card-number-display">
             {formatNumber(card.number)}
           </div>
 
-          <div className="card-footer">
-            {/* FOOTER GAUCHE : NOM + STATUT */}
-            <div className="footer-main-info">
+          {/* FOOTER : NOM + STATUT + EXP + MASTERCARD */}
+          <div className="card-bottom-footer">
+            <div className="footer-left-info">
               <div className="holder-block">
-                <span className="label-tiny">TITULAIRE</span>
-                <strong className="value-name">{card.holder || "NOM CLIENT"}</strong>
+                <span>TITULAIRE</span>
+                <strong>{card.holder || "NOM CLIENT"}</strong>
               </div>
 
-              <div className={`status-badge-bper ${displayStatus.toLowerCase().replace(/\s/g, '-')}`}>
-                <span className="dot-light"></span>
+              <div className={`status-pill ${displayStatus.toLowerCase().replace(/\s/g, '-')}`}>
+                <span className="light-indicator"></span>
                 {statusText[displayStatus] || displayStatus}
               </div>
             </div>
 
-            {/* EXPIRATION */}
-            <div className="exp-block">
-              <span className="label-tiny">EXP</span>
-              <strong className="value-exp">{card.expiry || `${card.exp_month}/${card.exp_year}`}</strong>
+            <div className="expiration-block">
+              <span>EXP</span>
+              <strong>{card.expiry || `${card.exp_month}/${card.exp_year}`}</strong>
             </div>
 
-            {/* LOGO MASTERCARD RECTO SEUL */}
-            <div className="mastercard-fixed">
-              <div className="mc-circle mc-red"></div>
-              <div className="mc-circle mc-orange"></div>
+            {/* LOGO MASTERCARD CSS EXACT */}
+            <div className="mastercard-logo-css">
+              <div className="mc-circle-red"></div>
+              <div className="mc-circle-orange"></div>
             </div>
           </div>
         </div>
 
         {/* --- BACK (CVV) --- */}
-        <div className="card-back" style={isCustomCard ? { background: card.bg } : {}}>
-          <div className="magnetic"></div>
-          <div className="cvv-box">
+        <div className="card-face-back" style={isCustomCard ? { background: card.bg } : {}}>
+          <div className="magnetic-stripe"></div>
+          <div className="cvv-signature-box">
             <span>CVV</span>
             <strong>{card.cvv || "•••"}</strong>
           </div>
@@ -99,74 +101,120 @@ export default function BankCard({ card }) {
       </div>
 
       <style jsx>{`
-        /* FORCER LE MÊME RENDU MOBILE ET DESKTOP */
-        .card-front {
+        /* STRUCTURE DE BASE IDENTIQUE MOBILE/DESKTOP */
+        .bank-card-container {
+          width: 100%;
+          max-width: 350px;
+          aspect-ratio: 1.58 / 1;
+          perspective: 1000px;
+          cursor: pointer;
+          margin: 0 auto;
+        }
+
+        .card-inner-3d {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          transition: transform 0.6s;
+          transform-style: preserve-3d;
+        }
+
+        .flipped .card-inner-3d { transform: rotateY(180deg); }
+
+        .card-face-front, .card-face-back {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          backface-visibility: hidden;
+          border-radius: 15px;
+          padding: 20px;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          padding: 20px !important;
-          box-sizing: border-box;
+          background: #005a64; /* Couleur par défaut */
+          box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+          overflow: hidden;
         }
 
-        .card-footer {
-          display: flex !important;
-          flex-direction: row !important;
-          align-items: flex-end !important;
-          justify-content: space-between !important;
-          width: 100%;
-          margin-top: auto;
+        .card-face-back { transform: rotateY(180deg); background: #004a52; }
+
+        /* HEADER */
+        .card-top-header { display: flex; justify-content: space-between; align-items: center; }
+        .bper-brand-custom { font-weight: 900; font-size: 20px; color: white; }
+        .bper-brand-custom span { color: #a3e635; }
+        .card-bank-label { color: white; font-weight: bold; font-size: 18px; }
+        .nfc-icon-fixed { color: white; transform: rotate(90deg); opacity: 0.9; }
+
+        /* CHIP */
+        .real-emv-chip {
+          width: 42px; height: 32px;
+          background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
+          border-radius: 6px; position: relative;
+        }
+        .chip-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: rgba(0,0,0,0.2); }
+        .chip-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: rgba(0,0,0,0.2); }
+
+        /* NUMBER */
+        .card-number-display {
+          color: white;
+          font-family: 'Courier New', monospace;
+          font-size: 1.3rem;
+          letter-spacing: 2px;
+          text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+          margin: 10px 0;
         }
 
-        .footer-main-info {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .label-tiny { display: block; font-size: 8px; opacity: 0.7; margin-bottom: 2px; }
-        .value-name, .value-exp { font-size: 11px; white-space: nowrap; }
+        /* FOOTER */
+        .card-bottom-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+        .footer-left-info { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .holder-block span, .expiration-block span { font-size: 8px; color: rgba(255,255,255,0.8); display: block; }
+        .holder-block strong, .expiration-block strong { color: white; font-size: 12px; }
 
         /* STATUT LUMINEUX */
-        .status-badge-bper {
+        .status-pill {
           display: inline-flex;
           align-items: center;
-          gap: 5px;
-          padding: 3px 8px;
-          background: rgba(0, 0, 0, 0.4);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 12px;
-          font-size: 8px;
-          font-weight: 800;
+          gap: 6px;
+          padding: 3px 10px;
+          background: rgba(0,0,0,0.4);
+          border-radius: 20px;
           color: white;
+          font-size: 9px;
+          font-weight: bold;
+          width: fit-content;
+          border: 1px solid rgba(255,255,255,0.1);
         }
+        .light-indicator { width: 6px; height: 6px; border-radius: 50%; }
+        .active .light-indicator { background: #4ade80; box-shadow: 0 0 6px #4ade80; animation: blink 2s infinite; }
+        .en-cours .light-indicator { background: #fbbf24; box-shadow: 0 0 6px #fbbf24; animation: blink 2s infinite; }
+        .blocked .light-indicator { background: #f87171; }
 
-        .dot-light { width: 6px; height: 6px; border-radius: 50%; }
-        .active .dot-light { background: #4ade80; box-shadow: 0 0 6px #4ade80; animation: blink 2s infinite; }
-        .en-cours .dot-light { background: #fbbf24; box-shadow: 0 0 6px #fbbf24; animation: blink 2s infinite; }
-        
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* PUCE EMV */
-        .emv-chip-real {
-          width: 40px; height: 30px;
-          background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%);
-          border-radius: 5px; position: relative;
+        /* MASTERCARD EXACT CSS */
+        .mastercard-logo-css {
+          position: relative; width: 45px; height: 28px; display: flex; align-items: center;
+        }
+        .mc-circle-red, .mc-circle-orange { width: 28px; height: 28px; border-radius: 50%; position: absolute; }
+        .mc-circle-red { background: #eb001b; left: 0; }
+        .mc-circle-orange { background: #ff5f00; right: 0; opacity: 0.9; }
+
+        /* BACK FACE SPECIFICS */
+        .magnetic-stripe { width: 110%; height: 40px; background: #111; margin: 10px -20px; }
+        .cvv-signature-box { background: white; height: 35px; width: 80%; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: black; border-radius: 4px; }
+
+        .gloss-overlay {
+          position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+          background: linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.1) 48%, rgba(255,255,255,0) 52%);
+          pointer-events: none;
         }
 
-        /* MASTERCARD LOGO (Recto seulement) */
-        .mastercard-fixed {
-          position: relative;
-          width: 45px;
-          height: 28px;
-          flex-shrink: 0;
+        /* MOBILE ADJUSTMENTS (Garde la proportion mais réduit légèrement les textes si besoin) */
+        @media (max-width: 480px) {
+          .card-number-display { font-size: 1.1rem; }
+          .card-face-front { padding: 15px; }
+          .status-pill { font-size: 8px; }
         }
-        .mc-circle { width: 26px; height: 26px; border-radius: 50%; position: absolute; top: 0; }
-        .mc-red { background: #eb001b; left: 0; z-index: 1; }
-        .mc-orange { background: #ff5f00; right: 0; opacity: 0.9; }
-
-        .nfc-icon-all { transform: rotate(90deg); opacity: 0.8; }
-        .bper-logo-custom { font-weight: 900; font-size: 19px; }
-        .bper-logo-custom span { color: #a3e635; }
       `}</style>
     </div>
   );
