@@ -78,11 +78,13 @@ export default function BankCard({ card }) {
               <strong>{card.expiry || `${card.exp_month}/${card.exp_year}`}</strong>
             </div>
 
-            {/* LOGO MASTERCARD : UNIQUEMENT ICI SUR LE RECTO */}
-            <div className="mastercard-fixed-layout">
-              <div className="mc-circle mc-red"></div>
-              <div className="mc-circle mc-orange"></div>
-            </div>
+            {/* On n'affiche le logo QUE si la carte n'est PAS retournée */}
+{!flipped && (
+  <div className="mastercard-fixed-layout">
+    <div className="mc-circle mc-red"></div>
+    <div className="mc-circle mc-orange"></div>
+  </div>
+)}
           </div>
         </div>
 
