@@ -103,7 +103,7 @@ export default function CardOrderConfirmation() {
           </button>
           <div className="security-badge">
             <ShieldCheck size={14} />
-            <span>Transaction sécurisée</span>
+            <span>SÉCURISÉE</span>
           </div>
         </div>
       </nav>

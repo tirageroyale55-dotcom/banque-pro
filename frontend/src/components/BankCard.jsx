@@ -17,9 +17,9 @@ export default function BankCard({ card }) {
   const displayStatus = isPending ? "EN COURS" : rawStatus;
 
   const statusText = {
-    inactive: "Carte inactive",
-    active: "Carte active",
-    blocked: "Carte bloquée",
+    inactive: "CARTE INACTIVE",
+    active: "CARTE ACTIVE",
+    blocked: "CARTE BLOQUÉE",
     "EN COURS": "EN COURS"
   };
 
@@ -145,7 +145,7 @@ export default function BankCard({ card }) {
         .horizontal-1 { width: 100%; height: 1px; top: 33%; }
         .horizontal-2 { width: 100%; height: 1px; top: 66%; }
         .vertical { height: 100%; width: 1px; left: 50%; }
-        
+
         /* TAILLE EXACTE MASTERCARD */
         .mastercard-fixed-layout {
           position: relative; width: 45px; height: 28px;
