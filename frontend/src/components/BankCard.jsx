@@ -87,7 +87,7 @@ export default function BankCard({ card }) {
 
             {/* LOGO MASTERCARD : Taille/Forme exacte (RECTO UNIQUEMENT) */}
             <div className="mastercard-layout-fixed">
-              <div className="mc-circle mc-red"></div>
+              
               <div className="mc-circle mc-orange"></div>
             </div>
           </div>
@@ -143,7 +143,9 @@ export default function BankCard({ card }) {
           position: relative; width: 45px; height: 28px;
           display: flex; align-items: center; margin-left: 10px;
         }
-        
+        .mc-circle { width: 28px; height: 28px; border-radius: 50%; position: absolute; }
+        .mc-red { background: #eb001b; left: 0; z-index: 1; }
+        .mc-orange { background: #ff5f00; right: 0; z-index: 2; opacity: 0.92; }
 
         /* AUTRES FIXES */
         .nfc-icon-fixed { opacity: 0.8; transform: rotate(90deg); color: white; }
