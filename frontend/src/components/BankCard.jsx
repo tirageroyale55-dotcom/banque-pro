@@ -190,11 +190,21 @@ export default function BankCard({ card }) {
   align-items: center; 
   margin-left: 10px;
 
-  /* --- CORRECTION IPHONE LOGO FANTÔME --- */
+  /* --- CORRECTION ULTIME DESYNCHRO IPHONE --- */
+  
+  /* 1. On le rend invisible mais présent (ne retire pas du DOM) */
+  visibility: visible; 
+  
+  /* 2. Cache l'envers, critique pour Safari */
   -webkit-backface-visibility: hidden !important;
   backface-visibility: hidden !important;
-  transform: translateZ(0); /* Force l'accélération GPU isolée */
-  -webkit-transform: translateZ(0);
+  
+  /* 3. Force une couche de rendu distincte pour chaque face */
+  -webkit-transform: translateZ(1px);
+  transform: translateZ(1px); 
+
+  /* 4. Désactive les interactions pour éviter les bugs de clic */
+  pointer-events: none; 
 }
       `}</style>
     </div>
