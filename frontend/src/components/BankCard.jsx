@@ -137,7 +137,10 @@ export default function BankCard({ card }) {
         .chip-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: rgba(0,0,0,0.2); }
 
         /* TAILLE EXACTE MASTERCARD */
-        
+        .mastercard-fixed-layout {
+          position: relative; width: 45px; height: 28px;
+          display: flex; align-items: center; margin-left: 10px;
+        }
         .mc-circle { width: 28px; height: 28px; border-radius: 50%; position: absolute; }
         .mc-red { background: #eb001b; left: 0; z-index: 1; }
         .mc-orange { background: #ff5f00; right: 0; z-index: 2; opacity: 0.92; }
@@ -150,6 +153,22 @@ export default function BankCard({ card }) {
           background: linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.08) 48%, rgba(255,255,255,0) 52%);
           pointer-events: none; z-index: 1;
         }
+
+        /* Ajoute ceci à l'intérieur de ton bloc <style jsx> */
+
+.card-front, .card-back {
+  backface-visibility: hidden; /* C'est la ligne magique */
+  -webkit-backface-visibility: hidden; /* Pour Safari */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.card-back {
+  transform: rotateY(180deg); /* Assure-toi que le verso est bien retourné */
+}
       `}</style>
     </div>
   );
