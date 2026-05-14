@@ -31,7 +31,7 @@ export default function BankCard({ card }) {
       onClick={() => setFlipped(!flipped)}
     >
       <div className="card-inner">
-        {/* --- FACE AVANT (RECTO) --- */}
+        {/* --- FACE AVANT (RECTO) : LOGO MASTERCARD PRÉSENT --- */}
         <div 
           className="card-front" 
           style={isCustomCard ? { background: card.bg } : {}}
@@ -78,7 +78,7 @@ export default function BankCard({ card }) {
               <strong>{card.expiry || `${card.exp_month}/${card.exp_year}`}</strong>
             </div>
 
-            {/* LOGO MASTERCARD : PRÉSENT UNIQUEMENT ICI (RECTO) */}
+            {/* LOGO MASTERCARD : UNIQUEMENT ICI SUR LE RECTO */}
             <div className="mastercard-fixed-layout">
               <div className="mc-circle mc-red"></div>
               <div className="mc-circle mc-orange"></div>
@@ -86,14 +86,14 @@ export default function BankCard({ card }) {
           </div>
         </div>
 
-        {/* --- FACE ARRIÈRE (VERSO) : LOGO MASTERCARD SUPPRIMÉ --- */}
+        {/* --- FACE ARRIÈRE (VERSO) : AUCUN LOGO MASTERCARD --- */}
         <div className="card-back" style={isCustomCard ? { background: card.bg } : {}}>
           <div className="magnetic"></div>
           <div className="cvv-box">
             <span>CVV</span>
             <strong>{card.cvv || "•••"}</strong>
           </div>
-          {/* Le logo Mastercard a été retiré d'ici */}
+          {/* Le logo Mastercard a été supprimé d'ici pour toutes les versions */}
         </div>
       </div>
 
@@ -136,6 +136,7 @@ export default function BankCard({ card }) {
         .chip-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: rgba(0,0,0,0.2); }
         .chip-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: rgba(0,0,0,0.2); }
 
+        /* TAILLE EXACTE MASTERCARD */
         .mastercard-fixed-layout {
           position: relative; width: 45px; height: 28px;
           display: flex; align-items: center; margin-left: 10px;
