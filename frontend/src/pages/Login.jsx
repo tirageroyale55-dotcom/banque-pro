@@ -112,7 +112,7 @@ export default function Login() {
       <style>{`
         .drawing-svg { filter: drop-shadow(0 4px 6px rgba(0, 90, 100, 0.1)); }
         .draw-path { stroke-dasharray: 100; stroke-dashoffset: 100; animation: draw 2.5s ease-in-out infinite; }
-        .shield-path { animation-delay: 0s; }
+        .shield-path { animation-delay: 5s; }
         .check-path { stroke-dasharray: 20; stroke-dashoffset: 20; animation: draw-check 2.5s ease-in-out infinite; animation-delay: 0.5s; }
         @keyframes draw { 
           0% { stroke-dashoffset: 100; opacity: 0; } 
