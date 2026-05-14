@@ -124,19 +124,37 @@ export default function CardOrderConfirmation() {
 
   if (isSuccess) {
     return (
-      <div className="bper-confirmation-screen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
-        <div style={{ textAlign: 'center', padding: '40px', background: '#fff', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.05)', maxWidth: '400px', margin: '20px' }}>
-          <div style={{ background: '#f0fdf4', width: '80px', height: '80px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-            <ShieldCheck size={40} color="#059669" />
+      <div className="bper-confirmation-screen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f8fafc' }}>
+        <div style={{ textAlign: 'center', padding: '48px 30px', background: '#fff', borderRadius: '28px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.08)', maxWidth: '400px', width: '90%', margin: '20px', border: '1px solid #f1f5f9' }}>
+          
+          <div style={{ background: '#f0fdf4', width: '70px', height: '70px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <ShieldCheck size={36} color="#059669" strokeWidth={2.5} />
           </div>
-          <h2 style={{ color: '#0f172a', fontWeight: '800', marginBottom: '15px' }}>Demande envoyée !</h2>
-          <p style={{ color: '#64748b', fontSize: '14px', lineHeight: '1.6', marginBottom: '30px' }}>
-            Votre demande est en cours de traitement. Vous recevrez une validation après l'investigation des conditions de sécurité.
+
+          <h2 style={{ color: '#0f172a', fontWeight: '900', fontSize: '22px', marginBottom: '12px', letterSpacing: '-0.5px' }}>
+            Demande envoyée !
+          </h2>
+
+          <p style={{ color: '#64748b', fontSize: '15px', lineHeight: '1.6', marginBottom: '32px', fontWeight: '500' }}>
+            Votre demande est en cours de traitement. Vous recevrez une validation après l'investigation des conditions de sécurité par nos services.
           </p>
+
           <button 
-            className="btn-submit-order" 
             onClick={() => navigate("/dashboard")}
-            style={{ width: '100%', cursor: 'pointer' }}
+            style={{ 
+              width: '100%', 
+              background: '#005a64', 
+              color: 'white', 
+              border: 'none', 
+              padding: '16px', 
+              borderRadius: '14px', 
+              fontSize: '16px', 
+              fontWeight: '900', 
+              letterSpacing: '1px',
+              cursor: 'pointer',
+              boxShadow: '0 10px 20px rgba(0, 90, 100, 0.15)',
+              transition: 'transform 0.2s ease'
+            }}
           >
             OK
           </button>
