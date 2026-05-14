@@ -55,9 +55,11 @@ export default function Login() {
   const submitPin = async () => {
   if (pin.length !== 5) return;
 
-  setLoading(true); // 1. On lance le chargement
-  setError("");     // On efface les erreurs précédentes
+  setLoading(true); 
+  setError("");     
 
+  const timer = new Promise((resolve) => setTimeout(resolve, 5000));
+  
   try {
     const res = await api("/auth/login", "POST", { personalId, pin });
     
@@ -112,7 +114,7 @@ export default function Login() {
       <style>{`
         .drawing-svg { filter: drop-shadow(0 4px 6px rgba(0, 90, 100, 0.1)); }
         .draw-path { stroke-dasharray: 100; stroke-dashoffset: 100; animation: draw 2.5s ease-in-out infinite; }
-        .shield-path { animation-delay: 5s; }
+        .shield-path { animation-delay: 0s; }
         .check-path { stroke-dasharray: 20; stroke-dashoffset: 20; animation: draw-check 2.5s ease-in-out infinite; animation-delay: 0.5s; }
         @keyframes draw { 
           0% { stroke-dashoffset: 100; opacity: 0; } 
