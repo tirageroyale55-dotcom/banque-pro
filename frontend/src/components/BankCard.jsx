@@ -137,10 +137,7 @@ export default function BankCard({ card }) {
         .chip-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: rgba(0,0,0,0.2); }
 
         /* TAILLE EXACTE MASTERCARD */
-        .mastercard-fixed-layout {
-          position: relative; width: 45px; height: 28px;
-          display: flex; align-items: center; margin-left: 10px;
-        }
+        
         .mc-circle { width: 28px; height: 28px; border-radius: 50%; position: absolute; }
         .mc-red { background: #eb001b; left: 0; z-index: 1; }
         .mc-orange { background: #ff5f00; right: 0; z-index: 2; opacity: 0.92; }
