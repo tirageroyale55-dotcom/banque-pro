@@ -189,8 +189,12 @@ export default function BankCard({ card }) {
   display: flex; 
   align-items: center; 
   margin-left: 10px;
-  /* Ajoute ceci pour éviter que le logo ne reste au-dessus du verso */
-  transform: translateZ(1px); 
+
+  /* --- CORRECTION IPHONE LOGO FANTÔME --- */
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+  transform: translateZ(0); /* Force l'accélération GPU isolée */
+  -webkit-transform: translateZ(0);
 }
       `}</style>
     </div>
