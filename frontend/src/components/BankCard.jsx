@@ -80,10 +80,16 @@ export default function BankCard({ card }) {
 
             {/* On n'affiche le logo QUE si la carte n'est PAS retournée */}
 {!flipped && (
-  <div className="mastercard-fixed-layout">
-    <div className="mc-circle mc-red"></div>
-    <div className="mc-circle mc-orange"></div>
-  </div>
+  <div 
+  className="mastercard-fixed-layout" 
+  style={{ 
+    opacity: flipped ? 0 : 1, 
+    transition: 'opacity 0.1s ease' // Disparition ultra rapide
+  }}
+>
+  <div className="mc-circle mc-red"></div>
+  <div className="mc-circle mc-orange"></div>
+</div>
 )}
           </div>
         </div>
@@ -190,7 +196,7 @@ export default function BankCard({ card }) {
   align-items: center; 
   margin-left: 10px;
   opacity: 0.99;
-  
+
   /* --- CORRECTION ULTIME DESYNCHRO IPHONE --- */
   
   /* 1. On le rend invisible mais présent (ne retire pas du DOM) */
