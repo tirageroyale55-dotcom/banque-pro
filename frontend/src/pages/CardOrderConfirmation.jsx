@@ -85,8 +85,81 @@ export default function CardOrderConfirmation() {
     );
   }
 
-  if (!card) return null;
-  if (loading) return <div className="bper-loading-state">Vérification de votre compte...</div>;
+  if (loading) {
+  return (
+    <div className="bper-confirmation-screen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f8fafc' }}>
+      <div style={{ textAlign: 'center' }}>
+        {/* SVG Animé qui se dessine */}
+        <svg 
+          width="80" 
+          height="80" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="#005a64" 
+          strokeWidth="1.5" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+          className="drawing-svg"
+        >
+          {/* Le bouclier */}
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" className="draw-path shield-path" />
+          {/* Le check interne */}
+          <path d="m9 12 2 2 4-4" className="draw-path check-path" />
+        </svg>
+        
+        <p style={{ 
+          marginTop: '20px', 
+          color: '#005a64', 
+          fontWeight: '800', 
+          fontSize: '14px', 
+          letterSpacing: '1px',
+          textTransform: 'uppercase'
+        }}>
+          Vérification de votre compte...
+        </p>
+      </div>
+
+      <style jsx>{`
+        .drawing-svg {
+          filter: drop-shadow(0 4px 6px rgba(0, 90, 100, 0.1));
+        }
+
+        .draw-path {
+          stroke-dasharray: 100;
+          stroke-dashoffset: 100;
+          animation: draw 2.5s ease-in-out infinite;
+        }
+
+        .shield-path {
+          animation-delay: 0s;
+        }
+
+        .check-path {
+          stroke-dasharray: 20;
+          stroke-dashoffset: 20;
+          animation: draw-check 2.5s ease-in-out infinite;
+          animation-delay: 0.5s;
+        }
+
+        @keyframes draw {
+          0% { stroke-dashoffset: 100; opacity: 0; }
+          20% { opacity: 1; }
+          50% { stroke-dashoffset: 0; }
+          80% { opacity: 1; }
+          100% { stroke-dashoffset: 0; opacity: 0; }
+        }
+
+        @keyframes draw-check {
+          0% { stroke-dashoffset: 20; opacity: 0; }
+          30% { stroke-dashoffset: 20; opacity: 0; }
+          60% { stroke-dashoffset: 0; opacity: 1; }
+          80% { opacity: 1; }
+          100% { stroke-dashoffset: 0; opacity: 0; }
+        }
+      `}</style>
+    </div>
+  );
+}
 
   
 
@@ -162,7 +235,7 @@ export default function CardOrderConfirmation() {
       </div>
     );
   }
-  
+
   return (
     <div className="bper-confirmation-screen">
       {/* HEADER FIXE */}
