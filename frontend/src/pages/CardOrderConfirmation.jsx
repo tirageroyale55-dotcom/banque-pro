@@ -136,7 +136,7 @@ export default function CardOrderConfirmation() {
           </h2>
 
           <p style={{ color: '#64748b', fontSize: '15px', lineHeight: '1.6', marginBottom: '32px', fontWeight: '500' }}>
-            Votre demande est en cours de traitement. **Un e-mail de confirmation vous sera envoyé** dès que l'investigation de nos services de sécurité sera terminée.
+            Votre demande est en cours de traitement. <strong style={{ color: '#1e293b', fontWeight: '700' }}>Un e-mail de confirmation vous sera envoyé</strong> dès que l'investigation de nos services de sécurité sera terminée.
           </p>
 
           <button 
