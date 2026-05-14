@@ -51,8 +51,9 @@ export default function BankCard({ card }) {
 
           <div className="chip-area">
             <div className="emv-chip-real">
-              <div className="chip-line-h"></div>
-              <div className="chip-line-v"></div>
+              <div className="chip-line horizontal-1"></div>
+                          <div className="chip-line horizontal-2"></div>
+                          <div className="chip-line vertical"></div>
             </div>
           </div>
 
@@ -144,6 +145,7 @@ export default function BankCard({ card }) {
         .horizontal-1 { width: 100%; height: 1px; top: 33%; }
         .horizontal-2 { width: 100%; height: 1px; top: 66%; }
         .vertical { height: 100%; width: 1px; left: 50%; }
+        
         /* TAILLE EXACTE MASTERCARD */
         .mastercard-fixed-layout {
           position: relative; width: 45px; height: 28px;
