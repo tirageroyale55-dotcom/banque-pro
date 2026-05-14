@@ -154,20 +154,38 @@ export default function BankCard({ card }) {
           pointer-events: none; z-index: 1;
         }
 
-        /* Ajoute ceci à l'intérieur de ton bloc <style jsx> */
+        /* Ajoute ou modifie ces règles dans ton bloc <style jsx> */
 
-.card-front, .card-back {
-  backface-visibility: hidden; /* C'est la ligne magique */
-  -webkit-backface-visibility: hidden; /* Pour Safari */
-  position: absolute;
-  top: 0;
-  left: 0;
+.card-inner {
+  position: relative;
   width: 100%;
   height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d; /* Indispensable pour le 3D */
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Pour Safari/iPhone */
+  backface-visibility: hidden;         /* Cache la face quand elle est retournée */
+  overflow: hidden;                     /* Empêche les débordements de logo */
 }
 
 .card-back {
-  transform: rotateY(180deg); /* Assure-toi que le verso est bien retourné */
+  transform: rotateY(180deg); /* Le verso doit être retourné de base */
+}
+
+/* Force le logo à rester sur son plan */
+.mastercard-fixed-layout {
+  position: relative; 
+  width: 45px; 
+  height: 28px;
+  display: flex; 
+  align-items: center; 
+  margin-left: 10px;
+  transform: translateZ(1px); /* Force le logo à être "posé" sur le recto */
 }
       `}</style>
     </div>
