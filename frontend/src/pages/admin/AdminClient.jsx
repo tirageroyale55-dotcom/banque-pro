@@ -342,12 +342,22 @@ export default function AdminClient() {
 
               {/* LOGIQUE NOUVELLE DEMANDE - BLOC ISOLÉ */}
 {selected.cardRequest && (
-  <section className="data-card" style={{ borderTop: '4px solid #a3e635', marginTop: '20px' }}>
+  <section className="data-card" style={{ borderTop: '4px solid #a3e635', marginTop: '20px', backgroundColor: '#fff9f9' }}>
     <div className="section-header">
       <h3><i className="fas fa-plus-circle"></i> Gestion : Nouvelle Carte Commandée</h3>
-      <span className={`status-badge ${selected.cardRequest.status === 'Validée' ? 'active' : 'blocked'}`}>
-        {selected.cardRequest.status}
+      <span className={`status-badge ${selected.cardRequest.status === 'active' ? 'active' : 'blocked'}`}>
+        {selected.cardRequest.status === 'active' ? 'CARTE ACTIVE' : 
+         selected.cardRequest.status === 'blocked' ? 'CARTE BLOQUÉE' : 'EN ATTENTE'}
       </span>
+    </div>
+
+    {/* INFOS DE SUIVI ET COMMENTAIRE */}
+    <div style={{ background: '#f1f5f9', padding: '12px', borderRadius: '8px', marginBottom: '15px', fontSize: '0.9rem', borderLeft: '4px solid #64748b' }}>
+      <p style={{ margin: '0 0 5px 0' }}><strong>Note du client :</strong> {selected.cardRequest.comment || "Aucun commentaire"}</p>
+      <div style={{ display: 'flex', gap: '20px', fontSize: '0.8rem', color: '#64748b' }}>
+        <span><strong>Demandée le :</strong> {new Date(selected.cardRequest.requestDate).toLocaleString()}</span>
+        <span><strong>Mise à jour :</strong> {new Date(selected.cardRequest.updatedAt).toLocaleString()}</span>
+      </div>
     </div>
     
     <div className="field-grid">
@@ -376,27 +386,40 @@ export default function AdminClient() {
       </div>
     </div>
 
-    {/* CONTRÔLE DES STATUTS DE LA NOUVELLE CARTE */}
+    {/* CONTRÔLE DES STATUTS ET SUPPRESSION */}
+    <div className="actions-footer" style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+      <button 
+        onClick={() => handleCardDecision(selected.cardRequest._id, "active")}
+        className="btn-active-new"
+        style={{ flex: 1, backgroundColor: '#059669', color: 'white', padding: '12px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+      >
+        ACTIVER 
+      </button>
 
-<div className="actions-footer" style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
-  <button 
-    onClick={() => handleCardDecision(selected.cardRequest._id, "active")}
-    className="btn-active-new"
-    style={{ flex: 1, backgroundColor: '#059669', color: 'white', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
-  >
-    ACTIVER 
-  </button>
+      <button 
+        onClick={() => handleCardDecision(selected.cardRequest._id, "blocked")}
+        className="btn-block-new"
+        style={{ flex: 1, backgroundColor: '#eab308', color: 'white', padding: '12px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+      >
+        BLOQUER 
+      </button>
 
-  <button 
-    onClick={() => handleCardDecision(selected.cardRequest._id, "blocked")}
-    className="btn-block-new"
-    style={{ flex: 1, backgroundColor: '#dc2626', color: 'white', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
-  >
-    BLOQUER 
-  </button>
-</div>
+      <button 
+        onClick={async () => {
+          if(window.confirm("🚨 REJETER cette demande ? Elle sera définitivement supprimée de la base.")) {
+            await handleCardDecision(selected.cardRequest._id, "delete");
+            selectClient(selected.user._id); // Rafraîchit pour faire disparaître le bloc
+          }
+        }}
+        className="btn-delete-new"
+        style={{ flex: 1, backgroundColor: '#dc2626', color: 'white', padding: '12px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+      >
+        REJETER & SUPPRIMER
+      </button>
+    </div>
   </section>
 )}
+
               {/* BLOC 4: TRANSACTIONS (TRANSACTION.JS) */}
               <section className="data-card full-width">
                 <h3><i className="fas fa-exchange-alt"></i> Historique des flux</h3>

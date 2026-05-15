@@ -150,9 +150,15 @@ router.put("/client-master-update/:id", auth, role("ADMIN"), async (req, res) =>
 
 router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req, res) => {
   try {
-    const { decision } = req.body; // passera "active" ou "blocked"
+    const { decision } = req.body;
     
-    // On met à jour UNIQUEMENT la demande de carte
+    // CAS SPÉCIAL : REJETER ET SUPPRIMER
+    if (decision === "delete") {
+      await CardRequest.findByIdAndDelete(req.params.requestId);
+      return res.json({ message: "Demande rejetée et supprimée de la base." });
+    }
+
+    // AUTRES CAS : ACTIVER / BLOQUER
     const request = await CardRequest.findByIdAndUpdate(
       req.params.requestId,
       { status: decision, updatedAt: Date.now() },
@@ -161,8 +167,7 @@ router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req
 
     if (!request) return res.status(404).json({ message: "Demande introuvable" });
 
-    // ON NE FAIT RIEN D'AUTRE. L'ancienne carte (modèle Card) reste intacte.
-    res.json({ message: "Statut de la nouvelle carte mis à jour", status: request.status });
+    res.json({ message: "Statut mis à jour", status: request.status });
   } catch (err) {
     res.status(500).json({ message: "Erreur serveur" });
   }
