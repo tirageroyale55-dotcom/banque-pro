@@ -150,32 +150,21 @@ router.put("/client-master-update/:id", auth, role("ADMIN"), async (req, res) =>
 
 router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req, res) => {
   try {
-    const { decision } = req.body; 
-    // decision sera "active" ou "blocked" envoyé par le front
+    const { decision } = req.body; // passera "active" ou "blocked"
     
-    const request = await CardRequest.findById(req.params.requestId);
+    // On met à jour UNIQUEMENT la demande de carte
+    const request = await CardRequest.findByIdAndUpdate(
+      req.params.requestId,
+      { status: decision, updatedAt: Date.now() },
+      { new: true }
+    );
+
     if (!request) return res.status(404).json({ message: "Demande introuvable" });
 
-    // 1. On met à jour la CardRequest (La nouvelle logique)
-    request.status = decision; 
-    await request.save();
-
-    // 2. On essaie de mettre à jour la Card physique si elle existe
-    // On utilise un try/catch interne pour ne pas bloquer si la carte n'existe pas
-    try {
-      await Card.findOneAndUpdate(
-        { user: request.user }, 
-        { status: decision },
-        { upsert: false } // Ne pas créer si n'existe pas
-      );
-    } catch (cardErr) {
-      console.log("Note: Pas de carte physique à mettre à jour, c'est ok.");
-    }
-
-    res.json({ message: "Statut mis à jour", status: decision });
+    // ON NE FAIT RIEN D'AUTRE. L'ancienne carte (modèle Card) reste intacte.
+    res.json({ message: "Statut de la nouvelle carte mis à jour", status: request.status });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Erreur serveur", details: err.message });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 });
 

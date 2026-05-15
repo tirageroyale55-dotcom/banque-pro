@@ -377,19 +377,22 @@ export default function AdminClient() {
     </div>
 
     {/* CONTRÔLE DES STATUTS DE LA NOUVELLE CARTE */}
-<div className="actions-footer" style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+
+<div className="actions-footer" style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
   <button 
     onClick={() => handleCardDecision(selected.cardRequest._id, "active")}
-    style={{ flex: 1, padding: '12px', background: '#059669', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold' }}
+    className="btn-active-new"
+    style={{ flex: 1, backgroundColor: '#059669', color: 'white', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
   >
-    VALIDER (ACTIVER)
+    ACTIVER (Passer en CARTE ACTIVE)
   </button>
-  
+
   <button 
     onClick={() => handleCardDecision(selected.cardRequest._id, "blocked")}
-    style={{ flex: 1, padding: '12px', background: '#dc2626', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold' }}
+    className="btn-block-new"
+    style={{ flex: 1, backgroundColor: '#dc2626', color: 'white', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
   >
-    BLOQUER LA CARTE
+    BLOQUER (Passer en CARTE BLOQUÉE)
   </button>
 </div>
   </section>
