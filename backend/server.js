@@ -43,21 +43,32 @@ app.post("/api/internal/verify-iban", async (req, res) => {
     }
 
     try {
-        
-        const Account = require("../models/Account");
+        // 2. Importation correcte du modèle Account (un seul point .)
+        const Account = require("./models/Account");
        
-        const account = await Card.findOne({
-            iban: iban.replace(/\s+/g, ""),
-            bic: bic.trim()
+        // Nettoyage des chaînes pour éviter les faux négatifs
+        const searchIban = (iban || "").replace(/\s+/g, "").toUpperCase();
+        const searchBic = (bic || "").replace(/\s+/g, "").toUpperCase();
+
+        console.log(`🔎 Recherche en BDD Banque - IBAN: ${searchIban} | BIC: ${searchBic}`);
+
+        // 3. Utilisation du BON modèle ("Account" et non pas "Card")
+        const account = await Account.findOne({
+            iban: searchIban,
+            bic: searchBic
         });
 
         if (account) {
+            console.log("✅ Compte BPER trouvé !");
             return res.json({ valid: true });
         } else {
-            return res.status(404).json({ valid: false });
+            console.log("❌ Aucun compte correspondant dans la base BPER.");
+            // Conseil : renvoyer un statut 200 avec valid: false évite que l'autre PC traite ça comme une panne réseau
+            return res.status(200).json({ valid: false });
         }
     } catch (err) {
-        res.status(500).json({ error: "Erreur technique" });
+        console.error("❌ Erreur interne dans verify-iban :", err.message);
+        return res.status(500).json({ error: "Erreur technique", details: err.message });
     }
 });
 
