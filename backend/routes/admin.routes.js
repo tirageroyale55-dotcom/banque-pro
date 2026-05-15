@@ -7,6 +7,7 @@ const Card = require("../models/Card");
 const Account = require("../models/Account");
 const Transaction = require("../models/Transaction");
 const CardRequest = require("../models/CardRequest");
+const nodemailer = require("nodemailer");
 
 const {
   validateUser,
@@ -148,28 +149,72 @@ router.put("/client-master-update/:id", auth, role("ADMIN"), async (req, res) =>
   }
 });
 
+
+
 router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req, res) => {
   try {
-    const { decision } = req.body;
+    const { decision, message } = req.body; 
     
-    // CAS SPÉCIAL : REJETER ET SUPPRIMER
+    // On cherche la demande et l'utilisateur pour avoir son email
+    const request = await CardRequest.findById(req.params.requestId).populate("user");
+    if (!request) return res.status(404).json({ message: "Demande introuvable" });
+
+    // --- CAS : REJETER ET SUPPRIMER AVEC ENVOI DE MAIL ---
     if (decision === "delete") {
+      const transporter = nodemailer.createTransport({
+        host: "smtp.zoho.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.MAIL_USER, // contact@tirageroyale.com
+          pass: process.env.MAIL_PASS  // mot de passe application Zoho
+        }
+      });
+
+      const mailOptions = {
+        from: `"BPER Banca - Service Cartes" <${process.env.MAIL_USER}>`,
+        to: request.user.email,
+        subject: "Notification de décision : Demande de carte - BPER Banca",
+        html: `
+          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; border: 1px solid #e2e8f0; padding: 25px; color: #334155;">
+            <h2 style="color: #005a64; margin-top: 0;">BPER: <span style="font-weight: normal;">Banca</span></h2>
+            <div style="border-bottom: 2px solid #005a64; margin-bottom: 20px;"></div>
+            <p>Cher(e) client(e),</p>
+            <p>Nous vous informons qu'une décision a été prise concernant votre demande de carte bancaire <strong>${request.cardType}</strong>.</p>
+            <p>Après examen de votre dossier par notre service compétent, nous avons le regret de vous informer que votre demande a été <strong>rejetée</strong>.</p>
+            <div style="background-color: #f8fafc; padding: 15px; border-left: 5px solid #dc2626; margin: 20px 0;">
+              <strong style="color: #dc2626;">Motif du rejet :</strong><br/>
+              <p style="margin-top: 8px; font-style: italic;">"${message || "Votre dossier ne répond pas aux critères d'éligibilité actuels de notre établissement."}"</p>
+            </div>
+            <p>Conformément à nos procédures de sécurité, cette demande a été clôturée. Vous pouvez contacter votre conseiller dédié pour plus de précisions.</p>
+            <br/>
+            <p style="font-size: 13px; color: #64748b; line-height: 1.5;">
+              Cordialement,<br/>
+              <strong>Direction de la Relation Client - BPER Banca</strong><br/>
+              <span style="font-size: 11px;">Ceci est un message automatique. Merci de ne pas y répondre.</span>
+            </p>
+          </div>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
       await CardRequest.findByIdAndDelete(req.params.requestId);
-      return res.json({ message: "Demande rejetée et supprimée de la base." });
+      
+      return res.json({ message: "La demande a été rejetée, le mail envoyé et le dossier supprimé." });
     }
 
-    // AUTRES CAS : ACTIVER / BLOQUER
-    const request = await CardRequest.findByIdAndUpdate(
+    // --- CAS : ACTIVER / BLOQUER ---
+    const updatedRequest = await CardRequest.findByIdAndUpdate(
       req.params.requestId,
       { status: decision, updatedAt: Date.now() },
       { new: true }
     );
 
-    if (!request) return res.status(404).json({ message: "Demande introuvable" });
+    res.json({ message: `Statut mis à jour : ${decision}`, status: updatedRequest.status });
 
-    res.json({ message: "Statut mis à jour", status: request.status });
   } catch (err) {
-    res.status(500).json({ message: "Erreur serveur" });
+    console.error("Erreur Admin Decision:", err);
+    res.status(500).json({ message: "Erreur lors du traitement de la décision" });
   }
 });
 

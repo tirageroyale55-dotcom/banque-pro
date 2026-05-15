@@ -7,6 +7,9 @@ export default function AdminClient() {
   const [selected, setSelected] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectMessage, setRejectMessage] = useState("");
+  const [isConfirmingRejection, setIsConfirmingRejection] = useState(false);
 
   useEffect(() => { api("/admin/clients").then(setClients); }, []);
 
@@ -33,14 +36,13 @@ export default function AdminClient() {
   } catch (e) { alert("Erreur de sauvegarde"); }
 };
 
-  const handleCardDecision = async (requestId, decision) => {
+  const handleCardDecision = async (requestId, decision, message = "") => {
   try {
-    
-    await api(`/admin/card-request-decision/${requestId}`, "POST", { decision });
-    alert(`Demande ${decision}`);
-    selectClient(selected.user._id); // Actualiser le dossier
-  } catch (e) {
-    alert("Erreur lors de la décision");
+    const res = await api(`/admin/card-request-decision/${requestId}`, "POST", { decision, message });
+    alert(res.message);
+    selectClient(selected.user._id); // Recharge les données
+  } catch (err) {
+    alert("Erreur serveur lors de l'opération");
   }
 };
 
@@ -387,39 +389,84 @@ export default function AdminClient() {
     </div>
 
     {/* CONTRÔLE DES STATUTS ET SUPPRESSION */}
-    <div className="actions-footer" style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+    <div className="actions-footer" style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
       <button 
         onClick={() => handleCardDecision(selected.cardRequest._id, "active")}
-        className="btn-active-new"
-        style={{ flex: 1, backgroundColor: '#059669', color: 'white', padding: '12px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+        style={{ flex: 1, backgroundColor: '#059669', color: 'white', padding: '14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '900', textTransform: 'uppercase' }}
       >
-        ACTIVER 
+        Valider & Activer
       </button>
 
       <button 
         onClick={() => handleCardDecision(selected.cardRequest._id, "blocked")}
-        className="btn-block-new"
-        style={{ flex: 1, backgroundColor: '#eab308', color: 'white', padding: '12px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+        style={{ flex: 1, backgroundColor: '#eab308', color: 'white', padding: '14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '900', textTransform: 'uppercase' }}
       >
-        BLOQUER 
+        Suspendre (Bloquer)
       </button>
 
       <button 
-        onClick={async () => {
-          if(window.confirm("🚨 REJETER cette demande ? Elle sera définitivement supprimée de la base.")) {
-            await handleCardDecision(selected.cardRequest._id, "delete");
-            selectClient(selected.user._id); // Rafraîchit pour faire disparaître le bloc
-          }
-        }}
-        className="btn-delete-new"
-        style={{ flex: 1, backgroundColor: '#dc2626', color: 'white', padding: '12px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+        onClick={() => setShowRejectModal(true)}
+        style={{ flex: 1, backgroundColor: '#dc2626', color: 'white', padding: '14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '900', textTransform: 'uppercase' }}
       >
-        REJETER & SUPPRIMER
+        Rejeter le Dossier
       </button>
     </div>
+
+    {/* MODALE DE REJET PROFESSIONNELLE */}
+    {showRejectModal && (
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,40,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }}>
+        <div style={{ background: 'white', padding: '30px', borderRadius: '15px', width: '100%', maxWidth: '550px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
+          <h2 style={{ color: '#005a64', marginTop: 0, borderBottom: '2px solid #f1f5f9', paddingBottom: '10px' }}>BPER Banca : Notification de Rejet</h2>
+          
+          {!isConfirmingRejection ? (
+            <>
+              <p style={{ color: '#64748b' }}>Veuillez stipuler le motif officiel du rejet qui sera transmis par email au client.</p>
+              <textarea 
+                placeholder="Ex: Après examen de vos pièces justificatives, votre profil ne répond pas aux critères d'éligibilité de la carte Gold..."
+                style={{ width: '100%', height: '150px', padding: '15px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '1rem', marginTop: '10px', fontFamily: 'inherit' }}
+                value={rejectMessage}
+                onChange={(e) => setRejectMessage(e.target.value)}
+              />
+              <div style={{ display: 'flex', gap: '15px', marginTop: '25px' }}>
+                <button onClick={() => setShowRejectModal(false)} style={{ flex: 1, padding: '12px', borderRadius: '8px', background: '#f1f5f9', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>Annuler</button>
+                <button 
+                  disabled={!rejectMessage}
+                  onClick={() => setIsConfirmingRejection(true)} 
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', background: '#005a64', color: 'white', border: 'none', fontWeight: 'bold', cursor: 'pointer', opacity: !rejectMessage ? 0.5 : 1 }}
+                >
+                  Relire la notification
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ background: '#fffbeb', border: '1px solid #fef3c7', padding: '15px', borderRadius: '10px', color: '#92400e' }}>
+                <strong>Aperçu du message :</strong>
+                <p style={{ fontStyle: 'italic', marginTop: '10px' }}>"{rejectMessage}"</p>
+              </div>
+              <p style={{ fontSize: '0.85rem', color: '#dc2626', marginTop: '15px' }}>🚨 Attention : La validation déclenchera l'envoi immédiat de l'email et la suppression irréversible du dossier de la base de données.</p>
+              <div style={{ display: 'flex', gap: '15px', marginTop: '25px' }}>
+                <button onClick={() => setIsConfirmingRejection(false)} style={{ flex: 1, padding: '12px', borderRadius: '8px', background: '#f1f5f9', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>Modifier</button>
+                <button 
+                  onClick={async () => {
+                    await handleCardDecision(selected.cardRequest._id, "delete", rejectMessage);
+                    setShowRejectModal(false);
+                    setIsConfirmingRejection(false);
+                    setRejectMessage("");
+                    selectClient(selected.user._id);
+                  }} 
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', background: '#dc2626', color: 'white', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
+                >
+                  Confirmer le Rejet Définitif
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    )}
   </section>
 )}
-
               {/* BLOC 4: TRANSACTIONS (TRANSACTION.JS) */}
               <section className="data-card full-width">
                 <h3><i className="fas fa-exchange-alt"></i> Historique des flux</h3>
