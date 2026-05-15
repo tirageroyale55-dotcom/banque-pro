@@ -155,19 +155,15 @@ router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req
     
     if (!request) return res.status(404).json({ message: "Demande introuvable" });
 
-    // 1. On met à jour la demande
-    request.status = decision;
+    // ON NE TOUCHE PAS À LA CARTE ANCIENNE (Card.findOneAndUpdate...)
+    // ON MODIFIE UNIQUEMENT LA NOUVELLE LOGIQUE
+    request.status = decision; 
     await request.save();
 
-    // 2. On change uniquement le statut de la carte du client
-    const newStatus = (decision === "Validée") ? "active" : "blocked";
-    await Card.findOneAndUpdate({ user: request.user }, { status: newStatus });
-
-    res.json({ message: `Statut mis à jour : ${decision}` });
+    res.json({ message: `Statut de la nouvelle carte : ${decision}` });
   } catch (err) {
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
-
 module.exports = router;
 

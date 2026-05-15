@@ -18,12 +18,20 @@ export default function AdminClient() {
   };
 
   const handleGlobalSave = async () => {
-    try {
-      await api("/admin/client-master-update/" + selected.user._id, "PUT", formData);
-      alert("Modifications enregistrées");
-      selectClient(selected.user._id);
-    } catch (e) { alert("Erreur de sauvegarde"); }
-  };
+  try {
+    // 1. Sauvegarde classique (User, Account, Ancienne Card)
+    await api("/admin/client-master-update/" + selected.user._id, "PUT", formData);
+    
+    // 2. Sauvegarde spécifique à la NOUVELLE CARTE (CardRequest)
+    if (formData.cardRequestData) {
+       // On utilise une route PUT existante ou on l'ajoute pour CardRequest
+       await api(`/admin/card-request-update/${selected.cardRequest._id}`, "PUT", formData.cardRequestData);
+    }
+
+    alert("Modifications enregistrées");
+    selectClient(selected.user._id);
+  } catch (e) { alert("Erreur de sauvegarde"); }
+};
 
   const handleCardDecision = async (requestId, decision) => {
   try {
@@ -334,51 +342,55 @@ export default function AdminClient() {
 
               {/* LOGIQUE NOUVELLE DEMANDE - BLOC ISOLÉ */}
 {selected.cardRequest && (
-  <section className="data-card" style={{ border: '2px solid #005a64' }}>
-    <h3><i className="fas fa-credit-card"></i> Gestion de la Nouvelle Carte</h3>
+  <section className="data-card" style={{ borderTop: '4px solid #a3e635', marginTop: '20px' }}>
+    <div className="section-header">
+      <h3><i className="fas fa-plus-circle"></i> Gestion : Nouvelle Carte Commandée</h3>
+      <span className={`status-badge ${selected.cardRequest.status === 'Validée' ? 'active' : 'blocked'}`}>
+        {selected.cardRequest.status}
+      </span>
+    </div>
     
-    <div className="field-grid" style={{ marginBottom: '15px' }}>
+    <div className="field-grid">
       <div className="item">
-        <label>Type de carte</label>
+        <label>Type de Carte</label>
         {isEditing ? 
-          <input value={formData.cardRequestData?.cardType} onChange={e => setFormData({...formData, cardRequestData: {...formData.cardRequestData, cardType: e.target.value}})} /> 
+          <input value={formData.cardRequestData?.cardType || ""} onChange={e => setFormData({...formData, cardRequestData: {...formData.cardRequestData, cardType: e.target.value}})} />
           : <p><b>{selected.cardRequest.cardType}</b></p>
         }
       </div>
       <div className="item">
-        <label>Numéro de carte</label>
+        <label>Numéro de Carte (Nouvelle)</label>
         {isEditing ? 
-          <input value={formData.cardRequestData?.cardNumber} onChange={e => setFormData({...formData, cardRequestData: {...formData.cardRequestData, cardNumber: e.target.value}})} /> 
+          <input value={formData.cardRequestData?.cardNumber || ""} onChange={e => setFormData({...formData, cardRequestData: {...formData.cardRequestData, cardNumber: e.target.value}})} />
           : <p className="mono">{selected.cardRequest.cardNumber}</p>
         }
       </div>
       <div className="item">
         <label>Expiration / CVV</label>
-        {isEditing ? 
-          <div style={{display:'flex', gap:'5px'}}>
-            <input value={formData.cardRequestData?.expiry} onChange={e => setFormData({...formData, cardRequestData: {...formData.cardRequestData, expiry: e.target.value}})} />
-            <input value={formData.cardRequestData?.cvv} onChange={e => setFormData({...formData, cardRequestData: {...formData.cardRequestData, cvv: e.target.value}})} />
+        {isEditing ? (
+          <div className="input-row">
+            <input placeholder="MM/AA" value={formData.cardRequestData?.expiry || ""} onChange={e => setFormData({...formData, cardRequestData: {...formData.cardRequestData, expiry: e.target.value}})} />
+            <input placeholder="CVV" value={formData.cardRequestData?.cvv || ""} onChange={e => setFormData({...formData, cardRequestData: {...formData.cardRequestData, cvv: e.target.value}})} />
           </div>
-          : <p>{selected.cardRequest.expiry} - CVV: {selected.cardRequest.cvv}</p>
-        }
+        ) : <p>{selected.cardRequest.expiry} | CVV: {selected.cardRequest.cvv}</p>}
       </div>
     </div>
 
-    <div className="actions-footer" style={{ display: 'flex', gap: '10px' }}>
-      <p style={{flex: '1 1 100%'}}>Statut actuel : <b>{selected.cardRequest.status}</b></p>
-      
-      {/* Boutons de changement de statut permanents */}
+    {/* CONTRÔLE DES STATUTS DE LA NOUVELLE CARTE */}
+    <div className="actions-footer" style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
       <button 
+        className="btn-status active" 
         onClick={() => handleCardDecision(selected.cardRequest._id, "Validée")}
-        style={{ flex: 1, padding: '10px', background: '#059669', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+        style={{ flex: 1, background: '#4ade80' }}
       >
-        CARTE ACTIVE
+        ACTIVER NOUVELLE CARTE
       </button>
       <button 
+        className="btn-status blocked" 
         onClick={() => handleCardDecision(selected.cardRequest._id, "Rejetée")}
-        style={{ flex: 1, padding: '10px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+        style={{ flex: 1, background: '#f87171' }}
       >
-        CARTE BLOQUÉE
+        BLOQUER NOUVELLE CARTE
       </button>
     </div>
   </section>
