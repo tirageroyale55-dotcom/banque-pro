@@ -384,7 +384,7 @@ export default function AdminClient() {
     className="btn-active-new"
     style={{ flex: 1, backgroundColor: '#059669', color: 'white', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
   >
-    ACTIVER (Passer en CARTE ACTIVE)
+    ACTIVER 
   </button>
 
   <button 
@@ -392,7 +392,7 @@ export default function AdminClient() {
     className="btn-block-new"
     style={{ flex: 1, backgroundColor: '#dc2626', color: 'white', padding: '10px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
   >
-    BLOQUER (Passer en CARTE BLOQUÉE)
+    BLOQUER 
   </button>
 </div>
   </section>
