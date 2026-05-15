@@ -25,6 +25,17 @@ export default function AdminClient() {
     } catch (e) { alert("Erreur de sauvegarde"); }
   };
 
+  const handleCardDecision = async (requestId, decision) => {
+  try {
+    
+    await api(`/admin/card-request-decision/${requestId}`, "POST", { decision });
+    alert(`Demande ${decision}`);
+    selectClient(selected.user._id); // Actualiser le dossier
+  } catch (e) {
+    alert("Erreur lors de la décision");
+  }
+};
+
   const runAction = async (path, method = "POST") => {
     await api(path, method);
     selectClient(selected.user._id);
@@ -319,6 +330,45 @@ export default function AdminClient() {
                    </button>
                 </div>
               </section>
+
+
+              {/* BLOC 5: NOUVELLE DEMANDE DE CARTE (CARDREQUEST.JS) */}
+{selected.cardRequest && (
+  <section className="data-card request-card-admin" style={{ border: '2px solid #005a64' }}>
+    <div className="section-header">
+      <h3><i className="fas fa- bell"></i> Nouvelle Demande de Carte</h3>
+      <span className={`status-badge ${selected.cardRequest.status.replace(/\s+/g, '-').toLowerCase()}`}>
+        {selected.cardRequest.status}
+      </span>
+    </div>
+
+    <div className="field-grid">
+      <div className="item"><label>Type Demandé</label><p className="txt-bold">{selected.cardRequest.cardType}</p></div>
+      <div className="item"><label>Numéro Généré</label><p className="mono">{selected.cardRequest.cardNumber}</p></div>
+      <div className="item"><label>Expiration / CVV</label><p>{selected.cardRequest.expiry} - {selected.cardRequest.cvv}</p></div>
+      <div className="item"><label>Note Client</label><p><i>{selected.cardRequest.comment || "Aucun commentaire"}</i></p></div>
+    </div>
+
+    {selected.cardRequest.status === "En cours d'investigation" && (
+      <div className="actions-footer decision-btns" style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+        <button 
+          onClick={() => handleCardDecision(selected.cardRequest._id, "Validée")} 
+          className="btn-save" 
+          style={{ background: '#059669', flex: 1 }}
+        >
+          Valider & Activer la carte
+        </button>
+        <button 
+          onClick={() => handleCardDecision(selected.cardRequest._id, "Rejetée")} 
+          className="btn-edit" 
+          style={{ background: '#dc2626', color: 'white', flex: 1 }}
+        >
+          Rejeter & Bloquer
+        </button>
+      </div>
+    )}
+  </section>
+)}
 
               {/* BLOC 4: TRANSACTIONS (TRANSACTION.JS) */}
               <section className="data-card full-width">
