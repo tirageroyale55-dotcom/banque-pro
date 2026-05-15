@@ -377,22 +377,31 @@ export default function AdminClient() {
     </div>
 
     {/* CONTRÔLE DES STATUTS DE LA NOUVELLE CARTE */}
-    <div className="actions-footer" style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
-      <button 
-        className="btn-status active" 
-        onClick={() => handleCardDecision(selected.cardRequest._id, "Validée")}
-        style={{ flex: 1, background: '#4ade80' }}
-      >
-        ACTIVER NOUVELLE CARTE
-      </button>
-      <button 
-        className="btn-status blocked" 
-        onClick={() => handleCardDecision(selected.cardRequest._id, "Rejetée")}
-        style={{ flex: 1, background: '#f87171' }}
-      >
-        BLOQUER NOUVELLE CARTE
-      </button>
-    </div>
+<div className="actions-footer" style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
+  
+  {/* BOUTON ACTIVER -> Devient CARTE ACTIVE */}
+  <button 
+    onClick={() => handleCardDecision(selected.cardRequest._id, "active")}
+    style={{ 
+      flex: 1, padding: '12px', background: '#059669', color: 'white', 
+      border: 'none', borderRadius: '8px', fontWeight: '900', cursor: 'pointer' 
+    }}
+  >
+    ACTIVER (CARTE ACTIVE)
+  </button>
+
+  {/* BOUTON BLOQUER -> Devient CARTE BLOQUÉE */}
+  <button 
+    onClick={() => handleCardDecision(selected.cardRequest._id, "blocked")}
+    style={{ 
+      flex: 1, padding: '12px', background: '#dc2626', color: 'white', 
+      border: 'none', borderRadius: '8px', fontWeight: '900', cursor: 'pointer' 
+    }}
+  >
+    BLOQUER (CARTE BLOQUÉE)
+  </button>
+
+</div>
   </section>
 )}
               {/* BLOC 4: TRANSACTIONS (TRANSACTION.JS) */}

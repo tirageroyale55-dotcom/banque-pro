@@ -150,20 +150,22 @@ router.put("/client-master-update/:id", auth, role("ADMIN"), async (req, res) =>
 
 router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req, res) => {
   try {
-    const { decision } = req.body; // "Validée" ou "Rejetée"
-    const request = await CardRequest.findById(req.params.requestId);
+    const { decision } = req.body; 
+    // On transforme la décision en statut lisible par ton BankCard.jsx
+    // Si decision == "active" -> "CARTE ACTIVE"
+    // Si decision == "blocked" -> "CARTE BLOQUÉE"
     
+    const request = await CardRequest.findById(req.params.requestId);
     if (!request) return res.status(404).json({ message: "Demande introuvable" });
 
-    // ON NE TOUCHE PAS À LA CARTE ANCIENNE (Card.findOneAndUpdate...)
-    // ON MODIFIE UNIQUEMENT LA NOUVELLE LOGIQUE
-    request.status = decision; 
+    request.status = (decision === "active") ? "active" : "blocked";
     await request.save();
 
-    res.json({ message: `Statut de la nouvelle carte : ${decision}` });
+    res.json({ message: `Statut mis à jour : ${request.status}` });
   } catch (err) {
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
+
 module.exports = router;
 
