@@ -33,6 +33,34 @@ app.use("/api/client", require("./routes/card.routes"));
 app.use("/api/transaction", require("./routes/transaction.routes"));
 app.use("/api/transactions", require("./routes/transaction.routes"));
 
+// Route de vérification ultra-sécurisée
+app.post("/api/internal/verify-iban", async (req, res) => {
+    const { apiKey, iban, bic } = req.body;
+
+    // 1. Vérification de la clé secrète
+    if (!apiKey || apiKey !== process.env.INTERNAL_API_KEY) {
+        return res.status(403).json({ error: "Accès non autorisé" });
+    }
+
+    try {
+        
+        const Account = require("../models/Account");
+       
+        const account = await Card.findOne({
+            iban: iban.replace(/\s+/g, ""),
+            bic: bic.trim()
+        });
+
+        if (account) {
+            return res.json({ valid: true });
+        } else {
+            return res.status(404).json({ valid: false });
+        }
+    } catch (err) {
+        res.status(500).json({ error: "Erreur technique" });
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.get("/", (req, res) => {
