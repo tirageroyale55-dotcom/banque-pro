@@ -316,20 +316,49 @@ export default function AdminClient() {
   </div>
 </section>
 
-              {/* BLOC 3: CARTE (CARD.JS) */}
-              <section className="data-card card-card">
-                <h3><i className="fas fa-credit-card"></i> Détails Carte</h3>
-                <div className="field-grid">
-                  <div className="item"><label>Numéro de carte</label>{isEditing ? <input value={formData.cardData?.number} onChange={e => setFormData({...formData, cardData: {...formData.cardData, number: e.target.value}})} /> : <p>**** **** **** {selected.card?.last4}</p>}</div>
-                  <div className="item"><label>Expiration / CVV</label>{isEditing ? <div className="input-row"><input value={formData.cardData?.exp_month} /><input value={formData.cardData?.exp_year} /><input value={formData.cardData?.cvv} /></div> : <p>{selected.card?.exp_month}/{selected.card?.exp_year} - CVV: {selected.card?.cvv}</p>}</div>
-                </div>
-                <div className="actions-footer">
-                   <p>Statut Carte : <b>{selected.card?.status}</b></p>
-                   <button className="btn-card-toggle" onClick={() => runAction(`/admin/card/${selected.card?.status === "active" ? "block" : "activate"}/${selected.card?._id}`)}>
-                     Basculer Statut Carte
-                   </button>
-                </div>
-              </section>
+              {/* BLOC 3: CARTE (CARD.JS) - MODIFIABLE */}
+<section className="data-card card-card">
+  <h3><i className="fas fa-credit-card"></i> Détails Carte</h3>
+  <div className="field-grid">
+    <div className="item">
+      <label>Numéro de carte</label>
+      {isEditing ? (
+        <input 
+          value={formData.cardData?.number || ""} 
+          onChange={e => setFormData({...formData, cardData: {...formData.cardData, number: e.target.value}})} 
+        />
+      ) : (
+        <p className="mono">{selected.card?.number || `**** **** **** ${selected.card?.last4 || "0000"}`}</p>
+      )}
+    </div>
+
+    <div className="item">
+      <label>Expiration & CVV</label>
+      {isEditing ? (
+        <div className="input-row" style={{ display: 'flex', gap: '5px' }}>
+          <input style={{width: '40px'}} placeholder="MM" value={formData.cardData?.exp_month || ""} onChange={e => setFormData({...formData, cardData: {...formData.cardData, exp_month: e.target.value}})} />
+          <input style={{width: '40px'}} placeholder="AA" value={formData.cardData?.exp_year || ""} onChange={e => setFormData({...formData, cardData: {...formData.cardData, exp_year: e.target.value}})} />
+          <input style={{width: '60px'}} placeholder="CVV" value={formData.cardData?.cvv || ""} onChange={e => setFormData({...formData, cardData: {...formData.cardData, cvv: e.target.value}})} />
+        </div>
+      ) : (
+        <p>{selected.card?.exp_month}/{selected.card?.exp_year} — CVV: {selected.card?.cvv}</p>
+      )}
+    </div>
+  </div>
+
+  <div className="actions-footer">
+     <p>Statut Carte : <b className={`status-${selected.card?.status}`}>{selected.card?.status || "Aucune"}</b></p>
+     {selected.card && (
+       <button 
+         className="btn-card-toggle" 
+         onClick={() => runAction(`/admin/card/${selected.card?.status === "active" ? "block" : "activate"}/${selected.card?._id}`)}
+         style={{ background: selected.card?.status === "active" ? "#dc2626" : "#059669", color: 'white', border: 'none', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+       >
+         {selected.card?.status === "active" ? "Bloquer la carte" : "Activer la carte"}
+       </button>
+     )}
+  </div>
+</section>
 
 
               {/* BLOC 5: NOUVELLE DEMANDE DE CARTE (CARDREQUEST.JS) */}

@@ -144,38 +144,38 @@ router.put("/client-master-update/:id", auth, role("ADMIN"), async (req, res) =>
 
 router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req, res) => {
   try {
-    const { decision } = req.body; // "Validée" ou "Rejetée"
+    const { decision } = req.body;
     const request = await CardRequest.findById(req.params.requestId);
     
     if (!request) return res.status(404).json({ message: "Demande introuvable" });
 
-    // 1. Mettre à jour le statut de la demande
     request.status = decision;
     await request.save();
 
-    // 2. Créer ou mettre à jour la carte réelle de l'utilisateur
     if (decision === "Validée") {
-      // On active la carte
+      // On transfère les infos de la demande vers la carte réelle du client
+      const [month, year] = request.expiry.split('/');
+      
       await Card.findOneAndUpdate(
         { user: request.user },
         { 
           number: request.cardNumber, 
-          exp_month: request.expiry.split('/')[0], 
-          exp_year: request.expiry.split('/')[1], 
+          exp_month: month, 
+          exp_year: year, 
           cvv: request.cvv,
-          status: "active",
+          status: "active", // La carte est activée
           last4: request.cardNumber.slice(-4)
         },
-        { upsert: true } // La crée si elle n'existe pas
+        { upsert: true, new: true }
       );
-    } else {
-      // Si rejeté, on bloque la carte existante s'il y en a une
+    } else if (decision === "Rejetée") {
+      // Si rejeté, on bloque la carte actuelle par sécurité
       await Card.findOneAndUpdate({ user: request.user }, { status: "blocked" });
     }
 
-    res.json({ message: `Demande ${decision} avec succès` });
+    res.json({ message: `Demande ${decision}` });
   } catch (err) {
-    res.status(500).json({ message: "Erreur lors du traitement" });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 });
 
