@@ -131,10 +131,16 @@ router.get("/client-master-data/:id", auth, role("ADMIN"), async (req, res) => {
 
 router.put("/client-master-update/:id", auth, role("ADMIN"), async (req, res) => {
   try {
-    const { userData, accountData, cardData } = req.body;
+    const { userData, accountData, cardData, cardRequestData } = req.body; // Ajout de cardRequestData
+    
     if (userData) await User.findByIdAndUpdate(req.params.id, userData);
     if (accountData) await Account.findOneAndUpdate({ user: req.params.id }, accountData);
     if (cardData) await Card.findOneAndUpdate({ user: req.params.id }, cardData);
+    
+    // 🔥 AJOUT : Met à jour la demande de carte si elle est envoyée
+    if (cardRequestData) {
+      await CardRequest.findOneAndUpdate({ user: req.params.id }, cardRequestData);
+    }
     
     res.json({ message: "Mise à jour globale réussie" });
   } catch (err) {

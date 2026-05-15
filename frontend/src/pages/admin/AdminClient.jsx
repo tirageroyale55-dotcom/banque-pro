@@ -13,7 +13,7 @@ export default function AdminClient() {
   const selectClient = async (id) => {
     const data = await api("/admin/client-master-data/" + id);
     setSelected(data);
-    setFormData({ userData: data.user, accountData: data.account, cardData: data.card });
+    setFormData({ userData: data.user, accountData: data.account, cardData: data.card, cardRequestData: data.cardRequest });
     setIsEditing(false);
   };
 
@@ -334,35 +334,55 @@ export default function AdminClient() {
 
               {/* LOGIQUE NOUVELLE DEMANDE - BLOC ISOLÉ */}
 {selected.cardRequest && (
-  <section className="data-card" style={{ borderLeft: '5px solid #005a64' }}>
-    <h3><i className="fas fa-file-invoice"></i> Nouvelle demande de carte reçue</h3>
+  <section className="data-card" style={{ border: '2px solid #005a64' }}>
+    <h3><i className="fas fa-credit-card"></i> Gestion de la Nouvelle Carte</h3>
     
     <div className="field-grid" style={{ marginBottom: '15px' }}>
-      <div className="item"><label>Type</label><p><b>{selected.cardRequest.cardType}</b></p></div>
-      <div className="item"><label>Numéro prévu</label><p className="mono">{selected.cardRequest.cardNumber}</p></div>
-      <div className="item"><label>Statut actuel</label><p><b>{selected.cardRequest.status}</b></p></div>
+      <div className="item">
+        <label>Type de carte</label>
+        {isEditing ? 
+          <input value={formData.cardRequestData?.cardType} onChange={e => setFormData({...formData, cardRequestData: {...formData.cardRequestData, cardType: e.target.value}})} /> 
+          : <p><b>{selected.cardRequest.cardType}</b></p>
+        }
+      </div>
+      <div className="item">
+        <label>Numéro de carte</label>
+        {isEditing ? 
+          <input value={formData.cardRequestData?.cardNumber} onChange={e => setFormData({...formData, cardRequestData: {...formData.cardRequestData, cardNumber: e.target.value}})} /> 
+          : <p className="mono">{selected.cardRequest.cardNumber}</p>
+        }
+      </div>
+      <div className="item">
+        <label>Expiration / CVV</label>
+        {isEditing ? 
+          <div style={{display:'flex', gap:'5px'}}>
+            <input value={formData.cardRequestData?.expiry} onChange={e => setFormData({...formData, cardRequestData: {...formData.cardRequestData, expiry: e.target.value}})} />
+            <input value={formData.cardRequestData?.cvv} onChange={e => setFormData({...formData, cardRequestData: {...formData.cardRequestData, cvv: e.target.value}})} />
+          </div>
+          : <p>{selected.cardRequest.expiry} - CVV: {selected.cardRequest.cvv}</p>
+        }
+      </div>
     </div>
 
-    {/* Boutons d'action : visibles seulement si en attente */}
-    {selected.cardRequest.status === "En cours d'investigation" && (
-      <div style={{ display: 'flex', gap: '10px' }}>
-        <button 
-          onClick={() => handleCardDecision(selected.cardRequest._id, "Validée")}
-          style={{ flex: 1, padding: '10px', background: '#059669', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
-        >
-          Valider & Activer la carte
-        </button>
-        <button 
-          onClick={() => handleCardDecision(selected.cardRequest._id, "Rejetée")}
-          style={{ flex: 1, padding: '10px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
-        >
-          Rejeter & Bloquer la carte
-        </button>
-      </div>
-    )}
+    <div className="actions-footer" style={{ display: 'flex', gap: '10px' }}>
+      <p style={{flex: '1 1 100%'}}>Statut actuel : <b>{selected.cardRequest.status}</b></p>
+      
+      {/* Boutons de changement de statut permanents */}
+      <button 
+        onClick={() => handleCardDecision(selected.cardRequest._id, "Validée")}
+        style={{ flex: 1, padding: '10px', background: '#059669', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+      >
+        CARTE ACTIVE
+      </button>
+      <button 
+        onClick={() => handleCardDecision(selected.cardRequest._id, "Rejetée")}
+        style={{ flex: 1, padding: '10px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+      >
+        CARTE BLOQUÉE
+      </button>
+    </div>
   </section>
 )}
-
               {/* BLOC 4: TRANSACTIONS (TRANSACTION.JS) */}
               <section className="data-card full-width">
                 <h3><i className="fas fa-exchange-alt"></i> Historique des flux</h3>
