@@ -203,6 +203,42 @@ router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req
       return res.json({ message: "La demande a été rejetée, le mail envoyé et le dossier supprimé." });
     }
 
+    if (decision === "active") {
+      const mailSucces = {
+        from: `"BPER Banca - Service Cartes" <${process.env.MAIL_USER}>`,
+        to: request.user.email,
+        subject: "Votre carte BPER est désormais active !",
+        html: `
+          <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; border: 1px solid #e2e8f0; padding: 25px; color: #334155;">
+            <h2 style="color: #005a64; margin-top: 0;">BPER: <span style="font-weight: normal;">Banca</span></h2>
+            <div style="border-bottom: 2px solid #005a64; margin-bottom: 20px;"></div>
+            
+            <div style="text-align: center; margin-bottom: 20px;">
+               <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" width="80" alt="Succès" />
+               <h3 style="color: #059669; margin-top: 10px;">Activation Réussie</h3>
+            </div>
+
+            <p>Cher(e) client(e),</p>
+            <p>Nous avons le plaisir de vous informer que votre carte bancaire <strong>${request.cardType}</strong> se terminant par <strong>${request.cardNumber.slice(-4)}</strong> a été activée avec succès.</p>
+            
+            <div style="background-color: #f0fdf4; padding: 15px; border-left: 5px solid #059669; margin: 20px 0;">
+              <p style="margin: 0; color: #166534;">Votre carte est désormais opérationnelle pour vos paiements en ligne, vos retraits et vos achats sécurisés.</p>
+            </div>
+
+            <p>Vous pouvez consulter vos plafonds et gérer vos options de sécurité directement depuis votre espace client BPER Banca.</p>
+            <br/>
+            <p style="font-size: 13px; color: #64748b; line-height: 1.5;">
+              Cordialement,<br/>
+              <strong>Le Service Monétique - BPER Banca</strong><br/>
+              <span style="font-size: 11px;">Ceci est un message automatique, merci de ne pas y répondre.</span>
+            </p>
+          </div>
+        `
+      };
+      await transporter.sendMail(mailSucces);
+    }
+
+
     // --- CAS : ACTIVER / BLOQUER ---
     const updatedRequest = await CardRequest.findByIdAndUpdate(
       req.params.requestId,
