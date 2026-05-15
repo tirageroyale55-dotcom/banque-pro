@@ -144,36 +144,20 @@ router.put("/client-master-update/:id", auth, role("ADMIN"), async (req, res) =>
 
 router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req, res) => {
   try {
-    const { decision } = req.body;
+    const { decision } = req.body; // "Validée" ou "Rejetée"
     const request = await CardRequest.findById(req.params.requestId);
     
     if (!request) return res.status(404).json({ message: "Demande introuvable" });
 
+    // 1. On met à jour la demande
     request.status = decision;
     await request.save();
 
-    if (decision === "Validée") {
-      // On transfère les infos de la demande vers la carte réelle du client
-      const [month, year] = request.expiry.split('/');
-      
-      await Card.findOneAndUpdate(
-        { user: request.user },
-        { 
-          number: request.cardNumber, 
-          exp_month: month, 
-          exp_year: year, 
-          cvv: request.cvv,
-          status: "active", // La carte est activée
-          last4: request.cardNumber.slice(-4)
-        },
-        { upsert: true, new: true }
-      );
-    } else if (decision === "Rejetée") {
-      // Si rejeté, on bloque la carte actuelle par sécurité
-      await Card.findOneAndUpdate({ user: request.user }, { status: "blocked" });
-    }
+    // 2. On change uniquement le statut de la carte du client
+    const newStatus = (decision === "Validée") ? "active" : "blocked";
+    await Card.findOneAndUpdate({ user: request.user }, { status: newStatus });
 
-    res.json({ message: `Demande ${decision}` });
+    res.json({ message: `Statut mis à jour : ${decision}` });
   } catch (err) {
     res.status(500).json({ message: "Erreur serveur" });
   }

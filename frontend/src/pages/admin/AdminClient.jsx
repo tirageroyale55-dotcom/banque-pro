@@ -316,83 +316,47 @@ export default function AdminClient() {
   </div>
 </section>
 
-              {/* BLOC 3: CARTE (CARD.JS) - MODIFIABLE */}
-<section className="data-card card-card">
-  <h3><i className="fas fa-credit-card"></i> Détails Carte</h3>
-  <div className="field-grid">
-    <div className="item">
-      <label>Numéro de carte</label>
-      {isEditing ? (
-        <input 
-          value={formData.cardData?.number || ""} 
-          onChange={e => setFormData({...formData, cardData: {...formData.cardData, number: e.target.value}})} 
-        />
-      ) : (
-        <p className="mono">{selected.card?.number || `**** **** **** ${selected.card?.last4 || "0000"}`}</p>
-      )}
-    </div>
-
-    <div className="item">
-      <label>Expiration & CVV</label>
-      {isEditing ? (
-        <div className="input-row" style={{ display: 'flex', gap: '5px' }}>
-          <input style={{width: '40px'}} placeholder="MM" value={formData.cardData?.exp_month || ""} onChange={e => setFormData({...formData, cardData: {...formData.cardData, exp_month: e.target.value}})} />
-          <input style={{width: '40px'}} placeholder="AA" value={formData.cardData?.exp_year || ""} onChange={e => setFormData({...formData, cardData: {...formData.cardData, exp_year: e.target.value}})} />
-          <input style={{width: '60px'}} placeholder="CVV" value={formData.cardData?.cvv || ""} onChange={e => setFormData({...formData, cardData: {...formData.cardData, cvv: e.target.value}})} />
-        </div>
-      ) : (
-        <p>{selected.card?.exp_month}/{selected.card?.exp_year} — CVV: {selected.card?.cvv}</p>
-      )}
-    </div>
-  </div>
-
-  <div className="actions-footer">
-     <p>Statut Carte : <b className={`status-${selected.card?.status}`}>{selected.card?.status || "Aucune"}</b></p>
-     {selected.card && (
-       <button 
-         className="btn-card-toggle" 
-         onClick={() => runAction(`/admin/card/${selected.card?.status === "active" ? "block" : "activate"}/${selected.card?._id}`)}
-         style={{ background: selected.card?.status === "active" ? "#dc2626" : "#059669", color: 'white', border: 'none', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
-       >
-         {selected.card?.status === "active" ? "Bloquer la carte" : "Activer la carte"}
-       </button>
-     )}
-  </div>
-</section>
+              {/* BLOC 3: CARTE (CARD.JS) */}
+              <section className="data-card card-card">
+                <h3><i className="fas fa-credit-card"></i> Détails Carte</h3>
+                <div className="field-grid">
+                  <div className="item"><label>Numéro de carte</label>{isEditing ? <input value={formData.cardData?.number} onChange={e => setFormData({...formData, cardData: {...formData.cardData, number: e.target.value}})} /> : <p>**** **** **** {selected.card?.last4}</p>}</div>
+                  <div className="item"><label>Expiration / CVV</label>{isEditing ? <div className="input-row"><input value={formData.cardData?.exp_month} /><input value={formData.cardData?.exp_year} /><input value={formData.cardData?.cvv} /></div> : <p>{selected.card?.exp_month}/{selected.card?.exp_year} - CVV: {selected.card?.cvv}</p>}</div>
+                </div>
+                <div className="actions-footer">
+                   <p>Statut Carte : <b>{selected.card?.status}</b></p>
+                   <button className="btn-card-toggle" onClick={() => runAction(`/admin/card/${selected.card?.status === "active" ? "block" : "activate"}/${selected.card?._id}`)}>
+                     Basculer Statut Carte
+                   </button>
+                </div>
+              </section>
 
 
-              {/* BLOC 5: NOUVELLE DEMANDE DE CARTE (CARDREQUEST.JS) */}
+              {/* LOGIQUE NOUVELLE DEMANDE - BLOC ISOLÉ */}
 {selected.cardRequest && (
-  <section className="data-card request-card-admin" style={{ border: '2px solid #005a64' }}>
-    <div className="section-header">
-      <h3><i className="fas fa- bell"></i> Nouvelle Demande de Carte</h3>
-      <span className={`status-badge ${selected.cardRequest.status.replace(/\s+/g, '-').toLowerCase()}`}>
-        {selected.cardRequest.status}
-      </span>
+  <section className="data-card" style={{ borderLeft: '5px solid #005a64' }}>
+    <h3><i className="fas fa-file-invoice"></i> Nouvelle demande de carte reçue</h3>
+    
+    <div className="field-grid" style={{ marginBottom: '15px' }}>
+      <div className="item"><label>Type</label><p><b>{selected.cardRequest.cardType}</b></p></div>
+      <div className="item"><label>Numéro prévu</label><p className="mono">{selected.cardRequest.cardNumber}</p></div>
+      <div className="item"><label>Statut actuel</label><p><b>{selected.cardRequest.status}</b></p></div>
     </div>
 
-    <div className="field-grid">
-      <div className="item"><label>Type Demandé</label><p className="txt-bold">{selected.cardRequest.cardType}</p></div>
-      <div className="item"><label>Numéro Généré</label><p className="mono">{selected.cardRequest.cardNumber}</p></div>
-      <div className="item"><label>Expiration / CVV</label><p>{selected.cardRequest.expiry} - {selected.cardRequest.cvv}</p></div>
-      <div className="item"><label>Note Client</label><p><i>{selected.cardRequest.comment || "Aucun commentaire"}</i></p></div>
-    </div>
-
+    {/* Boutons d'action : visibles seulement si en attente */}
     {selected.cardRequest.status === "En cours d'investigation" && (
-      <div className="actions-footer decision-btns" style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+      <div style={{ display: 'flex', gap: '10px' }}>
         <button 
-          onClick={() => handleCardDecision(selected.cardRequest._id, "Validée")} 
-          className="btn-save" 
-          style={{ background: '#059669', flex: 1 }}
+          onClick={() => handleCardDecision(selected.cardRequest._id, "Validée")}
+          style={{ flex: 1, padding: '10px', background: '#059669', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
         >
           Valider & Activer la carte
         </button>
         <button 
-          onClick={() => handleCardDecision(selected.cardRequest._id, "Rejetée")} 
-          className="btn-edit" 
-          style={{ background: '#dc2626', color: 'white', flex: 1 }}
+          onClick={() => handleCardDecision(selected.cardRequest._id, "Rejetée")}
+          style={{ flex: 1, padding: '10px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
         >
-          Rejeter & Bloquer
+          Rejeter & Bloquer la carte
         </button>
       </div>
     )}
