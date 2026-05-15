@@ -151,19 +151,31 @@ router.put("/client-master-update/:id", auth, role("ADMIN"), async (req, res) =>
 router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req, res) => {
   try {
     const { decision } = req.body; 
-    // On transforme la décision en statut lisible par ton BankCard.jsx
-    // Si decision == "active" -> "CARTE ACTIVE"
-    // Si decision == "blocked" -> "CARTE BLOQUÉE"
+    // decision sera "active" ou "blocked" envoyé par le front
     
     const request = await CardRequest.findById(req.params.requestId);
     if (!request) return res.status(404).json({ message: "Demande introuvable" });
 
-    request.status = (decision === "active") ? "active" : "blocked";
+    // 1. On met à jour la CardRequest (La nouvelle logique)
+    request.status = decision; 
     await request.save();
 
-    res.json({ message: `Statut mis à jour : ${request.status}` });
+    // 2. On essaie de mettre à jour la Card physique si elle existe
+    // On utilise un try/catch interne pour ne pas bloquer si la carte n'existe pas
+    try {
+      await Card.findOneAndUpdate(
+        { user: request.user }, 
+        { status: decision },
+        { upsert: false } // Ne pas créer si n'existe pas
+      );
+    } catch (cardErr) {
+      console.log("Note: Pas de carte physique à mettre à jour, c'est ok.");
+    }
+
+    res.json({ message: "Statut mis à jour", status: decision });
   } catch (err) {
-    res.status(500).json({ message: "Erreur serveur" });
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur", details: err.message });
   }
 });
 

@@ -377,30 +377,20 @@ export default function AdminClient() {
     </div>
 
     {/* CONTRÔLE DES STATUTS DE LA NOUVELLE CARTE */}
-<div className="actions-footer" style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
-  
-  {/* BOUTON ACTIVER -> Devient CARTE ACTIVE */}
+<div className="actions-footer" style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
   <button 
     onClick={() => handleCardDecision(selected.cardRequest._id, "active")}
-    style={{ 
-      flex: 1, padding: '12px', background: '#059669', color: 'white', 
-      border: 'none', borderRadius: '8px', fontWeight: '900', cursor: 'pointer' 
-    }}
+    style={{ flex: 1, padding: '12px', background: '#059669', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold' }}
   >
-    ACTIVER (CARTE ACTIVE)
+    VALIDER (ACTIVER)
   </button>
-
-  {/* BOUTON BLOQUER -> Devient CARTE BLOQUÉE */}
+  
   <button 
     onClick={() => handleCardDecision(selected.cardRequest._id, "blocked")}
-    style={{ 
-      flex: 1, padding: '12px', background: '#dc2626', color: 'white', 
-      border: 'none', borderRadius: '8px', fontWeight: '900', cursor: 'pointer' 
-    }}
+    style={{ flex: 1, padding: '12px', background: '#dc2626', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold' }}
   >
-    BLOQUER (CARTE BLOQUÉE)
+    BLOQUER LA CARTE
   </button>
-
 </div>
   </section>
 )}
