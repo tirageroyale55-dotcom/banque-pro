@@ -28,7 +28,7 @@ export default function ClientLayout() {
           2. ET qu'on n'est PAS sur le profil (!isProfilePage)
           3. ET qu'on n'est PAS sur les détails de carte (!isCardDetailsPage)
       */}
-      {!isDesktop && !isProfilePage && !isCardDetailsPage && !BottomNav && <isCardOrderConfirmation />}
+      {!isDesktop && !isProfilePage && !isCardDetailsPage && !isCardOrderConfirmation && <BottomNav />}
     </div>
   );
 }
