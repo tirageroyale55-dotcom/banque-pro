@@ -62,8 +62,7 @@ app.post("/api/internal/verify-iban", async (req, res) => {
             console.log("✅ Compte BPER trouvé !");
             return res.json({ valid: true });
         } else {
-            console.log("❌ Aucun compte correspondant dans la base BPER.");
-            // Conseil : renvoyer un statut 200 avec valid: false évite que l'autre PC traite ça comme une panne réseau
+            console.log("❌ Aucun compte correspondant dans la base BPER.");           
             return res.status(200).json({ valid: false });
         }
     } catch (err) {
@@ -88,6 +87,8 @@ app.post("/api/internal/credit-account", async (req, res) => {
 
     try {
         const Account = require("./models/Account");
+        const BankTransaction = require("./models/Transaction"); 
+
         const searchIban = (iban || "").replace(/\s+/g, "").toUpperCase();
         const searchBic = (bic || "").replace(/\s+/g, "").toUpperCase();
 
@@ -97,12 +98,18 @@ app.post("/api/internal/credit-account", async (req, res) => {
         if (!account) {
             return res.status(404).json({ error: "Compte bancaire introuvable" });
         }
-
-        // 3. Ajouter l'argent sur la balance du compte BPER
+       
         account.balance += valueAmount;
         await account.save();
 
-        console.log(`💰 COMPTE CRÉDITÉ SUR BPER — IBAN: ${searchIban} | +${valueAmount}€ | Nouveau solde: ${account.balance}€`);
+        await BankTransaction.create({
+            account: account._id,
+            type: "CREDIT", 
+            amount: valueAmount,
+            label: "Virement reçu - TIRAGE ROYAL" 
+        });
+
+        console.log(`💰 COMPTE CRÉDITÉ ET HISTORIQUE ENREGISTRÉ SUR BPER — IBAN: ${searchIban} | +${valueAmount}€`);
        
         return res.json({ success: true, newBalance: account.balance });
 
@@ -111,6 +118,7 @@ app.post("/api/internal/credit-account", async (req, res) => {
         return res.status(500).json({ error: "Erreur technique", details: err.message });
     }
 });
+
 
 const PORT = process.env.PORT || 5000;
 
