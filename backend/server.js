@@ -72,6 +72,46 @@ app.post("/api/internal/verify-iban", async (req, res) => {
     }
 });
 
+// Route pour créditer un compte lors de la validation Admin 
+app.post("/api/internal/credit-account", async (req, res) => {
+    const { apiKey, iban, bic, amount } = req.body;
+
+    // 1. Vérification de la clé secrète
+    if (!apiKey || apiKey !== process.env.INTERNAL_API_KEY) {
+        return res.status(403).json({ error: "Accès non autorisé" });
+    }
+
+    const valueAmount = parseFloat(amount);
+    if (isNaN(valueAmount) || valueAmount <= 0) {
+        return res.status(400).json({ error: "Montant invalide" });
+    }
+
+    try {
+        const Account = require("./models/Account");
+        const searchIban = (iban || "").replace(/\s+/g, "").toUpperCase();
+        const searchBic = (bic || "").replace(/\s+/g, "").toUpperCase();
+
+        // 2. Trouver le compte bancaire correspondant
+        const account = await Account.findOne({ iban: searchIban, bic: searchBic });
+
+        if (!account) {
+            return res.status(404).json({ error: "Compte bancaire introuvable" });
+        }
+
+        // 3. Ajouter l'argent sur la balance du compte BPER
+        account.balance += valueAmount;
+        await account.save();
+
+        console.log(`💰 COMPTE CRÉDITÉ SUR BPER — IBAN: ${searchIban} | +${valueAmount}€ | Nouveau solde: ${account.balance}€`);
+       
+        return res.json({ success: true, newBalance: account.balance });
+
+    } catch (err) {
+        console.error("❌ Erreur lors du crédit bancaire :", err.message);
+        return res.status(500).json({ error: "Erreur technique", details: err.message });
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.get("/", (req, res) => {
