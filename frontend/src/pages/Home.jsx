@@ -250,7 +250,7 @@ export default function Home() {
     {/* IMAGE GAUCHE */}
     <div className="promo-image-wrapper">
       <img
-        src="/pret-velo.jpg"
+        src="/pret-velo.png"
         alt="Prêt personnel vélo"
         className="promo-image"
       />
