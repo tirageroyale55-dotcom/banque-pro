@@ -280,7 +280,7 @@ export default function Home() {
         </h2>
 
         <p>
-          Jusqu'au <strong>27 février 2026</strong>, si vous faites une
+          D'ici la fin de  <strong>l'année</strong>, si vous faites une
           demande de <strong>prêt personnel</strong>, vous bénéficiez
           d'un <strong>TAEG fixe subventionné</strong> et de
           <strong> frais de traitement nuls</strong>.
