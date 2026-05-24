@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+
 import "../styles/produits.css";
 
 export default function Produits({ isDesktop = false }) {
