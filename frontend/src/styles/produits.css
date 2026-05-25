@@ -132,3 +132,70 @@
 
 
 
+/* ================= STYLE MOBILE ISOLÉ POUR LE PRÊT (VERT NUIT & BLANC) ================= */
+@media (max-width: 900px) {
+  /* Le conteneur global du prêt prend un fond vert nuit */
+  .bper-loan-container {
+    background: #002426 !important;
+    padding: 15px 10px;
+    border-radius: 20px;
+  }
+
+  /* La carte du formulaire devient transparente pour laisser voir le fond vert nuit */
+  .bper-loan-container .bper-loan-card {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 10px !important;
+  }
+
+  /* Tous les textes et titres passent en blanc */
+  .bper-loan-container .bper-loan-title,
+  .bper-loan-container .bper-step-title {
+    color: #ffffff !important;
+  }
+
+  .bper-loan-container .bper-loan-subtitle,
+  .bper-loan-container .bper-legal-text,
+  .bper-loan-container label {
+    color: #cbd5e1 !important; /* Blanc cassé pour une lecture agréable */
+  }
+
+  /* Ajustement de la grille en 1 seule colonne sur mobile */
+  .bper-loan-container .bper-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+  }
+
+  /* Style de la boîte d'estimation des mensualités */
+  .bper-loan-container .bper-estimation-box {
+    background: #003638 !important; /* Vert un peu plus clair pour le contraste */
+    border-left-color: #e6ff6a !important; /* Bordure jaune BPER */
+  }
+
+  .bper-loan-container .bper-estimation-box h4,
+  .bper-loan-container .bper-estimation-box p {
+    color: #ffffff !important;
+  }
+
+  .bper-loan-container .bper-rate-text {
+    color: #a7f3d0 !important;
+  }
+
+  /* Style de la boîte récapitulative finale (Étape 3) */
+  .bper-loan-container .bper-summary-box {
+    background: #003638 !important;
+    border: 1px solid #004f52 !important;
+    color: #ffffff !important;
+  }
+  
+  .bper-loan-container .bper-summary-box h4,
+  .bper-loan-container .bper-summary-box strong {
+    color: #e6ff6a !important; /* Jaune fluo pour faire ressortir les éléments clés */
+  }
+
+  /* Barre de progression des étapes adaptée pour le fond sombre */
+  .bper-loan-container .bper-loan-steps {
+    background: #003638 !important;
+    box-shadow: none !important;
+  }
+}
