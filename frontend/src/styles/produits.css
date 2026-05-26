@@ -265,12 +265,11 @@
 
 /* ================= STYLE MOBILE ISOLÉ POUR LE PRÊT (VERT NUIT & BLANC) ================= */
 @media (max-width: 900px) {
-  /* Le conteneur global du prêt prend un fond vert nuit */
-  .bper-loan-container {
+  .bper-page-global-wrapper {
     background-color: #f4f7f8;
   max-width: 1000px; /* Pour le confort sur desktop */
   margin: 0 auto;
-  }
+}
 
   /* La carte du formulaire devient transparente pour laisser voir le fond vert nuit */
   .bper-loan-container .bper-loan-card {
