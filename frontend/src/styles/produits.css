@@ -318,9 +318,5 @@
     color: #e6ff6a !important; /* Jaune fluo pour faire ressortir les éléments clés */
   }
 
-  /* Barre de progression des étapes adaptée pour le fond sombre */
-  .bper-loan-container .bper-loan-steps {
-    background: #003638 !important;
-    box-shadow: none !important;
-  }
+  
 }
