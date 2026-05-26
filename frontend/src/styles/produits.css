@@ -135,6 +135,9 @@
 /* ================= PROMO IMAGE CARD ================= */
 .promo-card-inner.reverse{
   grid-template-columns:.9fr 1.1fr;
+   background-color: #f4f7f8;
+  max-width: 1000px; /* Pour le confort sur desktop */
+  margin: 0 auto;
 }
 
 /* IMAGE */
