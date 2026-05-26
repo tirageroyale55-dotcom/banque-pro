@@ -139,6 +139,7 @@
     background: #002426 !important;
     padding: 15px 10px;
     border-radius: 20px;
+    margin-top: 60px !important;
   }
 
   /* La carte du formulaire devient transparente pour laisser voir le fond vert nuit */
