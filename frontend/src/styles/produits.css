@@ -136,15 +136,9 @@
 @media (max-width: 900px) {
 
     .bper-page-global-wrapper {
-    /* Ajoute une marge égale à la hauteur de ton Header mobile (ex: 60px) */
-    margin-top: 60px !important; 
-  }
-
-  .bper-page-global-wrapper {
-    background: #002426 !important;
-    min-height: 100vh;
-    padding: 20px 15px !important;
-    color: #ffffff !important;
+    background-color: #f4f7f8;
+  max-width: 1000px; /* Pour le confort sur desktop */
+  margin: 0 auto;
   }
   /* Le conteneur global du prêt prend un fond vert nuit */
   .bper-loan-container {
