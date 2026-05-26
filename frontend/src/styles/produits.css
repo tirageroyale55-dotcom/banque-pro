@@ -135,22 +135,14 @@
 /* ================= FORCE LE FOND VERT NUIT SUR TOUTE LA PAGE PRODUIT SUR MOBILE ================= */
 @media (max-width: 900px) {
 
-    .navbar, header, .app-header {
-    background-color: #002426 !important; /* Force le vert nuit BPER */
-    border-bottom: 1px solid #004f52 !important; /* Optionnel : une fine bordure pour le style */
-  }
-
-  /* Si tes liens de menu deviennent invisibles (car écrits en sombre), force-les en blanc */
-  .navbar a, header a, .app-header a {
-    color: #ffffff !important;
-  }
-  
+    
   /* Le conteneur parent prend tout l'écran mobile en Vert Nuit */
   .bper-page-global-wrapper {
     background: #002426 !important;
     min-height: 100vh;
     padding: 20px 15px !important;
     color: #ffffff !important;
+    margin-top: 60px !important;
   }
 
   /* --- VUE 1 : ACCUEIL DES PRODUITS --- */
