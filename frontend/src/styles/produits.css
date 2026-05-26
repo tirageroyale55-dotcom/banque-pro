@@ -132,76 +132,133 @@
 
 
 
-/* ================= STYLE MOBILE ISOLÉ POUR LE PRÊT (VERT NUIT & BLANC) ================= */
-@media (max-width: 900px) {
+/* ================= PROMO IMAGE CARD ================= */
+.promo-card-inner.reverse{
+  grid-template-columns:.9fr 1.1fr;
+}
 
-    .bper-page-global-wrapper {
-    background-color: #f4f7f8;
-  max-width: 1000px; /* Pour le confort sur desktop */
-  margin: 0 auto;
-  }
-  /* Le conteneur global du prêt prend un fond vert nuit */
-  .bper-loan-container {
-    background: #002426 !important;
-    padding: 15px 10px;
-    border-radius: 20px;
+/* IMAGE */
+.promo-image-wrapper{
+  position:relative;
+  overflow:hidden;
+}
+
+.promo-image{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* BADGE TAUX */
+.promo-badge{
+  position:absolute;
+  top:24px;
+  left:24px;
+  background:#e6ff6a;
+  color:#003f44;
+  border-radius:50%;
+  width:150px;
+  height:150px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-weight:700;
+  box-shadow:0 12px 30px rgba(0,0,0,.2);
+}
+
+.badge-small{
+  font-size:12px;
+}
+
+.badge-big{
+  font-size:26px;
+}
+
+.badge-old{
+  font-size:12px;
+  text-decoration:line-through;
+  opacity:.6;
+}
+
+.badge-label{
+  font-size:12px;
+  margin-top:4px;
+}
+
+/* BLOC DROIT SOMBRE */
+.promo-card-visual.dark{
+  background:#004f52;
+  border-top-right-radius:32px;
+  border-bottom-right-radius:32px;
+}
+
+.promo-text-dark{
+  padding:56px;
+  color:white;
+}
+
+.promo-text-dark h2{
+  font-size:36px;
+  line-height:1.25;
+  margin:20px 0;
+}
+
+.promo-text-dark p{
+  font-size:16px;
+  line-height:1.6;
+  margin-bottom:16px;
+}
+
+/* TAG */
+.promo-tag{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:600;
+  opacity:.9;
+}
+
+.promo-icon{
+  background:#007a5e;
+  padding:10px;
+  border-radius:12px;
+}
+
+/* BOUTON BLANC */
+.btn-white{
+  margin-top:18px;
+  display:inline-block;
+  padding:12px 26px;
+  background:white;
+  color:#004f52;
+  border-radius:30px;
+  font-weight:600;
+  text-decoration:none;
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .promo-card-inner.reverse{
+    grid-template-columns:1fr;
   }
 
-  /* La carte du formulaire devient transparente pour laisser voir le fond vert nuit */
-  .bper-loan-container .bper-loan-card {
-    background: transparent !important;
-    box-shadow: none !important;
-    padding: 10px !important;
+  .promo-card-visual.dark{
+    border-radius:0 0 32px 32px;
   }
 
-  /* Tous les textes et titres passent en blanc */
-  .bper-loan-container .bper-loan-title,
-  .bper-loan-container .bper-step-title {
-    color: #ffffff !important;
+  .promo-badge{
+    width:120px;
+    height:120px;
   }
 
-  .bper-loan-container .bper-loan-subtitle,
-  .bper-loan-container .bper-legal-text,
-  .bper-loan-container label {
-    color: #cbd5e1 !important; /* Blanc cassé pour une lecture agréable */
+  .promo-text-dark{
+    padding:32px 24px;
   }
 
-  /* Ajustement de la grille en 1 seule colonne sur mobile */
-  .bper-loan-container .bper-grid-2 {
-    grid-template-columns: 1fr !important;
-    gap: 15px !important;
-  }
-
-  /* Style de la boîte d'estimation des mensualités */
-  .bper-loan-container .bper-estimation-box {
-    background: #003638 !important; /* Vert un peu plus clair pour le contraste */
-    border-left-color: #e6ff6a !important; /* Bordure jaune BPER */
-  }
-
-  .bper-loan-container .bper-estimation-box h4,
-  .bper-loan-container .bper-estimation-box p {
-    color: #ffffff !important;
-  }
-
-  .bper-loan-container .bper-rate-text {
-    color: #a7f3d0 !important;
-  }
-
-  /* Style de la boîte récapitulative finale (Étape 3) */
-  .bper-loan-container .bper-summary-box {
-    background: #003638 !important;
-    border: 1px solid #004f52 !important;
-    color: #ffffff !important;
-  }
-  
-  .bper-loan-container .bper-summary-box h4,
-  .bper-loan-container .bper-summary-box strong {
-    color: #e6ff6a !important; /* Jaune fluo pour faire ressortir les éléments clés */
-  }
-
-  /* Barre de progression des étapes adaptée pour le fond sombre */
-  .bper-loan-container .bper-loan-steps {
-    background: #003638 !important;
-    box-shadow: none !important;
+  .promo-text-dark h2{
+    font-size:26px;
   }
 }
