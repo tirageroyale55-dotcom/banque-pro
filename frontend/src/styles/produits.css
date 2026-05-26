@@ -263,59 +263,112 @@
   }
 }
 
-/* ================= STYLE MOBILE ISOLÉ POUR LE PRÊT (VERT NUIT & BLANC) ================= */
+/* ================= FORCE LE FOND VERT NUIT SUR TOUTE LA PAGE PRODUIT SUR MOBILE ================= */
 @media (max-width: 900px) {
+  /* Le conteneur parent prend tout l'écran mobile en Vert Nuit */
   .bper-page-global-wrapper {
-    background-color: #f4f7f8;
-  max-width: 1000px; /* Pour le confort sur desktop */
-  margin: 0 auto;
-}
-
-  /* La carte du formulaire devient transparente pour laisser voir le fond vert nuit */
-  .bper-loan-container .bper-loan-card {
-    background: transparent !important;
-    box-shadow: none !important;
-    padding: 10px !important;
-  }
-
-  /* Tous les textes et titres passent en blanc */
-  .bper-loan-container .bper-loan-title,
-  .bper-loan-container .bper-step-title {
+    background: #002426 !important;
+    min-height: 100vh;
+    padding: 20px 15px !important;
     color: #ffffff !important;
   }
 
-  .bper-loan-container .bper-loan-subtitle,
-  .bper-loan-container .bper-legal-text,
-  .bper-loan-container label {
-    color: #cbd5e1 !important; /* Blanc cassé pour une lecture agréable */
+  /* --- VUE 1 : ACCUEIL DES PRODUITS --- */
+  .bper-page-global-wrapper .main-page-title {
+    color: #ffffff !important;
   }
 
-  /* Ajustement de la grille en 1 seule colonne sur mobile */
-  .bper-loan-container .bper-grid-2 {
+  /* Livret d'épargne adapté */
+  .bper-page-global-wrapper .bper-sav-card {
+    background: #003638 !important;
+    box-shadow: none !important;
+    border: 1px solid #004f52 !important;
+  }
+  .bper-page-global-wrapper .bper-sav-title {
+    color: #e6ff6a !important; /* Jaune BPER en valeur */
+  }
+  .bper-page-global-wrapper .bper-sav-text {
+    color: #cbd5e1 !important;
+  }
+
+  /* --- VUE 2 : PAGE AVANTAGES --- */
+  .bper-page-global-wrapper .bper-advantages-block {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  .bper-page-global-wrapper .bper-back-btn,
+  .bper-page-global-wrapper .bper-adv-title,
+  .bper-page-global-wrapper .bper-table-title {
+    color: #ffffff !important;
+  }
+  .bper-page-global-wrapper .bper-adv-subtitle {
+    color: #cbd5e1 !important;
+  }
+  /* Les petites cartes d'avantages */
+  .bper-page-global-wrapper .bper-adv-card {
+    background: #003638 !important;
+  }
+  .bper-page-global-wrapper .bper-adv-card h4 {
+    color: #e6ff6a !important;
+  }
+  .bper-page-global-wrapper .bper-adv-card p {
+    color: #cbd5e1 !important;
+  }
+  /* Tableau de comparaison sur fond sombre */
+  .bper-page-global-wrapper .bper-comparison-table {
+    background: #003638 !important;
+  }
+  .bper-page-global-wrapper .bper-comparison-table td {
+    color: #ffffff !important;
+    border-bottom: 1px solid #004f52 !important;
+  }
+
+  /* --- VUE 3 : FORMULAIRE & SIMULATEUR --- */
+  .bper-page-global-wrapper .bper-loan-container {
+    background: transparent !important;
+    padding: 0 !important;
+  }
+  .bper-page-global-wrapper .bper-loan-card {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  .bper-page-global-wrapper .bper-loan-title,
+  .bper-page-global-wrapper .bper-step-title {
+    color: #ffffff !important;
+  }
+  .bper-page-global-wrapper .bper-loan-subtitle,
+  .bper-page-global-wrapper .bper-legal-text,
+  .bper-page-global-wrapper label {
+    color: #cbd5e1 !important;
+  }
+  .bper-page-global-wrapper .bper-grid-2 {
     grid-template-columns: 1fr !important;
     gap: 15px !important;
   }
-
-  /* Style de la boîte d'estimation des mensualités */
-  .bper-loan-container .bper-estimation-box {
-    background: #003638 !important; /* Vert un peu plus clair pour le contraste */
-    border-left-color: #e6ff6a !important; /* Bordure jaune BPER */
+  .bper-page-global-wrapper .bper-estimation-box {
+    background: #003638 !important;
+    border-left-color: #e6ff6a !important;
   }
-
-  .bper-loan-container .bper-estimation-box h4,
-  .bper-loan-container .bper-estimation-box p {
+  .bper-page-global-wrapper .bper-estimation-box h4,
+  .bper-page-global-wrapper .bper-estimation-box p {
     color: #ffffff !important;
   }
-
-  .bper-loan-container .bper-rate-text {
+  .bper-page-global-wrapper .bper-rate-text {
     color: #a7f3d0 !important;
   }
-
-  
-  .bper-loan-container .bper-summary-box h4,
-  .bper-loan-container .bper-summary-box strong {
-    color: #e6ff6a !important; /* Jaune fluo pour faire ressortir les éléments clés */
+  .bper-page-global-wrapper .bper-summary-box {
+    background: #003638 !important;
+    border: 1px solid #004f52 !important;
+    color: #ffffff !important;
   }
-
-  
+  .bper-page-global-wrapper .bper-summary-box h4,
+  .bper-page-global-wrapper .bper-summary-box strong {
+    color: #e6ff6a !important;
+  }
+  .bper-page-global-wrapper .bper-loan-steps {
+    background: #003638 !important;
+    box-shadow: none !important;
+  }
 }
