@@ -5,6 +5,11 @@ import BottomNav from "../components/BottomNav";
 export default function ClientLayout() {
   const location = useLocation();
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
+  const [forceHideNav, setForceHideNav] = useState(false);
+
+  useEffect(() => {
+    setForceHideNav(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
@@ -28,7 +33,7 @@ export default function ClientLayout() {
           2. ET qu'on n'est PAS sur le profil (!isProfilePage)
           3. ET qu'on n'est PAS sur les détails de carte (!isCardDetailsPage)
       */}
-      {!isDesktop && !isProfilePage && !isCardDetailsPage && !isCardOrderConfirmation && <BottomNav />}
+      {!isDesktop && !isProfilePage && !isCardDetailsPage && !isCardOrderConfirmation && !forceHideNav && <BottomNav />}
     </div>
   );
 }

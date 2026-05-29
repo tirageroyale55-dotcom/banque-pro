@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import "../styles/produits.css";
 
 export default function Produits({ isDesktop = false }) {
   // États pour la navigation interne du produit
+  const { setForceHideNav } = useOutletContext() || {};
   const [currentView, setCurrentView] = useState("offres"); // 'offres' | 'avantages' | 'simulateur'
   const [loanStep, setLoanStep] = useState(1);
   
@@ -18,6 +20,17 @@ export default function Produits({ isDesktop = false }) {
     profession: "",
     hasCoBorrower: "Non"
   });
+
+
+  useEffect(() => {
+    if (setForceHideNav) {
+      if (currentView === "avantages") {
+        setForceHideNav(true);  // Cache le menu
+      } else {
+        setForceHideNav(false); // Affiche le menu
+      }
+    }
+  }, [currentView, setForceHideNav]);
 
   const handleSimulation = (amount, duration) => {
     const rate = 0.049; 
