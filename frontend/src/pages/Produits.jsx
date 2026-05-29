@@ -4,7 +4,7 @@ import { useOutletContext } from "react-router-dom";
 import "../styles/produits.css";
 
 export default function Produits({ isDesktop = false }) {
-  // Récupération de la fonction de contrôle du BottomNav (évite les crashs si absent avec le '|| {}')
+  // Récupération de la fonction de contrôle du BottomNav
   const { setForceHideNav } = useOutletContext() || {};
 
   const [currentView, setCurrentView] = useState("offres"); 
@@ -23,13 +23,13 @@ export default function Produits({ isDesktop = false }) {
     hasCoBorrower: "Non"
   });
 
-  // GESTION DU BOTTOM NAV : Cache le menu si on est sur la vue 'avantages'
+  // GESTION DU BOTTOM NAV : Disparaît sur "avantages" ET "simulateur" (toutes les étapes du prêt)
   useEffect(() => {
     if (setForceHideNav) {
-      if (currentView === "avantages") {
-        setForceHideNav(true);  // Cache le BottomNav
+      if (currentView === "avantages" || currentView === "simulateur") {
+        setForceHideNav(true);  // Cache le BottomNav complètement
       } else {
-        setForceHideNav(false); // Réaffiche le BottomNav sur les autres vues
+        setForceHideNav(false); // Réaffiche uniquement sur l'accueil des offres
       }
     }
   }, [currentView, setForceHideNav]);
