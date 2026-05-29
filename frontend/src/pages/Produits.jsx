@@ -42,7 +42,7 @@ export default function Produits({ isDesktop = false }) {
 
           <div className="promo-card-inner reverse" style={{ display: "grid", background: "white", borderRadius: "32px", overflow: "hidden", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.05)", marginBottom: "30px" }}>
             <div className="promo-image-wrapper">
-              <img src="watermarked_img_11865039945951112084.png" alt="BPER Crédits et Assurances" className="promo-image" />
+              <img src="pret-velo.png" alt="BPER Crédits et Assurances" className="promo-image" />
               <div className="promo-badge">
                 <span className="badge-small">TAEG FIXE</span>
                 <span className="badge-big">4.90%</span>
