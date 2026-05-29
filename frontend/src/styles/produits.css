@@ -273,9 +273,13 @@
   }
 
   .page-contente{
-  background-color: #f4f7f8;
+  background-color: #f4f7f8 !important;
   max-width: 1000px; /* Pour le confort sur desktop */
   margin: 0 auto;
+  
+    min-height: 100vh;
+    padding: 20px 15px !important;
+    color: #ffffff !important;
 }
   /* --- VUE 1 : ACCUEIL DES PRODUITS --- */
   .bper-page-global-wrapper .main-page-title {
