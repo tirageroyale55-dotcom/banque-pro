@@ -31,7 +31,7 @@ export default function Produits({ isDesktop = false }) {
   };
 
   return (
-    <div className={isDesktop ? "" : "page-content"} style={{ maxWidth: "1100px", margin: "0 auto", fontFamily: "'Segoe UI', sans-serif" }}>
+    <div className={isDesktop ? "" : "page-contente"} style={{ maxWidth: "1100px", margin: "0 auto", fontFamily: "'Segoe UI', sans-serif" }}>
       
       {/* VUE 1 : ACCUEIL DES PRODUITS FINANCIERS */}
       {currentView === "offres" && (
