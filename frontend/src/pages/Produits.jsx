@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+// Import de useOutletContext pour communiquer avec le Layout parent
+import { useOutletContext } from "react-router-dom"; 
 import "../styles/produits.css";
 
 export default function Produits({ isDesktop = false }) {
-  // États pour la navigation interne du produit
+  // Récupération de la fonction de contrôle du BottomNav (évite les crashs si absent avec le '|| {}')
   const { setForceHideNav } = useOutletContext() || {};
-  const [currentView, setCurrentView] = useState("offres"); // 'offres' | 'avantages' | 'simulateur'
+
+  const [currentView, setCurrentView] = useState("offres"); 
   const [loanStep, setLoanStep] = useState(1);
   
   const [loanData, setLoanData] = useState({
@@ -21,13 +23,13 @@ export default function Produits({ isDesktop = false }) {
     hasCoBorrower: "Non"
   });
 
-
+  // GESTION DU BOTTOM NAV : Cache le menu si on est sur la vue 'avantages'
   useEffect(() => {
     if (setForceHideNav) {
       if (currentView === "avantages") {
-        setForceHideNav(true);  // Cache le menu
+        setForceHideNav(true);  // Cache le BottomNav
       } else {
-        setForceHideNav(false); // Affiche le menu
+        setForceHideNav(false); // Réaffiche le BottomNav sur les autres vues
       }
     }
   }, [currentView, setForceHideNav]);
@@ -169,9 +171,7 @@ export default function Produits({ isDesktop = false }) {
         </div>
       )}
 
-      {/* =========================================================================
-          VUE 3 : TUNNEL DE DEMANDE DE PRÊT (Isolé pour le style mobile vert nuit)
-          ========================================================================= */}
+      {/* VUE 3 : TUNNEL DE DEMANDE DE PRÊT */}
       {currentView === "simulateur" && (
         <div className="bper-loan-container">
           {/* Fil d'Ariane */}

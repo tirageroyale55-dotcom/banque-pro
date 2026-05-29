@@ -5,11 +5,8 @@ import BottomNav from "../components/BottomNav";
 export default function ClientLayout() {
   const location = useLocation();
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1000);
+  // Nouvel état pour cacher dynamiquement le menu depuis les sous-vues
   const [forceHideNav, setForceHideNav] = useState(false);
-
-  useEffect(() => {
-    setForceHideNav(false);
-  }, [location.pathname]);
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1000);
@@ -17,23 +14,28 @@ export default function ClientLayout() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Vérification des pages où le menu doit être CACHÉ
+  // Réinitialise le masquage forcé si l'utilisateur change de page complète URL
+  useEffect(() => {
+    setForceHideNav(false);
+  }, [location.pathname]);
+
   const isProfilePage = location.pathname === "/profile";
   const isCardDetailsPage = location.pathname === "/card-details"; 
-  const isCardOrderConfirmation = location.pathname ===  "/order-confirmation"
+  const isCardOrderConfirmation = location.pathname === "/order-confirmation";
 
   return (
     <div className="bank-layout">
       <div className={isDesktop ? "desktop-wrapper" : "mobile-wrapper"}>
-        <Outlet />
+        {/* On passe la fonction setForceHideNav via le context de l'Outlet */}
+        <Outlet context={{ setForceHideNav }} />
       </div>
 
-      {/* Le menu s'affiche seulement si :
-          1. On est sur mobile (!isDesktop)
-          2. ET qu'on n'est PAS sur le profil (!isProfilePage)
-          3. ET qu'on n'est PAS sur les détails de carte (!isCardDetailsPage)
-      */}
-      {!isDesktop && !isProfilePage && !isCardDetailsPage && !isCardOrderConfirmation && !forceHideNav && <BottomNav />}
+      {/* Le menu s'affiche selon tes règles + la règle dynamique de la sous-vue */}
+      {!isDesktop && 
+       !isProfilePage && 
+       !isCardDetailsPage && 
+       !isCardOrderConfirmation && 
+       !forceHideNav && <BottomNav />}
     </div>
   );
 }
