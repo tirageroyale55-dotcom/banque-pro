@@ -8,7 +8,6 @@ const cardRoutes = require("./routes/card.routes");
 const cardRequestRoutes = require("./routes/cardRequest.route");
 const sendMail = require("./utils/sendMail");
 const LoanRequest = require("./models/LoanRequest"); 
-const auth = require("./middleware/auth.middleware"); 
 
 console.log("MONGO_URI au démarrage =", JSON.stringify(process.env.MONGO_URI));
 
@@ -217,43 +216,6 @@ app.post("/api/internal/credit-account", async (req, res) => {
 });
 
 
-app.post("/api/loans/apply", auth, async (req, res) => {
-  try {
-    console.log("=== NOUVELLE DEMANDE DE PRÊT REÇUE (ROUTE ISOLÉE) ===");
-    console.log("Données reçues :", req.body);
-    console.log("Utilisateur connecté :", req.user.id);
-
-    const { 
-      loanType, amount, duration, monthlyPayment, 
-      civility, lastName, firstName, income, profession, hasCoBorrower 
-    } = req.body;
-
-    const newLoanRequest = new LoanRequest({
-      user: req.user.id, // ID extrait du Token JWT par ton middleware auth
-      loanType,
-      amount: Number(amount),
-      duration: Number(duration),
-      monthlyPayment: Number(monthlyPayment),
-      civility,
-      lastName,
-      firstName,
-      income: Number(income),
-      profession,
-      hasCoBorrower
-    });
-
-    await newLoanRequest.save();
-
-    return res.status(201).json({ 
-      success: true,
-      message: "Votre demande de prêt a été transmise avec succès aux analystes BPER Banca." 
-    });
-
-  } catch (err) {
-    console.error("Erreur critique lors de l'enregistrement du prêt :", err);
-    return res.status(500).json({ message: "Erreur interne du serveur lors de la soumission." });
-  }
-});
 
 const PORT = process.env.PORT || 5000;
 
