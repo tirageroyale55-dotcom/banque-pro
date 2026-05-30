@@ -10,7 +10,7 @@ export default function Produits({ isDesktop = false }) {
   const [currentView, setCurrentView] = useState("offres"); 
   const [loanStep, setLoanStep] = useState(1);
   
-  // 🔥 AJOUT : État pour stocker l'email et le téléphone de l'utilisateur connecté
+  // 🔥 Cet état reste stable et ne sera jamais écrasé par les inputs du formulaire
   const [userProfile, setUserProfile] = useState({ email: "", telephone: "" });
 
   const [loanData, setLoanData] = useState({
@@ -23,31 +23,32 @@ export default function Produits({ isDesktop = false }) {
     firstName: "",
     income: "",
     profession: "",
-    hasCoBorrower: "Non",
-    email: "", // 🔥 AJOUT ICI
-    telephone: "" // 🔥 AJOUT ICI
+    hasCoBorrower: "Non"
   });
 
-  // 🔥 AJOUT : Charger les infos du client connecté dès le chargement de la page
+  // 🔥 Chargement sécurisé des données du User connecté
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        // Appel de ta route existante pour récupérer les infos du client connecté
         const res = await fetch("/api/auth/me", {
           headers: { "Authorization": `Bearer ${token}` }
         });
         if (res.ok) {
           const data = await res.json();
-          setUserProfile({ email: data.email, telephone: data.telephone });
+          // On sauvegarde les infos de manière hermétique ici
+          setUserProfile({ 
+            email: data.email || "", 
+            telephone: data.telephone || "" 
+          });
+          
+          // Pré-remplissage des champs optionnels s'ils existent
           setLoanData(prev => ({
             ...prev,
-            email: data.email,
-            telephone: data.telephone,
-            lastName: data.nom || "",
-            firstName: data.prenom || "",
+            lastName: prev.lastName || data.nom || "",
+            firstName: prev.firstName || data.prenom || "",
             civility: data.civilite === "M" ? "M." : "Mme"
           }));
         }
@@ -59,13 +60,13 @@ export default function Produits({ isDesktop = false }) {
     fetchUserProfile();
   }, []);
 
-  // GESTION DU BOTTOM NAV : Disparaît sur "avantages" ET "simulateur" (toutes les étapes du prêt)
+  // GESTION DU BOTTOM NAV
   useEffect(() => {
     if (setForceHideNav) {
       if (currentView === "avantages" || currentView === "simulateur") {
-        setForceHideNav(true);  // Cache le BottomNav complètement
+        setForceHideNav(true);
       } else {
-        setForceHideNav(false); // Réaffiche uniquement sur l'accueil des offres
+        setForceHideNav(false);
       }
     }
   }, [currentView, setForceHideNav]);
@@ -326,16 +327,16 @@ export default function Produits({ isDesktop = false }) {
               </div>
             )}
 
-            {/* ÉTAPE 3 : CONFIRMATION FINALE AVEC AFFICHAGE EMAIL ET TELEPHONE AUTOMATIQUES */}
+            {/* ÉTAPE 3 : CONFIRMATION FINALE AVEC AFFICHAGE DE L'ÉTAT IMMUTABLE USERPROFILE */}
             {loanStep === 3 && (
               <div>
                 <div className="bper-summary-box" style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "20px", color: "#333" }}>
                   <h4 style={{ margin: "0 0 15px 0", color: "#004f52" }}>Validation contractuelle du dossier</h4>
                   <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Titulaire du compte :</strong> {loanData.civility} {loanData.firstName} {loanData.lastName} ({loanData.profession})</p>
                   
-                  {/* 🔥 AFFICHAGE DES INFOS DE CONTACT OBLIGATOIRES POUR LA COMPATIBILITÉ ET LES MAILS */}
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email || "Chargement..."}</span></p>
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone || "Chargement..."}</span></p>
+                  {/* 🔥 CORRECTION ICI : On lit directement l'état stable userProfile pour empêcher l'affichage de "Chargement..." */}
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{userProfile.email || "Non communiqué"}</span></p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{userProfile.telephone || "Non communiqué"}</span></p>
                   
                   <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "15px 0" }} />
                   
@@ -356,13 +357,20 @@ export default function Produits({ isDesktop = false }) {
                     style={{ background: "#059669", color: "#fff", marginTop: 0 }}
                     onClick={async () => {
                       try {
+                        // Combinaison des données du simulateur ET des informations utilisateur réelles
+                        const payload = {
+                          ...loanData,
+                          email: userProfile.email,
+                          telephone: userProfile.telephone
+                        };
+
                         const response = await fetch("/api/auth/apply", {
                           method: "POST",
                           headers: {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${localStorage.getItem("token")}`
                           },
-                          body: JSON.stringify(loanData) // Envoyer loanData complet incluant email et telephone !
+                          body: JSON.stringify(payload) // 🔥 Envoi sécurisé des vraies infos
                         });
 
                         const resData = await response.json();
