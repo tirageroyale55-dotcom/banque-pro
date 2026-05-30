@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
+// Import de useOutletContext pour communiquer avec le Layout parent
 import { useOutletContext } from "react-router-dom"; 
 import "../styles/produits.css";
 
 export default function Produits({ isDesktop = false }) {
+  // Récupération de la fonction de contrôle du BottomNav
   const { setForceHideNav } = useOutletContext() || {};
 
   const [currentView, setCurrentView] = useState("offres"); 
   const [loanStep, setLoanStep] = useState(1);
 
+  // Un seul état centralisé pour tout le formulaire
   const [loanData, setLoanData] = useState({
     loanType: "Prêt Personnel",
     amount: 15000,
@@ -16,45 +19,60 @@ export default function Produits({ isDesktop = false }) {
     civility: "M.",
     lastName: "",
     firstName: "",
-    email: "",       // Sera rempli automatiquement par la BDD
-    telephone: "",   // Sera rempli automatiquement par la BDD
+    email: "",
+    telephone: "",
     income: "",
-    profession: "",  // Sera rempli automatiquement par la BDD
+    profession: "",
     hasCoBorrower: "Non"
   });
 
-  // 🔥 RECUPERATION EN DIRECT DES VRAIES DONNEES DEPUIS TA BASE MONGODB ATLAS
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
+  // 🔥 CHARGEMENT AUTOMATIQUE EN LIRE DIRECT DEPUIS L'API BANQUE
+useEffect(() => {
+  const fetchUserProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
-        // On appelle ta route client pour choper le profil frais et réel du user connecté
-        const response = await fetch("/api/client/profile", {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
+      // On appelle la route de profil client (généralement GET /api/client/profile ou /api/auth/me)
+      // Si tu as une route spécifique pour récupérer l'user connecté, mets son URL ici
+      const response = await fetch("/api/client/me", { 
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
 
-        if (response.ok) {
-          const userData = await response.json();
+      if (response.ok) {
+        const userData = await response.json();
+        setLoanData(prev => ({
+          ...prev,
+          lastName: userData.nom || prev.lastName,
+          firstName: userData.prenom || prev.firstName,
+          email: userData.email || prev.email,
+          telephone: userData.telephone || prev.telephone,
+          profession: userData.situationProfessionnelle || prev.profession
+        }));
+      } else {
+        // En cas d'échec de l'API, décodage de secours du localStorage si dispo
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser);
           setLoanData(prev => ({
             ...prev,
-            lastName: userData.nom || userData.lastName || prev.lastName,
-            firstName: userData.prenom || userData.firstName || prev.firstName,
-            email: userData.email || prev.email,
-            telephone: userData.telephone || prev.telephone,
-            profession: userData.profession || "Salarié"
+            lastName: parsed.nom || prev.lastName,
+            firstName: parsed.prenom || prev.firstName,
+            email: parsed.email || prev.email,
+            telephone: parsed.telephone || prev.telephone,
+            profession: parsed.situationProfessionnelle || prev.profession
           }));
         }
-      } catch (err) {
-        console.error("Erreur lors de la récupération auto du profil :", err);
       }
-    };
+    } catch (err) {
+      console.error("Erreur lors de la récupération automatique du profil complet :", err);
+    }
+  };
 
-    fetchUserProfile();
-  }, []);
+  fetchUserProfile();
+}, []);
 
   // GESTION DU BOTTOM NAV
   useEffect(() => {
@@ -195,7 +213,7 @@ export default function Produits({ isDesktop = false }) {
           </div>
 
           <div style={{ textAlign: "center", background: "#004f52", padding: "35px", borderRadius: "20px", color: "white" }}>
-            <h3 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>Prêt à concrétiser votre projet ?</h3>
+            <h3 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>Prêt à concrétiser votre project ?</h3>
             <p style={{ margin: "0 0 25px 0", opacity: 0.8, fontSize: "0.95rem" }}>Le formulaire prend moins de 3 minutes. Obtenez une pré-acceptation immédiate.</p>
             <button onClick={() => setCurrentView("simulateur")} style={{ background: "#e6ff6a", color: "#004f52", padding: "14px 35px", border: "none", borderRadius: "30px", fontWeight: "bold", fontSize: "1rem", cursor: "pointer" }}>
               Démarrer ma demande de prêt en ligne
@@ -288,6 +306,7 @@ export default function Produits({ isDesktop = false }) {
                   <div>
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Statut Professionnel</label>
                     <select style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} value={loanData.profession} onChange={(e) => setLoanData({...loanData, profession: e.target.value})}>
+                      <option value="">Sélectionnez...</option>
                       <option value="Salarié">Salarié</option>
                       <option value="CDI">Salarié (CDI)</option>
                       <option value="Indépendant">Entrepreneur / Profession Libérale</option>
@@ -322,72 +341,72 @@ export default function Produits({ isDesktop = false }) {
               </div>
             )}
 
-            {/* 🔥 ÉTAPE 3 : CONFIRMATION FINALE (AFFICHE STRICTEMENT LES VRAIES DONNÉES) */}
-            {loanStep === 3 && (
-              <div>
-                <div className="bper-summary-box" style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "20px", color: "#333" }}>
-                  <h4 style={{ margin: "0 0 15px 0", color: "#004f52" }}>Validation contractuelle du dossier</h4>
-                  
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>Titulaire du compte :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} ({loanData.profession || "Salarié"})
-                  </p>
-                  
-                  {/* 🔥 AFFICHAGE OBLIGATOIRE DU VRAI MAIL ET DU VRAI TEL CHARGÉS EN BDD */}
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email}</span>
-                  </p>
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone}</span>
-                  </p>
-                  
-                  <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "15px 0" }} />
-                  
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capital emprunté :</strong> {loanData.amount} € sur {loanData.duration} mois</p>
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Charge mensuelle calculée :</strong> {loanData.monthlyPayment} € / mois</p>
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capacité déclarée :</strong> {loanData.income} € net / mois</p>
-                </div>
+            {/* ÉTAPE 3 : CONFIRMATION FINALE */}
+{loanStep === 3 && (
+  <div>
+    <div className="bper-summary-box" style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "20px", color: "#333" }}>
+      <h4 style={{ margin: "0 0 15px 0", color: "#004f52" }}>Validation contractuelle du dossier</h4>
+      
+      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
+        <strong>Titulaire du compte :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} {loanData.profession ? `(${loanData.profession})` : ""}
+      </p>
+      
+      {/* 🔥 AFFICHAGE OBLIGATOIRE ET REEL DES DONNEES DE TA BASE USER.JS */}
+      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
+        <strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email}</span>
+      </p>
+      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
+        <strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone}</span>
+      </p>
+      
+      <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "15px 0" }} />
+      
+      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capital emprunté :</strong> {loanData.amount} € sur {loanData.duration} mois</p>
+      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Charge mensuelle calculée :</strong> {loanData.monthlyPayment} € / mois</p>
+      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capacité déclarée :</strong> {loanData.income} € net / mois</p>
+    </div>
 
-                <p className="bper-legal-text" style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "25px", lineHeight: "1.5" }}>
-                  En transmettant ce dossier, vous soumettez formellement votre demande de crédit au service d'analyse des risques et de conformité monétique de <strong>BPER Banca</strong>. Les fonds seront débloqués après validation administrative sous un délai réglementaire de 48h. Une notification de décision sera envoyée à l'adresse e-mail ci-dessus.
-                </p>
+    <p className="bper-legal-text" style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "25px", lineHeight: "1.5" }}>
+      En transmettant ce dossier, vous soumettez formellement votre demande de crédit au service d'analyse des risques et de conformité monétique de <strong>BPER Banca</strong>. Les fonds seront débloqués après validation administrative sous un délai réglementaire de 48h. Une notification de décision sera envoyée à l'adresse e-mail ci-dessus.
+    </p>
 
-                <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-                  <button className="btn-light" onClick={() => setLoanStep(2)}>Modifier</button>
-                  
-                  <button 
-                    className="btn-white" 
-                    style={{ background: "#059669", color: "#fff", marginTop: 0 }}
-                    onClick={async () => {
-                      try {
-                        const response = await fetch("/api/auth/apply-loan", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${localStorage.getItem("token")}`
-                          },
-                          body: JSON.stringify(loanData)
-                        });
+    <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+      <button className="btn-light" onClick={() => setLoanStep(2)}>Modifier</button>
+      
+      <button 
+        className="btn-white" 
+        style={{ background: "#059669", color: "#fff", marginTop: 0 }}
+        onClick={async () => {
+          try {
+            const response = await fetch("/api/auth/apply-loan", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+              },
+              body: JSON.stringify(loanData)
+            });
 
-                        const resData = await response.json();
+            const resData = await response.json();
 
-                        if (response.ok) {
-                          alert(resData.message || "Demande envoyée avec succès !");
-                          setCurrentView("offres");
-                          setLoanStep(1);
-                        } else {
-                          alert(resData.message || "Une erreur est survenue lors de l'envoi.");
-                        }
-                      } catch (err) {
-                        console.error(err);
-                        alert("Impossible de joindre le serveur.");
-                      }
-                    }}
-                  >
-                    Soumettre la demande à la banque
-                  </button>
-                </div>
-              </div>
-            )}
+            if (response.ok) {
+              alert(resData.message || "Demande envoyée avec succès !");
+              setCurrentView("offres");
+              setLoanStep(1);
+            } else {
+              alert(resData.message || "Une erreur est survenue lors de l'envoi.");
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Impossible de joindre le serveur.");
+          }
+        }}
+      >
+        Soumettre la demande à la banque
+      </button>
+    </div>
+  </div>
+)}
           </div>
         </div>
       )}
