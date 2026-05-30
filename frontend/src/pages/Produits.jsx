@@ -307,7 +307,7 @@ export default function Produits({ isDesktop = false }) {
 
                 <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
                   <button className="btn-light" onClick={() => setLoanStep(2)}>Modifier</button>
-                  // Remplace le bouton de soumission à la fin de l'Étape 3 dans Produits.jsx par ceci :
+                  
 <button 
   className="btn-white" 
   style={{ background: "#059669", color: "#fff", marginTop: 0 }}
