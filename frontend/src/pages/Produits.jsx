@@ -10,37 +10,58 @@ export default function Produits({ isDesktop = false }) {
   const [currentView, setCurrentView] = useState("offres"); 
   const [loanStep, setLoanStep] = useState(1);
 
+  // Un seul état centralisé pour tout le formulaire
   const [loanData, setLoanData] = useState({
     loanType: "Prêt Personnel",
     amount: 15000,
     duration: 48,
     monthlyPayment: 345,
     civility: "M.",
-    lastName: "BEN",
-    firstName: "Luc",
-    email: "", // Saisi par l'utilisateur pour éviter le bug du 404
-    telephone: "", // Saisi par l'utilisateur pour éviter le bug du 404
+    lastName: "",
+    firstName: "",
+    email: "",
+    telephone: "",
     income: "",
-    profession: "Salarié",
+    profession: "",
     hasCoBorrower: "Non"
   });
 
-  // Essayer de pré-remplir les noms s'ils existent dans la session
+  // 🔥 CHARGEMENT AUTOMATIQUE STRICT ET PUISSANT DEPUIS LA SESSION
   useEffect(() => {
     try {
+      // 1. On cherche d'abord dans l'objet 'user' complet (la méthode la plus courante)
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsed = JSON.parse(storedUser);
         setLoanData(prev => ({
           ...prev,
-          lastName: parsed.nom || parsed.lastName || prev.lastName,
+          lastName: parsed.nom || parsed.lastName || parsed.username || prev.lastName,
           firstName: parsed.prenom || parsed.firstName || prev.firstName,
-          email: parsed.email || parsed.mail || prev.email,
-          telephone: parsed.telephone || parsed.phone || parsed.tel || prev.telephone
+          email: parsed.email || parsed.mail || parsed.login || prev.email,
+          telephone: parsed.telephone || parsed.phone || parsed.tel || parsed.mobile || prev.telephone,
+          profession: parsed.profession || parsed.job || prev.profession
         }));
+        return; // Si trouvé, on s'arrête ici
       }
+
+      // 2. Si l'objet n'existe pas, on extrait les clés individuelles du localStorage
+      const localEmail = localStorage.getItem("email") || localStorage.getItem("user_email") || localStorage.getItem("mail") || "";
+      const localPhone = localStorage.getItem("telephone") || localStorage.getItem("phone") || localStorage.getItem("tel") || localStorage.getItem("mobile") || "";
+      const localNom = localStorage.getItem("nom") || localStorage.getItem("lastName") || "";
+      const localPrenom = localStorage.getItem("prenom") || localStorage.getItem("firstName") || "";
+      const localProfession = localStorage.getItem("profession") || "";
+
+      setLoanData(prev => ({
+        ...prev,
+        lastName: localNom || prev.lastName,
+        firstName: localPrenom || prev.firstName,
+        email: localEmail || prev.email,
+        telephone: localPhone || prev.telephone,
+        profession: localProfession || prev.profession
+      }));
+
     } catch (e) {
-      console.error(e);
+      console.error("Erreur d'extraction automatique des données utilisateur :", e);
     }
   }, []);
 
@@ -183,7 +204,7 @@ export default function Produits({ isDesktop = false }) {
           </div>
 
           <div style={{ textAlign: "center", background: "#004f52", padding: "35px", borderRadius: "20px", color: "white" }}>
-            <h3 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>Prêt à concrétiser votre projet ?</h3>
+            <h3 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>Prêt à concrétiser votre project ?</h3>
             <p style={{ margin: "0 0 25px 0", opacity: 0.8, fontSize: "0.95rem" }}>Le formulaire prend moins de 3 minutes. Obtenez une pré-acceptation immédiate.</p>
             <button onClick={() => setCurrentView("simulateur")} style={{ background: "#e6ff6a", color: "#004f52", padding: "14px 35px", border: "none", borderRadius: "30px", fontWeight: "bold", fontSize: "1rem", cursor: "pointer" }}>
               Démarrer ma demande de prêt en ligne
@@ -264,7 +285,7 @@ export default function Produits({ isDesktop = false }) {
             {/* ÉTAPE 2 */}
             {loanStep === 2 && (
               <div>
-                <h4 className="bper-step-title" style={{ color: "#004f52", marginBottom: "15px", borderBottom: "1px solid #e2e8f0", paddingBottom: "5px" }}>Situation Personnelle & Informations de Contact</h4>
+                <h4 className="bper-step-title" style={{ color: "#004f52", marginBottom: "15px", borderBottom: "1px solid #e2e8f0", paddingBottom: "5px" }}>Situation Personnelle & Financière</h4>
                 <div className="bper-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px", marginBottom: "20px" }}>
                   <div>
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Civilité</label>
@@ -276,6 +297,7 @@ export default function Produits({ isDesktop = false }) {
                   <div>
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Statut Professionnel</label>
                     <select style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} value={loanData.profession} onChange={(e) => setLoanData({...loanData, profession: e.target.value})}>
+                      <option value="">Sélectionnez...</option>
                       <option value="Salarié">Salarié</option>
                       <option value="CDI">Salarié (CDI)</option>
                       <option value="Indépendant">Entrepreneur / Profession Libérale</option>
@@ -290,19 +312,6 @@ export default function Produits({ isDesktop = false }) {
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Prénom</label>
                     <input type="text" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} value={loanData.firstName} onChange={(e) => setLoanData({...loanData, firstName: e.target.value})} />
                   </div>
-                  
-                  {/* 🔥 NOUVEAU : SAISIE DIRECTE DE L'EMAIL POUR CORRIGER LE COMPORTEMENT */}
-                  <div>
-                    <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem", fontWeight: "bold", color: "#004f52" }}>Adresse E-mail *</label>
-                    <input type="email" required placeholder="votre-email@exemple.com" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "2px solid #cbd5e1", color: "#333" }} value={loanData.email} onChange={(e) => setLoanData({...loanData, email: e.target.value})} />
-                  </div>
-                  
-                  {/* 🔥 NOUVEAU : SAISIE DIRECTE DU TELEPHONE POUR CORRIGER LE COMPORTEMENT */}
-                  <div>
-                    <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem", fontWeight: "bold", color: "#004f52" }}>Numéro de Téléphone *</label>
-                    <input type="tel" required placeholder="06 00 00 00 00" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "2px solid #cbd5e1", color: "#333" }} value={loanData.telephone} onChange={(e) => setLoanData({...loanData, telephone: e.target.value})} />
-                  </div>
-
                   <div>
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Revenus nets par mois (€)</label>
                     <input type="number" placeholder="Ex: 3100" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} value={loanData.income} onChange={(e) => setLoanData({...loanData, income: e.target.value})} />
@@ -318,7 +327,7 @@ export default function Produits({ isDesktop = false }) {
 
                 <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
                   <button className="btn-light" onClick={() => setLoanStep(1)}>Retour</button>
-                  <button className="btn-white" style={{ background: "#004f52", color: "#fff", marginTop: 0 }} disabled={!loanData.lastName || !loanData.income || !loanData.email || !loanData.telephone} onClick={() => setLoanStep(3)}>Suivant</button>
+                  <button className="btn-white" style={{ background: "#004f52", color: "#fff", marginTop: 0 }} disabled={!loanData.lastName || !loanData.income} onClick={() => setLoanStep(3)}>Suivant</button>
                 </div>
               </div>
             )}
@@ -328,11 +337,15 @@ export default function Produits({ isDesktop = false }) {
               <div>
                 <div className="bper-summary-box" style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "20px", color: "#333" }}>
                   <h4 style={{ margin: "0 0 15px 0", color: "#004f52" }}>Validation contractuelle du dossier</h4>
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Titulaire du compte :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} ({loanData.profession})</p>
                   
-                  {/* 🔥 AFFICHAGE DES INFOS SAISIES SANS PASSER PAR LE 404 */}
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email}</span></p>
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone}</span></p>
+                  {/* 🔥 Correction des parenthèses vides de la profession visible sur Capture.PNG */}
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
+                    <strong>Titulaire du compte :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} {loanData.profession ? `(${loanData.profession})` : ""}
+                  </p>
+                  
+                  {/* 🔥 AFFICHAGE DES INFOS COPIÉES AUTOMATIQUEMENT */}
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email || "Non configuré"}</span></p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone || "Non configuré"}</span></p>
                   
                   <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "15px 0" }} />
                   
