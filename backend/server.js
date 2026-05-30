@@ -8,7 +8,7 @@ const cardRoutes = require("./routes/card.routes");
 const cardRequestRoutes = require("./routes/cardRequest.route");
 const sendMail = require("./utils/sendMail");
 const LoanRequest = require("./models/LoanRequest"); 
-const auth = require("./middleware/auth.middleware"); 
+
 
 console.log("MONGO_URI au démarrage =", JSON.stringify(process.env.MONGO_URI));
 
