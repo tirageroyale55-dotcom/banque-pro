@@ -3,63 +3,12 @@ import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom"; 
 import "../styles/produits.css";
 
-// Fonction utilitaire pour extraire de manière sécurisée les données utilisateur
-const getStoredUserData = () => {
-  try {
-    // 1. On essaie de voir si un objet utilisateur complet est stocké
-    const user = localStorage.getItem("user");
-    if (user) {
-      const parsed = JSON.parse(user);
-      return {
-        email: parsed.email || parsed.mail || "",
-        telephone: parsed.telephone || parsed.phone || parsed.tel || "",
-        nom: parsed.nom || parsed.lastName || "",
-        prenom: parsed.prenom || parsed.firstName || ""
-      };
-    }
-
-    // 2. Si non, on vérifie si les informations sont stockées individuellement
-    const email = localStorage.getItem("email") || localStorage.getItem("user_email") || "";
-    const telephone = localStorage.getItem("telephone") || localStorage.getItem("phone") || localStorage.getItem("user_phone") || "";
-    const nom = localStorage.getItem("nom") || localStorage.getItem("lastName") || "";
-    const prenom = localStorage.getItem("prenom") || localStorage.getItem("firstName") || "";
-
-    // 3. Si uniquement un token JWT est disponible, on tente de le décoder de manière brute
-    const token = localStorage.getItem("token");
-    if (token) {
-      const base64Url = token.split('.')[1];
-      if (base64Url) {
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        
-        const decoded = JSON.parse(jsonPayload);
-        return {
-          email: decoded.email || decoded.mail || email,
-          telephone: decoded.telephone || decoded.phone || decoded.tel || telephone,
-          nom: decoded.nom || decoded.lastName || nom,
-          prenom: decoded.prenom || decoded.firstName || prenom
-        };
-      }
-    }
-
-    return { email, telephone, nom, prenom };
-  } catch (e) {
-    console.error("Erreur lors de la récupération des données locales:", e);
-    return { email: "", telephone: "", nom: "", prenom: "" };
-  }
-};
-
 export default function Produits({ isDesktop = false }) {
   // Récupération de la fonction de contrôle du BottomNav
   const { setForceHideNav } = useOutletContext() || {};
 
   const [currentView, setCurrentView] = useState("offres"); 
   const [loanStep, setLoanStep] = useState(1);
-  
-  // 🔥 On récupère immédiatement les infos de session stockées localement
-  const [userProfile, setUserProfile] = useState({ email: "", telephone: "" });
 
   const [loanData, setLoanData] = useState({
     loanType: "Prêt Personnel",
@@ -67,61 +16,32 @@ export default function Produits({ isDesktop = false }) {
     duration: 48,
     monthlyPayment: 345,
     civility: "M.",
-    lastName: "",
-    firstName: "",
+    lastName: "BEN",
+    firstName: "Luc",
+    email: "", // Saisi par l'utilisateur pour éviter le bug du 404
+    telephone: "", // Saisi par l'utilisateur pour éviter le bug du 404
     income: "",
-    profession: "",
+    profession: "Salarié",
     hasCoBorrower: "Non"
   });
 
-  // Chargement initial au montage du composant
+  // Essayer de pré-remplir les noms s'ils existent dans la session
   useEffect(() => {
-    const localData = getStoredUserData();
-    
-    // Sauvegarde hermétique des données de contact pour l'étape 3 et l'envoi
-    setUserProfile({
-      email: localData.email,
-      telephone: localData.telephone
-    });
-
-    // Pré-remplissage des champs du formulaire de l'étape 2
-    setLoanData(prev => ({
-      ...prev,
-      lastName: localData.nom || "",
-      firstName: localData.prenom || ""
-    }));
-
-    // Tentative d'appel vers le serveur de secours au cas où la route serait différente
-    const tryBackupFetch = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        // Si /api/auth/me fait une 404, on tente l'adresse sans le préfixe /api
-        const res = await fetch("/auth/me", {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        
-        if (res.ok) {
-          const data = await res.json();
-          const emailFetched = data.email || data.mail || "";
-          const phoneFetched = data.telephone || data.phone || data.tel || "";
-          
-          if (emailFetched || phoneFetched) {
-            setUserProfile({ email: emailFetched, telephone: phoneFetched });
-            setLoanData(prev => ({
-              ...prev,
-              lastName: prev.lastName || data.nom || data.lastName || "",
-              firstName: prev.firstName || data.prenom || data.firstName || ""
-            }));
-          }
-        }
-      } catch (err) {
-        // Échec silencieux, le fallback localStorage a déjà pris le relais
+    try {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsed = JSON.parse(storedUser);
+        setLoanData(prev => ({
+          ...prev,
+          lastName: parsed.nom || parsed.lastName || prev.lastName,
+          firstName: parsed.prenom || parsed.firstName || prev.firstName,
+          email: parsed.email || parsed.mail || prev.email,
+          telephone: parsed.telephone || parsed.phone || parsed.tel || prev.telephone
+        }));
       }
-    };
-
-    tryBackupFetch();
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
 
   // GESTION DU BOTTOM NAV
@@ -344,7 +264,7 @@ export default function Produits({ isDesktop = false }) {
             {/* ÉTAPE 2 */}
             {loanStep === 2 && (
               <div>
-                <h4 className="bper-step-title" style={{ color: "#004f52", marginBottom: "15px", borderBottom: "1px solid #e2e8f0", paddingBottom: "5px" }}>Situation Personnelle & Financière</h4>
+                <h4 className="bper-step-title" style={{ color: "#004f52", marginBottom: "15px", borderBottom: "1px solid #e2e8f0", paddingBottom: "5px" }}>Situation Personnelle & Informations de Contact</h4>
                 <div className="bper-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px", marginBottom: "20px" }}>
                   <div>
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Civilité</label>
@@ -356,7 +276,7 @@ export default function Produits({ isDesktop = false }) {
                   <div>
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Statut Professionnel</label>
                     <select style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} value={loanData.profession} onChange={(e) => setLoanData({...loanData, profession: e.target.value})}>
-                      <option value="">Sélectionnez...</option>
+                      <option value="Salarié">Salarié</option>
                       <option value="CDI">Salarié (CDI)</option>
                       <option value="Indépendant">Entrepreneur / Profession Libérale</option>
                       <option value="Retraité">Cadre Retraité</option>
@@ -370,6 +290,19 @@ export default function Produits({ isDesktop = false }) {
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Prénom</label>
                     <input type="text" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} value={loanData.firstName} onChange={(e) => setLoanData({...loanData, firstName: e.target.value})} />
                   </div>
+                  
+                  {/* 🔥 NOUVEAU : SAISIE DIRECTE DE L'EMAIL POUR CORRIGER LE COMPORTEMENT */}
+                  <div>
+                    <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem", fontWeight: "bold", color: "#004f52" }}>Adresse E-mail *</label>
+                    <input type="email" required placeholder="votre-email@exemple.com" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "2px solid #cbd5e1", color: "#333" }} value={loanData.email} onChange={(e) => setLoanData({...loanData, email: e.target.value})} />
+                  </div>
+                  
+                  {/* 🔥 NOUVEAU : SAISIE DIRECTE DU TELEPHONE POUR CORRIGER LE COMPORTEMENT */}
+                  <div>
+                    <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem", fontWeight: "bold", color: "#004f52" }}>Numéro de Téléphone *</label>
+                    <input type="tel" required placeholder="06 00 00 00 00" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "2px solid #cbd5e1", color: "#333" }} value={loanData.telephone} onChange={(e) => setLoanData({...loanData, telephone: e.target.value})} />
+                  </div>
+
                   <div>
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Revenus nets par mois (€)</label>
                     <input type="number" placeholder="Ex: 3100" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} value={loanData.income} onChange={(e) => setLoanData({...loanData, income: e.target.value})} />
@@ -385,7 +318,7 @@ export default function Produits({ isDesktop = false }) {
 
                 <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
                   <button className="btn-light" onClick={() => setLoanStep(1)}>Retour</button>
-                  <button className="btn-white" style={{ background: "#004f52", color: "#fff", marginTop: 0 }} disabled={!loanData.lastName || !loanData.income} onClick={() => setLoanStep(3)}>Suivant</button>
+                  <button className="btn-white" style={{ background: "#004f52", color: "#fff", marginTop: 0 }} disabled={!loanData.lastName || !loanData.income || !loanData.email || !loanData.telephone} onClick={() => setLoanStep(3)}>Suivant</button>
                 </div>
               </div>
             )}
@@ -395,11 +328,11 @@ export default function Produits({ isDesktop = false }) {
               <div>
                 <div className="bper-summary-box" style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "20px", color: "#333" }}>
                   <h4 style={{ margin: "0 0 15px 0", color: "#004f52" }}>Validation contractuelle du dossier</h4>
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Titulaire du compte :</strong> {loanData.civility} {loanData.firstName} {loanData.lastName} ({loanData.profession})</p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Titulaire du compte :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} ({loanData.profession})</p>
                   
-                  {/* 🔥 AFFICHAGE ROBUSTE DEPUIS LA SESSION LOCALSTORAGE */}
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{userProfile.email || "Non trouvé dans la session"}</span></p>
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{userProfile.telephone || "Non trouvé dans la session"}</span></p>
+                  {/* 🔥 AFFICHAGE DES INFOS SAISIES SANS PASSER PAR LE 404 */}
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email}</span></p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone}</span></p>
                   
                   <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "15px 0" }} />
                   
@@ -420,19 +353,13 @@ export default function Produits({ isDesktop = false }) {
                     style={{ background: "#059669", color: "#fff", marginTop: 0 }}
                     onClick={async () => {
                       try {
-                        const payload = {
-                          ...loanData,
-                          email: userProfile.email,
-                          telephone: userProfile.telephone
-                        };
-
                         const response = await fetch("/api/auth/apply", {
                           method: "POST",
                           headers: {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${localStorage.getItem("token")}`
                           },
-                          body: JSON.stringify(payload)
+                          body: JSON.stringify(loanData)
                         });
 
                         const resData = await response.json();
