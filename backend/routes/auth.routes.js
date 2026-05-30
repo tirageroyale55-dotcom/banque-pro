@@ -87,11 +87,11 @@ router.post("/reset-password", resetPassword);
 
 
 // ========================================================
-// SOUCHETTE DIRECTE : DEMANDE DE PRÊT (SANS INTERFÉRENCE USER)
+// ENREGISTREMENT DE LA DEMANDE DE PRÊT AVEC EMAIL & TEL
 // ========================================================
 router.post("/apply", auth, async (req, res) => {
   try {
-    // 1. Extraction stricte des données du formulaire pour éviter tout conflit avec le modèle User
+    // Extraction complète incluant l'email et le téléphone envoyés par Produits.jsx
     const { 
       loanType, 
       amount, 
@@ -100,19 +100,20 @@ router.post("/apply", auth, async (req, res) => {
       civility, 
       lastName, 
       firstName, 
+      email,        // 🔥 Reçu du Front-end
+      telephone,    // 🔥 Reçu du Front-end
       income, 
       profession, 
       hasCoBorrower 
     } = req.body;
 
-    // 2. On vérifie que l'ID de l'utilisateur est bien présent via le middleware auth
     if (!req.user || !req.user.id) {
       return res.status(401).json({ message: "Action non autorisée. Client non identifié." });
     }
 
-    // 3. Création du document Prêt en utilisant directement le modèle LoanRequest
+    // Création du prêt avec intégration des coordonnées
     const newLoanRequest = new LoanRequest({
-      user: req.user.id, // Liaison avec l'ID de la session
+      user: req.user.id,
       loanType,
       amount: Number(amount),
       duration: Number(duration),
@@ -120,22 +121,23 @@ router.post("/apply", auth, async (req, res) => {
       civility,
       lastName,
       firstName,
+      email,        // 🔥 Stocké dans LoanRequest
+      telephone,    // 🔥 Stocké dans LoanRequest
       income: Number(income),
       profession,
       hasCoBorrower,
       status: "PENDING"
     });
 
-    // 4. Sauvegarde en base de données Atlas
+    // Sauvegarde dans la collection loanrequests
     await newLoanRequest.save();
 
-    // 5. Réponse propre retournée au Front-end
     return res.status(201).json({ 
       message: "Votre demande de prêt a été transmise avec succès aux analystes BPER Banca." 
     });
 
   } catch (err) {
-    console.error("Erreur d'enregistrement du prêt dans auth.routes :", err);
+    console.error("Erreur d'enregistrement du prêt :", err);
     return res.status(500).json({ 
       message: "Erreur lors du traitement de votre dossier par la banque." 
     });
