@@ -8,7 +8,7 @@
   position: absolute; /* Force la position */
   top: 0;
   left: 0;
-  z-index: 5; /* Passe au dessus du "vide" */
+  z-index: 0; /* Passe au dessus du "vide" */
 }
 
 .payer-page {
@@ -35,7 +35,7 @@ body {
   font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
-  margin: 0px;
+  margin: 20px 0 10px 5px;
   letter-spacing: 0.5px;
 }
 
