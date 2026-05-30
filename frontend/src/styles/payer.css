@@ -3,7 +3,7 @@
 /* Ce conteneur bloque tout ce qui se passe derrière */
 .payer-full-container {
   background-color: #f4f7f8; /* Le gris clair de BPER */
-  min-height: 100vh;
+  min-height: 0%;
   width: 100%;
   position: absolute; /* Force la position */
   top: 0;
@@ -11,10 +11,6 @@
   z-index: 5; /* Passe au dessus du "vide" */
 }
 
-.page-content {
-  margin: 0 auto;
- }
-  
 .payer-page {
   background-color: #f4f7f8;
   max-width: 1000px; /* Pour le confort sur desktop */
