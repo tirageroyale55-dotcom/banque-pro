@@ -314,7 +314,7 @@ export default function Produits({ isDesktop = false }) {
   onClick={async () => {
     try {
       // Appel API réel vers le backend
-      const response = await fetch("/api/auth/apply", {
+      const response = await fetch("/api/loans/apply", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
