@@ -126,6 +126,9 @@ font-weight:600;
 .page-content{
 margin-top:145px;
 padding-bottom:120px;
+background-color: #f4f7f8 !important;
+  max-width: 1000px; 
+  margin: 0 auto;
 }
 
 
