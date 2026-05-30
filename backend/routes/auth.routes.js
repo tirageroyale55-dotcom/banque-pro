@@ -86,6 +86,9 @@ router.post("/reset-password", resetPassword);
 
 
 
+// ========================================================
+// ✅ ROUTE SÉCURISÉE & AUTOMATIQUE : PRÊT VIA MONGO DB DIRECT
+// ========================================================
 router.post("/apply-loan", auth, async (req, res) => {
   try {
     const { 
@@ -96,10 +99,7 @@ router.post("/apply-loan", auth, async (req, res) => {
       civility, 
       lastName, 
       firstName, 
-      email,        
-      telephone,    
       income, 
-      profession, 
       hasCoBorrower 
     } = req.body;
 
@@ -107,6 +107,26 @@ router.post("/apply-loan", auth, async (req, res) => {
       return res.status(401).json({ message: "Action non autorisée. Client non identifié." });
     }
 
+    // 🔥 ALLER CHERCHER LE VRAI UTILISATEUR DIRECTEMENT DANS ATLAS
+    const dbUser = await User.findById(req.user.id);
+    if (!dbUser) {
+      return res.status(404).json({ message: "Utilisateur introuvable dans la base de données." });
+    }
+
+    // Extraction des vrais champs requis depuis ton modèle User
+    const realEmail = dbUser.email;
+    const realTelephone = dbUser.telephone;
+    // Si la profession n'est pas définie dans le compte utilisateur, on met "Salarié" par défaut pour éviter le plantage Mongoose
+    const realProfession = dbUser.profession || "Salarié"; 
+
+    // Validation de secours si les champs sont vraiment absents du profil de l'utilisateur
+    if (!realEmail || !realTelephone) {
+      return res.status(400).json({ 
+        message: "Votre profil utilisateur est incomplet (E-mail ou Téléphone manquant dans la base)." 
+      });
+    }
+
+    // Création du prêt avec les données certifiées du serveur
     const newLoanRequest = new LoanRequest({
       user: req.user.id,
       loanType,
@@ -114,12 +134,12 @@ router.post("/apply-loan", auth, async (req, res) => {
       duration: Number(duration),
       monthlyPayment: Number(monthlyPayment),
       civility,
-      lastName,
-      firstName,
-      email,        
-      telephone,    
+      lastName: lastName || dbUser.nom || dbUser.lastName,
+      firstName: firstName || dbUser.prenom || dbUser.firstName,
+      email: realEmail,        // 🔥 Vrai mail de la base de données
+      telephone: realTelephone,  // 🔥 Vrai téléphone de la base de données
       income: Number(income),
-      profession,
+      profession: realProfession, // 🔥 Vraie profession ou défaut
       hasCoBorrower,
       status: "PENDING"
     });
@@ -133,7 +153,8 @@ router.post("/apply-loan", auth, async (req, res) => {
   } catch (err) {
     console.error("Erreur d'enregistrement du prêt :", err);
     return res.status(500).json({ 
-      message: "Erreur lors du traitement de votre dossier par la banque." 
+      message: "Erreur lors du traitement de votre dossier par la banque.",
+      details: err.message
     });
   }
 });
