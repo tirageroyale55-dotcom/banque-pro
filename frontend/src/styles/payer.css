@@ -11,13 +11,23 @@
   z-index: 5; /* Passe au dessus du "vide" */
 }
 
+.page-contente{
+  background-color: #f4f7f8 !important;
+  max-width: 1000px; /* Pour le confort sur desktop */
+  margin: 0 auto;
+  } 
+  
 .payer-page {
   background-color: #f4f7f8;
   max-width: 1000px; /* Pour le confort sur desktop */
   margin: 0 auto;
 }
 
-
+/* On s'assure que le body ne montre pas de vert */
+body {
+  background-color: #f4f7f8 !important;
+  overscroll-behavior: none; /* Empêche l'effet de rebond élastique sur mobile */
+}
 
 .page-title {
   color: #005a64; /* Bleu canard BPER */
