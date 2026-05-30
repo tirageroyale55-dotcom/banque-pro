@@ -20,7 +20,7 @@ export default function Produits({ isDesktop = false }) {
     email: "",         
     telephone: "",     
     income: "",
-    profession: "Salarié secteur privé (CDI)", // Valeur par défaut réglementaire
+    profession: "Salarié secteur privé (CDI)", 
     hasCoBorrower: "Non"
   });
 
@@ -82,7 +82,7 @@ export default function Produits({ isDesktop = false }) {
 
     setLoanData(prev => ({
       ...prev,
-      amount: amount, // On garde la chaîne brute ou le nombre tapé pour l'input
+      amount: amount, 
       duration: parsedDuration,
       monthlyPayment: Math.round(monthly) || 0
     }));
@@ -196,7 +196,6 @@ export default function Produits({ isDesktop = false }) {
               <div>
                 <div style={{ marginBottom: "20px" }}>
                   <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Nature de votre projet</label>
-                  {/* 🔥 LISTE COMPLETE DES TYPES DE PRETS REGLEMENTAIRES BPER BANCA */}
                   <select 
                     style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #cbd5e1", color: "#333" }}
                     value={loanData.loanType}
@@ -216,7 +215,6 @@ export default function Produits({ isDesktop = false }) {
                 <div className="bper-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "25px" }}>
                   <div>
                     <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Montant recherché (€)</label>
-                    {/* 🔥 MODIFICATION DE L'INPUT POUR PERMETTRE DE TAPER DIRECTEMENT LE MONTANT */}
                     <input 
                       type="number" 
                       style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #cbd5e1", color: "#333" }}
@@ -270,7 +268,6 @@ export default function Produits({ isDesktop = false }) {
                     </select>
                   </div>
                   <div>
-                    {/* 🔥 DEVIENT "PROFESSION DU CLIENT" AVEC TOUTE LA LISTE DES STATUTS BPER BANCA */}
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Profession du client</label>
                     <select 
                       style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} 
@@ -367,11 +364,13 @@ export default function Produits({ isDesktop = false }) {
 
                         const resData = await response.json();
 
+                        // 🔥 AFFICHE LE MESSAGE D'ERREUR DU BACKEND SI UNE DEMANDE EXISTE DÉJÀ
                         if (response.ok) {
                           alert(resData.message || "Demande envoyée avec succès !");
                           setCurrentView("offres");
                           setLoanStep(1);
                         } else {
+                          // Affiche l'alerte "Vous avez déjà une demande en cours..." renvoyée par l'API
                           alert(resData.message || "Une erreur est survenue lors de l'envoi.");
                         }
                       } catch (err) {

@@ -87,46 +87,38 @@ router.post("/reset-password", resetPassword);
 
 
 // ========================================================
-// ✅ ROUTE SÉCURISÉE & AUTOMATIQUE : PRÊT VIA MONGO DB DIRECT
+// ✅ ROUTE AVEC VÉRIFICATION DE DEMANDE UNIQUE EN COURS
 // ========================================================
 router.post("/apply-loan", auth, async (req, res) => {
   try {
-    const { 
-      loanType, 
-      amount, 
-      duration, 
-      monthlyPayment, 
-      civility, 
-      lastName, 
-      firstName, 
-      income, 
-      hasCoBorrower 
-    } = req.body;
-
     if (!req.user || !req.user.id) {
       return res.status(401).json({ message: "Action non autorisée. Client non identifié." });
     }
 
-    // 🔥 ALLER CHERCHER LE VRAI UTILISATEUR DIRECTEMENT DANS ATLAS
+    // 🛑 ÉTAPE CRUCIALE : VÉRIFIER SI UNE DEMANDE EST DÉJÀ EN COURS (PENDING)
+    const existingLoan = await LoanRequest.findOne({ 
+      user: req.user.id, 
+      status: "PENDING" 
+    });
+
+    if (existingLoan) {
+      return res.status(400).json({ 
+        message: "Vous avez déjà une demande de prêt en cours d'analyse. Veuillez attendre la décision de nos analystes avant de soumettre un nouveau dossier." 
+      });
+    }
+
+    // Si aucune demande en cours, on récupère l'utilisateur pour le dossier
     const dbUser = await User.findById(req.user.id);
     if (!dbUser) {
       return res.status(404).json({ message: "Utilisateur introuvable dans la base de données." });
     }
 
-    // Extraction des vrais champs requis depuis ton modèle User
-    const realEmail = dbUser.email;
-    const realTelephone = dbUser.telephone;
-    // Si la profession n'est pas définie dans le compte utilisateur, on met "Salarié" par défaut pour éviter le plantage Mongoose
-    const realProfession = dbUser.profession || "Salarié"; 
+    const { 
+      loanType, amount, duration, monthlyPayment, 
+      civility, lastName, firstName, income, profession, hasCoBorrower 
+    } = req.body;
 
-    // Validation de secours si les champs sont vraiment absents du profil de l'utilisateur
-    if (!realEmail || !realTelephone) {
-      return res.status(400).json({ 
-        message: "Votre profil utilisateur est incomplet (E-mail ou Téléphone manquant dans la base)." 
-      });
-    }
-
-    // Création du prêt avec les données certifiées du serveur
+    // Création de la demande unique
     const newLoanRequest = new LoanRequest({
       user: req.user.id,
       loanType,
@@ -134,12 +126,12 @@ router.post("/apply-loan", auth, async (req, res) => {
       duration: Number(duration),
       monthlyPayment: Number(monthlyPayment),
       civility,
-      lastName: lastName || dbUser.nom || dbUser.lastName,
-      firstName: firstName || dbUser.prenom || dbUser.firstName,
-      email: realEmail,        // 🔥 Vrai mail de la base de données
-      telephone: realTelephone,  // 🔥 Vrai téléphone de la base de données
+      lastName: lastName || dbUser.nom,
+      firstName: firstName || dbUser.prenom,
+      email: dbUser.email,        
+      telephone: dbUser.telephone,  
       income: Number(income),
-      profession: realProfession, // 🔥 Vraie profession ou défaut
+      profession: profession || dbUser.situationProfessionnelle, 
       hasCoBorrower,
       status: "PENDING"
     });
@@ -151,9 +143,9 @@ router.post("/apply-loan", auth, async (req, res) => {
     });
 
   } catch (err) {
-    console.error("Erreur d'enregistrement du prêt :", err);
+    console.error("Erreur lors de la soumission du prêt :", err);
     return res.status(500).json({ 
-      message: "Erreur lors du traitement de votre dossier par la banque.",
+      message: "Erreur interne lors du traitement de votre dossier.",
       details: err.message
     });
   }
