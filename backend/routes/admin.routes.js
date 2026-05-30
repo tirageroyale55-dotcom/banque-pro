@@ -9,6 +9,8 @@ const Transaction = require("../models/Transaction");
 const CardRequest = require("../models/CardRequest");
 const nodemailer = require("nodemailer");
 
+const LoanRequest = require("../models/LoanRequest");
+
 const {
   validateUser,
   getPendingUsers,
@@ -254,6 +256,100 @@ router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req
   } catch (err) {
     console.error("Erreur Admin Decision:", err);
     res.status(500).json({ message: "Erreur lors du traitement de la décision" });
+  }
+});
+
+
+
+
+
+// 🔥 ROUTE ADMIN 1 : Récupérer toutes les demandes de prêt en attente (PENDING)
+router.get("/loans/pending", auth, role("ADMIN"), async (req, res) => {
+  try {
+    const pendingLoans = await LoanRequest.find({ status: "PENDING" }).populate("user", "nom prenom email");
+    res.json(pendingLoans);
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors du chargement des demandes de prêt" });
+  }
+});
+
+// 🔥 ROUTE ADMIN 2 : Décision sur une demande de prêt (APPROVED / REJECTED)
+router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
+  try {
+    const { decision, message } = req.body; // decision: 'APPROVED' ou 'REJECTED'
+    
+    const loan = await LoanRequest.findById(req.params.loanId).populate("user");
+    if (!loan) return res.status(404).json({ message: "Demande de prêt introuvable" });
+
+    // Configuration de ton transporteur Zoho existant
+    const transporter = nodemailer.createTransport({
+      host: "smtp.zoho.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
+      }
+    });
+
+    let emailSubject = "";
+    let emailHtml = "";
+
+    if (decision === "APPROVED") {
+      loan.status = "APPROVED";
+      emailSubject = "Félicitations ! Votre demande de financement est approuvée - BPER Banca";
+      emailHtml = `
+        <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; border: 1px solid #e2e8f0; padding: 25px; color: #334155;">
+          <h2 style="color: #005a64; margin-top: 0;">BPER: <span style="font-weight: normal;">Banca</span></h2>
+          <div style="border-bottom: 2px solid #005a64; margin-bottom: 20px;"></div>
+          <p>Cher(e) client(e),</p>
+          <p>Nous avons le plaisir de vous informer que votre demande de <strong>${loan.loanType}</strong> d'un montant de <strong>${loan.amount} €</strong> a été <strong>acceptée</strong> par notre comité des engagements.</p>
+          <div style="background-color: #f0fdf4; padding: 15px; border-left: 5px solid #059669; margin: 20px 0;">
+            <p style="margin: 0; color: #166534; font-weight: bold;">Détails du financement :</p>
+            <ul style="margin: 5px 0 0 0; padding-left: 20px;">
+              <li>Montant accordé : ${loan.amount} €</li>
+              <li>Durée de remboursement : ${loan.duration} mois</li>
+              <li>Mensualité contractuelle : ${loan.monthlyPayment} € / mois</li>
+            </ul>
+          </div>
+          <p>Les fonds seront crédités immédiatement sur votre compte courant BPER.</p>
+          <br/>
+          <p style="font-size: 13px; color: #64748b;">Cordialement,<br/><strong>Service des Engagements Crédits - BPER Banca</strong></p>
+        </div>
+      `;
+    } else if (decision === "REJECTED") {
+      loan.status = "REJECTED";
+      emailSubject = "Mise à jour concernant votre demande de crédit - BPER Banca";
+      emailHtml = `
+        <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; border: 1px solid #e2e8f0; padding: 25px; color: #334155;">
+          <h2 style="color: #005a64; margin-top: 0;">BPER: <span style="font-weight: normal;">Banca</span></h2>
+          <div style="border-bottom: 2px solid #005a64; margin-bottom: 20px;"></div>
+          <p>Cher(e) client(e),</p>
+          <p>Nous avons étudié votre demande de <strong>${loan.loanType}</strong> de ${loan.amount} €.</p>
+          <p>Malheureusement, après étude approfondie de vos pièces justificatives et de votre capacité d'endettement, nous ne sommes pas en mesure de donner une suite favorable à votre demande pour le motif suivant :</p>
+          <div style="background-color: #f8fafc; padding: 15px; border-left: 5px solid #dc2626; margin: 20px 0;">
+            <p style="margin: 0; font-style: italic;">"${message || "Capacité de remboursement insuffisante au vu des standards réglementaires actuels."}"</p>
+          </div>
+          <p>Votre dossier est archivé. Vous pouvez réitérer une demande d'ici un délai de 3 mois.</p>
+          <br/>
+          <p style="font-size: 13px; color: #64748b;">Cordialement,<br/><strong>Direction des Risques Particuliers - BPER Banca</strong></p>
+        </div>
+      `;
+    }
+
+    await loan.save();
+    await transporter.sendMail({
+      from: `"BPER Banca - Service Crédits" <${process.env.MAIL_USER}>`,
+      to: loan.user.email,
+      subject: emailSubject,
+      html: emailHtml
+    });
+
+    res.json({ message: `La demande a été traitée avec succès (${decision}) et l'e-mail a été envoyé.` });
+
+  } catch (err) {
+    console.error("Erreur Décision Prêt:", err);
+    res.status(500).json({ message: "Erreur lors du traitement de la demande de prêt" });
   }
 });
 

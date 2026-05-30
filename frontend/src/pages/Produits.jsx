@@ -307,17 +307,39 @@ export default function Produits({ isDesktop = false }) {
 
                 <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
                   <button className="btn-light" onClick={() => setLoanStep(2)}>Modifier</button>
-                  <button 
-                    className="btn-white" 
-                    style={{ background: "#059669", color: "#fff", marginTop: 0 }}
-                    onClick={() => {
-                      alert("Félicitations, votre dossier d'emprunt a été transmis avec succès aux analystes BPER Banca.");
-                      setCurrentView("offres");
-                      setLoanStep(1);
-                    }}
-                  >
-                    Soumettre la demande à la banque
-                  </button>
+                  // Remplace le bouton de soumission à la fin de l'Étape 3 dans Produits.jsx par ceci :
+<button 
+  className="btn-white" 
+  style={{ background: "#059669", color: "#fff", marginTop: 0 }}
+  onClick={async () => {
+    try {
+      // Appel API réel vers le backend
+      const response = await fetch("/api/loans/apply", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}` // Ajuste si ton token est stocké ailleurs
+        },
+        body: JSON.stringify(loanData)
+      });
+
+      const resData = await response.json();
+
+      if (response.ok) {
+        alert(resData.message);
+        setCurrentView("offres");
+        setLoanStep(1);
+      } else {
+        alert(resData.message || "Une erreur est survenue lors de l'envoi.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Impossible de joindre le serveur.");
+    }
+  }}
+>
+  Soumettre la demande à la banque
+</button>
                 </div>
               </div>
             )}

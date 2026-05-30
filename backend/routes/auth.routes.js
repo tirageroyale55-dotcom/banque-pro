@@ -8,6 +8,10 @@ const User = require("../models/User");
 const { sendPersonalId, verifyPassword, changePin } = require("../controllers/auth.controller");
 const { resetPassword } = require("../controllers/auth.controller");
 
+const auth = require("../middleware/auth.middleware");
+const LoanRequest = require("../models/LoanRequest");
+
+
 router.post("/login", login);
 
 router.post("/activate", activateAccount);
@@ -77,6 +81,32 @@ router.post("/verify-password", verifyPassword);
 router.post("/change-pin", changePin);
 
 router.post("/reset-password", resetPassword);
+
+
+
+
+
+// POST : Créer une demande de prêt
+router.post("/apply", auth, async (req, res) => {
+  try {
+    const loanData = {
+      ...req.body,
+      user: req.user.id // Récupéré depuis le token grâce au middleware auth
+    };
+
+    const newLoanRequest = new LoanRequest(loanData);
+    await newLoanRequest.save();
+
+    res.status(201).json({ 
+      message: "Votre demande de prêt a été transmise avec succès aux analystes BPER Banca.",
+      loan: newLoanRequest 
+    });
+  } catch (err) {
+    console.error("Erreur soumission prêt:", err);
+    res.status(500).json({ message: "Erreur lors de la soumission de la demande de prêt" });
+  }
+});
+
 
 
 // --------------------
