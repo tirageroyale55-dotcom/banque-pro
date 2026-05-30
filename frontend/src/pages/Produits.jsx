@@ -10,7 +10,7 @@ export default function Produits({ isDesktop = false }) {
   const [currentView, setCurrentView] = useState("offres"); 
   const [loanStep, setLoanStep] = useState(1);
   
-  // 🔥 Cet état reste stable et ne sera jamais écrasé par les inputs du formulaire
+  // État pour stocker l'email et le téléphone de l'utilisateur connecté
   const [userProfile, setUserProfile] = useState({ email: "", telephone: "" });
 
   const [loanData, setLoanData] = useState({
@@ -26,7 +26,7 @@ export default function Produits({ isDesktop = false }) {
     hasCoBorrower: "Non"
   });
 
-  // 🔥 Chargement sécurisé des données du User connecté
+  // Chargement des données du User connecté
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -36,20 +36,28 @@ export default function Produits({ isDesktop = false }) {
         const res = await fetch("/api/auth/me", {
           headers: { "Authorization": `Bearer ${token}` }
         });
+        
         if (res.ok) {
           const data = await res.json();
-          // On sauvegarde les infos de manière hermétique ici
+          
+          // 🔥 METS CE LOG : Ouvre ta console de navigateur (F12) pour voir la structure exacte !
+          console.log("Données reçues de /api/auth/me :", data);
+
+          // 🛠️ INTERCEPTION INTELLIGENTE DES CHAMPS DU BACKEND
+          // On vérifie toutes les variantes possibles que ton backend pourrait renvoyer
+          const userEmail = data.email || data.mail || "";
+          const userPhone = data.telephone || data.phone || data.tel || data.telephoneNumber || "";
+
           setUserProfile({ 
-            email: data.email || "", 
-            telephone: data.telephone || "" 
+            email: userEmail, 
+            telephone: userPhone 
           });
           
-          // Pré-remplissage des champs optionnels s'ils existent
           setLoanData(prev => ({
             ...prev,
-            lastName: prev.lastName || data.nom || "",
-            firstName: prev.firstName || data.prenom || "",
-            civility: data.civilite === "M" ? "M." : "Mme"
+            lastName: prev.lastName || data.nom || data.lastName || "",
+            firstName: prev.firstName || data.prenom || data.firstName || "",
+            civility: data.civilite === "M" || data.civility === "M" ? "M." : "Mme"
           }));
         }
       } catch (err) {
@@ -211,7 +219,6 @@ export default function Produits({ isDesktop = false }) {
       {/* VUE 3 : TUNNEL DE DEMANDE DE PRÊT */}
       {currentView === "simulateur" && (
         <div className="bper-loan-container">
-          {/* Fil d'Ariane */}
           <div className="bper-loan-steps" style={{ display: "flex", justifyContent: "space-between", marginBottom: "30px", background: "#fff", padding: "15px", borderRadius: "12px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
             <div style={{ fontWeight: "bold", color: loanStep === 1 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 1 ? "3px solid #e6ff6a" : "none", paddingBottom: "5px", flex: 1, textAlign: "center", fontSize: "0.85rem" }}>1. CONFIGURATION</div>
             <div style={{ fontWeight: "bold", color: loanStep === 2 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 2 ? "3px solid #e6ff6a" : "none", paddingBottom: "5px", flex: 1, textAlign: "center", fontSize: "0.85rem" }}>2. INFORMATIONS</div>
@@ -222,7 +229,7 @@ export default function Produits({ isDesktop = false }) {
             <h2 className="bper-loan-title" style={{ color: "#004f52", marginBottom: "5px", fontSize: "1.6rem" }}>Demande de Financement en Ligne</h2>
             <p className="bper-loan-subtitle" style={{ color: "#64748b", fontSize: "0.9rem", marginBottom: "30px" }}>BPER Banca — Service d'octroi des crédits aux particuliers.</p>
 
-            {/* ÉTAPE 1 : SIMULATEUR */}
+            {/* ÉTAPE 1 */}
             {loanStep === 1 && (
               <div>
                 <div style={{ marginBottom: "20px" }}>
@@ -278,7 +285,7 @@ export default function Produits({ isDesktop = false }) {
               </div>
             )}
 
-            {/* ÉTAPE 2 : FORMULAIRE PRO */}
+            {/* ÉTAPE 2 */}
             {loanStep === 2 && (
               <div>
                 <h4 className="bper-step-title" style={{ color: "#004f52", marginBottom: "15px", borderBottom: "1px solid #e2e8f0", paddingBottom: "5px" }}>Situation Personnelle & Financière</h4>
@@ -327,16 +334,16 @@ export default function Produits({ isDesktop = false }) {
               </div>
             )}
 
-            {/* ÉTAPE 3 : CONFIRMATION FINALE AVEC AFFICHAGE DE L'ÉTAT IMMUTABLE USERPROFILE */}
+            {/* ÉTAPE 3 : CONFIRMATION FINALE */}
             {loanStep === 3 && (
               <div>
                 <div className="bper-summary-box" style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "20px", color: "#333" }}>
                   <h4 style={{ margin: "0 0 15px 0", color: "#004f52" }}>Validation contractuelle du dossier</h4>
                   <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Titulaire du compte :</strong> {loanData.civility} {loanData.firstName} {loanData.lastName} ({loanData.profession})</p>
                   
-                  {/* 🔥 CORRECTION ICI : On lit directement l'état stable userProfile pour empêcher l'affichage de "Chargement..." */}
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{userProfile.email || "Non communiqué"}</span></p>
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{userProfile.telephone || "Non communiqué"}</span></p>
+                  {/* 🔥 AFFICHAGE DES INFOS DE CONTACT SÉCURISÉES */}
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{userProfile.email || "Non trouvé sur le compte"}</span></p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{userProfile.telephone || "Non trouvé sur le compte"}</span></p>
                   
                   <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "15px 0" }} />
                   
@@ -357,7 +364,6 @@ export default function Produits({ isDesktop = false }) {
                     style={{ background: "#059669", color: "#fff", marginTop: 0 }}
                     onClick={async () => {
                       try {
-                        // Combinaison des données du simulateur ET des informations utilisateur réelles
                         const payload = {
                           ...loanData,
                           email: userProfile.email,
@@ -370,7 +376,7 @@ export default function Produits({ isDesktop = false }) {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${localStorage.getItem("token")}`
                           },
-                          body: JSON.stringify(payload) // 🔥 Envoi sécurisé des vraies infos
+                          body: JSON.stringify(payload)
                         });
 
                         const resData = await response.json();
