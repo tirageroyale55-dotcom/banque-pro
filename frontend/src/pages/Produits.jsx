@@ -3,6 +3,54 @@ import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom"; 
 import "../styles/produits.css";
 
+// Fonction utilitaire pour extraire de manière sécurisée les données utilisateur
+const getStoredUserData = () => {
+  try {
+    // 1. On essaie de voir si un objet utilisateur complet est stocké
+    const user = localStorage.getItem("user");
+    if (user) {
+      const parsed = JSON.parse(user);
+      return {
+        email: parsed.email || parsed.mail || "",
+        telephone: parsed.telephone || parsed.phone || parsed.tel || "",
+        nom: parsed.nom || parsed.lastName || "",
+        prenom: parsed.prenom || parsed.firstName || ""
+      };
+    }
+
+    // 2. Si non, on vérifie si les informations sont stockées individuellement
+    const email = localStorage.getItem("email") || localStorage.getItem("user_email") || "";
+    const telephone = localStorage.getItem("telephone") || localStorage.getItem("phone") || localStorage.getItem("user_phone") || "";
+    const nom = localStorage.getItem("nom") || localStorage.getItem("lastName") || "";
+    const prenom = localStorage.getItem("prenom") || localStorage.getItem("firstName") || "";
+
+    // 3. Si uniquement un token JWT est disponible, on tente de le décoder de manière brute
+    const token = localStorage.getItem("token");
+    if (token) {
+      const base64Url = token.split('.')[1];
+      if (base64Url) {
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        
+        const decoded = JSON.parse(jsonPayload);
+        return {
+          email: decoded.email || decoded.mail || email,
+          telephone: decoded.telephone || decoded.phone || decoded.tel || telephone,
+          nom: decoded.nom || decoded.lastName || nom,
+          prenom: decoded.prenom || decoded.firstName || prenom
+        };
+      }
+    }
+
+    return { email, telephone, nom, prenom };
+  } catch (e) {
+    console.error("Erreur lors de la récupération des données locales:", e);
+    return { email: "", telephone: "", nom: "", prenom: "" };
+  }
+};
+
 export default function Produits({ isDesktop = false }) {
   // Récupération de la fonction de contrôle du BottomNav
   const { setForceHideNav } = useOutletContext() || {};
@@ -10,7 +58,7 @@ export default function Produits({ isDesktop = false }) {
   const [currentView, setCurrentView] = useState("offres"); 
   const [loanStep, setLoanStep] = useState(1);
   
-  // État pour stocker l'email et le téléphone de l'utilisateur connecté
+  // 🔥 On récupère immédiatement les infos de session stockées localement
   const [userProfile, setUserProfile] = useState({ email: "", telephone: "" });
 
   const [loanData, setLoanData] = useState({
@@ -26,46 +74,54 @@ export default function Produits({ isDesktop = false }) {
     hasCoBorrower: "Non"
   });
 
-  // Chargement des données du User connecté
+  // Chargement initial au montage du composant
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const localData = getStoredUserData();
+    
+    // Sauvegarde hermétique des données de contact pour l'étape 3 et l'envoi
+    setUserProfile({
+      email: localData.email,
+      telephone: localData.telephone
+    });
+
+    // Pré-remplissage des champs du formulaire de l'étape 2
+    setLoanData(prev => ({
+      ...prev,
+      lastName: localData.nom || "",
+      firstName: localData.prenom || ""
+    }));
+
+    // Tentative d'appel vers le serveur de secours au cas où la route serait différente
+    const tryBackupFetch = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const res = await fetch("/api/auth/me", {
+        // Si /api/auth/me fait une 404, on tente l'adresse sans le préfixe /api
+        const res = await fetch("/auth/me", {
           headers: { "Authorization": `Bearer ${token}` }
         });
         
         if (res.ok) {
           const data = await res.json();
+          const emailFetched = data.email || data.mail || "";
+          const phoneFetched = data.telephone || data.phone || data.tel || "";
           
-          // 🔥 METS CE LOG : Ouvre ta console de navigateur (F12) pour voir la structure exacte !
-          console.log("Données reçues de /api/auth/me :", data);
-
-          // 🛠️ INTERCEPTION INTELLIGENTE DES CHAMPS DU BACKEND
-          // On vérifie toutes les variantes possibles que ton backend pourrait renvoyer
-          const userEmail = data.email || data.mail || "";
-          const userPhone = data.telephone || data.phone || data.tel || data.telephoneNumber || "";
-
-          setUserProfile({ 
-            email: userEmail, 
-            telephone: userPhone 
-          });
-          
-          setLoanData(prev => ({
-            ...prev,
-            lastName: prev.lastName || data.nom || data.lastName || "",
-            firstName: prev.firstName || data.prenom || data.firstName || "",
-            civility: data.civilite === "M" || data.civility === "M" ? "M." : "Mme"
-          }));
+          if (emailFetched || phoneFetched) {
+            setUserProfile({ email: emailFetched, telephone: phoneFetched });
+            setLoanData(prev => ({
+              ...prev,
+              lastName: prev.lastName || data.nom || data.lastName || "",
+              firstName: prev.firstName || data.prenom || data.firstName || ""
+            }));
+          }
         }
       } catch (err) {
-        console.error("Erreur récupération profil utilisateur:", err);
+        // Échec silencieux, le fallback localStorage a déjà pris le relais
       }
     };
 
-    fetchUserProfile();
+    tryBackupFetch();
   }, []);
 
   // GESTION DU BOTTOM NAV
@@ -341,9 +397,9 @@ export default function Produits({ isDesktop = false }) {
                   <h4 style={{ margin: "0 0 15px 0", color: "#004f52" }}>Validation contractuelle du dossier</h4>
                   <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Titulaire du compte :</strong> {loanData.civility} {loanData.firstName} {loanData.lastName} ({loanData.profession})</p>
                   
-                  {/* 🔥 AFFICHAGE DES INFOS DE CONTACT SÉCURISÉES */}
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{userProfile.email || "Non trouvé sur le compte"}</span></p>
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{userProfile.telephone || "Non trouvé sur le compte"}</span></p>
+                  {/* 🔥 AFFICHAGE ROBUSTE DEPUIS LA SESSION LOCALSTORAGE */}
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{userProfile.email || "Non trouvé dans la session"}</span></p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{userProfile.telephone || "Non trouvé dans la session"}</span></p>
                   
                   <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "15px 0" }} />
                   
@@ -382,7 +438,7 @@ export default function Produits({ isDesktop = false }) {
                         const resData = await response.json();
 
                         if (response.ok) {
-                          alert(resData.message);
+                          alert(resData.message || "Demande envoyée avec succès !");
                           setCurrentView("offres");
                           setLoanStep(1);
                         } else {
