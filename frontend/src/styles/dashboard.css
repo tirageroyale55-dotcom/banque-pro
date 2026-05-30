@@ -128,7 +128,7 @@ margin-top:145px;
 padding-bottom:120px;
 background-color: #f4f7f8 !important;
   max-width: 1000px; 
-  margin: 0 auto;
+  
 }
 
 
@@ -262,11 +262,11 @@ cursor:pointer;
 
 .bottom-nav{
   position: fixed;
-  bottom: 20px;
+  bottom: 5px;
   left: 20px;
   right: 20px;
 
-  height: 45px;
+  height: 75px;
 
   background:#e5e7eb;
   border-radius:30px;
