@@ -24,29 +24,42 @@ export default function Produits({ isDesktop = false }) {
     hasCoBorrower: "Non"
   });
 
-  // 🔥 SYNCHRONISATION STRICTE AVEC LES VRAIES CLÉS DU COMPTE USER CONNECTÉ
-  useEffect(() => {
+  // 🔥 CHARGEMENT DIRECT DEPUIS MONGODB ATLAS AU DÉMARRAGE
+useEffect(() => {
+  const loadRealUserData = async () => {
     try {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        
-        console.log("Données brutes détectées dans le localStorage :", parsedUser);
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
-        // Correspondance exacte avec ton modèle MongoDB (nom, prenom, email, telephone)
+      // Appelle la route backend pour obtenir le profil frais d'Atlas
+      const response = await fetch("/api/auth/me", { // Ajuste l'URL selon où tu as mis la route /me
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (response.ok) {
+        const dbUser = await response.json();
+        
+        // Injection directe des vraies valeurs dans l'état de ton formulaire
         setLoanData(prev => ({
           ...prev,
-          lastName: parsedUser.nom || parsedUser.lastName || "",
-          firstName: parsedUser.prenom || parsedUser.firstName || "",
-          email: parsedUser.email || parsedUser.mail || "",
-          telephone: parsedUser.telephone || parsedUser.phone || "",
-          profession: parsedUser.situationProfessionnelle || parsedUser.profession || "Salarié"
+          lastName: dbUser.nom || "",
+          firstName: dbUser.prenom || "",
+          email: dbUser.email || "",        // Vrai email de MongoDB Atlas
+          telephone: dbUser.telephone || "", // Vrai téléphone de MongoDB Atlas
+          profession: dbUser.situationProfessionnelle || "Salarié"
         }));
       }
     } catch (error) {
-      console.error("Erreur lors de la lecture des données utilisateur :", error);
+      console.error("Impossible de charger les données depuis Atlas :", error);
     }
-  }, []);
+  };
+
+  loadRealUserData();
+}, []);
 
   // Gestion de la navigation basse
   useEffect(() => {
@@ -275,28 +288,28 @@ export default function Produits({ isDesktop = false }) {
 
             {/* ÉTAPE 3 : CONFIRMATION FINALE */}
             {loanStep === 3 && (
-              <div>
-                <div className="bper-summary-box" style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "20px", color: "#333" }}>
-                  <h4 style={{ margin: "0 0 15px 0", color: "#004f52" }}>Validation contractuelle du dossier</h4>
-                  
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>Titulaire du compte :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} {loanData.profession ? `(${loanData.profession})` : ""}
-                  </p>
-                  
-                  {/* 🔥 AFFICHAGE REEL ET DIRECT DE TON EMAIL (PLUS JAMAIS VIDE OU TEXTE GENERIQUE) */}
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email || "Non récupéré"}</span>
-                  </p>
-                  
-                  {/* 🔥 AFFICHAGE REEL ET DIRECT DE TON TELEPHONE */}
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone || "Non récupéré"}</span>
-                  </p>
-                  
-                  <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "15px 0" }} />
-                  
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capital emprunté :</strong> {loanData.amount} € sur {loanData.duration} mois</p>
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Charge mensuelle calculée :</strong> {loanData.monthlyPayment} € / mois</p>
+  <div>
+    <div className="bper-summary-box" style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "20px", color: "#333" }}>
+      <h4 style={{ margin: "0 0 15px 0", color: "#004f52" }}>Validation contractuelle du dossier</h4>
+      
+      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
+        <strong>Titulaire du compte :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} {loanData.profession ? `(${loanData.profession})` : ""}
+      </p>
+      
+      {/* Affichage des vraies valeurs textuelles récupérées en direct de MongoDB */}
+      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
+        <strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email}</span>
+      </p>
+      
+      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
+        <strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone}</span>
+      </p>
+      
+      <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "15px 0" }} />
+      
+      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capital emprunté :</strong> {loanData.amount} € sur {loanData.duration} mois</p>
+      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Charge mensuelle calculée :</strong> {loanData.monthlyPayment} € / mois</p>
+
                   <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capacité déclarée :</strong> {loanData.income} € net / mois</p>
                 </div>
 

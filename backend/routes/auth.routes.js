@@ -161,6 +161,25 @@ router.post("/apply-loan", auth, async (req, res) => {
 
 
 
+
+
+router.get("/me", auth, async (req, res) => {
+  try {
+    // On cherche l'utilisateur dans Atlas via son ID décodé par le middleware 'auth'
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+    // On renvoie tout l'objet utilisateur (qui contient email et telephone)
+    return res.json(user);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+
+
 // --------------------
 // ROUTE TEST SIMPLE (GET)
 // --------------------
