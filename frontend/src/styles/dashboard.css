@@ -266,7 +266,7 @@ cursor:pointer;
   left: 20px;
   right: 20px;
 
-  height: 75px;
+  height: 45px;
 
   background:#e5e7eb;
   border-radius:30px;
@@ -323,7 +323,7 @@ white-space:nowrap;
 
 /* Empêche le contenu d'être caché par le menu du bas */
 .mobile-content {
-  padding-bottom: 40px; /* Hauteur de ton BottomNav + une petite marge */
+  padding-bottom: 90px; /* Hauteur de ton BottomNav + une petite marge */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
