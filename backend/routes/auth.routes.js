@@ -86,12 +86,8 @@ router.post("/reset-password", resetPassword);
 
 
 
-// ========================================================
-// ENREGISTREMENT DE LA DEMANDE DE PRÊT AVEC EMAIL & TEL
-// ========================================================
-router.post("/apply", auth, async (req, res) => {
+router.post("/apply-loan", auth, async (req, res) => {
   try {
-    // Extraction complète incluant l'email et le téléphone envoyés par Produits.jsx
     const { 
       loanType, 
       amount, 
@@ -100,8 +96,8 @@ router.post("/apply", auth, async (req, res) => {
       civility, 
       lastName, 
       firstName, 
-      email,        // 🔥 Reçu du Front-end
-      telephone,    // 🔥 Reçu du Front-end
+      email,        
+      telephone,    
       income, 
       profession, 
       hasCoBorrower 
@@ -111,7 +107,6 @@ router.post("/apply", auth, async (req, res) => {
       return res.status(401).json({ message: "Action non autorisée. Client non identifié." });
     }
 
-    // Création du prêt avec intégration des coordonnées
     const newLoanRequest = new LoanRequest({
       user: req.user.id,
       loanType,
@@ -121,15 +116,14 @@ router.post("/apply", auth, async (req, res) => {
       civility,
       lastName,
       firstName,
-      email,        // 🔥 Stocké dans LoanRequest
-      telephone,    // 🔥 Stocké dans LoanRequest
+      email,        
+      telephone,    
       income: Number(income),
       profession,
       hasCoBorrower,
       status: "PENDING"
     });
 
-    // Sauvegarde dans la collection loanrequests
     await newLoanRequest.save();
 
     return res.status(201).json({ 

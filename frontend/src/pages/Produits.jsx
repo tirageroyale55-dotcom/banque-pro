@@ -361,37 +361,38 @@ export default function Produits({ isDesktop = false }) {
                 <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
                   <button className="btn-light" onClick={() => setLoanStep(2)}>Modifier</button>
                   
-                  <button 
-                    className="btn-white" 
-                    style={{ background: "#059669", color: "#fff", marginTop: 0 }}
-                    onClick={async () => {
-                      try {
-                        const response = await fetch("/api/auth/apply", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${localStorage.getItem("token")}`
-                          },
-                          body: JSON.stringify(loanData)
-                        });
+                  
+<button 
+  className="btn-white" 
+  style={{ background: "#059669", color: "#fff", marginTop: 0 }}
+  onClick={async () => {
+    try {
+      const response = await fetch("/api/auth/apply-loan", { // <-- Changement d'adresse ici
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify(loanData) // l'e-mail et le tel automatiques sont dedans
+      });
 
-                        const resData = await response.json();
+      const resData = await response.json();
 
-                        if (response.ok) {
-                          alert(resData.message || "Demande envoyée avec succès !");
-                          setCurrentView("offres");
-                          setLoanStep(1);
-                        } else {
-                          alert(resData.message || "Une erreur est survenue lors de l'envoi.");
-                        }
-                      } catch (err) {
-                        console.error(err);
-                        alert("Impossible de joindre le serveur.");
-                      }
-                    }}
-                  >
-                    Soumettre la demande à la banque
-                  </button>
+      if (response.ok) {
+        alert(resData.message || "Demande envoyée avec succès !");
+        setCurrentView("offres");
+        setLoanStep(1);
+      } else {
+        alert(resData.message || "Une erreur est survenue lors de l'envoi.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Impossible de joindre le serveur.");
+    }
+  }}
+>
+  Soumettre la demande à la banque
+</button>
                 </div>
               </div>
             )}
