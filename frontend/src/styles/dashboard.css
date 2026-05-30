@@ -262,11 +262,11 @@ cursor:pointer;
 
 .bottom-nav{
   position: fixed;
-  bottom: 5px;
+  bottom: 10px;
   left: 20px;
   right: 20px;
 
-  height: 75px;
+  height: 65px;
 
   background:#e5e7eb;
   border-radius:30px;
