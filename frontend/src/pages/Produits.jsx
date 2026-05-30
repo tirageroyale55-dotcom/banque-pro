@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
-// Import de useOutletContext pour communiquer avec le Layout parent
 import { useOutletContext } from "react-router-dom"; 
 import "../styles/produits.css";
 
 export default function Produits({ isDesktop = false }) {
-  // Récupération de la fonction de contrôle du BottomNav
   const { setForceHideNav } = useOutletContext() || {};
 
   const [currentView, setCurrentView] = useState("offres"); 
   const [loanStep, setLoanStep] = useState(1);
 
-  // Un seul état centralisé pour tout le formulaire
+  // État initial global du formulaire
   const [loanData, setLoanData] = useState({
     loanType: "Prêt Personnel",
     amount: 15000,
@@ -19,62 +17,38 @@ export default function Produits({ isDesktop = false }) {
     civility: "M.",
     lastName: "",
     firstName: "",
-    email: "",
-    telephone: "",
+    email: "",         // Sera rempli automatiquement
+    telephone: "",     // Sera rempli automatiquement
     income: "",
     profession: "",
     hasCoBorrower: "Non"
   });
 
-  // 🔥 CHARGEMENT AUTOMATIQUE EN LIRE DIRECT DEPUIS L'API BANQUE
-useEffect(() => {
-  const fetchUserProfile = async () => {
+  // 🔥 SYNCHRONISATION STRICTE AVEC LES VRAIES CLÉS DU COMPTE USER CONNECTÉ
+  useEffect(() => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        
+        console.log("Données brutes détectées dans le localStorage :", parsedUser);
 
-      // On appelle la route de profil client (généralement GET /api/client/profile ou /api/auth/me)
-      // Si tu as une route spécifique pour récupérer l'user connecté, mets son URL ici
-      const response = await fetch("/api/client/me", { 
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
+        // Correspondance exacte avec ton modèle MongoDB (nom, prenom, email, telephone)
         setLoanData(prev => ({
           ...prev,
-          lastName: userData.nom || prev.lastName,
-          firstName: userData.prenom || prev.firstName,
-          email: userData.email || prev.email,
-          telephone: userData.telephone || prev.telephone,
-          profession: userData.situationProfessionnelle || prev.profession
+          lastName: parsedUser.nom || parsedUser.lastName || "",
+          firstName: parsedUser.prenom || parsedUser.firstName || "",
+          email: parsedUser.email || parsedUser.mail || "",
+          telephone: parsedUser.telephone || parsedUser.phone || "",
+          profession: parsedUser.situationProfessionnelle || parsedUser.profession || "Salarié"
         }));
-      } else {
-        // En cas d'échec de l'API, décodage de secours du localStorage si dispo
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          const parsed = JSON.parse(storedUser);
-          setLoanData(prev => ({
-            ...prev,
-            lastName: parsed.nom || prev.lastName,
-            firstName: parsed.prenom || prev.firstName,
-            email: parsed.email || prev.email,
-            telephone: parsed.telephone || prev.telephone,
-            profession: parsed.situationProfessionnelle || prev.profession
-          }));
-        }
       }
-    } catch (err) {
-      console.error("Erreur lors de la récupération automatique du profil complet :", err);
+    } catch (error) {
+      console.error("Erreur lors de la lecture des données utilisateur :", error);
     }
-  };
+  }, []);
 
-  fetchUserProfile();
-}, []);
-
-  // GESTION DU BOTTOM NAV
+  // Gestion de la navigation basse
   useEffect(() => {
     if (setForceHideNav) {
       if (currentView === "avantages" || currentView === "simulateur") {
@@ -88,18 +62,18 @@ useEffect(() => {
   const handleSimulation = (amount, duration) => {
     const rate = 0.049; 
     const monthly = (amount * (rate / 12)) / (1 - Math.pow(1 + rate / 12, -duration));
-    setLoanData({
-      ...loanData,
+    setLoanData(prev => ({
+      ...prev,
       amount: parseInt(amount) || 0,
       duration: parseInt(duration) || 12,
       monthlyPayment: Math.round(monthly)
-    });
+    }));
   };
 
   return (
     <div className={isDesktop ? "" : "page-contente"} style={{ maxWidth: "1100px", margin: "0 auto", fontFamily: "'Segoe UI', sans-serif" }}>
       
-      {/* VUE 1 : ACCUEIL DES PRODUITS FINANCIERS */}
+      {/* VUE 1 : OFFRES ACCUEIL */}
       {currentView === "offres" && (
         <>
           <h2 className="cards-title" style={{ color: "#004f52", fontSize: "2rem", marginBottom: "25px" }}>
@@ -144,7 +118,7 @@ useEffect(() => {
         </>
       )}
 
-      {/* VUE 2 : PAGE DES AVANTAGES COMPÉTITIFS */}
+      {/* VUE 2 : AVANTAGES */}
       {currentView === "avantages" && (
         <div style={{ background: "white", padding: "40px", borderRadius: "32px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.05)" }}>
           <button onClick={() => setCurrentView("offres")} style={{ background: "none", border: "none", color: "#004f52", cursor: "pointer", fontWeight: "600", marginBottom: "20px" }}>
@@ -156,7 +130,7 @@ useEffect(() => {
             Nous réinventons le crédit à la consommation. Pas de frais cachés, une flexibilité absolue sur vos mensualités et un taux d'intérêt hautement compétitif face aux banques traditionnelles.
           </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "25px", marginBottom: "5px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "25px", marginBottom: "40px" }}>
             <div style={{ background: "#f8fafc", padding: "25px", borderRadius: "16px", borderTop: "4px solid #004f52" }}>
               <div style={{ background: "#004f52", color: "white", width: "40px", height: "40px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "15px" }}><i className="fas fa-sliders-h"></i></div>
               <h4 style={{ color: "#004f52", fontSize: "1.15rem", margin: "0 0 10px 0" }}>Mensualités Modulables</h4>
@@ -176,44 +150,8 @@ useEffect(() => {
             </div>
           </div>
 
-          <div style={{ marginTop: "50px", marginBottom: "40px" }}>
-            <h3 style={{ color: "#004f52", marginBottom: "20px" }}>BPER face aux autres institutions financières (Moyenne 2026)</h3>
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.95rem" }}>
-                <thead>
-                  <tr style={{ background: "#004f52", color: "white" }}>
-                    <th style={{ padding: "15px" }}>Critères d'évaluation</th>
-                    <th style={{ padding: "15px", background: "#003638", textAlign: "center" }}>BPER Banca</th>
-                    <th style={{ padding: "15px" }}>Banques Traditionnelles</th>
-                    <th style={{ padding: "15px" }}>Organismes de Crédit en Ligne</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
-                    <td style={{ padding: "15px", fontWeight: "600" }}>TAEG Moyen Appliqué</td>
-                    <td style={{ padding: "15px", textAlign: "center", color: "#059669", fontWeight: "bold", background: "#f0fdf4" }}>4.90% fixe</td>
-                    <td style={{ padding: "15px" }}>5.95% à 6.80%</td>
-                    <td style={{ padding: "15px" }}>6.10% à 7.45%</td>
-                  </tr>
-                  <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
-                    <td style={{ padding: "15px", fontWeight: "600" }}>Frais de dossier contractuels</td>
-                    <td style={{ padding: "15px", textAlign: "center", color: "#059669", fontWeight: "bold", background: "#f0fdf4" }}>0 € (Gratuit)</td>
-                    <td style={{ padding: "15px" }}>En moyenne 150 €</td>
-                    <td style={{ padding: "15px" }}>Inclus (Taux gonflé)</td>
-                  </tr>
-                  <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
-                    <td style={{ padding: "15px", fontWeight: "600" }}>Pénalités de remboursement anticipé</td>
-                    <td style={{ padding: "15px", textAlign: "center", color: "#059669", fontWeight: "bold", background: "#f0fdf4" }}>Aucune (0%)</td>
-                    <td style={{ padding: "15px" }}>Jusqu'à 1% du capital</td>
-                    <td style={{ padding: "15px" }}>Réglementaires (Payant)</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
           <div style={{ textAlign: "center", background: "#004f52", padding: "35px", borderRadius: "20px", color: "white" }}>
-            <h3 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>Prêt à concrétiser votre project ?</h3>
+            <h3 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>Prêt à concrétiser votre projet ?</h3>
             <p style={{ margin: "0 0 25px 0", opacity: 0.8, fontSize: "0.95rem" }}>Le formulaire prend moins de 3 minutes. Obtenez une pré-acceptation immédiate.</p>
             <button onClick={() => setCurrentView("simulateur")} style={{ background: "#e6ff6a", color: "#004f52", padding: "14px 35px", border: "none", borderRadius: "30px", fontWeight: "bold", fontSize: "1rem", cursor: "pointer" }}>
               Démarrer ma demande de prêt en ligne
@@ -222,7 +160,7 @@ useEffect(() => {
         </div>
       )}
 
-      {/* VUE 3 : TUNNEL DE DEMANDE DE PRÊT */}
+      {/* VUE 3 : TUNNEL SIMULATEUR */}
       {currentView === "simulateur" && (
         <div className="bper-loan-container">
           <div className="bper-loan-steps" style={{ display: "flex", justifyContent: "space-between", marginBottom: "30px", background: "#fff", padding: "15px", borderRadius: "12px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
@@ -305,21 +243,15 @@ useEffect(() => {
                   </div>
                   <div>
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Statut Professionnel</label>
-                    <select style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} value={loanData.profession} onChange={(e) => setLoanData({...loanData, profession: e.target.value})}>
-                      <option value="">Sélectionnez...</option>
-                      <option value="Salarié">Salarié</option>
-                      <option value="CDI">Salarié (CDI)</option>
-                      <option value="Indépendant">Entrepreneur / Profession Libérale</option>
-                      <option value="Retraité">Cadre Retraité</option>
-                    </select>
+                    <input type="text" placeholder="Ex: Salarié, Artisan..." style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} value={loanData.profession} onChange={(e) => setLoanData({...loanData, profession: e.target.value})} />
                   </div>
                   <div>
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Nom</label>
-                    <input type="text" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} value={loanData.lastName} onChange={(e) => setLoanData({...loanData, lastName: e.target.value})} />
+                    <input type="text" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} value={loanData.lastName} readOnly />
                   </div>
                   <div>
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Prénom</label>
-                    <input type="text" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} value={loanData.firstName} onChange={(e) => setLoanData({...loanData, firstName: e.target.value})} />
+                    <input type="text" style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", color: "#333" }} value={loanData.firstName} readOnly />
                   </div>
                   <div>
                     <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem" }}>Revenus nets par mois (€)</label>
@@ -342,71 +274,73 @@ useEffect(() => {
             )}
 
             {/* ÉTAPE 3 : CONFIRMATION FINALE */}
-{loanStep === 3 && (
-  <div>
-    <div className="bper-summary-box" style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "20px", color: "#333" }}>
-      <h4 style={{ margin: "0 0 15px 0", color: "#004f52" }}>Validation contractuelle du dossier</h4>
-      
-      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-        <strong>Titulaire du compte :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} {loanData.profession ? `(${loanData.profession})` : ""}
-      </p>
-      
-      {/* 🔥 AFFICHAGE OBLIGATOIRE ET REEL DES DONNEES DE TA BASE USER.JS */}
-      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-        <strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email}</span>
-      </p>
-      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-        <strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone}</span>
-      </p>
-      
-      <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "15px 0" }} />
-      
-      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capital emprunté :</strong> {loanData.amount} € sur {loanData.duration} mois</p>
-      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Charge mensuelle calculée :</strong> {loanData.monthlyPayment} € / mois</p>
-      <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capacité déclarée :</strong> {loanData.income} € net / mois</p>
-    </div>
+            {loanStep === 3 && (
+              <div>
+                <div className="bper-summary-box" style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "20px", color: "#333" }}>
+                  <h4 style={{ margin: "0 0 15px 0", color: "#004f52" }}>Validation contractuelle du dossier</h4>
+                  
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
+                    <strong>Titulaire du compte :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} {loanData.profession ? `(${loanData.profession})` : ""}
+                  </p>
+                  
+                  {/* 🔥 AFFICHAGE REEL ET DIRECT DE TON EMAIL (PLUS JAMAIS VIDE OU TEXTE GENERIQUE) */}
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
+                    <strong>E-mail de notification :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email || "Non récupéré"}</span>
+                  </p>
+                  
+                  {/* 🔥 AFFICHAGE REEL ET DIRECT DE TON TELEPHONE */}
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
+                    <strong>Téléphone relié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone || "Non récupéré"}</span>
+                  </p>
+                  
+                  <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "15px 0" }} />
+                  
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capital emprunté :</strong> {loanData.amount} € sur {loanData.duration} mois</p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Charge mensuelle calculée :</strong> {loanData.monthlyPayment} € / mois</p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capacité déclarée :</strong> {loanData.income} € net / mois</p>
+                </div>
 
-    <p className="bper-legal-text" style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "25px", lineHeight: "1.5" }}>
-      En transmettant ce dossier, vous soumettez formellement votre demande de crédit au service d'analyse des risques et de conformité monétique de <strong>BPER Banca</strong>. Les fonds seront débloqués après validation administrative sous un délai réglementaire de 48h. Une notification de décision sera envoyée à l'adresse e-mail ci-dessus.
-    </p>
+                <p className="bper-legal-text" style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "25px", lineHeight: "1.5" }}>
+                  En transmettant ce dossier, vous soumettez formellement votre demande de crédit au service d'analyse des risques et de conformité monétique de <strong>BPER Banca</strong>. Les fonds seront débloqués après validation administrative sous un délai réglementaire de 48h. Une notification de décision sera envoyée à l'adresse e-mail ci-dessus.
+                </p>
 
-    <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-      <button className="btn-light" onClick={() => setLoanStep(2)}>Modifier</button>
-      
-      <button 
-        className="btn-white" 
-        style={{ background: "#059669", color: "#fff", marginTop: 0 }}
-        onClick={async () => {
-          try {
-            const response = await fetch("/api/auth/apply-loan", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("token")}`
-              },
-              body: JSON.stringify(loanData)
-            });
+                <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                  <button className="btn-light" onClick={() => setLoanStep(2)}>Modifier</button>
+                  
+                  <button 
+                    className="btn-white" 
+                    style={{ background: "#059669", color: "#fff", marginTop: 0 }}
+                    onClick={async () => {
+                      try {
+                        const response = await fetch("/api/auth/apply-loan", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`
+                          },
+                          body: JSON.stringify(loanData)
+                        });
 
-            const resData = await response.json();
+                        const resData = await response.json();
 
-            if (response.ok) {
-              alert(resData.message || "Demande envoyée avec succès !");
-              setCurrentView("offres");
-              setLoanStep(1);
-            } else {
-              alert(resData.message || "Une erreur est survenue lors de l'envoi.");
-            }
-          } catch (err) {
-            console.error(err);
-            alert("Impossible de joindre le serveur.");
-          }
-        }}
-      >
-        Soumettre la demande à la banque
-      </button>
-    </div>
-  </div>
-)}
+                        if (response.ok) {
+                          alert(resData.message || "Demande envoyée avec succès !");
+                          setCurrentView("offres");
+                          setLoanStep(1);
+                        } else {
+                          alert(resData.message || "Une erreur est survenue lors de l'envoi.");
+                        }
+                      } catch (err) {
+                        console.error(err);
+                        alert("Impossible de joindre le serveur.");
+                      }
+                    }}
+                  >
+                    Soumettre la demande à la banque
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
