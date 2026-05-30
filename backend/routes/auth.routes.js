@@ -86,24 +86,42 @@ router.post("/reset-password", resetPassword);
 
 
 
-// POST : Créer une demande de prêt
+// ====== ROUTE POUR LA DEMANDE DE PRÊT ======
+
 router.post("/apply", auth, async (req, res) => {
   try {
-    const loanData = {
-      ...req.body,
-      user: req.user.id // Récupéré depuis le token grâce au middleware auth
-    };
+    // 1. On récupère les données envoyées par le formulaire React
+    const { 
+      loanType, amount, duration, monthlyPayment, 
+      civility, lastName, firstName, income, profession, hasCoBorrower 
+    } = req.body;
 
-    const newLoanRequest = new LoanRequest(loanData);
+    // 2. On crée le document de demande de prêt
+    const newLoanRequest = new LoanRequest({
+      user: req.user.id, // ID de l'utilisateur connecté (fourni par le middleware auth)
+      loanType,
+      amount,
+      duration,
+      monthlyPayment,
+      civility,
+      lastName,
+      firstName,
+      income,
+      profession,
+      hasCoBorrower
+    });
+
+    // 3. Sauvegarde en base de données
     await newLoanRequest.save();
 
-    res.status(201).json({ 
-      message: "Votre demande de prêt a été transmise avec succès aux analystes BPER Banca.",
-      loan: newLoanRequest 
+    // 4. Réponse de succès
+    return res.status(201).json({ 
+      message: "Votre demande de prêt a été transmise avec succès aux analystes BPER Banca." 
     });
+
   } catch (err) {
-    console.error("Erreur soumission prêt:", err);
-    res.status(500).json({ message: "Erreur lors de la soumission de la demande de prêt" });
+    console.error("Erreur enregistrement prêt:", err);
+    return res.status(500).json({ message: "Erreur interne lors de la soumission du prêt." });
   }
 });
 

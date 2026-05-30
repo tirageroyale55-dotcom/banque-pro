@@ -217,25 +217,7 @@ app.post("/api/internal/credit-account", async (req, res) => {
 });
 
 
-app.post("/api/loans/apply", auth, async (req, res) => {
-     try {
-       const loanData = {
-         ...req.body,
-         user: req.user.id
-       };
 
-       const newLoanRequest = new LoanRequest(loanData);
-       await newLoanRequest.save();
-
-       res.status(201).json({ 
-         message: "Votre demande de prêt a été transmise avec succès aux analystes BPER Banca.",
-         loan: newLoanRequest 
-       });
-     } catch (err) {
-       console.error("Erreur soumission prêt:", err);
-       res.status(500).json({ message: "Erreur lors de la soumission de la demande" });
-     }
-   });
 
 const PORT = process.env.PORT || 5000;
 
