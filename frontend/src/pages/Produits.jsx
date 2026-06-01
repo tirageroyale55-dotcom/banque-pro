@@ -8,12 +8,17 @@ export default function Produits({ isDesktop = false }) {
   const [currentView, setCurrentView] = useState("offres"); 
   const [loanStep, setLoanStep] = useState(1);
 
-  // État de configuration pour le simulateur de prêt standard (Vue 3)
+  // Structure de données unifiée BPER Banca
   const [loanData, setLoanData] = useState({
-    loanType: "Prêt Personnel Multi-Projets",
-    amount: 15000,
-    duration: 48,
+    loanType: "Prêt Personnel Multi-Projets", // Prêt Personnel, Immo Fixe, Immo Variable
+    loanCategory: "PERSONNEL", // PERSONNEL ou HYPOTHECAIRE
+    rateType: "FIXE", // FIXE ou VARIABLE
+    amount: 15000, // Capital Net Emprunté
+    propertyValue: 250000, // Pour le calcul Immo
+    contribution: 50000, // Pour le calcul Immo
+    duration: 48, // Durée en mois
     monthlyPayment: 345,
+    interestRate: 4.90, // Taux appliqué au dossier
     civility: "M.",
     lastName: "",
     firstName: "",
@@ -24,18 +29,45 @@ export default function Produits({ isDesktop = false }) {
     hasCoBorrower: "Non"
   });
 
-  // NOUVEL ÉTAT : Configuration exclusive pour la simulation Hypothécaire / Immobilière
-  const [hypothequeData, setHypothequeData] = useState({
-    propertyValue: 250000,
-    apport: 50000,
-    durationYears: 20,
-    rateType: "FIXE", // "FIXE" ou "VARIABLE"
-    monthlyPayment: 1125,
-    totalInterest: 70000,
-    taeg: 3.15
-  });
+  // Logique unifiée des simulateurs BPER Banca
+  useEffect(() => {
+    let principal = parseFloat(loanData.amount) || 0;
+    let months = parseInt(loanData.duration) || 12;
+    let annualRate = 4.90; // Taux de base crédit consommation
 
-  // Chargement de la logique utilisateur complète depuis Atlas
+    // Ajustement de la structure financière si option Hypothécaire sélectionnée
+    if (loanData.loanCategory === "HYPOTHECAIRE") {
+      principal = Math.max(0, (parseFloat(loanData.propertyValue) || 0) - (parseFloat(loanData.contribution) || 0));
+      annualRate = loanData.rateType === "FIXE" ? 4.25 : 4.55; // Fixe : 4.25% | Variable Euribor 3M : 4.55%
+    }
+
+    let monthlyRate = (annualRate / 100) / 12;
+    let monthly = 0;
+
+    if (principal > 0 && months > 0) {
+      if (monthlyRate === 0) {
+        monthly = principal / months;
+      } else {
+        monthly = (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
+      }
+    }
+
+    setLoanData(prev => ({
+      ...prev,
+      amount: loanData.loanCategory === "HYPOTHECAIRE" ? principal : prev.amount,
+      interestRate: annualRate,
+      monthlyPayment: Math.round(monthly) || 0
+    }));
+  }, [
+    loanData.loanCategory, 
+    loanData.rateType, 
+    loanData.amount, 
+    loanData.propertyValue, 
+    loanData.contribution, 
+    loanData.duration
+  ]);
+
+  // Chargement des données utilisateur depuis Atlas
   useEffect(() => {
     const loadRealUserData = async () => {
       try {
@@ -70,10 +102,10 @@ export default function Produits({ isDesktop = false }) {
     loadRealUserData();
   }, []);
 
-  // Gestion de la visibilité de la navigation globale
+  // Visibilité de la navigation globale
   useEffect(() => {
     if (setForceHideNav) {
-      if (currentView === "avantages" || currentView === "simulateur" || currentView === "hypotheque") {
+      if (currentView === "avantages" || currentView === "simulateur") {
         setForceHideNav(true);
       } else {
         setForceHideNav(false);
@@ -81,55 +113,6 @@ export default function Produits({ isDesktop = false }) {
     }
   }, [currentView, setForceHideNav]);
 
-  // Logique de calcul des mensualités du simulateur de prêt standard
-  const handleSimulation = (amount, duration) => {
-    const parsedAmount = parseFloat(amount) || 0;
-    const parsedDuration = parseInt(duration) || 12;
-    const rate = 0.049; 
-    
-    let monthly = 0;
-    if (parsedAmount > 0 && parsedDuration > 0) {
-      monthly = (parsedAmount * (rate / 12)) / (1 - Math.pow(1 + rate / 12, -parsedDuration));
-    }
-
-    setLoanData(prev => ({
-      ...prev,
-      amount: amount, 
-      duration: parsedDuration,
-      monthlyPayment: Math.round(monthly) || 0
-    }));
-  };
-
-  // NOUVELLE LOGIQUE : Calcul financier avancé pour prêts hypothécaires (Formule d'amortissement de crédit)
-  const recalculateHypotheque = (updatedFields) => {
-    const current = { ...hypothequeData, ...updatedFields };
-    
-    const principal = Math.max(0, (parseFloat(current.propertyValue) || 0) - (parseFloat(current.apport) || 0));
-    const totalMonths = (parseInt(current.durationYears) || 1) * 12;
-    
-    // Taux nominal annuel BPER : Fixe institutionnel = 3.15% | Variable indexé Euribor = 2.80%
-    const annualRate = current.rateType === "FIXE" ? 0.0315 : 0.0280;
-    const monthlyRate = annualRate / 12;
-    
-    let monthly = 0;
-    if (principal > 0 && monthlyRate > 0) {
-      monthly = (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -totalMonths));
-    } else if (principal > 0) {
-      monthly = principal / totalMonths;
-    }
-    
-    const totalRepaid = monthly * totalMonths;
-    const interest = Math.max(0, totalRepaid - principal);
-
-    setHypothequeData({
-      ...current,
-      monthlyPayment: Math.round(monthly),
-      totalInterest: Math.round(interest),
-      taeg: current.rateType === "FIXE" ? 3.15 : 2.80
-    });
-  };
-
-  // Fonction de navigation interne avec reset automatique du scroll vers le haut
   const navigateToView = (viewName) => {
     setCurrentView(viewName);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -145,7 +128,7 @@ export default function Produits({ isDesktop = false }) {
             Nos Solutions de Financement & Épargne
           </h2>
 
-          <div className="bper-promo-card-grid" style={{ marginBottom: "25px" }}>
+          <div className="bper-promo-card-grid">
             <div className="promo-image-wrapper">
               <img src="pret-velo.png" alt="BPER Crédits et Assurances" className="promo-image" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               <div className="promo-badge">
@@ -168,27 +151,6 @@ export default function Produits({ isDesktop = false }) {
                   En savoir plus
                 </button>
               </div>
-            </div>
-          </div>
-
-          {/* NOUVELLE ENCADRÉ D'ACCÈS AU SIMULATEUR HYPOTHÉCAIRE BPER */}
-          <div className="bper-promo-card-grid" style={{ gridTemplateColumns: "1fr", marginBottom: "25px" }}>
-            <div style={{ background: "linear-gradient(135deg, #004f52 0%, #002c2e 100%)", padding: "30px 25px", borderRadius: "24px", color: "white" }}>
-              <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "12px" }}>
-                <span style={{ background: "#eab308", color: "#004f52", padding: "4px 10px", borderRadius: "6px", fontSize: "0.75rem", fontWeight: "bold" }}>OFFRE IMMOBILIÈRE</span>
-                <span style={{ fontSize: "0.85rem", opacity: 0.9 }}>Prêts Hypothécaires Réglementés</span>
-              </div>
-              <h3 style={{ color: "#fff", margin: "0 0 10px 0", fontSize: "1.5rem", fontWeight: "600" }}>Simulateur de Financement Immobilier & Hypothécaire</h3>
-              <p style={{ opacity: 0.85, fontSize: "0.95rem", margin: "0 0 20px 0", lineHeight: "1.5", maxWidth: "800px" }}>
-                Calculez vos mensualités d'acquisition de résidence principale ou d'investissement locatif. Comparez instantanément nos formules d'amortissement à taux fixe sécurisé ou à taux variable indexé sur l'Euribor monétaire.
-              </p>
-              <button 
-                onClick={() => { recalculateHypotheque({}); navigateToView("hypotheque"); }} 
-                className="btn-white" 
-                style={{ border: "none", cursor: "pointer", fontWeight: "700", padding: "12px 24px", borderRadius: "8px", background: "#ffffff", color: "#004f52" }}
-              >
-                <i className="fas fa-calculator" style={{ marginRight: "8px" }}></i> Accéder au simulateur d'hypothèque
-              </button>
             </div>
           </div>
 
@@ -239,7 +201,7 @@ export default function Produits({ isDesktop = false }) {
 
           <div className="bper-cta-box">
             <h3 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>Prêt à concrétiser votre projet ?</h3>
-            <p style={{ margin: "0 0 25px 0", opacity: 0.8, fontSize: "0.95rem" }}> Le formulaire prend moins de 3 minutes. Obtenez une pré-acceptation immédiate.</p>
+            <p style={{ margin: "0 0 25px 0", opacity: 0.8, fontSize: "0.95rem" }}>Le formulaire prend moins de 3 minutes. Obtenez une pré-acceptation immédiate.</p>
             <button onClick={() => navigateToView("simulateur")}>
               Démarrer ma demande de prêt en ligne
             </button>
@@ -247,250 +209,176 @@ export default function Produits({ isDesktop = false }) {
         </div>
       )}
 
-      {/* NOUVELLE VUE EXCLUSIVE : SIMULATEUR HYPOTHÉCAIRE PRO */}
-      {currentView === "hypotheque" && (
-        <div className="bper-loan-container" style={{ width: "100%", boxSizing: "border-box" }}>
-          <button onClick={() => navigateToView("offres")} className="btn-bper-back-top" style={{ marginBottom: "20px" }}>
-            <i className="fas fa-arrow-left"></i> Retourner aux solutions de financement
-          </button>
-
-          <div style={{ background: "#fff", padding: "30px 20px", borderRadius: "24px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", boxSizing: "border-box" }}>
-            <h2 style={{ color: "#004f52", marginBottom: "5px", fontSize: "1.6rem", fontWeight: "700" }}>
-              Planification Établissement de Crédit Hypothécaire
-            </h2>
-            <p style={{ color: "#64748b", fontSize: "0.9rem", marginBottom: "30px", lineHeight: "1.4" }}>
-              Modélisation financière conforme aux instructions réglementaires d'octroi de crédits immobiliers BPER Banca.
-            </p>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "25px" }}>
-              
-              {/* Type de Structure de Taux */}
-              <div>
-                <label style={{ display: "block", marginBottom: "10px", fontWeight: "700", color: "#334155", fontSize: "0.9rem" }}>Structure contractuelle du taux d'intérêt</label>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                  <button 
-                    type="button"
-                    onClick={() => recalculateHypotheque({ rateType: "FIXE" })}
-                    style={{
-                      padding: "14px",
-                      borderRadius: "10px",
-                      fontWeight: "700",
-                      fontSize: "0.9rem",
-                      cursor: "pointer",
-                      border: hypothequeData.rateType === "FIXE" ? "2px solid #004f52" : "1px solid #cbd5e1",
-                      background: hypothequeData.rateType === "FIXE" ? "#f0f7f7" : "#fff",
-                      color: "#004f52"
-                    }}
-                  >
-                    <i className="fas fa-lock" style={{ marginRight: "6px" }}></i> Taux Fixe Institutionnel (3.15%)
-                  </button>
-                  <button 
-                    type="button"
-                    onClick={() => recalculateHypotheque({ rateType: "VARIABLE" })}
-                    style={{
-                      padding: "14px",
-                      borderRadius: "10px",
-                      fontWeight: "700",
-                      fontSize: "0.9rem",
-                      cursor: "pointer",
-                      border: hypothequeData.rateType === "VARIABLE" ? "2px solid #004f52" : "1px solid #cbd5e1",
-                      background: hypothequeData.rateType === "VARIABLE" ? "#f0f7f7" : "#fff",
-                      color: "#004f52"
-                    }}
-                  >
-                    <i className="fas fa-chart-line" style={{ marginRight: "6px" }}></i> Taux Variable Révisable (2.80% Euribor)
-                  </button>
-                </div>
-              </div>
-
-              {/* Saisie des données financières */}
-              <div className="bper-grid-2" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "20px" }}>
-                <div>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", fontSize: "0.85rem", color: "#475569" }}>Valeur estimée du bien immobilier (€)</label>
-                  <input 
-                    type="number" 
-                    className="bper-full-input"
-                    style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #cbd5e1", boxSizing: "border-box" }}
-                    value={hypothequeData.propertyValue}
-                    onChange={(e) => recalculateHypotheque({ propertyValue: e.target.value })}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", fontSize: "0.85rem", color: "#475569" }}>Apport Personnel Initial (€)</label>
-                  <input 
-                    type="number" 
-                    className="bper-full-input"
-                    style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #cbd5e1", boxSizing: "border-box" }}
-                    value={hypothequeData.apport}
-                    onChange={(e) => recalculateHypotheque({ apport: e.target.value })}
-                  />
-                </div>
-
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <label style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontWeight: "600", fontSize: "0.85rem", color: "#475569" }}>
-                    <span>Durée de l'amortissement du prêt</span>
-                    <strong style={{ color: "#004f52" }}>{hypothequeData.durationYears} ans ({hypothequeData.durationYears * 12} échéances)</strong>
-                  </label>
-                  <input 
-                    type="range" 
-                    min="5" 
-                    max="30" 
-                    step="1"
-                    style={{ width: "100%", accentColor: "#004f52", cursor: "pointer" }}
-                    value={hypothequeData.durationYears}
-                    onChange={(e) => recalculateHypotheque({ durationYears: e.target.value })}
-                  />
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "#94a3b8", marginTop: "4px" }}>
-                    <span>5 ans</span>
-                    <span>15 ans</span>
-                    <span>25 ans</span>
-                    <span>30 ans Max</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bloc de Synthèse d'Amortissement Bancaire */}
-              <div style={{ background: "#f8fafc", padding: "20px", borderRadius: "16px", border: "1px solid #e2e8f0", marginTop: "10px" }}>
-                <h4 style={{ margin: "0 0 15px 0", color: "#004f52", fontSize: "1rem", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                  Rapport Analytique de l'Engagement
-                </h4>
-                
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "15px" }}>
-                  <div style={{ background: "#fff", padding: "15px", borderRadius: "12px", borderLeft: "4px solid #004f52" }}>
-                    <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block", marginBottom: "2px" }}>Mensualité Hors Assurance</span>
-                    <strong style={{ color: "#004f52", fontSize: "1.5rem", fontWeight: "700" }}>{hypothequeData.monthlyPayment} €</strong>
-                    <span style={{ fontSize: "0.7rem", color: "#94a3b8", display: "block" }}>Échéance constante</span>
-                  </div>
-
-                  <div style={{ background: "#fff", padding: "15px", borderRadius: "12px", borderLeft: "4px solid #059669" }}>
-                    <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block", marginBottom: "4px" }}>Capital Net Emprunté</span>
-                    <strong style={{ color: "#334155", fontSize: "1.2rem" }}>{Math.max(0, hypothequeData.propertyValue - hypothequeData.apport)} €</strong>
-                  </div>
-
-                  <div style={{ background: "#fff", padding: "15px", borderRadius: "12px", borderLeft: "4px solid #eab308" }}>
-                    <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block", marginBottom: "4px" }}>Coût Total des Intérêts</span>
-                    <strong style={{ color: "#334155", fontSize: "1.2rem" }}>{hypothequeData.totalInterest} €</strong>
-                  </div>
-
-                  <div style={{ background: "#fff", padding: "15px", borderRadius: "12px", borderLeft: "4px solid #38bdf8" }}>
-                    <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block", marginBottom: "4px" }}>TAEG Prévisionnel</span>
-                    <strong style={{ color: "#059669", fontSize: "1.2rem" }}>{hypothequeData.taeg}%</strong>
-                  </div>
-                </div>
-
-                {hypothequeData.rateType === "VARIABLE" && (
-                  <p style={{ margin: "12px 0 0 0", fontSize: "0.8rem", color: "#b45309", backgroundColor: "#fffbeb", padding: "10px", borderRadius: "8px", border: "1px solid #fde68a" }}>
-                    <i className="fas fa-exclamation-triangle"></i> <strong>Avis réglementaire :</strong> Le taux d'intérêt de ce contrat de crédit est révisable. Le montant de vos mensualités est indexé sur l'évolution du taux Euribor 3 mois et peut fluctuer à la hausse comme à la baisse.
-                  </p>
-                )}
-              </div>
-
-              {/* Mentions Légales Obligatoires & Bouton de contact */}
-              <p style={{ fontSize: "0.8rem", color: "#94a3b8", margin: 0, lineHeight: "1.5", textAlign: "justify" }}>
-                Un crédit immobilier vous engage et doit être remboursé. Vérifiez vos capacités de remboursement avant de vous engager. L'octroi d'un prêt hypothécaire définitif reste soumis à l'évaluation finale de solvabilité par notre commission des risques BPER Banca et à la constitution de garanties réelles adéquates.
-              </p>
-
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px" }}>
-                <button 
-                  onClick={() => navigateToView("offres")}
-                  style={{ background: "#cbd5e1", color: "#334155", border: "none", padding: "12px 20px", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}
-                >
-                  Fermer
-                </button>
-                <button 
-                  onClick={() => {
-                    alert("Simulation enregistrée. Un conseiller de l'agence commerciale BPER prendra contact avec vous sous 24h ouvrées.");
-                    navigateToView("offres");
-                  }}
-                  style={{ background: "#004f52", color: "white", border: "none", padding: "12px 24px", borderRadius: "8px", fontWeight: "700", cursor: "pointer" }}
-                >
-                  Déposer une intention de dossier immo
-                </button>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* VUE 3 : TUNNEL SIMULATEUR STANDARD */}
+      {/* VUE 3 : TUNNEL SIMULATEUR INTÉGRÉ */}
       {currentView === "simulateur" && (
         <div className="bper-loan-container">
           
           <div className="bper-loan-steps">
-            <div className="bper-step-item" style={{ color: loanStep === 1 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 1 ? "3px solid #004f52" : "none" }}>1. CONFIGURATION</div>
-            <div className="bper-step-item" style={{ color: loanStep === 2 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 2 ? "3px solid #004f52" : "none" }}>2. INFORMATIONS</div>
-            <div className="bper-step-item" style={{ color: loanStep === 3 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 3 ? "3px solid #004f52" : "none" }}>3. VÉRIFICATION</div>
+            <div className="bper-step-item" style={{ color: loanStep === 1 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 1 ? "3px solid #004f52" : "none" }}>1. ARCHITECTURE ET CALCUL</div>
+            <div className="bper-step-item" style={{ color: loanStep === 2 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 2 ? "3px solid #004f52" : "none" }}>2. STATUT PRO & SITUATION</div>
+            <div className="bper-step-item" style={{ color: loanStep === 3 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 3 ? "3px solid #004f52" : "none" }}>3. CONFORMITÉ</div>
           </div>
 
           <div className="bper-loan-card" style={{ background: "#fff", padding: "30px 20px", borderRadius: "24px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", boxSizing: "border-box" }}>
             <h2 className="bper-loan-title" style={{ color: "#004f52", marginBottom: "5px", fontSize: "1.6rem" }}>Demande de Financement en Ligne</h2>
-            <p className="bper-loan-subtitle" style={{ color: "#64748b", fontSize: "0.9rem", marginBottom: "30px" }}>BPER Banca — Service d'octroi des crédits aux particuliers.</p>
+            <p className="bper-loan-subtitle" style={{ color: "#64748b", fontSize: "0.9rem", marginBottom: "30px" }}>BPER Banca — Service d'octroi et de calcul instantané.</p>
 
-            {/* ÉTAPE 1 */}
+            {/* ÉTAPE 1 : TOUS LES CALCULS INTÉGRÉS ICI */}
             {loanStep === 1 && (
               <div>
+                {/* Sélecteur de type de Prêt Principal */}
                 <div style={{ marginBottom: "20px" }}>
-                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Nature de votre projet</label>
+                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Gamme de financement BPER</label>
                   <select 
                     className="bper-full-input"
-                    value={loanData.loanType}
-                    onChange={(e) => setLoanData({...loanData, loanType: e.target.value})}
+                    value={loanData.loanCategory}
+                    onChange={(e) => {
+                      const cat = e.target.value;
+                      setLoanData({
+                        ...loanData, 
+                        loanCategory: cat,
+                        loanType: cat === "HYPOTHECAIRE" ? "Crédit Immobilier BPER (Achat Résidence)" : "Prêt Personnel Multi-Projets"
+                      });
+                    }}
                   >
-                    <option value="Prêt Personnel Multi-Projets">Prêt Personnel Multi-Projets</option>
-                    <option value="Prêt Automobile (Véhicule Neuf / Hybride)">Prêt Automobile (Véhicule Neuf / Hybride)</option>
-                    <option value="Prêt Automobile (Véhicule d'Occasion)">Prêt Automobile (Véhicule d'Occasion)</option>
-                    <option value="Prêt Travaux & Éco-Rénovation">Prêt Travaux & Éco-Rénovation</option>
-                    <option value="Crédit Immobilier BPER (Achat Résidence)">Crédit Immobilier BPER (Achat Résidence)</option>
-                    <option value="Rachat et Regroupement de Crédits">Rachat et Regroupement de Crédits</option>
-                    <option value="Prêt Études & Financement Formation">Prêt Études & Financement Formation</option>
-                    <option value="Financement Trésorerie & Ligne Professionnelle">Financement Trésorerie & Ligne Professionnelle</option>
+                    <option value="PERSONNEL">Prêt Mensuel Personnel / Consommation & Auto</option>
+                    <option value="HYPOTHECAIRE">Prêt Hypothécaire & Crédit Immobilier</option>
                   </select>
                 </div>
 
-                <div className="bper-grid-2">
+                {/* BLOC 1A : FORMULAIRE CRÉDIT PERSONNEL */}
+                {loanData.loanCategory === "PERSONNEL" && (
                   <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Montant recherché (€)</label>
-                    <input 
-                      type="number" 
-                      className="bper-full-input"
-                      value={loanData.amount}
-                      onChange={(e) => handleSimulation(e.target.value, loanData.duration)}
-                    />
+                    <div style={{ marginBottom: "20px" }}>
+                      <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Nature de votre projet</label>
+                      <select 
+                        className="bper-full-input"
+                        value={loanData.loanType}
+                        onChange={(e) => setLoanData({...loanData, loanType: e.target.value})}
+                      >
+                        <option value="Prêt Personnel Multi-Projets">Prêt Personnel Multi-Projets</option>
+                        <option value="Prêt Automobile (Véhicule Neuf / Hybride)">Prêt Automobile (Véhicule Neuf / Hybride)</option>
+                        <option value="Prêt Automobile (Véhicule d'Occasion)">Prêt Automobile (Véhicule d'Occasion)</option>
+                        <option value="Prêt Travaux & Éco-Rénovation">Prêt Travaux & Éco-Rénovation</option>
+                        <option value="Rachat et Regroupement de Crédits">Rachat et Regroupement de Crédits</option>
+                        <option value="Prêt Études & Financement Formation">Prêt Études & Financement Formation</option>
+                      </select>
+                    </div>
+
+                    <div className="bper-grid-2">
+                      <div>
+                        <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Montant recherché (€)</label>
+                        <input 
+                          type="number" 
+                          className="bper-full-input"
+                          value={loanData.amount}
+                          onChange={(e) => setLoanData({...loanData, amount: parseFloat(e.target.value) || 0})}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Période d'amortissement (mois)</label>
+                        <select 
+                          className="bper-full-input"
+                          value={loanData.duration}
+                          onChange={(e) => setLoanData({...loanData, duration: parseInt(e.target.value)})}
+                        >
+                          <option value="12">12 mois (1 an)</option>
+                          <option value="24">24 mois (2 ans)</option>
+                          <option value="36">36 mois (3 ans)</option>
+                          <option value="48">48 mois (4 ans)</option>
+                          <option value="60">60 mois (5 ans)</option>
+                          <option value="72">72 mois (6 ans)</option>
+                          <option value="84">84 mois (7 ans)</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
+                )}
+
+                {/* BLOC 1B : FORMULAIRE SIMULATEUR HYPOTHÉCAIRE (TAUX FIXE / VARIABLE) */}
+                {loanData.loanCategory === "HYPOTHECAIRE" && (
                   <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Période de remboursement (mois)</label>
-                    <select 
-                      className="bper-full-input"
-                      value={loanData.duration}
-                      onChange={(e) => handleSimulation(loanData.amount, e.target.value)}
-                    >
-                      <option value="12">12 mois (1 an)</option>
-                      <option value="24">24 mois (2 ans)</option>
-                      <option value="36">36 mois (3 ans)</option>
-                      <option value="48">48 mois (4 ans)</option>
-                      <option value="60">60 mois (5 ans)</option>
-                      <option value="72">72 mois (6 ans)</option>
-                      <option value="84">84 mois (7 ans)</option>
-                      <option value="120">120 mois (10 ans)</option>
-                    </select>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "15px", marginBottom: "20px" }}>
+                      <div>
+                        <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Valeur du bien immobilier (€)</label>
+                        <input 
+                          type="number" 
+                          className="bper-full-input"
+                          value={loanData.propertyValue}
+                          onChange={(e) => setLoanData({...loanData, propertyValue: parseFloat(e.target.value) || 0})}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Apport personnel (€)</label>
+                        <input 
+                          type="number" 
+                          className="bper-full-input"
+                          value={loanData.contribution}
+                          onChange={(e) => setLoanData({...loanData, contribution: parseFloat(e.target.value) || 0})}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bper-grid-2">
+                      <div>
+                        <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Structure d'intérêt hypothécaire</label>
+                        <select 
+                          className="bper-full-input"
+                          value={loanData.rateType}
+                          onChange={(e) => {
+                            const rt = e.target.value;
+                            setLoanData({...loanData, rateType: rt, loanType: `Crédit Immobilier BPER (Achat Résidence) - Taux ${rt}`});
+                          }}
+                        >
+                          <option value="FIXE">Taux Fixe Institutionnel (4.25%)</option>
+                          <option value="VARIABLE">Taux Variable Indexé Euribor (4.55%)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Durée de l'engagement (mois)</label>
+                        <select 
+                          className="bper-full-input"
+                          value={loanData.duration}
+                          onChange={(e) => setLoanData({...loanData, duration: parseInt(e.target.value)})}
+                        >
+                          <option value="120">120 mois (10 ans)</option>
+                          <option value="180">180 mois (15 ans)</option>
+                          <option value="240">240 mois (20 ans)</option>
+                          <option value="300">300 mois (25 ans)</option>
+                          <option value="360">360 mois (30 ans)</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
+                )}
+
+                {/* AFFICHAGE EN TEMPS RÉEL DE LA MENSUALITÉ ET PARAMÈTRES BANCAIRES */}
+                <div className="bper-estimation-box" style={{ background: "#f0f7f7", padding: "20px", borderRadius: "12px", borderLeft: "5px solid #004f52", marginBottom: "25px", marginTop: "25px" }}>
+                  <h4 style={{ margin: "0 0 8px 0", color: "#004f52", fontSize: "0.95rem", fontWeight: "700" }}>
+                    {loanData.loanCategory === "HYPOTHECAIRE" ? "INDICATEURS DU PRÊT HYPOTHÉCAIRE CALCULÉ" : "ENGAGEMENT MENSUEL ESTIMÉ"}
+                  </h4>
+                  <p style={{ margin: 0, fontSize: "1.6rem", fontWeight: "bold", color: "#004f52" }}>
+                    {loanData.monthlyPayment} € <span style={{ fontSize: "0.9rem", fontWeight: "normal", color: "#64748b" }}>/ mois (Taux Nominal : {loanData.interestRate.toFixed(2)}%)</span>
+                  </p>
+                  {loanData.loanCategory === "HYPOTHECAIRE" && (
+                    <div style={{ marginTop: "10px", fontSize: "0.85rem", color: "#475569" }}>
+                      Capital net financé par BPER Banca : <strong>{loanData.amount} €</strong>
+                    </div>
+                  )}
                 </div>
 
-                <div className="bper-estimation-box" style={{ background: "#f0f7f7", padding: "20px", borderRadius: "12px", borderLeft: "5px solid #004f52", marginBottom: "25px", marginTop: "25px" }}>
-                  <h4 style={{ margin: "0 0 8px 0", color: "#004f52" }}>Engagement Mensuel Estimé</h4>
-                  <p style={{ margin: 0, fontSize: "1.5rem", fontWeight: "bold", color: "#004f52" }}>
-                    {loanData.monthlyPayment} € <span className="bper-rate-text" style={{ fontSize: "0.9rem", fontWeight: "normal", color: "#64748b" }}>/ mois (TAEG contractuel : 4,90%)</span>
+                {loanData.rateType === "VARIABLE" && loanData.loanCategory === "HYPOTHECAIRE" && (
+                  <p style={{ fontSize: "0.75rem", color: "#64748b", margin: "-15px 0 20px 0", fontStyle: "italic" }}>
+                    * Indexation réglementaire Euribor 3M : Soumis aux fluctuations des marchés financiers.
                   </p>
-                </div>
+                )}
 
                 <div className="bper-actions-wrapper">
                   <button className="btn-bper-back" onClick={() => navigateToView("avantages")}>
                     <i className="fas fa-chevron-left"></i> Retour
                   </button>
                   <button className="btn-bper-submit" style={{ background: "#004f52", color: "#fff" }} onClick={() => { setLoanStep(2); window.scrollTo({top: 0}); }}>
-                    Constituer 
+                    Continuer ma demande
                   </button>
                 </div>
               </div>
@@ -560,26 +448,26 @@ export default function Produits({ isDesktop = false }) {
                   <h4 style={{ margin: "0 0 15px 0", color: "#004f52" }}>Validation contractuelle du dossier</h4>
                   
                   <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>Nature du projet :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.loanType}</span>
+                    <strong>Architecture de crédit :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.loanType}</span>
                   </p>
 
                   <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>Titulaire :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} {loanData.profession ? `(${loanData.profession})` : ""}
+                    <strong>Titulaire du compte :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} {loanData.profession ? `(${loanData.profession})` : ""}
                   </p>
                   
                   <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>E-mail :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email}</span>
+                    <strong>E-mail d'envoi :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email}</span>
                   </p>
                   
                   <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>Téléphone :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone}</span>
+                    <strong>Téléphone lié :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone}</span>
                   </p>
                   
                   <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "15px 0" }} />
                   
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capital emprunté :</strong> {loanData.amount} € sur {loanData.duration} mois</p>
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Charge mensuelle calculée :</strong> {loanData.monthlyPayment} € / mois</p>
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capacité déclarée :</strong> {loanData.income} € net / mois</p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capital Principal Accordé :</strong> {loanData.amount} € sur {loanData.duration} mois</p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Mensualité Contractuelle Calculée :</strong> {loanData.monthlyPayment} € / mois</p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Revenus Déclarés Authentifiés :</strong> {loanData.income} € net / mois</p>
                 </div>
 
                 <p className="bper-legal-text" style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "25px", lineHeight: "1.5" }}>
@@ -620,7 +508,7 @@ export default function Produits({ isDesktop = false }) {
                       }
                     }}
                   >
-                    Valider
+                    Valider l'Engagement
                   </button>
                 </div>
               </div>
