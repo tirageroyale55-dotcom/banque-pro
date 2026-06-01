@@ -23,14 +23,64 @@ export default function Produits({ isDesktop = false }) {
     hasCoBorrower: "Non"
   });
 
-  // --- NOUVELLE LOGIQUE INTERNE : PARAMÈTRES HYPOTHÉCAIRES (TAUX FIXE / VARIABLE) ---
+  // --- PARAMÈTRES DU TABLEAU D'AMORTISSEMENT PROFESSIONNEL INTERACTIF (VUE 1) ---
+  const [interactiveAmount, setInteractiveAmount] = useState(200000);
+  const [interactiveYears, setInteractiveYears] = useState(20);
+  const [interactiveRateType, setInteractiveRateType] = useState("FIXE"); // FIXE ou VARIABLE
+  const [amortizationSchedule, setAmortizationSchedule] = useState([]);
+  const [summaryMetrics, setSummaryMetrics] = useState({ monthlyBox: 0, totalInterest: 0, insuranceBox: 0 });
+
+  // --- LOGIQUE INTERNE POUR LE TUNNEL DE DEMANDE (VUE 3) ---
   const [hypoRateType, setHypoRateType] = useState("FIXE"); 
   const [hypoContribution, setHypoContribution] = useState(0); 
 
-  // --- ÉTAT DU TABLEAU D'AMORTISSEMENT DYNAMIQUE (VUE 1) ---
-  const [amortizationSchedule, setAmortizationSchedule] = useState([]);
+  // Moteur de calcul financier pour le Tableau d'Amortissement Interactif (Vue 1)
+  useEffect(() => {
+    const principal = parseFloat(interactiveAmount) || 0;
+    const months = (parseInt(interactiveYears) || 1) * 12;
+    const annualRate = interactiveRateType === "FIXE" ? 0.0425 : 0.0455; // Grille BPER Banca
+    const monthlyRate = annualRate / 12;
+    
+    let monthlyPAndI = 0;
+    if (principal > 0 && months > 0) {
+      monthlyPAndI = (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
+    }
 
-  // Logique de calcul globale unifiée (Personnel et Hypothécaire)
+    const insuranceM = Math.round((principal * 0.0021) / 12); // Taux d'assurance standardisé 0.21%
+    let remainingPrincipal = principal;
+    const schedule = [];
+    let accumulatedInterest = 0;
+
+    // Génération des lignes d'échéances (limitée aux 12 premiers mois pour la lisibilité)
+    const limitDisplay = Math.min(months, 12);
+
+    for (let i = 1; i <= months; i++) {
+      const interestFactor = remainingPrincipal * monthlyRate;
+      const principalFactor = Math.max(0, monthlyPAndI - interestFactor);
+      accumulatedInterest += interestFactor;
+      remainingPrincipal = Math.max(0, remainingPrincipal - principalFactor);
+
+      if (i <= limitDisplay) {
+        schedule.push({
+          month: i,
+          totalMonthly: Math.round(monthlyPAndI + insuranceM),
+          principalPaid: Math.round(principalFactor),
+          interestPaid: Math.round(interestFactor),
+          insurance: insuranceM,
+          remaining: Math.round(remainingPrincipal)
+        });
+      }
+    }
+
+    setAmortizationSchedule(schedule);
+    setSummaryMetrics({
+      monthlyBox: Math.round(monthlyPAndI),
+      totalInterest: Math.round(accumulatedInterest),
+      insuranceBox: insuranceM
+    });
+  }, [interactiveAmount, interactiveYears, interactiveRateType]);
+
+  // Logique de calcul unifiée pour le tunnel de demande (Vue 3)
   const handleSimulation = (amount, duration, typeOfLoan = loanData.loanType, rateType = hypoRateType, contribution = hypoContribution) => {
     const parsedAmount = parseFloat(amount) || 0;
     const parsedDuration = parseInt(duration) || 12;
@@ -60,51 +110,13 @@ export default function Produits({ isDesktop = false }) {
     }));
   };
 
-  // Générateur de tableau d'amortissement prévisionnel basé sur les encours actuels
-  useEffect(() => {
-    const principal = parseFloat(loanData.amount) || 0;
-    const months = parseInt(loanData.duration) || 12;
-    let annualRate = 0.049;
-
-    if (loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) {
-      annualRate = hypoRateType === "FIXE" ? 0.0425 : 0.0455;
-    }
-
-    const monthlyRate = annualRate / 12;
-    const totalPayment = loanData.monthlyPayment;
-    const insurance = Math.round((principal * 0.0021) / 12) || 15; // Assurance standardisée
-
-    let remainingPrincipal = principal;
-    const schedule = [];
-
-    // On génère les 6 premiers mois pour l'aperçu du tableau sans surcharger la page
-    const iterations = Math.min(months, 6);
-
-    for (let i = 1; i <= iterations; i++) {
-      if (remainingPrincipal <= 0) break;
-      const interestPayment = remainingPrincipal * monthlyRate;
-      const principalPayment = Math.max(0, totalPayment - interestPayment);
-      remainingPrincipal = Math.max(0, remainingPrincipal - principalPayment);
-
-      schedule.push({
-        month: i,
-        principalPaid: Math.round(principalPayment),
-        interestPaid: Math.round(interestPayment),
-        insurance: insurance,
-        totalMonthly: Math.round(totalPayment + insurance),
-        remaining: Math.round(remainingPrincipal)
-      });
-    }
-    setAmortizationSchedule(schedule);
-  }, [loanData.amount, loanData.duration, loanData.monthlyPayment, loanData.loanType, hypoRateType]);
-
   useEffect(() => {
     if (loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) {
       handleSimulation(loanData.amount, loanData.duration, loanData.loanType, hypoRateType, hypoContribution);
     }
   }, [hypoRateType, hypoContribution]);
 
-  // Chargement de la logique utilisateur complète depuis Atlas
+  // Chargement des données de l'utilisateur depuis Atlas
   useEffect(() => {
     const loadRealUserData = async () => {
       try {
@@ -121,7 +133,6 @@ export default function Produits({ isDesktop = false }) {
 
         if (response.ok) {
           const dbUser = await response.json();
-          
           setLoanData(prev => ({
             ...prev,
             lastName: dbUser.nom || "",
@@ -135,11 +146,9 @@ export default function Produits({ isDesktop = false }) {
         console.error("Impossible de charger les données depuis Atlas :", error);
       }
     };
-
     loadRealUserData();
   }, []);
 
-  // Gestion de la visibilité de la navigation globale
   useEffect(() => {
     if (setForceHideNav) {
       if (currentView === "avantages" || currentView === "simulateur") {
@@ -191,49 +200,135 @@ export default function Produits({ isDesktop = false }) {
             </div>
           </div>
 
-          {/* --- NOUVELLE SECTION : TABLEAU D'AMORTISSEMENT REQUIS (JUSTE APRÈS EN SAVOIR PLUS) --- */}
+          {/* --- NOUVELLE SECTION COMPLÈTE : VRAIS TABLEAU D'AMORTISSEMENT PROFESSIONNEL INTERACTIF BPER BANCA --- */}
           <div style={{ background: "#fff", padding: "25px", borderRadius: "24px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", marginBottom: "25px", border: "1px solid #e2e8f0" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "15px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
               <div style={{ background: "#004f52", color: "#fff", width: "35px", height: "35px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <i className="fas fa-table"></i>
+                <i className="fas fa-calculator"></i>
               </div>
               <div>
-                <h3 style={{ color: "#004f52", margin: 0, fontSize: "1.2rem", fontWeight: "700" }}>Tableau d'Amortissement Prévisionnel</h3>
-                <p style={{ color: "#64748b", margin: 0, fontSize: "0.85rem" }}>Planification détaillée des premières échéances réglementaires (Base : {loanData.amount || 0} € sur {loanData.duration} mois).</p>
+                <h3 style={{ color: "#004f52", margin: 0, fontSize: "1.25rem", fontWeight: "700" }}>Générateur de Tableau d'Amortissement Bancaire</h3>
+                <p style={{ color: "#64748b", margin: 0, fontSize: "0.85rem" }}>Simulez vos remboursements réels selon les taux directeurs officiels de BPER Banca.</p>
               </div>
             </div>
 
-            <div style={{ overflowX: "auto", width: "100%" }}>
+            {/* Inputs de contrôle du Tableau */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "15px", marginBottom: "20px", background: "#f8fafc", padding: "15px", borderRadius: "12px" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "600", color: "#475569", marginBottom: "5px" }}>Capital souhaité (€)</label>
+                <input 
+                  type="number" 
+                  className="bper-full-input" 
+                  value={interactiveAmount === 0 ? "" : interactiveAmount} 
+                  placeholder="Ex: 150000"
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setInteractiveAmount(v === "" ? "" : parseFloat(v));
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "600", color: "#475569", marginBottom: "5px" }}>Durée de l'encours (Années)</label>
+                <input 
+                  type="number" 
+                  className="bper-full-input" 
+                  value={interactiveYears === 0 ? "" : interactiveYears} 
+                  placeholder="Ex: 15"
+                  onChange={(e) => {
+                    const y = e.target.value;
+                    setInteractiveYears(y === "" ? "" : parseInt(y));
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "600", color: "#475569", marginBottom: "5px" }}>Structure de Taux BPER</label>
+                <select 
+                  className="bper-full-input" 
+                  value={interactiveRateType} 
+                  onChange={(e) => setInteractiveRateType(e.target.value)}
+                >
+                  <option value="FIXE">Taux Fixe Référentiel (4.25%)</option>
+                  <option value="VARIABLE">Taux Variable Euribor (4.55%)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Fiche de Synthèse d'Amortissement */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "10px", marginBottom: "20px", textAlign: "center" }}>
+              <div style={{ padding: "10px", background: "#f0f7f7", borderRadius: "8px" }}>
+                <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block" }}>Mensualité (Hors Ass.)</span>
+                <strong style={{ color: "#004f52", fontSize: "1.1rem" }}>{summaryMetrics.monthlyBox} €</strong>
+              </div>
+              <div style={{ padding: "10px", background: "#f0f7f7", borderRadius: "8px" }}>
+                <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block" }}>Assurance /mois</span>
+                <strong style={{ color: "#004f52", fontSize: "1.1rem" }}>+{summaryMetrics.insuranceBox} €</strong>
+              </div>
+              <div style={{ padding: "10px", background: "#f8fafc", borderRadius: "8px" }}>
+                <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block" }}>Taux Nominal Applique</span>
+                <strong style={{ color: "#059669", fontSize: "1.1rem" }}>{interactiveRateType === "FIXE" ? "4.25 %" : "4.55 %"}</strong>
+              </div>
+              <div style={{ padding: "10px", background: "#fef2f2", borderRadius: "8px" }}>
+                <span style={{ fontSize: "0.75rem", color: "#dc2626", display: "block" }}>Coût total Intérêts</span>
+                <strong style={{ color: "#dc2626", fontSize: "1.1rem" }}>{summaryMetrics.totalInterest} €</strong>
+              </div>
+            </div>
+
+            {/* Structure du Vrais Tableau */}
+            <div style={{ overflowX: "auto", width: "100%", maxHeight: "320px" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.85rem" }}>
-                <thead>
+                <thead style={{ position: "sticky", top: 0, background: "#fff", zIndex: 1 }}>
                   <tr style={{ borderBottom: "2px solid #cbd5e1", color: "#475569" }}>
-                    <th style={{ padding: "10px 8px", fontWeight: "600" }}>Période</th>
-                    <th style={{ padding: "10px 8px", fontWeight: "600" }}>Mensualité Totale</th>
-                    <th style={{ padding: "10px 8px", fontWeight: "600" }}>Capital Amorti</th>
-                    <th style={{ padding: "10px 8px", fontWeight: "600" }}>Intérêts Facturés</th>
-                    <th style={{ padding: "10px 8px", fontWeight: "600" }}>Assurance CPT</th>
-                    <th style={{ padding: "10px 8px", fontWeight: "600" }}>Capital Restant Dû</th>
+                    <th style={{ padding: "10px 8px" }}>Échéance</th>
+                    <th style={{ padding: "10px 8px" }}>Prélèvement Mensuel</th>
+                    <th style={{ padding: "10px 8px" }}>Part Capital Remboursé</th>
+                    <th style={{ padding: "10px 8px" }}>Part Intérêts Payés</th>
+                    <th style={{ padding: "10px 8px" }}>Assurance Décès/Incap.</th>
+                    <th style={{ padding: "10px 8px" }}>Capital Restant Dû</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {amortizationSchedule.map((row) => (
-                    <tr key={row.month} style={{ borderBottom: "1px solid #f1f5f9", color: "#334155" }}>
-                      <td style={{ padding: "12px 8px", fontWeight: "600" }}>Mois {row.month}</td>
-                      <td style={{ padding: "12px 8px", color: "#004f52", fontWeight: "700" }}>{row.totalMonthly} €</td>
-                      <td style={{ padding: "12px 8px" }}>{row.principalPaid} €</td>
-                      <td style={{ padding: "12px 8px", color: "#dc2626" }}>{row.interestPaid} €</td>
-                      <td style={{ padding: "12px 8px", color: "#64748b" }}>{row.insurance} €</td>
-                      <td style={{ padding: "12px 8px", fontWeight: "600" }}>{row.remaining} €</td>
+                  {amortizationSchedule.length > 0 ? (
+                    amortizationSchedule.map((row) => (
+                      <tr key={row.month} style={{ borderBottom: "1px solid #f1f5f9", color: "#334155" }}>
+                        <td style={{ padding: "10px 8px", fontWeight: "600" }}>Mois {row.month}</td>
+                        <td style={{ padding: "10px 8px", color: "#004f52", fontWeight: "700" }}>{row.totalMonthly} €</td>
+                        <td style={{ padding: "10px 8px", color: "#0f766e" }}>{row.principalPaid} €</td>
+                        <td style={{ padding: "10px 8px", color: "#b91c1c" }}>{row.interestPaid} €</td>
+                        <td style={{ padding: "10px 8px", color: "#64748b" }}>{row.insurance} €</td>
+                        <td style={{ padding: "10px 8px", fontWeight: "600", background: "#f8fafc" }}>{row.remaining} €</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="6" style={{ padding: "20px", textCenter: "center", color: "#94a3b8" }}>Veuillez renseigner un montant et une durée valides pour éditer le tableau.</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
-            <p style={{ margin: "12px 0 0 0", fontSize: "0.75rem", color: "#94a3b8", fontStyle: "italic", lineHeight: "1.3" }}>
-              * Ce plan de remboursement est édité à titre informatif selon les barèmes monétaires en vigueur de BPER Banca et ne constitue pas un engagement contractuel définitif avant édition de l'offre de crédit formelle.
-            </p>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", marginTop: "15px", gap: "10px" }}>
+              <p style={{ margin: 0, fontSize: "0.75rem", color: "#94a3b8", fontStyle: "italic", maxWidth: "70%" }}>
+                * Affichage réglementaire : Ce tableau présente les 12 premières échéances périodiques du crédit. L'indexation Euribor pour le taux variable est mise à jour mensuellement selon les taux officiels de la Banque Centrale Européenne.
+              </p>
+              <button 
+                onClick={() => {
+                  setLoanData({
+                    ...loanData,
+                    loanType: interactiveAmount > 75000 ? "Crédit Immobilier BPER (Achat Résidence)" : "Prêt Personnel Multi-Projets",
+                    amount: interactiveAmount,
+                    duration: interactiveYears * 12,
+                    monthlyPayment: summaryMetrics.monthlyBox
+                  });
+                  navigateToView("simulateur");
+                }}
+                style={{ background: "#004f52", color: "#fff", border: "none", padding: "8px 14px", borderRadius: "6px", fontWeight: "600", fontSize: "0.8rem", cursor: "pointer" }}
+              >
+                Appliquer cette structure au dossier
+              </button>
+            </div>
           </div>
-          {/* --------------------------------------------------------------------------------- */}
+          {/* --------------------------------------------------------------------------------------------------------- */}
 
           <div className="account-card" style={{ background: "#fff", padding: "25px", borderRadius: "20px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "15px" }}>
@@ -281,7 +376,7 @@ export default function Produits({ isDesktop = false }) {
           </div>
 
           <div className="bper-cta-box">
-            <h3 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>Prêt à concrétiser votre project ?</h3>
+            <h3 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>Prêt à concrétiser votre projet ?</h3>
             <p style={{ margin: "0 0 25px 0", opacity: 0.8, fontSize: "0.95rem" }}>Le formulaire prend moins de 3 minutes. Obtenez une pré-acceptation immédiate.</p>
             <button onClick={() => navigateToView("simulateur")}>
               Démarrer ma demande de prêt en ligne
