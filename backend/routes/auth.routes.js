@@ -172,6 +172,17 @@ router.get("/me", auth, async (req, res) => {
 
 
 
+// 🔥 ROUTE CLIENT : Récupérer l'historique des demandes de prêt de l'utilisateur connecté
+router.get("/my-loans", auth, async (req, res) => {
+  try {
+    const myLoans = await LoanRequest.find({ user: req.user._id }).sort({ createdAt: -1 });
+    res.json(myLoans);
+  } catch (err) {
+    console.error("Erreur récupération prêts client:", err);
+    res.status(500).json({ message: "Erreur lors du chargement de votre historique de crédit" });
+  }
+});
+
 // --------------------
 // ROUTE TEST SIMPLE (GET)
 // --------------------
