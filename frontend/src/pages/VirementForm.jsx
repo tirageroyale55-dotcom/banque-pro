@@ -126,7 +126,7 @@ const confirmTransfer = async () => {
           <>
             <div className="security-box">
               <CheckCircle size={18} />
-              <p>Remplir le virement bancaire SEPA / Instantané. L'opération sera effestuer selon des normes de sécurité élevées.</p>
+              <p>Remplir le virement bancaire SEPA / Instantané. L'opération sera effectuer selon des normes de sécurité élevées.</p>
             </div>
 
             <div className="form-section">
