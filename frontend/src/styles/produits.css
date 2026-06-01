@@ -547,10 +547,9 @@
   font-size: 0.9rem;
   white-space: nowrap;
   flex-grow: 1; /* Permet au bouton principal d'occuper l'espace disponible proprement */
-  max-width: 250px;
+  max-width: 2O0px;
   text-align: center;
   transition: opacity 0.2s ease;
-  margin-bottom: 20px;
 }
 
 @media (max-width: 400px) {
