@@ -542,7 +542,7 @@
   border: none;
   cursor: pointer;
   font-weight: bold;
-  padding: 12px 20px;
+  padding: 12px 24px;
   border-radius: 30px;
   font-size: 0.9rem;
   white-space: nowrap;
@@ -550,6 +550,7 @@
   max-width: 250px;
   text-align: center;
   transition: opacity 0.2s ease;
+  margin-bottom: 20px;
 }
 
 @media (max-width: 400px) {
