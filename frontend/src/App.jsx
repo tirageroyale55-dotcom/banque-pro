@@ -45,7 +45,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUserDetails from "./pages/admin/AdminUserDetails";
 import AdminReset from "./pages/admin/AdminReset";
 import AdminClient from "./pages/admin/AdminClient";
-
+import AdminPrets from "./pages/admin/AdminPrets";
 
 
 export default function App() {
@@ -90,6 +90,15 @@ export default function App() {
           }
         />
 
+        <Route
+          path="/admin/loans"
+          element={
+            <AdminRoute>
+              <AdminPrets />
+            </AdminRoute>
+          }
+        />
+        
         <Route
           path="/admin/user/:id"
           element={
