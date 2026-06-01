@@ -23,17 +23,6 @@ export default function Produits({ isDesktop = false }) {
     hasCoBorrower: "Non"
   });
 
-  // 🔥 FONCTION DE SCROLL AUTOMATIQUE VERS LE HAUT (FLUIDE ET PRO)
-  const handleViewChange = (viewName) => {
-    setCurrentView(viewName);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleStepChange = (stepNumber) => {
-    setLoanStep(stepNumber);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   useEffect(() => {
     const loadRealUserData = async () => {
       try {
@@ -125,8 +114,7 @@ export default function Produits({ isDesktop = false }) {
                 </div>
                 <h2>Financez vos ambitions au meilleur taux du marché.</h2>
                 <p>Découvrez pourquoi BPER Banca reste le choix n°1 des emprunteurs cette année avec une gestion 100% flexible et transparente.</p>
-                {/* Modification ici pour le scroll */}
-                <button onClick={() => handleViewChange("avantages")} className="btn-white" style={{ border: "none", cursor: "pointer", fontWeight: "bold" }}>
+                <button onClick={() => setCurrentView("avantages")} className="btn-white" style={{ border: "none", cursor: "pointer", fontWeight: "bold" }}>
                   En savoir plus
                 </button>
               </div>
@@ -149,8 +137,8 @@ export default function Produits({ isDesktop = false }) {
       {currentView === "avantages" && (
         <div style={{ background: "white", padding: "40px", borderRadius: "32px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.05)" }}>
           
-          {/* Modification ici pour le scroll */}
-          <button onClick={() => handleViewChange("offres")} className="btn-bper-back-top">
+          {/* BOUTON DE RETOUR DYNAMIQUE */}
+          <button onClick={() => setCurrentView("offres")} className="btn-bper-back-top">
             <i className="fas fa-arrow-left"></i> Retour aux produits
           </button>
 
@@ -180,11 +168,9 @@ export default function Produits({ isDesktop = false }) {
           </div>
 
           <div style={{ textAlign: "center", background: "#004f52", padding: "35px", borderRadius: "20px", color: "white" }}>
-            <h3 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>Prêt à concrétiser votre projet ?</h3>
+            <h3 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>Prêt à concrétiser votre project ?</h3>
             <p style={{ margin: "0 0 25px 0", opacity: 0.8, fontSize: "0.95rem" }}>Le formulaire prend moins de 3 minutes. Obtenez une pré-acceptation immédiate.</p>
-            
-            {/* 🔥 LE BOUTON CLIQUE VERS LE SIMULATEUR + REMONTE AUTOMATIQUEMENT L'ÉCRAN */}
-            <button onClick={() => handleViewChange("simulateur")} style={{ background: "#e6ff6a", color: "#004f52", padding: "14px 35px", border: "none", borderRadius: "30px", fontWeight: "bold", fontSize: "1rem", cursor: "pointer" }}>
+            <button onClick={() => setCurrentView("simulateur")} style={{ background: "#e6ff6a", color: "#004f52", padding: "14px 35px", border: "none", borderRadius: "30px", fontWeight: "bold", fontSize: "1rem", cursor: "pointer" }}>
               Démarrer ma demande de prêt en ligne
             </button>
           </div>
@@ -195,6 +181,7 @@ export default function Produits({ isDesktop = false }) {
       {currentView === "simulateur" && (
         <div className="bper-loan-container">
           
+          {/* LA BARRE SUIT DÉSORMAIS L'ÉCRAN GRÂCE AU COMPORTEMENT STICKY CSS */}
           <div className="bper-loan-steps">
             <div className="bper-step-item" style={{ color: loanStep === 1 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 1 ? "3px solid #e6ff6a" : "none" }}>1. CONFIGURATION</div>
             <div className="bper-step-item" style={{ color: loanStep === 2 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 2 ? "3px solid #e6ff6a" : "none" }}>2. INFORMATIONS</div>
@@ -263,12 +250,11 @@ export default function Produits({ isDesktop = false }) {
                 </div>
 
                 <div className="bper-actions-wrapper">
-                  {/* Retour avec scroll */}
-                  <button className="btn-bper-back" onClick={() => handleViewChange("avantages")}>
+                  {/* Renvoie à l'écran des avantages où se trouve le bouton "Retour aux produits" */}
+                  <button className="btn-bper-back" onClick={() => setCurrentView("avantages")}>
                     <i className="fas fa-chevron-left"></i> Retour
                   </button>
-                  {/* Suivant avec scroll */}
-                  <button className="btn-bper-submit" style={{ background: "#004f52", color: "#fff" }} onClick={() => handleStepChange(2)}>
+                  <button className="btn-bper-submit" style={{ background: "#004f52", color: "#fff" }} onClick={() => setLoanStep(2)}>
                     Constituer mon dossier
                   </button>
                 </div>
@@ -326,12 +312,10 @@ export default function Produits({ isDesktop = false }) {
                 </div>
 
                 <div className="bper-actions-wrapper">
-                  {/* Modification ici pour le scroll */}
-                  <button className="btn-bper-back" onClick={() => handleStepChange(1)}>
+                  <button className="btn-bper-back" onClick={() => setLoanStep(1)}>
                     <i className="fas fa-chevron-left"></i> Retour
                   </button>
-                  {/* Modification ici pour le scroll */}
-                  <button className="btn-bper-submit" style={{ background: "#004f52", color: "#fff" }} disabled={!loanData.lastName || !loanData.income} onClick={() => handleStepChange(3)}>
+                  <button className="btn-bper-submit" style={{ background: "#004f52", color: "#fff" }} disabled={!loanData.lastName || !loanData.income} onClick={() => setLoanStep(3)}>
                     Suivant
                   </button>
                 </div>
@@ -372,8 +356,7 @@ export default function Produits({ isDesktop = false }) {
                 </p>
 
                 <div className="bper-actions-wrapper">
-                  {/* Modification ici pour le scroll */}
-                  <button className="btn-bper-back" onClick={() => handleStepChange(2)}>
+                  <button className="btn-bper-back" onClick={() => setLoanStep(2)}>
                     <i className="fas fa-edit"></i> Modifier
                   </button>
                   
@@ -395,7 +378,7 @@ export default function Produits({ isDesktop = false }) {
 
                         if (response.ok) {
                           alert(resData.message || "Demande envoyée avec succès !");
-                          handleViewChange("offres");
+                          setCurrentView("offres");
                           setLoanStep(1);
                         } else {
                           alert(resData.message || "Une erreur est survenue lors de l'envoi.");
