@@ -24,8 +24,11 @@ export default function Produits({ isDesktop = false }) {
   });
 
   // --- NOUVELLE LOGIQUE INTERNE : PARAMÈTRES HYPOTHÉCAIRES (TAUX FIXE / VARIABLE) ---
-  const [hypoRateType, setHypoRateType] = useState("FIXE"); // FIXE ou VARIABLE
-  const [hypoContribution, setHypoContribution] = useState(0); // Apport personnel
+  const [hypoRateType, setHypoRateType] = useState("FIXE"); 
+  const [hypoContribution, setHypoContribution] = useState(0); 
+
+  // --- ÉTAT DU TABLEAU D'AMORTISSEMENT DYNAMIQUE (VUE 1) ---
+  const [amortizationSchedule, setAmortizationSchedule] = useState([]);
 
   // Logique de calcul globale unifiée (Personnel et Hypothécaire)
   const handleSimulation = (amount, duration, typeOfLoan = loanData.loanType, rateType = hypoRateType, contribution = hypoContribution) => {
@@ -33,16 +36,13 @@ export default function Produits({ isDesktop = false }) {
     const parsedDuration = parseInt(duration) || 12;
     const parsedContribution = parseFloat(contribution) || 0;
 
-    let rate = 0.049; // Taux par défaut pour le Prêt Personnel d'origine (4.90%)
+    let rate = 0.049; 
 
-    // Si c'est un crédit immobilier / hypothécaire
     if (typeOfLoan.includes("Immobilier") || typeOfLoan.includes("Hypothécaire")) {
-      // Structure de taux style bancaire BPER Banca
-      rate = rateType === "FIXE" ? 0.0425 : 0.0455; // Fixe institutionnel à 4.25% ou Variable indexé Euribor à 4.55%
+      rate = rateType === "FIXE" ? 0.0425 : 0.0455; 
     }
     
     let monthly = 0;
-    // Pour l'hypothécaire, le capital emprunté correspond au montant du bien moins l'apport personnel
     const principalToBorrow = (typeOfLoan.includes("Immobilier") || typeOfLoan.includes("Hypothécaire")) 
       ? Math.max(0, parsedAmount - parsedContribution)
       : parsedAmount;
@@ -60,13 +60,49 @@ export default function Produits({ isDesktop = false }) {
     }));
   };
 
-  // Recalcul automatique lorsque le type de taux ou l'apport change sur un prêt immobilier
+  // Générateur de tableau d'amortissement prévisionnel basé sur les encours actuels
+  useEffect(() => {
+    const principal = parseFloat(loanData.amount) || 0;
+    const months = parseInt(loanData.duration) || 12;
+    let annualRate = 0.049;
+
+    if (loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) {
+      annualRate = hypoRateType === "FIXE" ? 0.0425 : 0.0455;
+    }
+
+    const monthlyRate = annualRate / 12;
+    const totalPayment = loanData.monthlyPayment;
+    const insurance = Math.round((principal * 0.0021) / 12) || 15; // Assurance standardisée
+
+    let remainingPrincipal = principal;
+    const schedule = [];
+
+    // On génère les 6 premiers mois pour l'aperçu du tableau sans surcharger la page
+    const iterations = Math.min(months, 6);
+
+    for (let i = 1; i <= iterations; i++) {
+      if (remainingPrincipal <= 0) break;
+      const interestPayment = remainingPrincipal * monthlyRate;
+      const principalPayment = Math.max(0, totalPayment - interestPayment);
+      remainingPrincipal = Math.max(0, remainingPrincipal - principalPayment);
+
+      schedule.push({
+        month: i,
+        principalPaid: Math.round(principalPayment),
+        interestPaid: Math.round(interestPayment),
+        insurance: insurance,
+        totalMonthly: Math.round(totalPayment + insurance),
+        remaining: Math.round(remainingPrincipal)
+      });
+    }
+    setAmortizationSchedule(schedule);
+  }, [loanData.amount, loanData.duration, loanData.monthlyPayment, loanData.loanType, hypoRateType]);
+
   useEffect(() => {
     if (loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) {
       handleSimulation(loanData.amount, loanData.duration, loanData.loanType, hypoRateType, hypoContribution);
     }
   }, [hypoRateType, hypoContribution]);
-  // ---------------------------------------------------------------------------------
 
   // Chargement de la logique utilisateur complète depuis Atlas
   useEffect(() => {
@@ -114,7 +150,6 @@ export default function Produits({ isDesktop = false }) {
     }
   }, [currentView, setForceHideNav]);
 
-  // Fonction de navigation interne avec reset automatique du scroll vers le haut
   const navigateToView = (viewName) => {
     setCurrentView(viewName);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -155,6 +190,50 @@ export default function Produits({ isDesktop = false }) {
               </div>
             </div>
           </div>
+
+          {/* --- NOUVELLE SECTION : TABLEAU D'AMORTISSEMENT REQUIS (JUSTE APRÈS EN SAVOIR PLUS) --- */}
+          <div style={{ background: "#fff", padding: "25px", borderRadius: "24px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", marginBottom: "25px", border: "1px solid #e2e8f0" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "15px" }}>
+              <div style={{ background: "#004f52", color: "#fff", width: "35px", height: "35px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <i className="fas fa-table"></i>
+              </div>
+              <div>
+                <h3 style={{ color: "#004f52", margin: 0, fontSize: "1.2rem", fontWeight: "700" }}>Tableau d'Amortissement Prévisionnel</h3>
+                <p style={{ color: "#64748b", margin: 0, fontSize: "0.85rem" }}>Planification détaillée des premières échéances réglementaires (Base : {loanData.amount || 0} € sur {loanData.duration} mois).</p>
+              </div>
+            </div>
+
+            <div style={{ overflowX: "auto", width: "100%" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.85rem" }}>
+                <thead>
+                  <tr style={{ borderBottom: "2px solid #cbd5e1", color: "#475569" }}>
+                    <th style={{ padding: "10px 8px", fontWeight: "600" }}>Période</th>
+                    <th style={{ padding: "10px 8px", fontWeight: "600" }}>Mensualité Totale</th>
+                    <th style={{ padding: "10px 8px", fontWeight: "600" }}>Capital Amorti</th>
+                    <th style={{ padding: "10px 8px", fontWeight: "600" }}>Intérêts Facturés</th>
+                    <th style={{ padding: "10px 8px", fontWeight: "600" }}>Assurance CPT</th>
+                    <th style={{ padding: "10px 8px", fontWeight: "600" }}>Capital Restant Dû</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {amortizationSchedule.map((row) => (
+                    <tr key={row.month} style={{ borderBottom: "1px solid #f1f5f9", color: "#334155" }}>
+                      <td style={{ padding: "12px 8px", fontWeight: "600" }}>Mois {row.month}</td>
+                      <td style={{ padding: "12px 8px", color: "#004f52", fontWeight: "700" }}>{row.totalMonthly} €</td>
+                      <td style={{ padding: "12px 8px" }}>{row.principalPaid} €</td>
+                      <td style={{ padding: "12px 8px", color: "#dc2626" }}>{row.interestPaid} €</td>
+                      <td style={{ padding: "12px 8px", color: "#64748b" }}>{row.insurance} €</td>
+                      <td style={{ padding: "12px 8px", fontWeight: "600" }}>{row.remaining} €</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p style={{ margin: "12px 0 0 0", fontSize: "0.75rem", color: "#94a3b8", fontStyle: "italic", lineHeight: "1.3" }}>
+              * Ce plan de remboursement est édité à titre informatif selon les barèmes monétaires en vigueur de BPER Banca et ne constitue pas un engagement contractuel définitif avant édition de l'offre de crédit formelle.
+            </p>
+          </div>
+          {/* --------------------------------------------------------------------------------- */}
 
           <div className="account-card" style={{ background: "#fff", padding: "25px", borderRadius: "20px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "15px" }}>
@@ -202,7 +281,7 @@ export default function Produits({ isDesktop = false }) {
           </div>
 
           <div className="bper-cta-box">
-            <h3 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>Prêt à concrétiser votre projet ?</h3>
+            <h3 style={{ margin: "0 0 10px 0", fontSize: "1.5rem" }}>Prêt à concrétiser votre project ?</h3>
             <p style={{ margin: "0 0 25px 0", opacity: 0.8, fontSize: "0.95rem" }}>Le formulaire prend moins de 3 minutes. Obtenez une pré-acceptation immédiate.</p>
             <button onClick={() => navigateToView("simulateur")}>
               Démarrer ma demande de prêt en ligne
@@ -249,7 +328,7 @@ export default function Produits({ isDesktop = false }) {
                   </select>
                 </div>
 
-                {/* LOGIQUE D'OPTIONS HYPOTHÉCAIRES INJECTÉE UNIQUEMENT LORSQUE LE TYPE EST SÉLECTIONNÉ */}
+                {/* LOGIQUE D'OPTIONS HYPOTHÉCAIRES */}
                 {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) && (
                   <div className="bper-grid-2" style={{ marginBottom: "20px" }}>
                     <div>
@@ -277,21 +356,20 @@ export default function Produits({ isDesktop = false }) {
 
                 <div className="bper-grid-2">
                   <div>
-  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
-    {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) ? "Valeur du bien immobilier (€)" : "Montant recherché (€)"}
-  </label>
-  <input 
-    type="number" 
-    className="bper-full-input"
-    value={loanData.amount === 0 ? "" : loanData.amount} // Libère le champ si c'est 0 pour pouvoir écrire proprement
-    placeholder="Ex: 25000"
-    onChange={(e) => {
-      const val = e.target.value;
-      // Permet d'effacer complètement sans bloquer à 0
-      handleSimulation(val === "" ? "" : parseFloat(val), loanData.duration, loanData.loanType, hypoRateType, hypoContribution);
-    }}
-  />
-</div>
+                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
+                      {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) ? "Valeur du bien immobilier (€)" : "Montant recherché (€)"}
+                    </label>
+                    <input 
+                      type="number" 
+                      className="bper-full-input"
+                      value={loanData.amount === 0 ? "" : loanData.amount}
+                      placeholder="Ex: 25000"
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        handleSimulation(val === "" ? "" : parseFloat(val), loanData.duration, loanData.loanType, hypoRateType, hypoContribution);
+                      }}
+                    />
+                  </div>
                   <div>
                     <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Période de remboursement (mois)</label>
                     <select 
@@ -307,7 +385,6 @@ export default function Produits({ isDesktop = false }) {
                       <option value="72">72 mois (6 ans)</option>
                       <option value="84">84 mois (7 ans)</option>
                       <option value="120">120 mois (10 ans)</option>
-                      {/* Options de durées adaptées pour l'immobilier / hypothécaire */}
                       {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) && (
                         <>
                           <option value="180">180 mois (15 ans)</option>
@@ -334,7 +411,7 @@ export default function Produits({ isDesktop = false }) {
                 </div>
 
                 <div className="bper-actions-wrapper">
-                  <button className="btn-bper-back" onClick={() => navigateToView("avantages")}>
+                  <button className="btn-bper-back" onClick={() => navigateToView("offres")}>
                     <i className="fas fa-chevron-left"></i> Retour
                   </button>
                   <button className="btn-bper-submit" style={{ background: "#004f52", color: "#fff" }} onClick={() => { setLoanStep(2); window.scrollTo({top: 0}); }}>
@@ -446,7 +523,6 @@ export default function Produits({ isDesktop = false }) {
                       try {
                         const finalPayload = {
                           ...loanData,
-                          // Ajustement optionnel du montant net pour l'API si prêt immobilier
                           amount: (loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) ? Math.max(0, loanData.amount - hypoContribution) : loanData.amount
                         };
 
