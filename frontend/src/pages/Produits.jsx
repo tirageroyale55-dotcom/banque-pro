@@ -277,16 +277,21 @@ export default function Produits({ isDesktop = false }) {
 
                 <div className="bper-grid-2">
                   <div>
-                    <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
-                      {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) ? "Valeur du bien immobilier (€)" : "Montant recherché (€)"}
-                    </label>
-                    <input 
-                      type="number" 
-                      className="bper-full-input"
-                      value={loanData.amount}
-                      onChange={(e) => handleSimulation(e.target.value, loanData.duration, loanData.loanType, hypoRateType, hypoContribution)}
-                    />
-                  </div>
+  <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
+    {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) ? "Valeur du bien immobilier (€)" : "Montant recherché (€)"}
+  </label>
+  <input 
+    type="number" 
+    className="bper-full-input"
+    value={loanData.amount === 0 ? "" : loanData.amount} // Libère le champ si c'est 0 pour pouvoir écrire proprement
+    placeholder="Ex: 25000"
+    onChange={(e) => {
+      const val = e.target.value;
+      // Permet d'effacer complètement sans bloquer à 0
+      handleSimulation(val === "" ? "" : parseFloat(val), loanData.duration, loanData.loanType, hypoRateType, hypoContribution);
+    }}
+  />
+</div>
                   <div>
                     <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>Période de remboursement (mois)</label>
                     <select 
