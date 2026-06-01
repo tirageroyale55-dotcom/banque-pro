@@ -382,9 +382,44 @@
 }
 
 
+/* ================= BARRE DE PROGRESSION DU TUNNEL (OPTIMISÉE MOBILE) ================= */
+.bper-loan-steps {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px; /* Espace de sécurité entre les blocs */
+  margin-bottom: 30px;
+  background: #fff;
+  padding: 15px 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+.bper-step-item {
+  font-weight: 700;
+  padding-bottom: 8px;
+  flex: 1;
+  text-align: center;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  white-space: nowrap; /* Évite la coupure de ligne moche */
+  transition: all 0.3s ease;
+}
+
+/* Version mobile de la barre de progression */
+@media (max-width: 600px) {
+  .bper-loan-steps {
+    padding: 12px 5px;
+    gap: 5px;
+  }
+  .bper-step-item {
+    font-size: 0.68rem; /* Réduction subtile pour que tout passe sur une seule ligne */
+    letter-spacing: 0px;
+  }
+}
+
 /* ================= BOUTONS DE NAVIGATION RETOUR (STYLE BANCAIRE) ================= */
 
-/* Conteneur des boutons du tunnel : pousse le bouton Soumettre/Suivant à droite et Retour à gauche */
 .bper-actions-wrapper {
   display: flex;
   justify-content: space-between;
@@ -393,7 +428,7 @@
   margin-top: 25px;
 }
 
-/* Style universel pour le bouton Retour simple */
+/* Bouton Retour standard */
 .btn-bper-back {
   background: #f1f5f9;
   color: #475569;
@@ -412,40 +447,43 @@
 .btn-bper-back:hover {
   background: #e2e8f0;
   color: #1e293b;
-  transform: translateX(-2px); /* Léger effet de glissement vers la gauche */
+  transform: translateX(-2px);
 }
 
-/* Style premium pour le bouton supérieur "Retour aux produits" (Vue Avantages) */
+/* Bouton Premium "Retour aux produits" avec flèche iconique */
 .btn-bper-back-top {
   background: transparent;
   border: none;
   color: #004f52;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 8px;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 30px;
+  border: 1px solid rgba(0, 79, 82, 0.2);
   margin-bottom: 25px;
-  transition: all 0.2s ease;
+  transition: all 0.2s ease-in-out;
 }
 
 .btn-bper-back-top i {
+  font-size: 0.95rem;
   transition: transform 0.2s ease;
 }
 
+/* Effet pro au survol */
 .btn-bper-back-top:hover {
-  background: rgba(0, 79, 82, 0.05);
-  color: #002f31;
+  background: #004f52;
+  color: #ffffff !important;
+  border-color: #004f52;
 }
 
 .btn-bper-back-top:hover i {
-  transform: translateX(-4px); /* Flèche qui recule au survol */
+  transform: translateX(-4px); /* La flèche bouge vers la gauche pour indiquer le retour */
 }
 
-/* Ajustement pour les boutons de validation principaux */
 .btn-bper-submit {
   border: none;
   cursor: pointer;

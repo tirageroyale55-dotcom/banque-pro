@@ -8,7 +8,6 @@ export default function Produits({ isDesktop = false }) {
   const [currentView, setCurrentView] = useState("offres"); 
   const [loanStep, setLoanStep] = useState(1);
 
-  // État initial global du formulaire
   const [loanData, setLoanData] = useState({
     loanType: "Prêt Personnel Multi-Projets",
     amount: 15000,
@@ -24,7 +23,6 @@ export default function Produits({ isDesktop = false }) {
     hasCoBorrower: "Non"
   });
 
-  // CHARGEMENT DIRECT DEPUIS MONGODB ATLAS AU DÉMARRAGE
   useEffect(() => {
     const loadRealUserData = async () => {
       try {
@@ -59,7 +57,6 @@ export default function Produits({ isDesktop = false }) {
     loadRealUserData();
   }, []);
 
-  // Gestion de la navigation basse
   useEffect(() => {
     if (setForceHideNav) {
       if (currentView === "avantages" || currentView === "simulateur") {
@@ -140,7 +137,7 @@ export default function Produits({ isDesktop = false }) {
       {currentView === "avantages" && (
         <div style={{ background: "white", padding: "40px", borderRadius: "32px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.05)" }}>
           
-          {/* 🔥 BOUTON RETOUR PRODUITS NET ET TRÈS CLIQUABLE */}
+          {/* ✅ BOUTON RETOUR AVEC FLÈCHE DYNAMIQUE INCLUSE */}
           <button onClick={() => setCurrentView("offres")} className="btn-bper-back-top">
             <i className="fas fa-arrow-left"></i> Retour aux produits
           </button>
@@ -183,10 +180,12 @@ export default function Produits({ isDesktop = false }) {
       {/* VUE 3 : TUNNEL SIMULATEUR */}
       {currentView === "simulateur" && (
         <div className="bper-loan-container">
-          <div className="bper-loan-steps" style={{ display: "flex", justifyContent: "space-between", marginBottom: "30px", background: "#fff", padding: "15px", borderRadius: "12px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
-            <div style={{ fontWeight: "bold", color: loanStep === 1 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 1 ? "3px solid #e6ff6a" : "none", paddingBottom: "5px", flex: 1, textAlign: "center", fontSize: "0.85rem" }}>1. CONFIGURATION</div>
-            <div style={{ fontWeight: "bold", color: loanStep === 2 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 2 ? "3px solid #e6ff6a" : "none", paddingBottom: "5px", flex: 1, textAlign: "center", fontSize: "0.85rem" }}>2. INFORMATIONS</div>
-            <div style={{ fontWeight: "bold", color: loanStep === 3 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 3 ? "3px solid #e6ff6a" : "none", paddingBottom: "5px", flex: 1, textAlign: "center", fontSize: "0.85rem" }}>3. VÉRIFICATION</div>
+          
+          {/* ✅ NETTOYAGE ET AJUSTEMENT DES ÉTAPES VIA CLASSES CSS COMPATIBLES MOBILE */}
+          <div className="bper-loan-steps">
+            <div className="bper-step-item" style={{ color: loanStep === 1 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 1 ? "3px solid #e6ff6a" : "none" }}>1. CONFIGURATION</div>
+            <div className="bper-step-item" style={{ color: loanStep === 2 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 2 ? "3px solid #e6ff6a" : "none" }}>2. INFORMATIONS</div>
+            <div className="bper-step-item" style={{ color: loanStep === 3 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 3 ? "3px solid #e6ff6a" : "none" }}>3. VÉRIFICATION</div>
           </div>
 
           <div className="bper-loan-card" style={{ background: "#fff", padding: "30px", borderRadius: "24px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }}>
@@ -250,13 +249,12 @@ export default function Produits({ isDesktop = false }) {
                   </p>
                 </div>
 
-                {/* 🔥 STRUCTURE DE BOUTONS PROFESSIONNELLE ALIGNÉE */}
                 <div className="bper-actions-wrapper">
                   <button className="btn-bper-back" onClick={() => setCurrentView("avantages")}>
                     <i className="fas fa-chevron-left"></i> Retour
                   </button>
                   <button className="btn-bper-submit" style={{ background: "#004f52", color: "#fff" }} onClick={() => setLoanStep(2)}>
-                    Constituer mon dossier
+                    Suivant
                   </button>
                 </div>
               </div>
@@ -312,7 +310,6 @@ export default function Produits({ isDesktop = false }) {
                   </div>
                 </div>
 
-                {/* 🔥 ACTIONS ÉTAPE 2 */}
                 <div className="bper-actions-wrapper">
                   <button className="btn-bper-back" onClick={() => setLoanStep(1)}>
                     <i className="fas fa-chevron-left"></i> Retour
@@ -324,7 +321,7 @@ export default function Produits({ isDesktop = false }) {
               </div>
             )}
 
-            {/* ÉTAPE 3 : CONFIRMATION FINALE */}
+            {/* ÉTAPE 3 */}
             {loanStep === 3 && (
               <div>
                 <div className="bper-summary-box" style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", marginBottom: "20px", color: "#333" }}>
@@ -357,7 +354,6 @@ export default function Produits({ isDesktop = false }) {
                   En transmettant ce dossier, vous soumettez formellement votre demande de crédit au service d'analyse des risques et de conformité monétique de <strong>BPER Banca</strong>. Les fonds seront débloqués après validation administrative sous un délai réglementaire de 48h. Une notification de décision sera envoyée à l'adresse e-mail ci-dessus.
                 </p>
 
-                {/* 🔥 ACTIONS ÉTAPE FINALE */}
                 <div className="bper-actions-wrapper">
                   <button className="btn-bper-back" onClick={() => setLoanStep(2)}>
                     <i className="fas fa-edit"></i> Modifier
@@ -392,7 +388,7 @@ export default function Produits({ isDesktop = false }) {
                       }
                     }}
                   >
-                    Soumettre la demande à la banque
+                    Soumettre 
                   </button>
                 </div>
               </div>
