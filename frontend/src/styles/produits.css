@@ -382,59 +382,61 @@
 }
 
 
-/* ================= BARRE DE PROGRESSION STICKY (COLLANTE AU SCROLL) ================= */
+/* ================= BARRE DE PROGRESSION ULTRA-RESPONSIVE & STICKY ================= */
 .bper-loan-steps {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 30px;
+  gap: 8px;
+  margin-bottom: 25px;
   background: #ffffff;
-  padding: 18px 15px;
+  padding: 14px 12px;
   border-radius: 12px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  
-  /* Code magique pour fixer la barre au défilement */
-  position: sticky;
-  top: 0px; /* Ajuste à 70px ou plus si tu as une barre de navigation fixe sur ton site */
-  z-index: 100;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
   border: 1px solid #e2e8f0;
+  
+  /* Sticky Header parfait pour le défilement */
+  position: -webkit-sticky; /* Pour la compatibilité Safari iOS */
+  position: sticky;
+  top: 0; 
+  z-index: 1000; /* Priorité d'affichage maximale lors du scroll */
 }
 
 .bper-step-item {
   font-weight: 700;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
   flex: 1;
   text-align: center;
-  font-size: 0.85rem;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
+  font-size: 0.8rem;
+  letter-spacing: 0.3px;
+  white-space: nowrap; /* Empêche le texte de se couper de façon inesthétique */
   transition: all 0.3s ease;
 }
 
-/* Ajustement fond mobile sombre si imbriqué dans .bper-page-global-wrapper */
-@media (max-width: 900px) {
-  .bper-page-global-wrapper .bper-loan-steps {
-    position: sticky;
-    top: 0px;
-    background: #003638 !important; /* Reste vert nuit même fixé */
-    border: 1px solid #004f52 !important;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-  }
-}
-
-@media (max-width: 600px) {
+/* --- MEDIA QUERIES : ADAPTATION SMARTPHONES (TOUS MODÈLES) --- */
+@media (max-width: 480px) {
   .bper-loan-steps {
-    padding: 14px 5px;
-    gap: 5px;
+    padding: 10px 6px;
+    gap: 4px;
+    border-radius: 8px;
   }
+  
   .bper-step-item {
-    font-size: 0.68rem;
-    letter-spacing: 0px;
+    font-size: 0.65rem; /* Réduction proportionnelle pour les très petits écrans (iPhone SE) */
+    letter-spacing: -0.2px;
+    padding-bottom: 4px;
   }
 }
 
-/* ================= BOUTONS DE NAVIGATION RETOUR (STYLE BANCAIRE) ================= */
+/* ================= COMPORTEMENT DES BOUTONS ET GRILLES SUR MOBILE ================= */
+
+/* Gestion des grilles de formulaires sur mobile */
+@media (max-width: 600px) {
+  .bper-grid-2 {
+    grid-template-columns: 1fr !important; /* Passe automatiquement sur 1 seule colonne propre */
+    gap: 15px !important;
+  }
+}
 
 .bper-actions-wrapper {
   display: flex;
@@ -442,54 +444,68 @@
   align-items: center;
   width: 100%;
   margin-top: 25px;
+  gap: 10px;
 }
 
-/* Bouton Retour standard */
+/* Boutons de navigation */
 .btn-bper-back {
   background: #f1f5f9;
   color: #475569;
   border: 1px solid #cbd5e1;
-  padding: 12px 24px;
+  padding: 12px 20px;
   border-radius: 30px;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
   transition: all 0.2s ease-in-out;
 }
 
-.btn-bper-back:hover {
-  background: #e2e8f0;
-  color: #1e293b;
-  transform: translateX(-2px);
+.btn-bper-submit {
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  flex-grow: 1; /* Permet au bouton principal d'occuper l'espace disponible proprement */
+  max-width: 250px;
+  text-align: center;
+  transition: opacity 0.2s ease;
 }
 
-/* Bouton Premium "Retour aux produits" avec flèche iconique */
+@media (max-width: 400px) {
+  .bper-actions-wrapper {
+    flex-direction: row; /* Maintient sur la même ligne mais adapte les paddings */
+  }
+  .btn-bper-back, .btn-bper-submit {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Bouton Premium de retour global */
 .btn-bper-back-top {
   background: transparent;
   border: none;
   color: #004f52;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 18px;
+  gap: 8px;
+  padding: 8px 16px;
   border-radius: 30px;
   border: 1px solid rgba(0, 79, 82, 0.2);
-  margin-bottom: 25px;
+  margin-bottom: 20px;
   transition: all 0.2s ease-in-out;
 }
 
-.btn-bper-back-top i {
-  font-size: 0.95rem;
-  transition: transform 0.2s ease;
-}
-
-/* Effet pro au survol */
 .btn-bper-back-top:hover {
   background: #004f52;
   color: #ffffff !important;
@@ -497,19 +513,5 @@
 }
 
 .btn-bper-back-top:hover i {
-  transform: translateX(-4px); /* La flèche bouge vers la gauche pour indiquer le retour */
-}
-
-.btn-bper-submit {
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  padding: 12px 30px;
-  border-radius: 30px;
-  font-size: 0.95rem;
-  transition: opacity 0.2s ease;
-}
-
-.btn-bper-submit:hover:not(:disabled) {
-  opacity: 0.9;
+  transform: translateX(-3px);
 }
