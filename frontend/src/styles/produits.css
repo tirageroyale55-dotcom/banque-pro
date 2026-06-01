@@ -380,3 +380,82 @@
     box-shadow: none !important;
   }
 }
+
+
+/* ================= BOUTONS DE NAVIGATION RETOUR (STYLE BANCAIRE) ================= */
+
+/* Conteneur des boutons du tunnel : pousse le bouton Soumettre/Suivant à droite et Retour à gauche */
+.bper-actions-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 25px;
+}
+
+/* Style universel pour le bouton Retour simple */
+.btn-bper-back {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-bper-back:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+  transform: translateX(-2px); /* Léger effet de glissement vers la gauche */
+}
+
+/* Style premium pour le bouton supérieur "Retour aux produits" (Vue Avantages) */
+.btn-bper-back-top {
+  background: transparent;
+  border: none;
+  color: #004f52;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  transition: all 0.2s ease;
+}
+
+.btn-bper-back-top i {
+  transition: transform 0.2s ease;
+}
+
+.btn-bper-back-top:hover {
+  background: rgba(0, 79, 82, 0.05);
+  color: #002f31;
+}
+
+.btn-bper-back-top:hover i {
+  transform: translateX(-4px); /* Flèche qui recule au survol */
+}
+
+/* Ajustement pour les boutons de validation principaux */
+.btn-bper-submit {
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 12px 30px;
+  border-radius: 30px;
+  font-size: 0.95rem;
+  transition: opacity 0.2s ease;
+}
+
+.btn-bper-submit:hover:not(:disabled) {
+  opacity: 0.9;
+}

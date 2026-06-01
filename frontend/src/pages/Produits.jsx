@@ -24,7 +24,7 @@ export default function Produits({ isDesktop = false }) {
     hasCoBorrower: "Non"
   });
 
-  // 🔥 CHARGEMENT DIRECT DEPUIS MONGODB ATLAS AU DÉMARRAGE
+  // CHARGEMENT DIRECT DEPUIS MONGODB ATLAS AU DÉMARRAGE
   useEffect(() => {
     const loadRealUserData = async () => {
       try {
@@ -139,7 +139,9 @@ export default function Produits({ isDesktop = false }) {
       {/* VUE 2 : AVANTAGES */}
       {currentView === "avantages" && (
         <div style={{ background: "white", padding: "40px", borderRadius: "32px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.05)" }}>
-          <button onClick={() => setCurrentView("offres")} style={{ background: "none", border: "none", color: "#004f52", cursor: "pointer", fontWeight: "600", marginBottom: "20px" }}>
+          
+          {/* 🔥 BOUTON RETOUR PRODUITS NET ET TRÈS CLIQUABLE */}
+          <button onClick={() => setCurrentView("offres")} className="btn-bper-back-top">
             <i className="fas fa-arrow-left"></i> Retour aux produits
           </button>
 
@@ -248,9 +250,14 @@ export default function Produits({ isDesktop = false }) {
                   </p>
                 </div>
 
-                <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-                  <button className="btn-light" onClick={() => setCurrentView("avantages")}>Retour</button>
-                  <button className="btn-white" style={{ background: "#004f52", color: "#fff", marginTop: 0 }} onClick={() => setLoanStep(2)}>Constituer mon dossier</button>
+                {/* 🔥 STRUCTURE DE BOUTONS PROFESSIONNELLE ALIGNÉE */}
+                <div className="bper-actions-wrapper">
+                  <button className="btn-bper-back" onClick={() => setCurrentView("avantages")}>
+                    <i className="fas fa-chevron-left"></i> Retour
+                  </button>
+                  <button className="btn-bper-submit" style={{ background: "#004f52", color: "#fff" }} onClick={() => setLoanStep(2)}>
+                    Constituer mon dossier
+                  </button>
                 </div>
               </div>
             )}
@@ -305,9 +312,14 @@ export default function Produits({ isDesktop = false }) {
                   </div>
                 </div>
 
-                <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-                  <button className="btn-light" onClick={() => setLoanStep(1)}>Retour</button>
-                  <button className="btn-white" style={{ background: "#004f52", color: "#fff", marginTop: 0 }} disabled={!loanData.lastName || !loanData.income} onClick={() => setLoanStep(3)}>Suivant</button>
+                {/* 🔥 ACTIONS ÉTAPE 2 */}
+                <div className="bper-actions-wrapper">
+                  <button className="btn-bper-back" onClick={() => setLoanStep(1)}>
+                    <i className="fas fa-chevron-left"></i> Retour
+                  </button>
+                  <button className="btn-bper-submit" style={{ background: "#004f52", color: "#fff" }} disabled={!loanData.lastName || !loanData.income} onClick={() => setLoanStep(3)}>
+                    Suivant
+                  </button>
                 </div>
               </div>
             )}
@@ -345,12 +357,15 @@ export default function Produits({ isDesktop = false }) {
                   En transmettant ce dossier, vous soumettez formellement votre demande de crédit au service d'analyse des risques et de conformité monétique de <strong>BPER Banca</strong>. Les fonds seront débloqués après validation administrative sous un délai réglementaire de 48h. Une notification de décision sera envoyée à l'adresse e-mail ci-dessus.
                 </p>
 
-                <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-                  <button className="btn-light" onClick={() => setLoanStep(2)}>Modifier</button>
+                {/* 🔥 ACTIONS ÉTAPE FINALE */}
+                <div className="bper-actions-wrapper">
+                  <button className="btn-bper-back" onClick={() => setLoanStep(2)}>
+                    <i className="fas fa-edit"></i> Modifier
+                  </button>
                   
                   <button 
-                    className="btn-white" 
-                    style={{ background: "#059669", color: "#fff", marginTop: 0 }}
+                    className="btn-bper-submit" 
+                    style={{ background: "#059669", color: "#fff" }}
                     onClick={async () => {
                       try {
                         const response = await fetch("/api/auth/apply-loan", {
@@ -364,13 +379,11 @@ export default function Produits({ isDesktop = false }) {
 
                         const resData = await response.json();
 
-                        // 🔥 AFFICHE LE MESSAGE D'ERREUR DU BACKEND SI UNE DEMANDE EXISTE DÉJÀ
                         if (response.ok) {
                           alert(resData.message || "Demande envoyée avec succès !");
                           setCurrentView("offres");
                           setLoanStep(1);
                         } else {
-                          // Affiche l'alerte "Vous avez déjà une demande en cours..." renvoyée par l'API
                           alert(resData.message || "Une erreur est survenue lors de l'envoi.");
                         }
                       } catch (err) {
