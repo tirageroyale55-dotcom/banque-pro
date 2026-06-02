@@ -165,6 +165,20 @@ export default function Produits({ isDesktop = false }) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // Style partagé pour éviter que les inputs et sélecteurs ne se coupent graphiquement
+  const responsiveInputStyle = {
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "10px 12px",
+    fontSize: isDesktop ? "0.9rem" : "0.85rem",
+    lineHeight: "1.4",
+    height: "auto", 
+    minHeight: "42px",
+    borderRadius: "8px",
+    border: "1px solid #cbd5e1",
+    backgroundColor: "#fff"
+  };
+
   return (
     <div className={isDesktop ? "bper-page-container" : "page-contente bper-page-container"} style={{ padding: isDesktop ? "30px" : "10px", width: "100%", boxSizing: "border-box" }}>
       
@@ -219,8 +233,7 @@ export default function Produits({ isDesktop = false }) {
                 <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "600", color: "#475569", marginBottom: "4px" }}>Capital Emprunté (€)</label>
                 <input 
                   type="number" 
-                  className="bper-full-input" 
-                  style={{ height: "40px", fontSize: "0.9rem" }}
+                  style={responsiveInputStyle}
                   value={interactiveAmount === 0 ? "" : interactiveAmount} 
                   placeholder="Ex: 200000"
                   onChange={(e) => {
@@ -233,8 +246,7 @@ export default function Produits({ isDesktop = false }) {
                 <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "600", color: "#475569", marginBottom: "4px" }}>Durée de l'amortissement (Années)</label>
                 <input 
                   type="number" 
-                  className="bper-full-input" 
-                  style={{ height: "40px", fontSize: "0.9rem" }}
+                  style={responsiveInputStyle}
                   value={interactiveYears === 0 ? "" : interactiveYears} 
                   placeholder="Ex: 20"
                   onChange={(e) => {
@@ -246,8 +258,7 @@ export default function Produits({ isDesktop = false }) {
               <div>
                 <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "600", color: "#475569", marginBottom: "4px" }}>Grille de Taux BPER Banca</label>
                 <select 
-                  className="bper-full-input" 
-                  style={{ height: "40px", fontSize: "0.85rem" }}
+                  style={responsiveInputStyle}
                   value={interactiveRateType} 
                   onChange={(e) => setInteractiveRateType(e.target.value)}
                 >
@@ -257,7 +268,7 @@ export default function Produits({ isDesktop = false }) {
               </div>
             </div>
 
-            {/* Fiche de Synthèse d'Amortissement - Grille ultra fluide iPhone SE (2 colonnes) */}
+            {/* Fiche de Synthèse d'Amortissement */}
             <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(4, 1fr)" : "repeat(2, 1fr)", gap: "8px", marginBottom: "20px" }}>
               <div style={{ padding: "10px 8px", background: "#f0f7f7", borderRadius: "10px", borderLeft: "3px solid #004f52" }}>
                 <span style={{ fontSize: "0.65rem", color: "#64748b", display: "block" }}>Mensualité (Hors Ass.)</span>
@@ -277,7 +288,7 @@ export default function Produits({ isDesktop = false }) {
               </div>
             </div>
 
-            {/* Structure du Vrais Tableau - Défilement géré Desktop/Mobile */}
+            {/* Structure du Vrais Tableau */}
             <div style={{ overflowX: "auto", width: "100%", maxHeight: "300px", border: "1px solid #e2e8f0", borderRadius: "10px" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.8rem", minWidth: "580px" }}>
                 <thead style={{ position: "sticky", top: 0, background: "#f8fafc", zIndex: 1 }}>
@@ -368,7 +379,7 @@ export default function Produits({ isDesktop = false }) {
             <div style={{ background: "#f8fafc", padding: "18px", borderRadius: "12px", borderTop: "4px solid #059669" }}>
               <div style={{ background: "#059669", color: "white", width: "32px", height: "32px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px", fontSize: "0.9rem" }}><i className="fas fa-hand-holding-usd"></i></div>
               <h4 style={{ color: "#059669", fontSize: "1rem", margin: "0 0 6px 0" }}>Zéro Frais de Dossier</h4>
-              <p style={{ color: "#64748b", fontSize: "0.8rem", margin: 0, lineHeight: "1.4" }}>Aucuns frais administratifs ne vous seront facturent pour l'étude, l'ouverture ou la mise en place de votre dossier bancaire.</p>
+              <p style={{ color: "#64748b", fontSize: "0.8rem", margin: 0, lineHeight: "1.4" }}>Aucuns frais administratifs ne vous seront facturés pour l'étude, l'ouverture ou la mise en place de votre dossier bancaire.</p>
             </div>
 
             <div style={{ background: "#f8fafc", padding: "18px", borderRadius: "12px", borderTop: "4px solid #eab308" }}>
@@ -408,8 +419,7 @@ export default function Produits({ isDesktop = false }) {
                 <div style={{ marginBottom: "15px" }}>
                   <label style={{ display: "block", marginBottom: "6px", fontSize: "0.8rem", fontWeight: "600" }}>Nature de votre projet</label>
                   <select 
-                    className="bper-full-input"
-                    style={{ fontSize: "0.8rem", height: "40px" }}
+                    style={responsiveInputStyle}
                     value={loanData.loanType}
                     onChange={(e) => {
                       const selectedType = e.target.value;
@@ -433,8 +443,7 @@ export default function Produits({ isDesktop = false }) {
                     <div>
                       <label style={{ display: "block", marginBottom: "6px", fontSize: "0.8rem", fontWeight: "600" }}>Type de taux hypothécaire</label>
                       <select 
-                        className="bper-full-input"
-                        style={{ fontSize: "0.8rem", height: "40px" }}
+                        style={responsiveInputStyle}
                         value={hypoRateType}
                         onChange={(e) => setHypoRateType(e.target.value)}
                       >
@@ -446,8 +455,7 @@ export default function Produits({ isDesktop = false }) {
                       <label style={{ display: "block", marginBottom: "6px", fontSize: "0.8rem", fontWeight: "600" }}>Apport personnel disponible (€)</label>
                       <input 
                         type="number" 
-                        className="bper-full-input"
-                        style={{ fontSize: "0.85rem", height: "40px" }}
+                        style={responsiveInputStyle}
                         value={hypoContribution}
                         onChange={(e) => setHypoContribution(parseFloat(e.target.value) || 0)}
                       />
@@ -462,8 +470,7 @@ export default function Produits({ isDesktop = false }) {
                     </label>
                     <input 
                       type="number" 
-                      className="bper-full-input"
-                      style={{ fontSize: "0.85rem", height: "40px" }}
+                      style={responsiveInputStyle}
                       value={loanData.amount === 0 ? "" : loanData.amount}
                       placeholder="Ex: 25000"
                       onChange={(e) => {
@@ -475,8 +482,7 @@ export default function Produits({ isDesktop = false }) {
                   <div>
                     <label style={{ display: "block", marginBottom: "6px", fontSize: "0.8rem", fontWeight: "600" }}>Période de remboursement (mois)</label>
                     <select 
-                      className="bper-full-input"
-                      style={{ fontSize: "0.8rem", height: "40px" }}
+                      style={responsiveInputStyle}
                       value={loanData.duration}
                       onChange={(e) => handleSimulation(loanData.amount, e.target.value, loanData.loanType, hypoRateType, hypoContribution)}
                     >
@@ -531,14 +537,14 @@ export default function Produits({ isDesktop = false }) {
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   <div>
                     <label style={{ display: "block", marginBottom: "4px", fontSize: "0.75rem" }}>Civilité</label>
-                    <select className="bper-full-input" style={{ height: "38px", fontSize: "0.85rem" }} value={loanData.civility} onChange={(e) => setLoanData({...loanData, civility: e.target.value})}>
+                    <select style={responsiveInputStyle} value={loanData.civility} onChange={(e) => setLoanData({...loanData, civility: e.target.value})}>
                       <option value="M.">M.</option>
                       <option value="Mme">Mme</option>
                     </select>
                   </div>
                   <div>
                     <label style={{ display: "block", marginBottom: "4px", fontSize: "0.75rem" }}>Profession du client</label>
-                    <select className="bper-full-input" style={{ height: "38px", fontSize: "0.85rem" }} value={loanData.profession} onChange={(e) => setLoanData({...loanData, profession: e.target.value})}>
+                    <select style={responsiveInputStyle} value={loanData.profession} onChange={(e) => setLoanData({...loanData, profession: e.target.value})}>
                       <option value="Salarié secteur privé (CDI)">Salarié secteur privé (CDI)</option>
                       <option value="Fonctionnaire / Service Public">Fonctionnaire / Service Public</option>
                       <option value="Profession Libérale / Indépendant">Profession Libérale / Indépendant</option>
@@ -551,19 +557,19 @@ export default function Produits({ isDesktop = false }) {
                   </div>
                   <div>
                     <label style={{ display: "block", marginBottom: "4px", fontSize: "0.75rem" }}>Nom</label>
-                    <input type="text" className="bper-full-input" style={{ height: "38px", fontSize: "0.85rem", background: "#f1f5f9" }} value={loanData.lastName} readOnly />
+                    <input type="text" style={{ ...responsiveInputStyle, background: "#f1f5f9" }} value={loanData.lastName} readOnly />
                   </div>
                   <div>
                     <label style={{ display: "block", marginBottom: "4px", fontSize: "0.75rem" }}>Prénom</label>
-                    <input type="text" className="bper-full-input" style={{ height: "38px", fontSize: "0.85rem", background: "#f1f5f9" }} value={loanData.firstName} readOnly />
+                    <input type="text" style={{ ...responsiveInputStyle, background: "#f1f5f9" }} value={loanData.firstName} readOnly />
                   </div>
                   <div>
                     <label style={{ display: "block", marginBottom: "4px", fontSize: "0.75rem" }}>Revenus nets par mois (€)</label>
-                    <input type="number" placeholder="Ex: 3100" className="bper-full-input" style={{ height: "38px", fontSize: "0.85rem" }} value={loanData.income} onChange={(e) => setLoanData({...loanData, income: e.target.value})} />
+                    <input type="number" placeholder="Ex: 3100" style={responsiveInputStyle} value={loanData.income} onChange={(e) => setLoanData({...loanData, income: e.target.value})} />
                   </div>
                   <div>
                     <label style={{ display: "block", marginBottom: "4px", fontSize: "0.75rem" }}>Co-emprunteur</label>
-                    <select className="bper-full-input" style={{ height: "38px", fontSize: "0.85rem" }} value={loanData.hasCoBorrower} onChange={(e) => setLoanData({...loanData, hasCoBorrower: e.target.value})}>
+                    <select style={responsiveInputStyle} value={loanData.hasCoBorrower} onChange={(e) => setLoanData({...loanData, hasCoBorrower: e.target.value})}>
                       <option value="Non">Non</option>
                       <option value="Oui">Oui</option>
                     </select>
