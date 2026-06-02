@@ -26,19 +26,19 @@ export default function Produits({ isDesktop = false }) {
   // --- PARAMÈTRES DU TABLEAU D'AMORTISSEMENT PROFESSIONNEL INTERACTIF (VUE 1) ---
   const [interactiveAmount, setInteractiveAmount] = useState(200000);
   const [interactiveYears, setInteractiveYears] = useState(20);
-  const [interactiveRateType, setInteractiveRateType] = useState("FIXE"); // FIXE ou VARIABLE
+  const [interactiveRateType, setInteractiveRateType] = useState("FIXE"); // FIXE = 4.25% | VARIABLE = 4.55%
   const [amortizationSchedule, setAmortizationSchedule] = useState([]);
-  const [summaryMetrics, setSummaryMetrics] = useState({ monthlyBox: 0, totalInterest: 0, insuranceBox: 0 });
+  const [summaryMetrics, setSummaryMetrics] = useState({ monthlyBox: 0, totalInterest: 0, insuranceBox: 0, totalInsurance: 0 });
 
   // --- LOGIQUE INTERNE POUR LE TUNNEL DE DEMANDE (VUE 3) ---
   const [hypoRateType, setHypoRateType] = useState("FIXE"); 
   const [hypoContribution, setHypoContribution] = useState(0); 
 
-  // Moteur de calcul financier pour le Tableau d'Amortissement Interactif (Vue 1)
+  // Moteur de calcul financier réglementaire (Tableau d'Amortissement Interactif - Vue 1)
   useEffect(() => {
     const principal = parseFloat(interactiveAmount) || 0;
     const months = (parseInt(interactiveYears) || 1) * 12;
-    const annualRate = interactiveRateType === "FIXE" ? 0.0425 : 0.0455; // Grille BPER Banca
+    const annualRate = interactiveRateType === "FIXE" ? 0.0425 : 0.0455; // Taux BPER Banca
     const monthlyRate = annualRate / 12;
     
     let monthlyPAndI = 0;
@@ -46,12 +46,16 @@ export default function Produits({ isDesktop = false }) {
       monthlyPAndI = (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
     }
 
-    const insuranceM = Math.round((principal * 0.0021) / 12); // Taux d'assurance standardisé 0.21%
+    // Calcul de l'assurance Décès/Incapacité révisé à 0,60% ANNUEL
+    const annualInsuranceCost = principal * 0.0060;
+    const insuranceM = Math.round(annualInsuranceCost / 12); 
+    const totalInsuranceCost = insuranceM * months;
+
     let remainingPrincipal = principal;
     const schedule = [];
     let accumulatedInterest = 0;
 
-    // Génération des lignes d'échéances (limitée aux 12 premiers mois pour la lisibilité)
+    // Affichage des 12 premières mensualités (Aperçu d'encours standard)
     const limitDisplay = Math.min(months, 12);
 
     for (let i = 1; i <= months; i++) {
@@ -76,11 +80,12 @@ export default function Produits({ isDesktop = false }) {
     setSummaryMetrics({
       monthlyBox: Math.round(monthlyPAndI),
       totalInterest: Math.round(accumulatedInterest),
-      insuranceBox: insuranceM
+      insuranceBox: insuranceM,
+      totalInsurance: totalInsuranceCost
     });
   }, [interactiveAmount, interactiveYears, interactiveRateType]);
 
-  // Logique de calcul unifiée pour le tunnel de demande (Vue 3)
+  // Logique de calcul pour le tunnel de demande (Vue 3)
   const handleSimulation = (amount, duration, typeOfLoan = loanData.loanType, rateType = hypoRateType, contribution = hypoContribution) => {
     const parsedAmount = parseFloat(amount) || 0;
     const parsedDuration = parseInt(duration) || 12;
@@ -116,7 +121,7 @@ export default function Produits({ isDesktop = false }) {
     }
   }, [hypoRateType, hypoContribution]);
 
-  // Chargement des données de l'utilisateur depuis Atlas
+  // Récupération Atlas User Data
   useEffect(() => {
     const loadRealUserData = async () => {
       try {
@@ -143,7 +148,7 @@ export default function Produits({ isDesktop = false }) {
           }));
         }
       } catch (error) {
-        console.error("Impossible de charger les données depuis Atlas :", error);
+        console.error("Erreur Atlas :", error);
       }
     };
     loadRealUserData();
@@ -151,11 +156,7 @@ export default function Produits({ isDesktop = false }) {
 
   useEffect(() => {
     if (setForceHideNav) {
-      if (currentView === "avantages" || currentView === "simulateur") {
-        setForceHideNav(true);
-      } else {
-        setForceHideNav(false);
-      }
+      setForceHideNav(currentView === "avantages" || currentView === "simulateur");
     }
   }, [currentView, setForceHideNav]);
 
@@ -200,27 +201,27 @@ export default function Produits({ isDesktop = false }) {
             </div>
           </div>
 
-          {/* --- NOUVELLE SECTION COMPLÈTE : VRAIS TABLEAU D'AMORTISSEMENT PROFESSIONNEL INTERACTIF BPER BANCA --- */}
-          <div style={{ background: "#fff", padding: "25px", borderRadius: "24px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", marginBottom: "25px", border: "1px solid #e2e8f0" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
-              <div style={{ background: "#004f52", color: "#fff", width: "35px", height: "35px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <i className="fas fa-calculator"></i>
+          {/* --- SECTION TABLEAU D'AMORTISSEMENT PROFESSIONNEL RE-PARAMÉTRÉ (0.60% ASSURANCE) --- */}
+          <div style={{ background: "#fff", padding: isDesktop ? "30px" : "15px", borderRadius: "24px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)", marginBottom: "25px", border: "1px solid #e2e8f0" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
+              <div style={{ background: "#004f52", color: "#fff", width: "40px", height: "40px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <i className="fas fa-calculator" style={{ fontSize: "1.1rem" }}></i>
               </div>
               <div>
-                <h3 style={{ color: "#004f52", margin: 0, fontSize: "1.25rem", fontWeight: "700" }}>Générateur de Tableau d'Amortissement Bancaire</h3>
-                <p style={{ color: "#64748b", margin: 0, fontSize: "0.85rem" }}>Simulez vos remboursements réels selon les taux directeurs officiels de BPER Banca.</p>
+                <h3 style={{ color: "#004f52", margin: 0, fontSize: "1.3rem", fontWeight: "700" }}>Tableau d'Amortissement Réglementaire</h3>
+                <p style={{ color: "#64748b", margin: 0, fontSize: "0.85rem" }}>Outil de simulation d'encours mis à jour avec la tarification Décès/Incapacité de 0,60%.</p>
               </div>
             </div>
 
             {/* Inputs de contrôle du Tableau */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "15px", marginBottom: "20px", background: "#f8fafc", padding: "15px", borderRadius: "12px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "15px", marginBottom: "20px", background: "#f8fafc", padding: "20px", borderRadius: "16px" }}>
               <div>
-                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "600", color: "#475569", marginBottom: "5px" }}>Capital souhaité (€)</label>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#475569", marginBottom: "6px" }}>Capital Emprunté (€)</label>
                 <input 
                   type="number" 
                   className="bper-full-input" 
                   value={interactiveAmount === 0 ? "" : interactiveAmount} 
-                  placeholder="Ex: 150000"
+                  placeholder="Ex: 200000"
                   onChange={(e) => {
                     const v = e.target.value;
                     setInteractiveAmount(v === "" ? "" : parseFloat(v));
@@ -228,12 +229,12 @@ export default function Produits({ isDesktop = false }) {
                 />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "600", color: "#475569", marginBottom: "5px" }}>Durée de l'encours (Années)</label>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#475569", marginBottom: "6px" }}>Durée de l'amortissement (Années)</label>
                 <input 
                   type="number" 
                   className="bper-full-input" 
                   value={interactiveYears === 0 ? "" : interactiveYears} 
-                  placeholder="Ex: 15"
+                  placeholder="Ex: 20"
                   onChange={(e) => {
                     const y = e.target.value;
                     setInteractiveYears(y === "" ? "" : parseInt(y));
@@ -241,7 +242,7 @@ export default function Produits({ isDesktop = false }) {
                 />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "600", color: "#475569", marginBottom: "5px" }}>Structure de Taux BPER</label>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", color: "#475569", marginBottom: "6px" }}>Grille de Taux BPER Banca</label>
                 <select 
                   className="bper-full-input" 
                   value={interactiveRateType} 
@@ -254,62 +255,62 @@ export default function Produits({ isDesktop = false }) {
             </div>
 
             {/* Fiche de Synthèse d'Amortissement */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "10px", marginBottom: "20px", textAlign: "center" }}>
-              <div style={{ padding: "10px", background: "#f0f7f7", borderRadius: "8px" }}>
-                <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block" }}>Mensualité (Hors Ass.)</span>
-                <strong style={{ color: "#004f52", fontSize: "1.1rem" }}>{summaryMetrics.monthlyBox} €</strong>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "12px", marginBottom: "25px" }}>
+              <div style={{ padding: "12px", background: "#f0f7f7", borderRadius: "12px", borderLeft: "4px solid #004f52" }}>
+                <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block", marginBottom: "2px" }}>Mensualité (Hors Ass.)</span>
+                <strong style={{ color: "#004f52", fontSize: "1.2rem", fontWeight: "700" }}>{summaryMetrics.monthlyBox} €</strong>
               </div>
-              <div style={{ padding: "10px", background: "#f0f7f7", borderRadius: "8px" }}>
-                <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block" }}>Assurance /mois</span>
-                <strong style={{ color: "#004f52", fontSize: "1.1rem" }}>+{summaryMetrics.insuranceBox} €</strong>
+              <div style={{ padding: "12px", background: "#fbf7f0", borderRadius: "12px", borderLeft: "4px solid #d97706" }}>
+                <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block", marginBottom: "2px" }}>Assurance (0.60% an)</span>
+                <strong style={{ color: "#b45309", fontSize: "1.2rem", fontWeight: "700" }}>+{summaryMetrics.insuranceBox} €/m</strong>
               </div>
-              <div style={{ padding: "10px", background: "#f8fafc", borderRadius: "8px" }}>
-                <span style={{ fontSize: "0.75rem", color: "#64748b", display: "block" }}>Taux Nominal Applique</span>
-                <strong style={{ color: "#059669", fontSize: "1.1rem" }}>{interactiveRateType === "FIXE" ? "4.25 %" : "4.55 %"}</strong>
+              <div style={{ padding: "12px", background: "#fef2f2", borderRadius: "12px", borderLeft: "4px solid #dc2626" }}>
+                <span style={{ fontSize: "0.75rem", color: "#b91c1c", display: "block", marginBottom: "2px" }}>Total Intérêts Dus</span>
+                <strong style={{ color: "#dc2626", fontSize: "1.2rem", fontWeight: "700" }}>{summaryMetrics.totalInterest} €</strong>
               </div>
-              <div style={{ padding: "10px", background: "#fef2f2", borderRadius: "8px" }}>
-                <span style={{ fontSize: "0.75rem", color: "#dc2626", display: "block" }}>Coût total Intérêts</span>
-                <strong style={{ color: "#dc2626", fontSize: "1.1rem" }}>{summaryMetrics.totalInterest} €</strong>
+              <div style={{ padding: "12px", background: "#f8fafc", borderRadius: "12px", borderLeft: "4px solid #64748b" }}>
+                <span style={{ fontSize: "0.75rem", color: "#475569", display: "block", marginBottom: "2px" }}>Total Assurances</span>
+                <strong style={{ color: "#334155", fontSize: "1.2rem", fontWeight: "700" }}>{summaryMetrics.totalInsurance} €</strong>
               </div>
             </div>
 
-            {/* Structure du Vrais Tableau */}
-            <div style={{ overflowX: "auto", width: "100%", maxHeight: "320px" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.85rem" }}>
-                <thead style={{ position: "sticky", top: 0, background: "#fff", zIndex: 1 }}>
+            {/* Structure du Vrais Tableau - Défilement géré Desktop/Mobile */}
+            <div style={{ overflowX: "auto", width: "100%", maxHeight: "350px", border: "1px solid #e2e8f0", borderRadius: "12px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.85rem", minWidth: "650px" }}>
+                <thead style={{ position: "sticky", top: 0, background: "#f8fafc", zIndex: 1 }}>
                   <tr style={{ borderBottom: "2px solid #cbd5e1", color: "#475569" }}>
-                    <th style={{ padding: "10px 8px" }}>Échéance</th>
-                    <th style={{ padding: "10px 8px" }}>Prélèvement Mensuel</th>
-                    <th style={{ padding: "10px 8px" }}>Part Capital Remboursé</th>
-                    <th style={{ padding: "10px 8px" }}>Part Intérêts Payés</th>
-                    <th style={{ padding: "10px 8px" }}>Assurance Décès/Incap.</th>
-                    <th style={{ padding: "10px 8px" }}>Capital Restant Dû</th>
+                    <th style={{ padding: "12px 10px", fontWeight: "600" }}>Échéance</th>
+                    <th style={{ padding: "12px 10px", fontWeight: "600" }}>Prélèvement Total</th>
+                    <th style={{ padding: "12px 10px", fontWeight: "600" }}>Amortissement Capital</th>
+                    <th style={{ padding: "12px 10px", fontWeight: "600" }}>Intérêts Élus</th>
+                    <th style={{ padding: "12px 10px", fontWeight: "600" }}>Ass. Décès/Incap (0.60%)</th>
+                    <th style={{ padding: "12px 10px", fontWeight: "600" }}>Capital Restant Dû</th>
                   </tr>
                 </thead>
                 <tbody>
                   {amortizationSchedule.length > 0 ? (
                     amortizationSchedule.map((row) => (
                       <tr key={row.month} style={{ borderBottom: "1px solid #f1f5f9", color: "#334155" }}>
-                        <td style={{ padding: "10px 8px", fontWeight: "600" }}>Mois {row.month}</td>
-                        <td style={{ padding: "10px 8px", color: "#004f52", fontWeight: "700" }}>{row.totalMonthly} €</td>
-                        <td style={{ padding: "10px 8px", color: "#0f766e" }}>{row.principalPaid} €</td>
-                        <td style={{ padding: "10px 8px", color: "#b91c1c" }}>{row.interestPaid} €</td>
-                        <td style={{ padding: "10px 8px", color: "#64748b" }}>{row.insurance} €</td>
-                        <td style={{ padding: "10px 8px", fontWeight: "600", background: "#f8fafc" }}>{row.remaining} €</td>
+                        <td style={{ padding: "12px 10px", fontWeight: "600" }}>Mois {row.month}</td>
+                        <td style={{ padding: "12px 10px", color: "#004f52", fontWeight: "700" }}>{row.totalMonthly} €</td>
+                        <td style={{ padding: "12px 10px", color: "#0f766e" }}>{row.principalPaid} €</td>
+                        <td style={{ padding: "12px 10px", color: "#b91c1c" }}>{row.interestPaid} €</td>
+                        <td style={{ padding: "12px 10px", color: "#64748b" }}>{row.insurance} €</td>
+                        <td style={{ padding: "12px 10px", fontWeight: "600", background: "#f8fafc" }}>{row.remaining} €</td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="6" style={{ padding: "20px", textCenter: "center", color: "#94a3b8" }}>Veuillez renseigner un montant et une durée valides pour éditer le tableau.</td>
+                      <td colSpan="6" style={{ padding: "20px", textAlign: "center", color: "#94a3b8" }}>Veuillez configurer un capital et une durée valides.</td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
 
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", marginTop: "15px", gap: "10px" }}>
-              <p style={{ margin: 0, fontSize: "0.75rem", color: "#94a3b8", fontStyle: "italic", maxWidth: "70%" }}>
-                * Affichage réglementaire : Ce tableau présente les 12 premières échéances périodiques du crédit. L'indexation Euribor pour le taux variable est mise à jour mensuellement selon les taux officiels de la Banque Centrale Européenne.
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", marginTop: "15px", gap: "15px" }}>
+              <p style={{ margin: 0, fontSize: "0.75rem", color: "#94a3b8", fontStyle: "italic", maxWidth: isDesktop ? "70%" : "100%", lineHeight: "1.4" }}>
+                * Tableau d'amortissement prévisionnel indicatif présentant les 12 premières échéances mensuelles. L'assurance emprunteur obligatoire (Décès, Perte Totale et Irréversible d'Autonomie, Invalidité Permanente) est calculée au taux annuel fixe de 0,60% sur le capital initial.
               </p>
               <button 
                 onClick={() => {
@@ -318,13 +319,13 @@ export default function Produits({ isDesktop = false }) {
                     loanType: interactiveAmount > 75000 ? "Crédit Immobilier BPER (Achat Résidence)" : "Prêt Personnel Multi-Projets",
                     amount: interactiveAmount,
                     duration: interactiveYears * 12,
-                    monthlyPayment: summaryMetrics.monthlyBox
+                    monthlyPayment: summaryMetrics.monthlyBox + summaryMetrics.insuranceBox
                   });
                   navigateToView("simulateur");
                 }}
-                style={{ background: "#004f52", color: "#fff", border: "none", padding: "8px 14px", borderRadius: "6px", fontWeight: "600", fontSize: "0.8rem", cursor: "pointer" }}
+                style={{ background: "#004f52", color: "#fff", border: "none", padding: "10px 18px", borderRadius: "8px", fontWeight: "600", fontSize: "0.85rem", cursor: "pointer", width: isDesktop ? "auto" : "100%", textAlign: "center" }}
               >
-                Appliquer cette structure au dossier
+                Injecter dans mon dossier de crédit
               </button>
             </div>
           </div>
@@ -345,7 +346,6 @@ export default function Produits({ isDesktop = false }) {
       {/* VUE 2 : AVANTAGES */}
       {currentView === "avantages" && (
         <div className="bper-advantages-view">
-          
           <button onClick={() => navigateToView("offres")} className="btn-bper-back-top">
             <i className="fas fa-arrow-left"></i> Retour aux produits
           </button>
@@ -578,25 +578,11 @@ export default function Produits({ isDesktop = false }) {
               <div>
                 <div className="bper-summary-box">
                   <h4 style={{ margin: "0 0 15px 0", color: "#004f52" }}>Validation contractuelle du dossier</h4>
-                  
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>Nature du projet :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.loanType}</span>
-                  </p>
-
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>Titulaire :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} {loanData.profession ? `(${loanData.profession})` : ""}
-                  </p>
-                  
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>E-mail :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email}</span>
-                  </p>
-                  
-                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}>
-                    <strong>Téléphone :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone}</span>
-                  </p>
-                  
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Nature du projet :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.loanType}</span></p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Titulaire :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} {loanData.profession ? `(${loanData.profession})` : ""}</p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>E-mail :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.email}</span></p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Téléphone :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.telephone}</span></p>
                   <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "15px 0" }} />
-                  
                   <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capital emprunté :</strong> {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) ? Math.max(0, loanData.amount - hypoContribution) : loanData.amount} € sur {loanData.duration} mois</p>
                   <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Charge mensuelle calculée :</strong> {loanData.monthlyPayment} € / mois</p>
                   <p style={{ margin: "5px 0", fontSize: "0.9rem" }}><strong>Capacité déclarée :</strong> {loanData.income} € net / mois</p>
@@ -610,7 +596,6 @@ export default function Produits({ isDesktop = false }) {
                   <button className="btn-bper-back" onClick={() => { setLoanStep(2); window.scrollTo({top: 0}); }}>
                     <i className="fas fa-edit"></i> Modifier
                   </button>
-                  
                   <button 
                     className="btn-bper-submit" 
                     style={{ background: "#059669", color: "#fff" }}
