@@ -2,23 +2,25 @@ import React, { useState, useEffect, useRef } from "react";
 import { useOutletContext } from "react-router-dom"; 
 import "../styles/produits.css";
 
-// --- COMPOSANT DE SIGNATURE RESPONSIVE SÉCURISÉ (EFFET STYLO BIC & ÉCRAN FIXE) ---
+// --- COMPOSANT DE SIGNATURE RESPONSIVE (AVEC CURSEUR STYLO BIC & ÉCRAN FIXE) ---
 function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReading }) {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  // Stockage de la position pour afficher le stylo Bic au bon endroit
+  const [penPos, setPenPos] = useState({ x: 0, y: 0 });
+  const [showPen, setShowPen] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     
-    // Configuration du tracé pour imiter un stylo à bille Bic bleu
+    // Configuration du tracé (Effet encre Bic bleue institutionnelle)
     ctx.strokeStyle = "#002f34"; 
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
-    // Empêcher l'écran de bouger / scroller sur iPhone, iPhone SE et Android pendant le dessin
     const preventScroll = (e) => {
       if (e.target === canvas) {
         e.preventDefault();
@@ -60,6 +62,8 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
     ctx.beginPath();
     ctx.moveTo(x, y);
     setIsDrawing(true);
+    setPenPos({ x, y });
+    setShowPen(true);
   };
 
   const draw = (e) => {
@@ -68,11 +72,13 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
     const ctx = canvasRef.current.getContext("2d");
     ctx.lineTo(x, y);
     ctx.stroke();
+    setPenPos({ x, y });
   };
 
   const stopDrawing = () => {
     if (!isDrawing) return;
     setIsDrawing(false);
+    setShowPen(false);
     const dataUrl = canvasRef.current.toDataURL("image/png");
     onSave(dataUrl);
   };
@@ -105,7 +111,7 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
           ref={canvasRef}
           width={300}
           height={130}
-          style={{ width: "100%", height: "130px", display: "block", cursor: contractRead ? "crosshair" : "not-allowed", touchAction: "none" }}
+          style={{ width: "100%", height: "130px", display: "block", cursor: "none", touchAction: "none" }}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
@@ -114,6 +120,25 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
           onTouchMove={draw}
           onTouchEnd={stopDrawing}
         />
+        
+        {/* LE STYLO BIC QUI S'AFFICHE AU MOMENT OU L'ON SIGNE */}
+        {showPen && (
+          <img 
+            src="https://i.imgur.com/vHwWofF.png" 
+            alt="Bic"
+            style={{
+              position: "absolute",
+              left: `${penPos.x}px`,
+              top: `${penPos.y - 45}px`, // Ajustement pour que la pointe écrive pile sur le doigt/curseur
+              width: "45px",
+              height: "45px",
+              pointerEvents: "none",
+              zIndex: 50,
+              transform: "rotate(-15deg)"
+            }}
+          />
+        )}
+
         {!contractRead && (
           <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(254, 242, 242, 0.85)", color: "#b91c1c", fontSize: "0.75rem", fontWeight: "bold", padding: "10px", textAlign: "center" }}>
             ⚠️ Signature bloquée : Veuillez d'abord lire le contrat ci-dessus
@@ -753,7 +778,7 @@ export default function Produits({ isDesktop = false }) {
                 />
 
                 <p className="bper-legal-text" style={{ fontSize: "0.75rem", color: "#64748b", marginBottom: "20px", marginTop: "15px", lineHeight: "1.4" }}>
-                  En transmettant ce dossier dûment signed, vous soumettez formellement votre demande de crédit au service d'analyse des risques de <strong>BPER Banca</strong>.
+                  En transmettant ce dossier dûment signé, vous soumettez formellement votre demande de crédit au service d'analyse des risques de <strong>BPER Banca</strong>.
                 </p>
 
                 <div className="bper-actions-wrapper" style={{ display: "flex", gap: "10px" }}>
@@ -806,108 +831,75 @@ export default function Produits({ isDesktop = false }) {
         </div>
       )}
 
-      {/* MODALE CONTRAT - DESIGN STRICT AVEC STRUCTURE ET ALIGNEMENTS SÉCURISÉS CONTINUS */}
+      {/* MODALE CONTRAT CORRIGÉE : AUCUNE COUPURE DE COULEUR BLANCHE SUR TOUT ÉCRAN ET IPHONE SE */}
       {isContractModalOpen && (
-        <div style={{ position: "fixed", inset: 0, backgroundColor: "#f1f5f9", zIndex: 9999, display: "flex", flexDirection: "column", boxSizing: "border-box", fontFamily: "Arial, sans-serif" }}>
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "#f1f5f9", zIndex: 9999, display: "flex", flexDirection: "column", boxSizing: "border-box", fontFamily: "'Times New Roman', Times, serif" }}>
           
-          {/* En-tête Supérieure Fixe */}
+          {/* En-tête fixe supérieure */}
           <div style={{ background: "#004f52", padding: "15px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", color: "#fff", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ fontSize: "1.3rem", fontWeight: "bold", letterSpacing: "1px" }}>BPER: Banca</span>
+              <span style={{ fontSize: "1.4rem", fontWeight: "bold", letterSpacing: "1px" }}>BPER: Banca</span>
             </div>
-            <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>RÉF: BPER-CONTRACT-2026</span>
+            <span style={{ fontSize: "0.75rem", opacity: 0.8, fontFamily: "sans-serif" }}>RÉF: BPER-CONTRACT-2026</span>
           </div>
 
-          {/* Zone de Défilement Interne */}
-          <div style={{ flex: 1, overflowY: "auto", padding: isDesktop ? "30px 40px" : "10px", display: "flex", flexDirection: "column", alignItems: "center", width: "100%", boxSizing: "border-box" }}>
+          {/* Zone défilante principale */}
+          <div style={{ flex: 1, overflowY: "auto", padding: isDesktop ? "30px 40px" : "10px", width: "100%", display: "flex", flexDirection: "column", alignItems: "center", boxSizing: "border-box" }}>
+            
+            {/* CORRECTION DU FOND BLANC : Utilisation de display table et min-height 100% pour envelopper le texte sans jamais se couper */}
             <div style={{ 
               backgroundColor: "#fff", 
               width: "100%", 
               maxWidth: "800px", 
-              padding: isDesktop ? "45px" : "20px 15px", 
-              boxShadow: "0 4px 15px rgba(0,0,0,0.08)", 
+              padding: isDesktop ? "50px" : "25px 20px", 
+              boxShadow: "0 4px 15px rgba(0,0,0,0.1)", 
               borderRadius: "4px", 
-              color: "#1e293b", 
-              fontSize: "0.9rem", 
+              color: "#000", 
+              fontSize: "0.95rem", 
               lineHeight: "1.6", 
+              textAlign: "justify",
               boxSizing: "border-box",
-              minHeight: "100%",
-              marginBottom: "15px"
+              display: "table", 
+              minHeight: "100%", 
+              height: "auto",
+              marginBottom: "20px"
             }}>
               
-              {/* En-tête Titre Principale (Zéro décalage) */}
-              <div style={{ width: "100%", borderBottom: "2px solid #004f52", paddingBottom: "15px", marginBottom: "25px", textAlign: "left" }}>
-                <div style={{ fontSize: "1.4rem", fontWeight: "800", color: "#004f52", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "4px", textAlign: "left" }}>
-                  Offre Préalable de Crédit
-                </div>
-                <div style={{ fontSize: "0.8rem", fontStyle: "italic", color: "#64748b", textAlign: "left" }}>
-                  Contrat électronique régi conformément aux directives bancaires européennes en vigueur
-                </div>
+              <div style={{ textAlign: "center", marginBottom: "30px", borderBottom: "2px solid #004f52", paddingBottom: "15px" }}>
+                <h1 style={{ fontSize: "1.5rem", color: "#004f52", margin: "0 0 5px 0", textTransform: "uppercase" }}>Offre Préalable de Crédit</h1>
+                <p style={{ margin: 0, fontStyle: "italic", color: "#475569", fontSize: "0.8rem", fontFamily: "sans-serif" }}>Contrat régi conformément aux directives bancaires européennes</p>
               </div>
 
-              {/* Encadré d'Identification des Parties */}
-              <div style={{ width: "100%", background: "#f8fafc", padding: "14px", borderRadius: "6px", marginBottom: "25px", border: "1px solid #e2e8f0", boxSizing: "border-box" }}>
-                <div style={{ margin: "3px 0", fontSize: "0.85rem", textAlign: "left" }}><strong>Organisme Prêteur :</strong> BPER Banca S.p.A. (Banca Popolare dell'Emilia Romagna)</div>
-                <div style={{ margin: "3px 0", fontSize: "0.85rem", textAlign: "left" }}><strong>Bénéficiaire Emprunteur :</strong> {loanData.civility} {loanData.lastName.toUpperCase()} {loanData.firstName}</div>
-                <div style={{ margin: "3px 0", fontSize: "0.85rem", textAlign: "left" }}><strong>Situation Professionnelle :</strong> {loanData.profession}</div>
-                <div style={{ margin: "3px 0", fontSize: "0.85rem", textAlign: "left" }}><strong>Capacité Financière Déclarée :</strong> {loanData.income} EUR / mois</div>
+              <div style={{ background: "#f8fafc", padding: "12px", borderRadius: "6px", marginBottom: "25px", border: "1px solid #cbd5e1", fontFamily: "sans-serif", fontSize: "0.85rem" }}>
+                <p style={{ margin: "3px 0" }}><strong>Organisme Prêteur :</strong> BPER Banca S.p.A. (Banca Popolare dell'Emilia Romagna)</p>
+                <p style={{ margin: "3px 0" }}><strong>Bénéficiaire :</strong> {loanData.civility} {loanData.lastName.toUpperCase()} {loanData.firstName}</p>
+                <p style={{ margin: "3px 0" }}><strong>Profession déclarée :</strong> {loanData.profession}</p>
+                <p style={{ margin: "3px 0" }}><strong>Revenus Mensuels :</strong> {loanData.income} EUR</p>
               </div>
 
-              {/* Section Bloc d'Articles (Forcé à gauche pour éviter les sauts de lignes chaotiques) */}
-              <div style={{ width: "100%", textAlign: "left", marginBottom: "20px" }}>
-                <div style={{ color: "#004f52", fontWeight: "700", fontSize: "0.95rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "3px", marginBottom: "8px", textTransform: "uppercase" }}>
-                  ARTICLE 1 : OBJET ET ASSIETTE DU FINANCEMENT
-                </div>
-                <div style={{ textAlign: "justify", fontSize: "0.85rem", color: "#334155" }}>
-                  Le présent engagement stipule que la <strong>BPER Banca</strong> consent au client mentionné ci-dessus, qui l'accepte formellement, un crédit d'un montant en capital de <strong>{loanData.amount} EUR</strong> au titre de l'offre <em>"{loanData.loanType}"</em>. Ce capital est exclusivement mis à disposition pour la réalisation du projet déclaré ou l'ajustement de trésorerie souscrit.
-                </div>
-              </div>
+              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 1 : OBJET ET ASSIETTE DU FINANCEMENT</h3>
+              <p>Le présent engagement stipule que la <strong>BPER Banca</strong> consent au client mentionné ci-dessus, qui l'accepte formellement, un crédit d'un montant en capital de <strong>{loanData.amount} EUR</strong> au titre de l'offre <em>"{loanData.loanType}"</em>. Ce capital est exclusivement mis à disposition pour la réalisation du projet déclaré ou l'ajustement de trésorerie souscrit.</p>
 
-              <div style={{ width: "100%", textAlign: "left", marginBottom: "20px" }}>
-                <div style={{ color: "#004f52", fontWeight: "700", fontSize: "0.95rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "3px", marginBottom: "8px", textTransform: "uppercase" }}>
-                  ARTICLE 2 : CONDITIONS DE REMBOURSEMENT ET AMORTISSEMENT
-                </div>
-                <div style={{ textAlign: "justify", fontSize: "0.85rem", color: "#334155" }}>
-                  L'emprunteur s'engage irrévocablement à rembourser l'intégralité du capital emprunté majoré des intérêts courus sur une durée ferme de <strong>{loanData.duration} mois</strong>. Le prélèvement s'exécutera à échéance constante fixe d'un montant brut de <strong>{loanData.monthlyPayment} EUR par mois</strong>. Le Taux Annuel Effectif Global (TAEG) appliqué est contractuellement fixé à 4,90%.
-                </div>
-              </div>
+              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 2 : CONDITIONS DE REMBOURSEMENT ET AMORTISSEMENT</h3>
+              <p>L'emprunteur s'engage irrévocablement à rembourser l'intégralité du capital emprunté majoré des intérêts courus sur une durée ferme de <strong>{loanData.duration} mois</strong>. Le prélèvement s'exécutera à échéance constante fixe d'un montant brut de <strong>{loanData.monthlyPayment} EUR par mois</strong>. Le Taux Annuel Effectif Global (TAEG) appliqué est contractuellement fixé à 4,90%.</p>
 
-              <div style={{ width: "100%", textAlign: "left", marginBottom: "20px" }}>
-                <div style={{ color: "#004f52", fontWeight: "700", fontSize: "0.95rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "3px", marginBottom: "8px", textTransform: "uppercase" }}>
-                  ARTICLE 3 : EXIGIBILITÉ ET DÉCHÉANCE DU TERME
-                </div>
-                <div style={{ textAlign: "justify", fontSize: "0.85rem", color: "#334155" }}>
-                  Toute fausse déclaration concernant les justificatifs financiers ou tout défaut récurrent de paiement des mensualités dues entraînera de plein droit l'exigibilité immédiate des sommes restant dues. La banque BPER Banca se réservera le droit d'appliquer une indemnité forfaitaire égale à 8% du capital restant dû.
-                </div>
-              </div>
+              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 3 : EXIGIBILITÉ ET DÉCHÉANCE DU TERME</h3>
+              <p>Toute fausse déclaration concernant les justificatifs financiers ou tout défaut récurrent de paiement des mensualités dues entraînera de plein droit l'exigibilité immédiate des sommes restant dues. La banque BPER Banca se réservera le droit d'appliquer une indemnité forfaitaire égale à 8% du capital restant dû.</p>
 
-              <div style={{ width: "100%", textAlign: "left", marginBottom: "20px" }}>
-                <div style={{ color: "#004f52", fontWeight: "700", fontSize: "0.95rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "3px", marginBottom: "8px", textTransform: "uppercase" }}>
-                  ARTICLE 4 : DROIT DE RÉTRACTATION LÉGAL
-                </div>
-                <div style={{ textAlign: "justify", fontSize: "0.85rem", color: "#334155" }}>
-                  Conformément à la législation internationale sur le crédit à la consommation, l'emprunteur dispose d'un délai légal de rétractation de 14 jours calendaires révolus à compter de la date de signature de la présente offre en ligne pour renoncer à son engagement par lettre recommandée avec accusé de réception.
-                </div>
-              </div>
+              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 4 : DROIT DE RÉTRACTATION</h3>
+              <p>Conformément à la législation sur le crédit, l'emprunteur dispose d'un délai légal de rétractation de 14 jours calendaires révolus à compter de la date de signature de la présente offre en ligne pour renoncer à son engagement par lettre recommandée avec accusé de réception.</p>
 
-              <div style={{ width: "100%", textAlign: "left", marginBottom: "30px" }}>
-                <div style={{ color: "#004f52", fontWeight: "700", fontSize: "0.95rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "3px", marginBottom: "8px", textTransform: "uppercase" }}>
-                  ARTICLE 5 : CONSENTEMENT ET VALEUR DE PREUVE ÉLECTRONIQUE
-                </div>
-                <div style={{ textAlign: "justify", fontSize: "0.85rem", color: "#334155" }}>
-                  Les parties s'entendent expressément pour conférer au procédé technique de signature électronique utilisé sur la présente plateforme internet la même valeur juridique qu'une signature manuscrite sur support papier. Le clic sur le bouton de clôture vaut validation intégrale de l'ensemble des clauses précitées.
-                </div>
-              </div>
+              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 5 : CONSENTEMENT ET PREUVE ÉLECTRONIQUE</h3>
+              <p>Les parties s'entendent expressément pour conférer au procédé technique de signature électronique utilisé sur la présente plateforme internet la même valeur juridique qu'une signature manuscrite sur support papier. Le clic sur le bouton de clôture vaut validation intégrale de l'ensemble des clauses précitées.</p>
 
-              {/* Zone Mentions Légales de Bas de Page */}
-              <div style={{ width: "100%", marginTop: "35px", borderTop: "1px solid #cbd5e1", paddingTop: "12px", display: "flex", flexWrap: "wrap", justifyContent: "space-between", fontSize: "0.75rem", color: "#64748b", fontStyle: "italic" }}>
-                <span style={{ marginBottom: "4px" }}>Mention : "Bon pour acceptation de l'offre de crédit"</span>
-                <span>Document certifié par BPER Banca S.p.A.</span>
+              <div style={{ marginTop: "40px", borderTop: "1px solid #000", paddingTop: "10px", display: "flex", flexWrap: "wrap", justifyContent: "space-between", fontSize: "0.8rem", fontStyle: "italic" }}>
+                <span>Mention : "Bon pour acceptation de l'offre de crédit"</span>
+                <span>Émis par BPER Banca S.p.A.</span>
               </div>
             </div>
           </div>
 
-          {/* Pied de Page Fixe */}
+          {/* Pied de page fixe avec le bouton de validation */}
           <div style={{ background: "#fff", padding: "15px 20px", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "center", flexShrink: 0, width: "100%", boxSizing: "border-box" }}>
             <button
               type="button"
@@ -916,7 +908,7 @@ export default function Produits({ isDesktop = false }) {
                 setIsContractModalOpen(false);
                 window.scrollTo({ top: 120, behavior: "smooth" });
               }}
-              style={{ width: isDesktop ? "auto" : "100%", padding: "14px 50px", backgroundColor: "#004f52", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "bold", fontSize: "0.9rem", cursor: "pointer", boxShadow: "0 4px 6px rgba(0,80,82,0.2)" }}
+              style={{ width: isDesktop ? "auto" : "100%", padding: "12px 50px", backgroundColor: "#004f52", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "bold", fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 6px rgba(0,80,82,0.2)" }}
             >
               ✔️ OK j'ai lu le contrat 
             </button>
