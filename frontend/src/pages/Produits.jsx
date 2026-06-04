@@ -2,46 +2,56 @@ import React, { useState, useEffect, useRef } from "react";
 import { useOutletContext } from "react-router-dom"; 
 import "../styles/produits.css";
 
-// --- SOUS-COMPOSANT DE SIGNATURE SÉCURISÉ (ANTI-SCROLL + STYLO BIC INTERACTIF) ---
+// --- COMPOSANT DE SIGNATURE RESPONSIVE SÉCURISÉ (EFFET STYLO BIC & ÉCRAN FIXE) ---
 function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReading }) {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  
-  // États pour la position du stylo Bic virtuel
-  const [penPos, setPenPos] = useState({ x: 0, y: 0 });
-  const [showPen, setShowPen] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    ctx.strokeStyle = "#004f52";
+    
+    // Configuration du tracé pour imiter un stylo à bille Bic bleu
+    ctx.strokeStyle = "#002f34"; 
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
+
+    // Empêcher l'écran de bouger / scroller sur iPhone, iPhone SE et Android pendant le dessin
+    const preventScroll = (e) => {
+      if (e.target === canvas) {
+        e.preventDefault();
+      }
+    };
+
+    canvas.addEventListener("touchstart", preventScroll, { passive: false });
+    canvas.addEventListener("touchmove", preventScroll, { passive: false });
+    canvas.addEventListener("touchend", preventScroll, { passive: false });
+
+    return () => {
+      canvas.removeEventListener("touchstart", preventScroll);
+      canvas.removeEventListener("touchmove", preventScroll);
+      canvas.removeEventListener("touchend", preventScroll);
+    };
   }, []);
 
   const getEventCoordinates = (e) => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
-    
-    // Gestion des événements tactiles (Mobile / iPhone SE)
     if (e.touches && e.touches.length > 0) {
       return { 
         x: e.touches[0].clientX - rect.left, 
         y: e.touches[0].clientY - rect.top 
       };
     }
-    // Gestion souris (Desktop)
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   };
 
   const startDrawing = (e) => {
-    // Empêche le défilement de l'écran sur mobile
-    if (e.cancelable) e.preventDefault();
-    
     if (!contractRead) {
+      e.preventDefault();
       onAttemptWithoutReading();
       return;
     }
@@ -50,26 +60,19 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
     ctx.beginPath();
     ctx.moveTo(x, y);
     setIsDrawing(true);
-    setPenPos({ x, y });
-    setShowPen(true);
   };
 
   const draw = (e) => {
     if (!isDrawing) return;
-    // Empêche strictement l'écran de bouger pendant le tracé
-    if (e.cancelable) e.preventDefault();
-
     const { x, y } = getEventCoordinates(e);
     const ctx = canvasRef.current.getContext("2d");
     ctx.lineTo(x, y);
     ctx.stroke();
-    setPenPos({ x, y });
   };
 
   const stopDrawing = () => {
     if (!isDrawing) return;
     setIsDrawing(false);
-    setShowPen(false);
     const dataUrl = canvasRef.current.toDataURL("image/png");
     onSave(dataUrl);
   };
@@ -87,8 +90,6 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
       <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "bold", color: "#004f52", marginBottom: "5px" }}>
         Signature Électronique Obligatoire (Écran tactile ou Souris) :
       </label>
-      
-      {/* Container du pad avec propriété CSS pour couper le scroll natif mobile */}
       <div 
         onClick={() => { if(!contractRead) onAttemptWithoutReading(); }}
         style={{ 
@@ -97,20 +98,14 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
           background: contractRead ? "#f8fafc" : "#fef2f2", 
           overflow: "hidden", 
           position: "relative",
-          touchAction: "none" // Évite le comportement de pull-to-refresh et scroll sur iPhone/Android
+          touchAction: "none" // Bloque les gestes natifs du navigateur sur la zone
         }}
       >
         <canvas
           ref={canvasRef}
-          width={320}
-          height={140}
-          style={{ 
-            width: "100%", 
-            height: "140px", 
-            display: "block", 
-            cursor: contractRead ? "crosshair" : "not-allowed",
-            touchAction: "none"
-          }}
+          width={300}
+          height={130}
+          style={{ width: "100%", height: "130px", display: "block", cursor: contractRead ? "crosshair" : "not-allowed", touchAction: "none" }}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
@@ -119,25 +114,6 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
           onTouchMove={draw}
           onTouchEnd={stopDrawing}
         />
-
-        {/* STYLO BIC VIRTUEL INTERACTIF */}
-        {showPen && contractRead && (
-          <div 
-            style={{
-              position: "absolute",
-              left: `${penPos.x}px`,
-              top: `${penPos.y}px`,
-              pointerEvents: "none",
-              transform: "translate(-2px, -38px)", // Ajustement pour que la pointe écrive pile sur le tracé
-              transition: "none",
-              zIndex: 10,
-              fontSize: "1.8rem"
-            }}
-          >
-            🖋️
-          </div>
-        )}
-
         {!contractRead && (
           <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(254, 242, 242, 0.85)", color: "#b91c1c", fontSize: "0.75rem", fontWeight: "bold", padding: "10px", textAlign: "center" }}>
             ⚠️ Signature bloquée : Veuillez d'abord lire le contrat ci-dessus
@@ -147,7 +123,7 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
       <button 
         onClick={clearCanvas}
         disabled={!contractRead}
-        style={{ marginTop: "6px", background: contractRead ? "#ef4444" : "#cbd5e1", color: "#fff", border: "none", padding: "5px 12px", fontSize: "0.75rem", borderRadius: "4px", cursor: contractRead ? "pointer" : "not-allowed" }}
+        style={{ marginTop: "5px", background: contractRead ? "#ef4444" : "#cbd5e1", color: "#fff", border: "none", padding: "4px 10px", fontSize: "0.7rem", borderRadius: "4px", cursor: contractRead ? "pointer" : "not-allowed" }}
       >
         Effacer la signature
       </button>
@@ -361,7 +337,7 @@ export default function Produits({ isDesktop = false }) {
                   <span>CRÉDIT PARTICULIER ET AUTO</span>
                 </div>
                 <h2 style={{ fontSize: isDesktop ? "1.6rem" : "1.15rem", lineHeight: "1.3", margin: "10px 0" }}>Financez vos ambitions au meilleur taux du marché.</h2>
-                <p style={{ fontSize: isDesktop ? "1rem" : "0.8rem", lineHeight: "1.4" }}>Découvrez pourquoi BPER Banca reste le choix n°1 des emprunteurs cette année avec une gestion 100% flexible et transparente.</p>
+                <p style={{ fontSize: isDesktop ? "1rem" : "0.8rem", lineHeight: "1.4" }}>Découvrez why BPER Banca reste le choix n°1 des emprunteurs cette année avec une gestion 100% flexible et transparente.</p>
                 <button onClick={() => navigateToView("avantages")} className="btn-white" style={{ border: "none", cursor: "pointer", fontWeight: "bold", padding: "10px 16px", fontSize: "0.85rem", width: isDesktop ? "auto" : "100%" }}>
                   En savoir plus
                 </button>
@@ -660,7 +636,7 @@ export default function Produits({ isDesktop = false }) {
                     </span>
                   </p>
                   {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) && (
-                    <p style={{ margin: "6px 0 0 0", fontSize: "0.7rem", color: "#64748b" }}>
+                    <p style={{ margin: "6px 0 0 0", fontSize: "0.7 alum", color: "#64748b" }}>
                       Capital Principal Net Emprunté : {Math.max(0, loanData.amount - hypoContribution)} € (après déduction de l'apport)
                     </p>
                   )}
@@ -830,97 +806,82 @@ export default function Produits({ isDesktop = false }) {
         </div>
       )}
 
-      {/* MODALE PLEIN ÉCRAN OPTIMISÉE POUR SMARTPHONES, IPHONE SE ET DESKTOP (FEUILLE CONTINUE) */}
+      {/* MODALE CONTRAT OPTIMISÉE SANS COUPURE BLANCHE POUR TOUS MOBILES & SMARTPHONES */}
       {isContractModalOpen && (
         <div style={{ position: "fixed", inset: 0, backgroundColor: "#f1f5f9", zIndex: 9999, display: "flex", flexDirection: "column", boxSizing: "border-box", fontFamily: "'Times New Roman', Times, serif" }}>
           
-          {/* Header BPER permanent */}
-          <div style={{ background: "#004f52", padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", color: "#fff", flexShrink: 0 }}>
-            <span style={{ fontSize: "1.3rem", fontWeight: "bold", letterSpacing: "1px" }}>BPER: Banca</span>
-            <span style={{ fontSize: "0.75rem", opacity: 0.8, fontFamily: "sans-serif" }}>DOCUMENT NUMÉRIQUE RÉGLEMENTÉ</span>
+          {/* En-tête fixe supérieure */}
+          <div style={{ background: "#004f52", padding: "15px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", color: "#fff", flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{ fontSize: "1.4rem", fontWeight: "bold", letterSpacing: "1px" }}>BPER: Banca</span>
+            </div>
+            <span style={{ fontSize: "0.75rem", opacity: 0.8, fontFamily: "sans-serif" }}>RÉF: BPER-CONTRACT-2026</span>
           </div>
 
-          {/* Zone de Scroll de la feuille PDF */}
-          <div style={{ flex: 1, overflowY: "auto", padding: isDesktop ? "30px 40px" : "10px 8px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-            
-            {/* La feuille blanche A4 - Modifiée pour éviter les coupures sur les petits smartphones */}
+          {/* Zone défilante : Ajustement du conteneur pour éviter toute coupure */}
+          <div style={{ flex: 1, overflowY: "auto", padding: isDesktop ? "30px 40px" : "10px", display: "flex", flexDirection: "column", alignItems: "center" }}>
             <div style={{ 
               backgroundColor: "#fff", 
               width: "100%", 
               maxWidth: "800px", 
-              padding: isDesktop ? "50px" : "25px 15px", 
+              padding: isDesktop ? "50px" : "25px 20px", 
               boxShadow: "0 4px 15px rgba(0,0,0,0.1)", 
               borderRadius: "4px", 
               color: "#000", 
-              fontSize: isDesktop ? "0.95rem" : "0.85rem", 
-              lineHeight: "1.5", 
+              fontSize: "0.95rem", 
+              lineHeight: "1.6", 
               textAlign: "justify",
               boxSizing: "border-box",
-              minHeight: "100%", // Oblige la feuille à occuper tout le scroll sans s'arrêter au milieu
-              display: "block",
-              marginBottom: "20px" // Petit espace de respiration en bas de feuille
+              minHeight: "100%", // Force le fond blanc à s'étendre sur toute la hauteur du flux interne
+              marginBottom: "15px"
             }}>
               
-              <div style={{ textAlign: "center", marginBottom: "25px", borderBottom: "2px solid #004f52", paddingBottom: "15px" }}>
-                <h1 style={{ fontSize: isDesktop ? "1.6rem" : "1.2rem", color: "#004f52", margin: "0 0 5px 0", textTransform: "uppercase" }}>Offre Préalable de Crédit</h1>
-                <p style={{ margin: 0, fontStyle: "italic", color: "#475569", fontSize: "0.75rem", fontFamily: "sans-serif" }}>Contrat régi conformément aux directives bancaires européennes et au code de la consommation</p>
+              <div style={{ textAlign: "center", marginBottom: "30px", borderBottom: "2px solid #004f52", paddingBottom: "15px" }}>
+                <h1 style={{ fontSize: "1.5rem", color: "#004f52", margin: "0 0 5px 0", textTransform: "uppercase" }}>Offre Préalable de Crédit</h1>
+                <p style={{ margin: 0, fontStyle: "italic", color: "#475569", fontSize: "0.8rem", fontFamily: "sans-serif" }}>Contrat régi conformément aux directives bancaires européennes</p>
               </div>
 
-              <div style={{ background: "#f8fafc", padding: "12px", borderRadius: "6px", marginBottom: "20px", border: "1px solid #cbd5e1", fontFamily: "sans-serif", fontSize: "0.8rem" }}>
+              <div style={{ background: "#f8fafc", padding: "12px", borderRadius: "6px", marginBottom: "25px", border: "1px solid #cbd5e1", fontFamily: "sans-serif", fontSize: "0.85rem" }}>
                 <p style={{ margin: "3px 0" }}><strong>Organisme Prêteur :</strong> BPER Banca S.p.A. (Banca Popolare dell'Emilia Romagna)</p>
-                <p style={{ margin: "3px 0" }}><strong>Bénéficiaire de l'enveloppe :</strong> {loanData.civility} {loanData.lastName.toUpperCase()} {loanData.firstName}</p>
-                <p style={{ margin: "3px 0" }}><strong>Capacité Socio-Professionnelle :</strong> {loanData.profession}</p>
-                <p style={{ margin: "3px 0" }}><strong>Revenus Mensuels Justifiés :</strong> {loanData.income} EUR</p>
+                <p style={{ margin: "3px 0" }}><strong>Bénéficiaire :</strong> {loanData.civility} {loanData.lastName.toUpperCase()} {loanData.firstName}</p>
+                <p style={{ margin: "3px 0" }}><strong>Profession déclarée :</strong> {loanData.profession}</p>
+                <p style={{ margin: "3px 0" }}><strong>Revenus Mensuels :</strong> {loanData.income} EUR</p>
               </div>
 
-              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1rem", marginTop: "15px" }}>ARTICLE 1 : OBJET ET ASSIETTE DU FINANCEMENT</h3>
+              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 1 : OBJET ET ASSIETTE DU FINANCEMENT</h3>
               <p>Le présent engagement stipule que la <strong>BPER Banca</strong> consent au client mentionné ci-dessus, qui l'accepte formellement, un crédit d'un montant en capital de <strong>{loanData.amount} EUR</strong> au titre de l'offre <em>"{loanData.loanType}"</em>. Ce capital est exclusivement mis à disposition pour la réalisation du projet déclaré ou l'ajustement de trésorerie souscrit.</p>
 
-              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1rem", marginTop: "15px" }}>ARTICLE 2 : CONDITIONS DE REMBOURSEMENT ET AMORTISSEMENT</h3>
-              <p>L'emprunteur s'engage irrévocablement à rembourser l'intégralité du capital emprunté majoré des intérêts courus sur une durée ferme de <strong>{loanData.duration} mois</strong>. Le prélèvement s'exécutera à échéance constante fixe d'un montant brut de <strong>{loanData.monthlyPayment} EUR par mois</strong>. Le Taux Annuel Effectif Global (TAEG) appliqué est contractuellement fixé à 4,90% (sauf spécificité liée aux grilles de prêts d'acquisition immobilière).</p>
+              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 2 : CONDITIONS DE REMBOURSEMENT ET AMORTISSEMENT</h3>
+              <p>L'emprunteur s'engage irrévocablement à rembourser l'intégralité du capital emprunté majoré des intérêts courus sur une durée ferme de <strong>{loanData.duration} mois</strong>. Le prélèvement s'exécutera à échéance constante fixe d'un montant brut de <strong>{loanData.monthlyPayment} EUR par mois</strong>. Le Taux Annuel Effectif Global (TAEG) appliqué est contractuellement fixé à 4,90%.</p>
 
-              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1rem", marginTop: "15px" }}>ARTICLE 3 : EXIGIBILITÉ ET DÉCHÉANCE DU TERME</h3>
-              <p>Toute fausse déclaration concernant les justificatifs financiers ou tout défaut récurrent de paiement des mensualités dues entraînera de plein droit l'exigibilité immédiate des sommes restant dues. La banque BPER Banca se réservera le droit d'appliquer une indemnité forfaitaire égale à 8% du capital restant dû, en sus des intérêts de retard légaux en vigueur.</p>
+              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 3 : EXIGIBILITÉ ET DÉCHÉANCE DU TERME</h3>
+              <p>Toute fausse déclaration concernant les justificatifs financiers ou tout défaut récurrent de paiement des mensualités dues entraînera de plein droit l'exigibilité immédiate des sommes restant dues. La banque BPER Banca se réservera le droit d'appliquer une indemnité forfaitaire égale à 8% du capital restant dû.</p>
 
-              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1rem", marginTop: "15px" }}>ARTICLE 4 : DROIT DE RÉTRACTATION</h3>
-              <p>Conformément à la législation sur le crédit à la consommation, l'emprunteur dispose d'un délai légal de rétractation de 14 jours calendaires révolus à compter de la date de signature de la présente offre en ligne pour renoncer à son engagement par lettre recommandée avec accusé de réception.</p>
+              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 4 : DROIT DE RÉTRACTATION</h3>
+              <p>Conformément à la législation sur le crédit, l'emprunteur dispose d'un délai légal de rétractation de 14 jours calendaires révolus à compter de la date de signature de la présente offre en ligne pour renoncer à son engagement par lettre recommandée avec accusé de réception.</p>
 
-              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1rem", marginTop: "15px" }}>ARTICLE 5 : CONSENTEMENT ET PREUVE ÉLECTRONIQUE</h3>
+              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 5 : CONSENTEMENT ET PREUVE ÉLECTRONIQUE</h3>
               <p>Les parties s'entendent expressément pour conférer au procédé technique de signature électronique utilisé sur la présente plateforme internet la même valeur juridique qu'une signature manuscrite sur support papier. Le clic sur le bouton de clôture vaut validation intégrale de l'ensemble des clauses précitées.</p>
 
-              <div style={{ marginTop: "40px", borderTop: "1px solid #000", paddingTop: "10px", display: "flex", flexDirection: isDesktop ? "row" : "column", gap: "10px", fontSize: "0.75rem", fontStyle: "italic" }}>
-                <span>Mention obligatoire : "Bon pour acceptation de l'offre préalable de crédit"</span>
-                <span style={{ marginLeft: isDesktop ? "auto" : "0" }}>Émis électroniquement par BPER Banca S.p.A.</span>
+              <div style={{ marginTop: "40px", borderTop: "1px solid #000", paddingTop: "10px", display: "flex", flexWrap: "wrap", justifyContent: "space-between", fontSize: "0.8rem", fontStyle: "italic" }}>
+                <span>Mention : "Bon pour acceptation de l'offre de crédit"</span>
+                <span>Émis par BPER Banca S.p.A.</span>
               </div>
             </div>
-
           </div>
 
-          {/* Pied de page fixe contenant le bouton OK impératif */}
-          <div style={{ background: "#fff", padding: "12px 15px", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "center", flexShrink: 0 }}>
+          {/* Pied de page fixe contenant obligatoirement le bouton OK */}
+          <div style={{ background: "#fff", padding: "15px 20px", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "center", flexShrink: 0 }}>
             <button
               type="button"
               onClick={() => {
                 setHasReadContract(true);
                 setIsContractModalOpen(false);
-                // Petit défilement fluide automatique vers la zone de signature
-                setTimeout(() => window.scrollTo({ top: 400, behavior: "smooth" }), 100);
+                window.scrollTo({ top: 120, behavior: "smooth" });
               }}
-              style={{ 
-                width: isDesktop ? "auto" : "100%",
-                maxWidth: "400px",
-                padding: "14px 35px", 
-                backgroundColor: "#004f52", 
-                color: "#fff", 
-                border: "none", 
-                borderRadius: "8px", 
-                fontWeight: "bold", 
-                fontSize: "0.95rem", 
-                cursor: "pointer", 
-                boxShadow: "0 4px 10px rgba(0,80,82,0.25)" 
-              }}
+              style={{ width: isDesktop ? "auto" : "100%", padding: "12px 50px", backgroundColor: "#004f52", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "bold", fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 6px rgba(0,80,82,0.2)" }}
             >
-              ✔️ OK — Revenir et valider la lecture
+              ✔️ J'ai lu le contrat - Cliquer sur OK pour valider
             </button>
           </div>
 
