@@ -273,15 +273,14 @@ router.get("/loans/pending", auth, role("ADMIN"), async (req, res) => {
   }
 });
 
-// 🔥 ROUTE ADMIN 2 : Décision sur une demande de prêt (APPROVED / REJECTED)
+// 🔥 ROUTE ADMIN 2 : Décision et envoi automatique du contrat signé
 router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
   try {
-    const { decision, message } = req.body; // decision: 'APPROVED' ou 'REJECTED'
+    const { decision, message } = req.body; 
     
     const loan = await LoanRequest.findById(req.params.loanId).populate("user");
     if (!loan) return res.status(404).json({ message: "Demande de prêt introuvable" });
 
-    // Configuration de ton transporteur Zoho existant
     const transporter = nodemailer.createTransport({
       host: "smtp.zoho.com",
       port: 587,
@@ -294,29 +293,52 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
 
     let emailSubject = "";
     let emailHtml = "";
+    let emailAttachments = [];
 
     if (decision === "APPROVED") {
       loan.status = "APPROVED";
       emailSubject = "Félicitations ! Votre demande de financement est approuvée - BPER Banca";
+      
+      // Contrat final incluant la signature électronique
       emailHtml = `
         <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; border: 1px solid #e2e8f0; padding: 25px; color: #334155;">
           <h2 style="color: #005a64; margin-top: 0;">BPER: <span style="font-weight: normal;">Banca</span></h2>
           <div style="border-bottom: 2px solid #005a64; margin-bottom: 20px;"></div>
-          <p>Cher(e) client(e),</p>
-          <p>Nous avons le plaisir de vous informer que votre demande de <strong>${loan.loanType}</strong> d'un montant de <strong>${loan.amount} €</strong> a été <strong>acceptée</strong> par notre comité des engagements.</p>
+          <p>Cher(e) client(e) <strong>${loan.firstName} ${loan.lastName}</strong>,</p>
+          <p>Nous avons le plaisir de vous informer que votre demande de <strong>${loan.loanType}</strong> d'un montant de <strong>${loan.amount} €</strong> a été <strong>approuvée et les fonds ont été débloqués</strong>.</p>
+          
           <div style="background-color: #f0fdf4; padding: 15px; border-left: 5px solid #059669; margin: 20px 0;">
-            <p style="margin: 0; color: #166534; font-weight: bold;">Détails du financement :</p>
+            <p style="margin: 0; color: #166534; font-weight: bold;">Détails de votre exemplaire de contrat :</p>
             <ul style="margin: 5px 0 0 0; padding-left: 20px;">
               <li>Montant accordé : ${loan.amount} €</li>
-              <li>Durée de remboursement : ${loan.duration} mois</li>
-              <li>Mensualité contractuelle : ${loan.monthlyPayment} € / mois</li>
+              <li>Durée d'échéance : ${loan.duration} mois</li>
+              <li>Mensualité prélevée : ${loan.monthlyPayment} € / mois</li>
             </ul>
           </div>
-          <p>Les fonds seront crédités immédiatement sur votre compte courant BPER.</p>
-          <br/>
-          <p style="font-size: 13px; color: #64748b;">Cordialement,<br/><strong>Service des Engagements Crédits - BPER Banca</strong></p>
+          
+          <p>Vous trouverez ci-joint votre contrat officiel revêtu de votre signature numérique certifiée.</p>
+          <div style="border: 1px dashed #cbd5e1; padding: 10px; background: #f8fafc; font-family: monospace; font-size: 11px; margin-top: 15px;">
+             ${loan.contractBody ? loan.contractBody.replace(/\n/g, "<br/>") : ""}
+          </div>
+
+          <p style="margin-top: 15px;"><strong>Votre Signature Électronique enregistrée :</strong></p>
+          <img src="cid:userSignatureImage" alt="Signature Client" style={{ border: "1px solid #cbd5e1", background: "#fff", width: "180px" }} />
+
+          <br/><br/>
+          <p style="font-size: 13px; color: #64748b;">Cordialement,<br/><strong>Direction Générale des Engagements - BPER Banca</strong></p>
         </div>
       `;
+
+      // Conversion de la signature Base64 en fichier joint CID embarqué
+      if (loan.signatureData && loan.signatureData.includes("base64,")) {
+        const base64Data = loan.signatureData.split("base64,")[1];
+        emailAttachments.push({
+          filename: `Contrat_Signe_${loan.lastName}.png`,
+          content: Buffer.from(base64Data, "base64"),
+          cid: "userSignatureImage" // Lié à la balise img src="cid:userSignatureImage"
+        });
+      }
+
     } else if (decision === "REJECTED") {
       loan.status = "REJECTED";
       emailSubject = "Mise à jour concernant votre demande de crédit - BPER Banca";
@@ -342,7 +364,8 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
       from: `"BPER Banca - Service Crédits" <${process.env.MAIL_USER}>`,
       to: loan.user.email,
       subject: emailSubject,
-      html: emailHtml
+      html: emailHtml,
+      attachments: emailAttachments
     });
 
     res.json({ message: `La demande a été traitée avec succès (${decision}) et l'e-mail a été envoyé.` });

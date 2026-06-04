@@ -1,12 +1,107 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useOutletContext } from "react-router-dom"; 
 import "../styles/produits.css";
+
+// --- SOUS-COMPOSANT DE SIGNATURE RESPONSIVE IPHONE SE & PC ---
+function BperSignaturePad({ onSave, onClear }) {
+  const canvasRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    ctx.strokeStyle = "#004f52";
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+  }, []);
+
+  const getEventCoordinates = (e) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    
+    if (e.touches && e.touches.length > 0) {
+      return {
+        x: e.touches[0].clientX - rect.left,
+        y: e.touches[0].clientY - rect.top
+      };
+    }
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  };
+
+  const startDrawing = (e) => {
+    e.preventDefault();
+    const { x, y } = getEventCoordinates(e);
+    const ctx = canvasRef.current.getContext("2d");
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    setIsDrawing(true);
+  };
+
+  const draw = (e) => {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const { x, y } = getEventCoordinates(e);
+    const ctx = canvasRef.current.getContext("2d");
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  const stopDrawing = () => {
+    if (!isDrawing) return;
+    setIsDrawing(false);
+    const dataUrl = canvasRef.current.toDataURL("image/png");
+    onSave(dataUrl);
+  };
+
+  const clearCanvas = (e) => {
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    onClear();
+  };
+
+  return (
+    <div style={{ marginTop: "15px" }}>
+      <label style={{ display: "block", fontSize: "0.8rem", fontWeight: "bold", color: "#004f52", marginBottom: "5px" }}>
+        Signature Électronique Obligatoire (Écran tactile ou Souris) :
+      </label>
+      <div style={{ border: "2px dashed #004f52", borderRadius: "8px", background: "#f8fafc", overflow: "hidden" }}>
+        <canvas
+          ref={canvasRef}
+          width={300}
+          height={130}
+          style={{ width: "100%", height: "130px", display: "block", cursor: "crosshair" }}
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseLeave={stopDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+        />
+      </div>
+      <button 
+        onClick={clearCanvas}
+        style={{ marginTop: "5px", background: "#ef4444", color: "#fff", border: "none", padding: "4px 10px", fontSize: "0.7rem", borderRadius: "4px", cursor: "pointer" }}
+      >
+        Effacer la signature
+      </button>
+    </div>
+  );
+}
 
 export default function Produits({ isDesktop = false }) {
   const { setForceHideNav } = useOutletContext() || {};
 
   const [currentView, setCurrentView] = useState("offres"); 
   const [loanStep, setLoanStep] = useState(1);
+  const [signatureBase64, setSignatureBase64] = useState("");
 
   const [loanData, setLoanData] = useState({
     loanType: "Prêt Personnel Multi-Projets",
@@ -23,22 +118,19 @@ export default function Produits({ isDesktop = false }) {
     hasCoBorrower: "Non"
   });
 
-  // --- PARAMÈTRES DU TABLEAU D'AMORTISSEMENT PROFESSIONNEL INTERACTIF (VUE 1) ---
   const [interactiveAmount, setInteractiveAmount] = useState(200000);
   const [interactiveYears, setInteractiveYears] = useState(20);
-  const [interactiveRateType, setInteractiveRateType] = useState("FIXE"); // FIXE = 4.25% | VARIABLE = 4.55%
+  const [interactiveRateType, setInteractiveRateType] = useState("FIXE");
   const [amortizationSchedule, setAmortizationSchedule] = useState([]);
   const [summaryMetrics, setSummaryMetrics] = useState({ monthlyBox: 0, totalInterest: 0, insuranceBox: 0, totalInsurance: 0 });
 
-  // --- LOGIQUE INTERNE POUR LE TUNNEL DE DEMANDE (VUE 3) ---
   const [hypoRateType, setHypoRateType] = useState("FIXE"); 
   const [hypoContribution, setHypoContribution] = useState(0); 
 
-  // Moteur de calcul financier réglementaire (Tableau d'Amortissement Interactif - Vue 1)
   useEffect(() => {
     const principal = parseFloat(interactiveAmount) || 0;
     const months = (parseInt(interactiveYears) || 1) * 12;
-    const annualRate = interactiveRateType === "FIXE" ? 0.0425 : 0.0455; // Taux BPER Banca
+    const annualRate = interactiveRateType === "FIXE" ? 0.0425 : 0.0455;
     const monthlyRate = annualRate / 12;
     
     let monthlyPAndI = 0;
@@ -46,7 +138,6 @@ export default function Produits({ isDesktop = false }) {
       monthlyPAndI = (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
     }
 
-    // Calcul de l'assurance Décès/Incapacité révisé à 0,60% ANNUEL
     const annualInsuranceCost = principal * 0.0060;
     const insuranceM = Math.round(annualInsuranceCost / 12); 
     const totalInsuranceCost = insuranceM * months;
@@ -54,8 +145,6 @@ export default function Produits({ isDesktop = false }) {
     let remainingPrincipal = principal;
     const schedule = [];
     let accumulatedInterest = 0;
-
-    // Affichage des 12 premières mensualités (Aperçu d'encours standard)
     const limitDisplay = Math.min(months, 12);
 
     for (let i = 1; i <= months; i++) {
@@ -85,14 +174,12 @@ export default function Produits({ isDesktop = false }) {
     });
   }, [interactiveAmount, interactiveYears, interactiveRateType]);
 
-  // Logique de calcul pour le tunnel de demande (Vue 3)
   const handleSimulation = (amount, duration, typeOfLoan = loanData.loanType, rateType = hypoRateType, contribution = hypoContribution) => {
     const parsedAmount = parseFloat(amount) || 0;
     const parsedDuration = parseInt(duration) || 12;
     const parsedContribution = parseFloat(contribution) || 0;
 
     let rate = 0.049; 
-
     if (typeOfLoan.includes("Immobilier") || typeOfLoan.includes("Hypothécaire")) {
       rate = rateType === "FIXE" ? 0.0425 : 0.0455; 
     }
@@ -121,7 +208,6 @@ export default function Produits({ isDesktop = false }) {
     }
   }, [hypoRateType, hypoContribution]);
 
-  // Récupération Atlas User Data
   useEffect(() => {
     const loadRealUserData = async () => {
       try {
@@ -165,7 +251,6 @@ export default function Produits({ isDesktop = false }) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Style partagé pour éviter que les inputs et sélecteurs ne se coupent graphiquement
   const responsiveInputStyle = {
     width: "100%",
     boxSizing: "border-box",
@@ -215,7 +300,6 @@ export default function Produits({ isDesktop = false }) {
             </div>
           </div>
 
-          {/* --- SECTION TABLEAU D'AMORTISSEMENT PROFESSIONNEL RE-PARAMÉTRÉ (0.60% ASSURANCE) --- */}
           <div style={{ background: "#fff", padding: isDesktop ? "30px" : "12px", borderRadius: "18px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)", marginBottom: "20px", border: "1px solid #e2e8f0" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "15px" }}>
               <div style={{ background: "#004f52", color: "#fff", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -227,7 +311,6 @@ export default function Produits({ isDesktop = false }) {
               </div>
             </div>
 
-            {/* Inputs de contrôle du Tableau */}
             <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "15px", background: "#f8fafc", padding: isDesktop ? "20px" : "12px", borderRadius: "12px" }}>
               <div>
                 <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "600", color: "#475569", marginBottom: "4px" }}>Capital Emprunté (€)</label>
@@ -268,7 +351,6 @@ export default function Produits({ isDesktop = false }) {
               </div>
             </div>
 
-            {/* Fiche de Synthèse d'Amortissement */}
             <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(4, 1fr)" : "repeat(2, 1fr)", gap: "8px", marginBottom: "20px" }}>
               <div style={{ padding: "10px 8px", background: "#f0f7f7", borderRadius: "10px", borderLeft: "3px solid #004f52" }}>
                 <span style={{ fontSize: "0.65rem", color: "#64748b", display: "block" }}>Mensualité (Hors Ass.)</span>
@@ -288,7 +370,6 @@ export default function Produits({ isDesktop = false }) {
               </div>
             </div>
 
-            {/* Structure du Vrais Tableau */}
             <div style={{ overflowX: "auto", width: "100%", maxHeight: "300px", border: "1px solid #e2e8f0", borderRadius: "10px" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.8rem", minWidth: "580px" }}>
                 <thead style={{ position: "sticky", top: 0, background: "#f8fafc", zIndex: 1 }}>
@@ -343,7 +424,6 @@ export default function Produits({ isDesktop = false }) {
               </button>
             </div>
           </div>
-          {/* --------------------------------------------------------------------------------------------------------- */}
 
           <div className="account-card" style={{ background: "#fff", padding: "15px", borderRadius: "16px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -402,11 +482,10 @@ export default function Produits({ isDesktop = false }) {
       {/* VUE 3 : TUNNEL SIMULATEUR */}
       {currentView === "simulateur" && (
         <div className="bper-loan-container" style={{ padding: 0 }}>
-          
           <div className="bper-loan-steps" style={{ gap: "4px", marginBottom: "15px" }}>
             <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 1 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 1 ? "3px solid #004f52" : "none" }}>1. CONFIGURATION</div>
             <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 2 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 2 ? "3px solid #004f52" : "none" }}>2. INFORMATIONS</div>
-            <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 3 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 3 ? "3px solid #004f52" : "none" }}>3. VÉRIFICATION</div>
+            <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 3 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 3 ? "3px solid #004f52" : "none" }}>3. CONTRAT & SIGNATURE</div>
           </div>
 
           <div className="bper-loan-card" style={{ background: "#fff", padding: isDesktop ? "30px 20px" : "15px 12px", borderRadius: "16px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", boxSizing: "border-box" }}>
@@ -437,7 +516,6 @@ export default function Produits({ isDesktop = false }) {
                   </select>
                 </div>
 
-                {/* LOGIQUE D'OPTIONS HYPOTHÉCAIRES */}
                 {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) && (
                   <div style={{ display: "flex", flexDirection: "column", gap: "15px", marginBottom: "15px" }}>
                     <div>
@@ -587,23 +665,35 @@ export default function Produits({ isDesktop = false }) {
               </div>
             )}
 
-            {/* ÉTAPE 3 */}
+            {/* ÉTAPE 3 : EDITEUR DE CONTRAT ET SIGNATURE AUTOMATIQUE */}
             {loanStep === 3 && (
               <div>
+                <div style={{ maxHeight: "200px", overflowY: "scroll", border: "1px solid #cbd5e1", padding: "10px", borderRadius: "8px", fontSize: "0.75rem", background: "#fff", color: "#334155", fontFamily: "monospace", marginBottom: "15px" }}>
+                  <p style={{ textAlign: "center", fontWeight: "bold", margin: "0 0 10px 0" }}>CONTRAT DE CRÉDIT RÉGLEMENTÉ — BPER BANCA</p>
+                  <p><strong>Identité de l'emprunteur :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName}</p>
+                  <p><strong>Montant du financement accordé :</strong> {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) ? Math.max(0, loanData.amount - hypoContribution) : loanData.amount} EUR</p>
+                  <p><strong>Type de Prêt souscrit :</strong> {loanData.loanType}</p>
+                  <p><strong>Durée d'amortissement :</strong> {loanData.duration} mois</p>
+                  <p><strong>Mensualité globale estimée :</strong> {loanData.monthlyPayment} EUR / mois</p>
+                  <p>Le soussigné certifie exactes les déclarations de revenus s'élevant à {loanData.income} EUR. En signant électroniquement ce document, le client accepte l'intégralité des conditions générales et s'engage à rembourser le capital emprunté majoré des intérêts au TAEG contractuel en vigueur.</p>
+                </div>
+
                 <div className="bper-summary-box" style={{ padding: "12px", borderRadius: "10px", background: "#f8fafc", border: "1px solid #e2e8f0" }}>
                   <h4 style={{ margin: "0 0 10px 0", color: "#004f52", fontSize: "0.9rem" }}>Validation contractuelle du dossier</h4>
                   <p style={{ margin: "4px 0", fontSize: "0.8rem" }}><strong>Nature du projet :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.loanType}</span></p>
-                  <p style={{ margin: "4px 0", fontSize: "0.8rem" }}><strong>Titulaire :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName} <span style={{ fontSize: "0.75rem", color: "#64748b" }}>{loanData.profession ? `(${loanData.profession})` : ""}</span></p>
+                  <p style={{ margin: "4px 0", fontSize: "0.8rem" }}><strong>Titulaire :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName}</p>
                   <p style={{ margin: "4px 0", fontSize: "0.8rem" }}><strong>E-mail :</strong> <span style={{ color: "#004f52" }}>{loanData.email}</span></p>
                   <p style={{ margin: "4px 0", fontSize: "0.8rem" }}><strong>Téléphone :</strong> <span style={{ color: "#004f52" }}>{loanData.telephone}</span></p>
-                  <hr style={{ border: "none", borderTop: "1px solid #e2e8f0", margin: "10px 0" }} />
-                  <p style={{ margin: "4px 0", fontSize: "0.8rem" }}><strong>Capital emprunté :</strong> {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) ? Math.max(0, loanData.amount - hypoContribution) : loanData.amount} € sur {loanData.duration} mois</p>
-                  <p style={{ margin: "4px 0", fontSize: "0.8rem" }}><strong>Charge mensuelle :</strong> {loanData.monthlyPayment} € / mois</p>
-                  <p style={{ margin: "4px 0", fontSize: "0.8rem" }}><strong>Capacité déclarée :</strong> {loanData.income} € net / mois</p>
                 </div>
 
+                {/* Insertion du module de dessin tactile */}
+                <BperSignaturePad 
+                  onSave={(base64) => setSignatureBase64(base64)} 
+                  onClear={() => setSignatureBase64("")} 
+                />
+
                 <p className="bper-legal-text" style={{ fontSize: "0.75rem", color: "#64748b", marginBottom: "20px", marginTop: "15px", lineHeight: "1.4" }}>
-                  En transmettant ce dossier, vous soumettez formellement votre demande de crédit au service d'analyse des risques et de conformité monétique de <strong>BPER Banca</strong>. Les fonds seront débloqués après validation administrative sous un délai réglementaire de 48h. Une notification de décision sera envoyée à l'adresse e-mail ci-dessus.
+                  En transmettant ce dossier dûment signé, vous soumettez formellement votre demande de crédit au service d'analyse des risques de <strong>BPER Banca</strong>. Les fonds seront débloqués après validation administrative sous un délai réglementaire de 48h.
                 </p>
 
                 <div className="bper-actions-wrapper" style={{ display: "flex", gap: "10px" }}>
@@ -612,12 +702,14 @@ export default function Produits({ isDesktop = false }) {
                   </button>
                   <button 
                     className="btn-bper-submit" 
-                    style={{ flex: 1, height: "42px", fontSize: "0.85rem", background: "#059669", color: "#fff" }}
+                    style={{ flex: 1, height: "42px", fontSize: "0.85rem", background: signatureBase64 ? "#059669" : "#94a3b8", color: "#fff", cursor: signatureBase64 ? "pointer" : "not-allowed" }}
+                    disabled={!signatureBase64}
                     onClick={async () => {
                       try {
                         const finalPayload = {
                           ...loanData,
-                          amount: (loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) ? Math.max(0, loanData.amount - hypoContribution) : loanData.amount
+                          amount: (loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) ? Math.max(0, loanData.amount - hypoContribution) : loanData.amount,
+                          signatureData: signatureBase64 // Injection automatique de la signature
                         };
 
                         const response = await fetch("/api/auth/apply-loan", {
@@ -632,9 +724,10 @@ export default function Produits({ isDesktop = false }) {
                         const resData = await response.json();
 
                         if (response.ok) {
-                          alert(resData.message || "Demande envoyée avec succès !");
+                          alert(resData.message || "Contrat signé et envoyé avec succès !");
                           navigateToView("offres");
                           setLoanStep(1);
+                          setSignatureBase64("");
                         } else {
                           alert(resData.message || "Une erreur est survenue lors de l'envoi.");
                         }
@@ -644,7 +737,7 @@ export default function Produits({ isDesktop = false }) {
                       }
                     }}
                   >
-                    Valider
+                    Valider & Signer le Contrat
                   </button>
                 </div>
               </div>

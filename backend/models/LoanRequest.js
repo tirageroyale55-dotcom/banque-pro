@@ -13,11 +13,8 @@ const LoanRequestSchema = new mongoose.Schema({
   civility: { type: String, required: true },
   lastName: { type: String, required: true },
   firstName: { type: String, required: true },
-  
-  // 🔥 AJOUT : Ces deux champs doivent être stockés ici pour l'envoi de mail plus tard
   email: { type: String, required: true },
   telephone: { type: String, required: true },
-
   income: { type: Number, required: true },
   profession: { type: String, required: true },
   hasCoBorrower: { type: String, required: true },
@@ -26,6 +23,13 @@ const LoanRequestSchema = new mongoose.Schema({
     enum: ["PENDING", "APPROVED", "REJECTED"], 
     default: "PENDING" 
   },
+  
+  // Gestion du Contrat et de la Signature Électronique
+  contractBody: { type: String }, // Contrat au format texte juridique
+  signatureData: { type: String }, // Image de la signature au format Base64 PNG
+  isSignedByClient: { type: Boolean, default: false }, // Signature obligatoire du client
+  signedAt: { type: Date },
+
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

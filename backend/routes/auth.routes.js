@@ -86,16 +86,13 @@ router.post("/reset-password", resetPassword);
 
 
 
-// ========================================================
-// ✅ ROUTE AVEC VÉRIFICATION DE DEMANDE UNIQUE EN COURS
-// ========================================================
+// ✅ ROUTE AVEC ENGAGEMENT ET SIGNATURE CONTRACTUELLE DIRECTE
 router.post("/apply-loan", auth, async (req, res) => {
   try {
     if (!req.user || !req.user.id) {
       return res.status(401).json({ message: "Action non autorisée. Client non identifié." });
     }
 
-    // 🛑 ÉTAPE CRUCIALE : VÉRIFIER SI UNE DEMANDE EST DÉJÀ EN COURS (PENDING)
     const existingLoan = await LoanRequest.findOne({ 
       user: req.user.id, 
       status: "PENDING" 
@@ -103,11 +100,10 @@ router.post("/apply-loan", auth, async (req, res) => {
 
     if (existingLoan) {
       return res.status(400).json({ 
-        message: "Vous avez déjà une demande de prêt en cours d'analyse. Veuillez attendre la décision de nos analystes avant de soumettre un nouveau dossier." 
+        message: "Vous avez déjà une demande de prêt en cours d'analyse. Veuillez attendre la décision de nos analystes." 
       });
     }
 
-    // Si aucune demande en cours, on récupère l'utilisateur pour le dossier
     const dbUser = await User.findById(req.user.id);
     if (!dbUser) {
       return res.status(404).json({ message: "Utilisateur introuvable dans la base de données." });
@@ -115,10 +111,38 @@ router.post("/apply-loan", auth, async (req, res) => {
 
     const { 
       loanType, amount, duration, monthlyPayment, 
-      civility, lastName, firstName, income, profession, hasCoBorrower 
+      civility, lastName, firstName, income, profession, hasCoBorrower, signatureData 
     } = req.body;
 
-    // Création de la demande unique
+    if (!signatureData) {
+      return res.status(400).json({ message: "La signature du contrat de crédit est obligatoire avant soumission." });
+    }
+
+    // Génération du texte juridique formel BPER BANCA
+    const contractText = `
+      CONTRAT DE CRÉDIT PAR PARTICULIER - FORMULAIRE RÉGLEMENTÉ BPER BANCA
+      ---------------------------------------------------------------------
+      Réf Titre : BPER-${Math.floor(100000 + Math.random() * 900000)}
+      Date de génération : ${new Date().toLocaleDateString("fr-FR")}
+      
+      ENTRE LES SOUSSIGNÉS :
+      BPER Banca S.p.A., agissant en qualité d'organisme prêteur,
+      ET le Client ci-après désigné :
+      Nom / Prénom : ${civility} ${lastName || dbUser.nom} ${firstName || dbUser.prenom}
+      Activité Professionnelle : ${profession || dbUser.situationProfessionnelle}
+      Revenus Déclarés : ${income} EUR / mois
+      
+      CARACTÉRISTIQUES DU FINANCEMENT :
+      - Type de prêt : ${loanType}
+      - Capital Emprunté : ${amount} EUR
+      - Durée d'amortissement globale : ${duration} mois
+      - Mensualité constante de remboursement : ${monthlyPayment} EUR / mois (Hors assurance optionnelle)
+      
+      DISPOSITIONS LÉGALES ET SIGNATURE :
+      L'emprunteur reconnaît que l'exécution complète des obligations contractuelles découle de la validation finale du dossier par le service des risques de la banque.
+      Fait en ligne par consentement numérique certifié.
+    `;
+
     const newLoanRequest = new LoanRequest({
       user: req.user.id,
       loanType,
@@ -133,53 +157,43 @@ router.post("/apply-loan", auth, async (req, res) => {
       income: Number(income),
       profession: profession || dbUser.situationProfessionnelle, 
       hasCoBorrower,
-      status: "PENDING"
+      status: "PENDING",
+      
+      // Affectation des éléments de preuve électronique
+      contractBody: contractText,
+      signatureData: signatureData,
+      isSignedByClient: true,
+      signedAt: new Date()
     });
 
     await newLoanRequest.save();
 
     return res.status(201).json({ 
-      message: "Votre demande de prêt a été transmise avec succès aux analystes BPER Banca." 
+      message: "Votre contrat a été signé électroniquement et transmis avec succès aux analystes BPER Banca." 
     });
 
   } catch (err) {
-    console.error("Erreur lors de la soumission du prêt :", err);
-    return res.status(500).json({ 
-      message: "Erreur interne lors du traitement de votre dossier.",
-      details: err.message
-    });
+    console.error("Erreur soumission prêt :", err);
+    return res.status(500).json({ message: "Erreur interne lors du traitement de votre dossier." });
   }
 });
 
-
-
-
-
 router.get("/me", auth, async (req, res) => {
   try {
-    // On cherche l'utilisateur dans Atlas via son ID décodé par le middleware 'auth'
     const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ message: "Utilisateur non trouvé" });
-    }
-    // On renvoie tout l'objet utilisateur (qui contient email et telephone)
+    if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
     return res.json(user);
   } catch (err) {
-    console.error(err);
     return res.status(500).json({ message: "Erreur serveur" });
   }
 });
 
-
-
-// 🔥 ROUTE CLIENT : Récupérer l'historique des demandes de prêt de l'utilisateur connecté
 router.get("/my-loans", auth, async (req, res) => {
   try {
     const myLoans = await LoanRequest.find({ user: req.user._id }).sort({ createdAt: -1 });
     res.json(myLoans);
   } catch (err) {
-    console.error("Erreur récupération prêts client:", err);
-    res.status(500).json({ message: "Erreur lors du chargement de votre historique de crédit" });
+    res.status(500).json({ message: "Erreur lors du chargement de votre historique" });
   }
 });
 
