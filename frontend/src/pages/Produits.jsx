@@ -2,11 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { useOutletContext } from "react-router-dom"; 
 import "../styles/produits.css";
 
-// --- COMPOSANT DE SIGNATURE RESPONSIVE (AVEC CURSEUR STYLO BIC & ÉCRAN FIXE) ---
+// --- COMPOSANT DE SIGNATURE RESPONSIVE (AVEC CURSEUR STYLO BIC RÉEL) ---
 function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReading }) {
   const canvasRef = useRef(null);
+  const containerRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  // Stockage de la position pour afficher le stylo Bic au bon endroit
+  
+  // Stockage de la position exacte du stylo Bic
   const [penPos, setPenPos] = useState({ x: 0, y: 0 });
   const [showPen, setShowPen] = useState(false);
 
@@ -15,7 +17,7 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     
-    // Configuration du tracé (Effet encre Bic bleue institutionnelle)
+    // Configuration du tracé (Encre bleue Bic)
     ctx.strokeStyle = "#002f34"; 
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
@@ -38,7 +40,27 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
     };
   }, []);
 
-  const getEventCoordinates = (e) => {
+  // Calcul exact des coordonnées par rapport au conteneur de la zone de dessin
+  const updatePenPosition = (e) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    
+    let clientX, clientY;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    setPenPos({
+      x: clientX - rect.left,
+      y: clientY - rect.top
+    });
+  };
+
+  const getCanvasCoordinates = (e) => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
@@ -57,22 +79,24 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
       onAttemptWithoutReading();
       return;
     }
-    const { x, y } = getEventCoordinates(e);
+    const { x, y } = getCanvasCoordinates(e);
     const ctx = canvasRef.current.getContext("2d");
     ctx.beginPath();
     ctx.moveTo(x, y);
     setIsDrawing(true);
-    setPenPos({ x, y });
+    
+    updatePenPosition(e);
     setShowPen(true);
   };
 
   const draw = (e) => {
     if (!isDrawing) return;
-    const { x, y } = getEventCoordinates(e);
+    const { x, y } = getCanvasCoordinates(e);
     const ctx = canvasRef.current.getContext("2d");
     ctx.lineTo(x, y);
     ctx.stroke();
-    setPenPos({ x, y });
+    
+    updatePenPosition(e);
   };
 
   const stopDrawing = () => {
@@ -97,6 +121,7 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
         Signature Électronique Obligatoire (Écran tactile ou Souris) :
       </label>
       <div 
+        ref={containerRef}
         onClick={() => { if(!contractRead) onAttemptWithoutReading(); }}
         style={{ 
           border: contractRead ? "2px dashed #004f52" : "2px dashed #dc2626", 
@@ -121,22 +146,27 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
           onTouchEnd={stopDrawing}
         />
         
-        {/* LE STYLO BIC QUI S'AFFICHE AU MOMENT OU L'ON SIGNE */}
+        {/* LE STYLO BIC BLEU EN SVG VECTORIEL INDESTRUCTIBLE */}
         {showPen && (
-          <img 
-            src="https://i.imgur.com/vHwWofF.png" 
-            alt="Bic"
+          <div
             style={{
               position: "absolute",
               left: `${penPos.x}px`,
-              top: `${penPos.y - 45}px`, // Ajustement pour que la pointe écrive pile sur le doigt/curseur
-              width: "45px",
-              height: "45px",
+              top: `${penPos.y}px`,
+              transform: "translate(-4px, -36px) rotate(-15deg)", // Aligne la pointe du Bic pile sur le tracé
               pointerEvents: "none",
-              zIndex: 50,
-              transform: "rotate(-15deg)"
+              zIndex: 999
             }}
-          />
+          >
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Corps du stylo Bic Cristal */}
+              <path d="M19 3L21 5L10 16L7 17L8 14L19 3Z" fill="#1e40af" stroke="#ffffff" strokeWidth="1" />
+              {/* Capuchon ou pointe encre bleue */}
+              <path d="M7 17L4 20L3 21L4 19L7 17Z" fill="#002f34" />
+              {/* Détail de la mine */}
+              <circle cx="3" cy="21" r="1.5" fill="#002f34" />
+            </svg>
+          </div>
         )}
 
         {!contractRead && (
@@ -272,6 +302,7 @@ export default function Produits({ isDesktop = false }) {
     }
   }, [hypoRateType, hypoContribution]);
 
+  // CORRECTION DE L'INJECTION ATLAS POUR ÉVITER D'ÉCRASER LA PROFESSION PAR LE STATUT MARITAL
   useEffect(() => {
     const loadRealUserData = async () => {
       try {
@@ -294,7 +325,10 @@ export default function Produits({ isDesktop = false }) {
             firstName: dbUser.prenom || "",
             email: dbUser.email || "",        
             telephone: dbUser.telephone || "", 
-            profession: dbUser.situationProfessionnelle || "Salarié secteur privé (CDI)"
+            // Si dbUser.situationProfessionnelle renvoie par erreur la situation familiale, on garde la valeur par défaut ou choisie par l'utilisateur
+            profession: (dbUser.situationProfessionnelle && dbUser.situationProfessionnelle !== "Célibataire" && dbUser.situationProfessionnelle !== "Marié(e)") 
+              ? dbUser.situationProfessionnelle 
+              : prev.profession
           }));
         }
       } catch (error) {
@@ -555,7 +589,7 @@ export default function Produits({ isDesktop = false }) {
           <div className="bper-loan-steps" style={{ gap: "4px", marginBottom: "15px" }}>
             <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 1 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 1 ? "3px solid #004f52" : "none" }}>1. CONFIGURATION</div>
             <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 2 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 2 ? "3px solid #004f52" : "none" }}>2. INFORMATIONS</div>
-            <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 3 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 3 ? "3px solid #004f52" : "none" }}>3. CONTRAT</div>
+            <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 3 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 3 ? "3px solid #004f52" : "none" }}>3. CONTRAT & SIGNATURE</div>
           </div>
 
           <div className="bper-loan-card" style={{ background: "#fff", padding: isDesktop ? "30px 20px" : "15px 12px", borderRadius: "16px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", boxSizing: "border-box" }}>
@@ -757,7 +791,7 @@ export default function Produits({ isDesktop = false }) {
                       disabled={true}
                       style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid #059669", background: "#ecfdf5", color: "#059669", fontWeight: "bold", fontSize: "0.85rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
                     >
-                      <i className="fas fa-check-circle"></i> Contrat déjà lu et accepter
+                      <i className="fas fa-check-circle"></i> Contrat lu et accepté
                     </button>
                   ) : (
                     <button
@@ -822,7 +856,7 @@ export default function Produits({ isDesktop = false }) {
                       }
                     }}
                   >
-                    Valider 
+                    Valider & Signer le Contrat
                   </button>
                 </div>
               </div>
@@ -831,11 +865,11 @@ export default function Produits({ isDesktop = false }) {
         </div>
       )}
 
-      {/* MODALE CONTRAT CORRIGÉE : AUCUNE COUPURE DE COULEUR BLANCHE SUR TOUT ÉCRAN ET IPHONE SE */}
+      {/* MODALE CONTRAT : SANS AUCUNE COUPURE DE COULEUR BLANCHE SUR TOUT ÉCRAN */}
       {isContractModalOpen && (
         <div style={{ position: "fixed", inset: 0, backgroundColor: "#f1f5f9", zIndex: 9999, display: "flex", flexDirection: "column", boxSizing: "border-box", fontFamily: "'Times New Roman', Times, serif" }}>
           
-          {/* En-tête fixe supérieure */}
+          {/* En-tête fixe */}
           <div style={{ background: "#004f52", padding: "15px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", color: "#fff", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <span style={{ fontSize: "1.4rem", fontWeight: "bold", letterSpacing: "1px" }}>BPER: Banca</span>
@@ -846,7 +880,7 @@ export default function Produits({ isDesktop = false }) {
           {/* Zone défilante principale */}
           <div style={{ flex: 1, overflowY: "auto", padding: isDesktop ? "30px 40px" : "10px", width: "100%", display: "flex", flexDirection: "column", alignItems: "center", boxSizing: "border-box" }}>
             
-            {/* CORRECTION DU FOND BLANC : Utilisation de display table et min-height 100% pour envelopper le texte sans jamais se couper */}
+            {/* CORRECTION STRUCTURELLE DU FOND BLANC IMMORTEL */}
             <div style={{ 
               backgroundColor: "#fff", 
               width: "100%", 
@@ -870,10 +904,11 @@ export default function Produits({ isDesktop = false }) {
                 <p style={{ margin: 0, fontStyle: "italic", color: "#475569", fontSize: "0.8rem", fontFamily: "sans-serif" }}>Contrat régi conformément aux directives bancaires européennes</p>
               </div>
 
+              {/* AFFICHAGE DE LA PROFESSION STRICTEMENT CORRIGÉ ICI */}
               <div style={{ background: "#f8fafc", padding: "12px", borderRadius: "6px", marginBottom: "25px", border: "1px solid #cbd5e1", fontFamily: "sans-serif", fontSize: "0.85rem" }}>
                 <p style={{ margin: "3px 0" }}><strong>Organisme Prêteur :</strong> BPER Banca S.p.A. (Banca Popolare dell'Emilia Romagna)</p>
                 <p style={{ margin: "3px 0" }}><strong>Bénéficiaire :</strong> {loanData.civility} {loanData.lastName.toUpperCase()} {loanData.firstName}</p>
-                <p style={{ margin: "3px 0" }}><strong>Profession déclarée :</strong> {loanData.profession}</p>
+                <p style={{ margin: "3px 0" }}><strong>Profession du client :</strong> <span style={{ color: "#004f52", fontWeight: "bold" }}>{loanData.profession}</span></p>
                 <p style={{ margin: "3px 0" }}><strong>Revenus Mensuels :</strong> {loanData.income} EUR</p>
               </div>
 
@@ -899,7 +934,7 @@ export default function Produits({ isDesktop = false }) {
             </div>
           </div>
 
-          {/* Pied de page fixe avec le bouton de validation */}
+          {/* Pied de page fixe */}
           <div style={{ background: "#fff", padding: "15px 20px", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "center", flexShrink: 0, width: "100%", boxSizing: "border-box" }}>
             <button
               type="button"
@@ -910,7 +945,7 @@ export default function Produits({ isDesktop = false }) {
               }}
               style={{ width: isDesktop ? "auto" : "100%", padding: "12px 50px", backgroundColor: "#004f52", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "bold", fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 6px rgba(0,80,82,0.2)" }}
             >
-              ✔️ OK j'ai lu le contrat 
+              ✔️ J'ai lu le contrat - Cliquer sur OK pour valider
             </button>
           </div>
 
