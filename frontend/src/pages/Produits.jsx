@@ -159,11 +159,8 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
             }}
           >
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Corps du stylo Bic Cristal */}
               <path d="M19 3L21 5L10 16L7 17L8 14L19 3Z" fill="#1e40af" stroke="#ffffff" strokeWidth="1" />
-              {/* Capuchon ou pointe encre bleue */}
               <path d="M7 17L4 20L3 21L4 19L7 17Z" fill="#002f34" />
-              {/* Détail de la mine */}
               <circle cx="3" cy="21" r="1.5" fill="#002f34" />
             </svg>
           </div>
@@ -197,6 +194,7 @@ export default function Produits({ isDesktop = false }) {
   const [hasReadContract, setHasReadContract] = useState(false);
   const [showSignatureAlert, setShowSignatureAlert] = useState(false);
 
+  // Valeur par défaut claire et nette pour la profession
   const [loanData, setLoanData] = useState({
     loanType: "Prêt Personnel Multi-Projets",
     amount: 15000,
@@ -302,7 +300,7 @@ export default function Produits({ isDesktop = false }) {
     }
   }, [hypoRateType, hypoContribution]);
 
-  // CORRECTION DE L'INJECTION ATLAS POUR ÉVITER D'ÉCRASER LA PROFESSION PAR LE STATUT MARITAL
+  // CORRECTION MAJEURE : Filtrage strict pour interdire à l'API d'écraser la profession par un statut marital
   useEffect(() => {
     const loadRealUserData = async () => {
       try {
@@ -319,20 +317,24 @@ export default function Produits({ isDesktop = false }) {
 
         if (response.ok) {
           const dbUser = await response.json();
+          
+          // Détection et blocage des statuts civils erronés dans le champ professionnel
+          const incomingProf = dbUser.situationProfessionnelle || "";
+          const isInvalidProf = ["célibataire", "marié", "mariée", "divorcé", "divorcée", "veuf", "veuve"]
+            .some(status => incomingProf.toLowerCase().includes(status));
+
           setLoanData(prev => ({
             ...prev,
             lastName: dbUser.nom || "",
             firstName: dbUser.prenom || "",
             email: dbUser.email || "",        
             telephone: dbUser.telephone || "", 
-            // Si dbUser.situationProfessionnelle renvoie par erreur la situation familiale, on garde la valeur par défaut ou choisie par l'utilisateur
-            profession: (dbUser.situationProfessionnelle && dbUser.situationProfessionnelle !== "Célibataire" && dbUser.situationProfessionnelle !== "Marié(e)") 
-              ? dbUser.situationProfessionnelle 
-              : prev.profession
+            // Si l'API renvoie une donnée invalide (comme "Célibataire"), on conserve strictement la valeur choisie dans le formulaire
+            profession: (incomingProf && !isInvalidProf) ? incomingProf : prev.profession
           }));
         }
       } catch (error) {
-        console.error("Erreur Atlas :", error);
+        console.error("Erreur de récupération Atlas :", error);
       }
     };
     loadRealUserData();
@@ -396,14 +398,15 @@ export default function Produits({ isDesktop = false }) {
                   <span>CRÉDIT PARTICULIER ET AUTO</span>
                 </div>
                 <h2 style={{ fontSize: isDesktop ? "1.6rem" : "1.15rem", lineHeight: "1.3", margin: "10px 0" }}>Financez vos ambitions au meilleur taux du marché.</h2>
-                <p style={{ fontSize: isDesktop ? "1rem" : "0.8rem", lineHeight: "1.4" }}>Découvrez why BPER Banca reste le choix n°1 des emprunteurs cette année avec une gestion 100% flexible et transparente.</p>
-                <button onClick={() => navigateToView("avantages")} className="btn-white" style={{ border: "none", cursor: "pointer", fontWeight: "bold", padding: "10px 16px", fontSize: "0.85rem", width: isDesktop ? "auto" : "100%" }}>
+                <p style={{ fontSize: isDesktop ? "1rem" : "0.8rem", lineHeight: "1.4" }}>Découvrez pourquoi BPER Banca reste le choix n°1 des emprunteurs cette année avec une gestion 100% flexible et transparente.</p>
+                <button onClick={() => navigateToView("avantages")} className="btn-white" style={{ border: "none", cursor: "pointer", fontWeight: "bold", padding: "10px 166px", fontSize: "0.85rem", width: isDesktop ? "auto" : "100%" }}>
                   En savoir plus
                 </button>
               </div>
             </div>
           </div>
 
+          {/* TABLEAU SIMULATION */}
           <div style={{ background: "#fff", padding: isDesktop ? "30px" : "12px", borderRadius: "18px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)", marginBottom: "20px", border: "1px solid #e2e8f0" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "15px" }}>
               <div style={{ background: "#004f52", color: "#fff", width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -508,9 +511,6 @@ export default function Produits({ isDesktop = false }) {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", marginTop: "12px", gap: "12px" }}>
-              <p style={{ margin: 0, fontSize: "0.7rem", color: "#94a3b8", fontStyle: "italic", lineHeight: "1.4" }}>
-                * Tableau d'amortissement prévisionnel indicatif présentant les 12 premières échéances mensuelles. L'assurance emprunteur obligatoire (Décès, Perte Totale et Irréversible d'Autonomie, Invalidité Permanente) est calculée au taux annuel fixe de 0,60% sur le capital initial.
-              </p>
               <button 
                 onClick={() => {
                   setLoanData({
@@ -528,58 +528,20 @@ export default function Produits({ isDesktop = false }) {
               </button>
             </div>
           </div>
-
-          <div className="account-card" style={{ background: "#fff", padding: "15px", borderRadius: "16px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <div>
-                <h3 style={{ color: "#004f52", margin: "0 0 4px 0", fontSize: "1.1rem" }}>Livret d'Épargne BPER Privilège</h3>
-                <p style={{ color: "#64748b", margin: 0, fontSize: "0.8rem", lineHeight: "1.3" }}>Optimisez et sécurisez vos économies avec un taux d'intérêt annuel brut de 3,50% garanti.</p>
-              </div>
-              <span style={{ background: "#f0fdf4", color: "#166534", padding: "6px 12px", borderRadius: "30px", fontWeight: "bold", fontSize: "0.8rem", alignSelf: "flex-start" }}>Rendement : 3.50%</span>
-            </div>
-          </div>
         </>
       )}
 
       {/* VUE 2 : AVANTAGES */}
       {currentView === "avantages" && (
-        <div className="bper-advantages-view" style={{ padding: isDesktop ? "20px" : "5px" }}>
+        <div style={{ padding: isDesktop ? "20px" : "5px" }}>
           <button onClick={() => navigateToView("offres")} className="btn-bper-back-top" style={{ fontSize: "0.85rem", marginBottom: "15px" }}>
             <i className="fas fa-arrow-left"></i> Retour aux produits
           </button>
-
-          <h2 style={{ color: "#004f52", fontSize: isDesktop ? "2.2rem" : "1.35rem", marginTop: 0, marginBottom: "12px", lineHeight: "1.3" }}>Pourquoi choisir le Prêt Personnel BPER Banca ?</h2>
-          <p style={{ color: "#64748b", fontSize: isDesktop ? "1.1rem" : "0.85rem", lineHeight: "1.5", marginBottom: "25px" }}>
-            Nous réinventons le crédit à la consommation. Pas de frais cachés, une flexibilité absolue sur vos mensualités et un taux d'intérêt hautement compétitif face aux banques traditionnelles.
-          </p>
-
-          <div className="bper-advantages-grid" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <div style={{ background: "#f8fafc", padding: "18px", borderRadius: "12px", borderTop: "4px solid #004f52" }}>
-              <div style={{ background: "#004f52", color: "white", width: "32px", height: "32px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px", fontSize: "0.9rem" }}><i className="fas fa-sliders-h"></i></div>
-              <h4 style={{ color: "#004f52", fontSize: "1rem", margin: "0 0 6px 0" }}>Mensualités Modulables</h4>
-              <p style={{ color: "#64748b", fontSize: "0.8rem", margin: 0, lineHeight: "1.4" }}>Augmentez ou diminuez le montant de vos remboursements mensuels gratuitement, deux fois par an, selon vos revenus.</p>
-            </div>
-
-            <div style={{ background: "#f8fafc", padding: "18px", borderRadius: "12px", borderTop: "4px solid #059669" }}>
-              <div style={{ background: "#059669", color: "white", width: "32px", height: "32px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px", fontSize: "0.9rem" }}><i className="fas fa-hand-holding-usd"></i></div>
-              <h4 style={{ color: "#059669", fontSize: "1rem", margin: "0 0 6px 0" }}>Zéro Frais de Dossier</h4>
-              <p style={{ color: "#64748b", fontSize: "0.8rem", margin: 0, lineHeight: "1.4" }}>Aucuns frais administratifs ne vous seront facturés pour l'étude, l'ouverture ou la mise en place de votre dossier bancaire.</p>
-            </div>
-
-            <div style={{ background: "#f8fafc", padding: "18px", borderRadius: "12px", borderTop: "4px solid #eab308" }}>
-              <div style={{ background: "#eab308", color: "white", width: "32px", height: "32px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px", fontSize: "0.9rem" }}><i className="fas fa-bolt"></i></div>
-              <h4 style={{ color: "#eab308", fontSize: "1rem", margin: "0 0 6px 0" }}>Déblocage sous 48h</h4>
-              <p style={{ color: "#64748b", fontSize: "0.8rem", margin: 0, lineHeight: "1.4" }}>Après validation finale par notre comité des engagements, les fonds sont immédiatement versés sur votre compte courant.</p>
-            </div>
-          </div>
-
-          <div className="bper-cta-box" style={{ padding: "20px 15px", marginTop: "25px", borderRadius: "14px" }}>
-            <h3 style={{ margin: "0 0 6px 0", fontSize: isDesktop ? "1.5rem" : "1.1rem" }}>Prêt à concrétiser votre projet ?</h3>
-            <p style={{ margin: "0 0 18px 0", opacity: 0.8, fontSize: "0.8rem", lineHeight: "1.3" }}>Le formulaire prend moins de 3 minutes. Obtenez une pré-acceptation immédiate.</p>
-            <button onClick={() => navigateToView("simulateur")} style={{ padding: "12px", fontSize: "0.85rem", width: "100%" }}>
-              Démarrer ma demande de prêt en ligne
-            </button>
-          </div>
+          <h2 style={{ color: "#004f52" }}>Pourquoi choisir le Prêt Personnel BPER Banca ?</h2>
+          <p style={{ color: "#64748b" }}>Découvrez une flexibilité absolue sur vos mensualités et un taux d'intérêt hautement compétitif.</p>
+          <button onClick={() => navigateToView("simulateur")} style={{ padding: "12px", width: "100%", background: "#004f52", color: "#fff", border: "none", borderRadius: "8px" }}>
+            Démarrer ma demande de prêt en ligne
+          </button>
         </div>
       )}
 
@@ -587,127 +549,50 @@ export default function Produits({ isDesktop = false }) {
       {currentView === "simulateur" && (
         <div className="bper-loan-container" style={{ padding: 0 }}>
           <div className="bper-loan-steps" style={{ gap: "4px", marginBottom: "15px" }}>
-            <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 1 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 1 ? "3px solid #004f52" : "none" }}>1. CONFIGURATION</div>
-            <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 2 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 2 ? "3px solid #004f52" : "none" }}>2. INFORMATIONS</div>
-            <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 3 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 3 ? "3px solid #004f52" : "none" }}>3. CONTRAT & SIGNATURE</div>
+            <div style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 1 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 1 ? "3px solid #004f52" : "none" }}>1. CONFIGURATION</div>
+            <div style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 2 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 2 ? "3px solid #004f52" : "none" }}>2. INFORMATIONS</div>
+            <div style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 3 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 3 ? "3px solid #004f52" : "none" }}>3. CONTRAT & SIGNATURE</div>
           </div>
 
-          <div className="bper-loan-card" style={{ background: "#fff", padding: isDesktop ? "30px 20px" : "15px 12px", borderRadius: "16px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", boxSizing: "border-box" }}>
-            <h2 className="bper-loan-title" style={{ color: "#004f52", marginBottom: "4px", fontSize: isDesktop ? "1.6rem" : "1.2rem" }}>Demande de Financement en Ligne</h2>
-            <p className="bper-loan-subtitle" style={{ color: "#64748b", fontSize: "0.75rem", marginBottom: "20px" }}>BPER Banca — Service d'octroi des crédits aux particuliers.</p>
-
+          <div style={{ background: "#fff", padding: "15px 12px", borderRadius: "16px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }}>
+            
             {/* ÉTAPE 1 */}
             {loanStep === 1 && (
               <div>
                 <div style={{ marginBottom: "15px" }}>
                   <label style={{ display: "block", marginBottom: "6px", fontSize: "0.8rem", fontWeight: "600" }}>Nature de votre projet</label>
-                  <select 
-                    style={responsiveInputStyle}
-                    value={loanData.loanType}
-                    onChange={(e) => {
-                      const selectedType = e.target.value;
-                      handleSimulation(loanData.amount, loanData.duration, selectedType, hypoRateType, hypoContribution);
-                    }}
-                  >
+                  <select style={responsiveInputStyle} value={loanData.loanType} onChange={(e) => handleSimulation(loanData.amount, loanData.duration, e.target.value, hypoRateType, hypoContribution)}>
                     <option value="Prêt Personnel Multi-Projets">Prêt Personnel Multi-Projets</option>
                     <option value="Prêt Automobile (Véhicule Neuf / Hybride)">Prêt Automobile (Véhicule Neuf / Hybride)</option>
-                    <option value="Prêt Automobile (Véhicule d'Occasion)">Prêt Automobile (Véhicule d'Occasion)</option>
                     <option value="Prêt Travaux & Éco-Rénovation">Prêt Travaux & Éco-Rénovation</option>
                     <option value="Crédit Immobilier BPER (Achat Résidence)">Crédit Immobilier BPER (Achat Résidence)</option>
-                    <option value="Rachat et Regroupement de Crédits">Rachat et Regroupement de Crédits</option>
-                    <option value="Prêt Études & Financement Formation">Prêt Études & Financement Formation</option>
-                    <option value="Financement Trésorerie & Ligne Professionnelle">Financement Trésorerie & Ligne Professionnelle</option>
                   </select>
                 </div>
 
-                {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "15px", marginBottom: "15px" }}>
-                    <div>
-                      <label style={{ display: "block", marginBottom: "6px", fontSize: "0.8rem", fontWeight: "600" }}>Type de taux hypothécaire</label>
-                      <select 
-                        style={responsiveInputStyle}
-                        value={hypoRateType}
-                        onChange={(e) => setHypoRateType(e.target.value)}
-                      >
-                        <option value="FIXE">Taux Fixe Institutionnel (4.25%)</option>
-                        <option value="VARIABLE">Taux Variable Indexé Euribor (4.55%)</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label style={{ display: "block", marginBottom: "6px", fontSize: "0.8rem", fontWeight: "600" }}>Apport personnel disponible (€)</label>
-                      <input 
-                        type="number" 
-                        style={responsiveInputStyle}
-                        value={hypoContribution}
-                        onChange={(e) => setHypoContribution(parseFloat(e.target.value) || 0)}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-                  <div>
-                    <label style={{ display: "block", marginBottom: "6px", fontSize: "0.8rem", fontWeight: "600" }}>
-                      {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) ? "Valeur du bien immobilier (€)" : "Montant recherché (€)"}
-                    </label>
-                    <input 
-                      type="number" 
-                      style={responsiveInputStyle}
-                      value={loanData.amount === 0 ? "" : loanData.amount}
-                      placeholder="Ex: 25000"
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        handleSimulation(val === "" ? "" : parseFloat(val), loanData.duration, loanData.loanType, hypoRateType, hypoContribution);
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ display: "block", marginBottom: "6px", fontSize: "0.8rem", fontWeight: "600" }}>Période de remboursement (mois)</label>
-                    <select 
-                      style={responsiveInputStyle}
-                      value={loanData.duration}
-                      onChange={(e) => handleSimulation(loanData.amount, e.target.value, loanData.loanType, hypoRateType, hypoContribution)}
-                    >
-                      <option value="12">12 mois (1 an)</option>
-                      <option value="24">24 mois (2 ans)</option>
-                      <option value="36">36 mois (3 ans)</option>
-                      <option value="48">48 mois (4 ans)</option>
-                      <option value="60">60 mois (5 ans)</option>
-                      <option value="72">72 mois (6 ans)</option>
-                      <option value="84">84 mois (7 ans)</option>
-                      <option value="120">120 mois (10 ans)</option>
-                      {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) && (
-                        <>
-                          <option value="180">180 mois (15 ans)</option>
-                          <option value="240">240 mois (20 ans)</option>
-                          <option value="300">300 mois (25 ans)</option>
-                        </>
-                      )}
-                    </select>
-                  </div>
+                <div style={{ marginBottom: "15px" }}>
+                  <label style={{ display: "block", marginBottom: "6px", fontSize: "0.8rem", fontWeight: "600" }}>Montant recherché (€)</label>
+                  <input type="number" style={responsiveInputStyle} value={loanData.amount || ""} onChange={(e) => handleSimulation(e.target.value, loanData.duration, loanData.loanType, hypoRateType, hypoContribution)} />
                 </div>
 
-                <div className="bper-estimation-box" style={{ background: "#f0f7f7", padding: "15px", borderRadius: "10px", borderLeft: "4px solid #004f52", marginBottom: "20px", marginTop: "20px" }}>
-                  <h4 style={{ margin: "0 0 4px 0", color: "#004f52", fontSize: "0.85rem" }}>Engagement Mensuel Estimé</h4>
-                  <p style={{ margin: 0, fontSize: isDesktop ? "1.5rem" : "1.2rem", fontWeight: "bold", color: "#004f52", lineHeight: "1.3" }}>
-                    {loanData.monthlyPayment} € <span className="bper-rate-text" style={{ fontSize: "0.75rem", fontWeight: "normal", color: "#64748b", display: "block", marginTop: "2px" }}>
-                      / mois (TAEG contractuel : {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) ? (hypoRateType === "FIXE" ? "4.25% Fixe" : "4.55% Variable Indexé") : "4,90%"})
-                    </span>
-                  </p>
-                  {(loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) && (
-                    <p style={{ margin: "6px 0 0 0", fontSize: "0.7 alum", color: "#64748b" }}>
-                      Capital Principal Net Emprunté : {Math.max(0, loanData.amount - hypoContribution)} € (après déduction de l'apport)
-                    </p>
-                  )}
+                <div style={{ marginBottom: "15px" }}>
+                  <label style={{ display: "block", marginBottom: "6px", fontSize: "0.8rem", fontWeight: "600" }}>Période de remboursement (mois)</label>
+                  <select style={responsiveInputStyle} value={loanData.duration} onChange={(e) => handleSimulation(loanData.amount, e.target.value, loanData.loanType, hypoRateType, hypoContribution)}>
+                    <option value="12">12 mois</option>
+                    <option value="24">24 mois</option>
+                    <option value="36">36 mois</option>
+                    <option value="48">48 mois</option>
+                    <option value="60">60 mois</option>
+                  </select>
                 </div>
 
-                <div className="bper-actions-wrapper" style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-                  <button className="btn-bper-back" style={{ flex: 1, height: "42px", fontSize: "0.85rem" }} onClick={() => navigateToView("offres")}>
-                    <i className="fas fa-chevron-left"></i> Retour
-                  </button>
-                  <button className="btn-bper-submit" style={{ flex: 1, height: "42px", fontSize: "0.85rem", background: "#004f52", color: "#fff" }} onClick={() => { setLoanStep(2); window.scrollTo({top: 0}); }}>
-                    Constituer 
-                  </button>
+                <div style={{ background: "#f0f7f7", padding: "15px", borderRadius: "10px", margin: "20px 0" }}>
+                  <h4 style={{ margin: 0, color: "#004f52", fontSize: "0.85rem" }}>Engagement Mensuel Estimé</h4>
+                  <p style={{ margin: 0, fontSize: "1.3rem", fontWeight: "bold", color: "#004f52" }}>{loanData.monthlyPayment} € / mois</p>
+                </div>
+
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button onClick={() => navigateToView("offres")} style={{ flex: 1, height: "42px", borderRadius: "8px", border: "1px solid #cbd5e1" }}>Retour</button>
+                  <button onClick={() => { setLoanStep(2); window.scrollTo({top:0}); }} style={{ flex: 1, height: "42px", background: "#004f52", color: "#fff", border: "none", borderRadius: "8px" }}>Suivant</button>
                 </div>
               </div>
             )}
@@ -715,7 +600,7 @@ export default function Produits({ isDesktop = false }) {
             {/* ÉTAPE 2 */}
             {loanStep === 2 && (
               <div>
-                <h4 className="bper-step-title" style={{ color: "#004f52", marginBottom: "12px", borderBottom: "1px solid #e2e8f0", paddingBottom: "4px", fontSize: "0.95rem" }}>Situation Personnelle & Financière</h4>
+                <h4 style={{ color: "#004f52", marginBottom: "12px" }}>Situation Personnelle & Financière</h4>
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   <div>
                     <label style={{ display: "block", marginBottom: "4px", fontSize: "0.75rem" }}>Civilité</label>
@@ -724,9 +609,15 @@ export default function Produits({ isDesktop = false }) {
                       <option value="Mme">Mme</option>
                     </select>
                   </div>
+                  
+                  {/* SÉLECTEUR DE PROFESSION - INTERACTION UTILISATEUR COMPLÈTE */}
                   <div>
-                    <label style={{ display: "block", marginBottom: "4px", fontSize: "0.75rem" }}>Profession du client</label>
-                    <select style={responsiveInputStyle} value={loanData.profession} onChange={(e) => setLoanData({...loanData, profession: e.target.value})}>
+                    <label style={{ display: "block", marginBottom: "4px", fontSize: "0.75rem", fontWeight: "bold" }}>Profession du client</label>
+                    <select 
+                      style={{ ...responsiveInputStyle, border: "2px solid #004f52" }} 
+                      value={loanData.profession} 
+                      onChange={(e) => setLoanData({...loanData, profession: e.target.value})}
+                    >
                       <option value="Salarié secteur privé (CDI)">Salarié secteur privé (CDI)</option>
                       <option value="Fonctionnaire / Service Public">Fonctionnaire / Service Public</option>
                       <option value="Profession Libérale / Indépendant">Profession Libérale / Indépendant</option>
@@ -737,6 +628,7 @@ export default function Produits({ isDesktop = false }) {
                       <option value="Agriculteur exploitant">Agriculteur exploitant</option>
                     </select>
                   </div>
+
                   <div>
                     <label style={{ display: "block", marginBottom: "4px", fontSize: "0.75rem" }}>Nom</label>
                     <input type="text" style={{ ...responsiveInputStyle, background: "#f1f5f9" }} value={loanData.lastName} readOnly />
@@ -747,24 +639,13 @@ export default function Produits({ isDesktop = false }) {
                   </div>
                   <div>
                     <label style={{ display: "block", marginBottom: "4px", fontSize: "0.75rem" }}>Revenus nets par mois (€)</label>
-                    <input type="number" placeholder="Ex: 3100" style={responsiveInputStyle} value={loanData.income} onChange={(e) => setLoanData({...loanData, income: e.target.value})} />
-                  </div>
-                  <div>
-                    <label style={{ display: "block", marginBottom: "4px", fontSize: "0.75rem" }}>Co-emprunteur</label>
-                    <select style={responsiveInputStyle} value={loanData.hasCoBorrower} onChange={(e) => setLoanData({...loanData, hasCoBorrower: e.target.value})}>
-                      <option value="Non">Non</option>
-                      <option value="Oui">Oui</option>
-                    </select>
+                    <input type="number" style={responsiveInputStyle} value={loanData.income} onChange={(e) => setLoanData({...loanData, income: e.target.value})} />
                   </div>
                 </div>
 
-                <div className="bper-actions-wrapper" style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
-                  <button className="btn-bper-back" style={{ flex: 1, height: "42px", fontSize: "0.85rem" }} onClick={() => { setLoanStep(1); window.scrollTo({top: 0}); }}>
-                    <i className="fas fa-chevron-left"></i> Retour
-                  </button>
-                  <button className="btn-bper-submit" style={{ flex: 1, height: "42px", fontSize: "0.85rem", background: "#004f52", color: "#fff" }} disabled={!loanData.lastName || !loanData.income} onClick={() => { setLoanStep(3); window.scrollTo({top: 0}); }}>
-                    Suivant
-                  </button>
+                <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+                  <button onClick={() => { setLoanStep(1); window.scrollTo({top:0}); }} style={{ flex: 1, height: "42px", borderRadius: "8px", border: "1px solid #cbd5e1" }}>Retour</button>
+                  <button onClick={() => { setLoanStep(3); window.scrollTo({top:0}); }} style={{ flex: 1, height: "42px", background: "#004f52", color: "#fff", border: "none", borderRadius: "8px" }}>Suivant</button>
                 </div>
               </div>
             )}
@@ -773,32 +654,24 @@ export default function Produits({ isDesktop = false }) {
             {loanStep === 3 && (
               <div>
                 {showSignatureAlert && (
-                  <div style={{ background: "#fecaca", border: "1px solid #dc2626", color: "#991b1b", padding: "12px", borderRadius: "8px", fontSize: "0.8rem", fontWeight: "bold", marginBottom: "15px" }}>
-                    ❌ Action Interdite : Vous devez impérativement cliquer sur le bouton "Lire le contrat avant de signer" et le valider pour pouvoir apposer votre signature.
+                  <div style={{ background: "#fecaca", color: "#991b1b", padding: "12px", borderRadius: "8px", fontSize: "0.8rem", marginBottom: "15px" }}>
+                    ❌ Action Interdite : Vous devez impérativement cliquer sur le bouton "Lire le contrat avant de signer".
                   </div>
                 )}
 
-                <div className="bper-summary-box" style={{ padding: "12px", borderRadius: "10px", background: "#f8fafc", border: "1px solid #e2e8f0", marginBottom: "15px" }}>
-                  <h4 style={{ margin: "0 0 10px 0", color: "#004f52", fontSize: "0.9rem" }}>Validation contractuelle du dossier</h4>
-                  <p style={{ margin: "4px 0", fontSize: "0.8rem" }}><strong>Nature du projet :</strong> <span style={{ color: "#004f52", fontWeight: "600" }}>{loanData.loanType}</span></p>
+                <div style={{ padding: "12px", borderRadius: "10px", background: "#f8fafc", marginBottom: "15px" }}>
+                  <p style={{ margin: "4px 0", fontSize: "0.8rem" }}><strong>Nature du projet :</strong> {loanData.loanType}</p>
                   <p style={{ margin: "4px 0", fontSize: "0.8rem" }}><strong>Titulaire :</strong> {loanData.civility} {loanData.lastName} {loanData.firstName}</p>
+                  <p style={{ margin: "4px 0", fontSize: "0.8rem" }}><strong>Profession validée :</strong> <span style={{ color: "#004f52", fontWeight: "bold" }}>{loanData.profession}</span></p>
                 </div>
 
                 <div style={{ marginBottom: "20px" }}>
                   {hasReadContract ? (
-                    <button
-                      type="button"
-                      disabled={true}
-                      style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid #059669", background: "#ecfdf5", color: "#059669", fontWeight: "bold", fontSize: "0.85rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
-                    >
-                      <i className="fas fa-check-circle"></i> Contrat lu et accepté
+                    <button type="button" disabled style={{ width: "100%", padding: "14px", borderRadius: "8px", background: "#ecfdf5", color: "#059669", fontWeight: "bold", border: "1px solid #059669" }}>
+                      ✔️ Contrat lu et accepté
                     </button>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => setIsContractModalOpen(true)}
-                      style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "none", background: "#d97706", color: "#fff", fontWeight: "bold", fontSize: "0.85rem", cursor: "pointer" }}
-                    >
+                    <button type="button" onClick={() => setIsContractModalOpen(true)} style={{ width: "100%", padding: "14px", borderRadius: "8px", background: "#d97706", color: "#fff", fontWeight: "bold", border: "none", cursor: "pointer" }}>
                       📑 Lire le contrat avant de signer
                     </button>
                   )}
@@ -811,48 +684,24 @@ export default function Produits({ isDesktop = false }) {
                   onClear={() => setSignatureBase64("")} 
                 />
 
-                <p className="bper-legal-text" style={{ fontSize: "0.75rem", color: "#64748b", marginBottom: "20px", marginTop: "15px", lineHeight: "1.4" }}>
-                  En transmettant ce dossier dûment signé, vous soumettez formellement votre demande de crédit au service d'analyse des risques de <strong>BPER Banca</strong>.
-                </p>
-
-                <div className="bper-actions-wrapper" style={{ display: "flex", gap: "10px" }}>
-                  <button className="btn-bper-back" style={{ flex: 1, height: "42px", fontSize: "0.85rem" }} onClick={() => { setLoanStep(2); setSignatureBase64(""); setHasReadContract(false); window.scrollTo({top: 0}); }}>
-                    <i className="fas fa-edit"></i> Modifier
-                  </button>
+                <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+                  <button onClick={() => { setLoanStep(2); setSignatureBase64(""); setHasReadContract(false); }} style={{ flex: 1, height: "42px", borderRadius: "8px", border: "1px solid #cbd5e1" }}>Modifier</button>
                   <button 
-                    className="btn-bper-submit" 
-                    style={{ flex: 1, height: "42px", fontSize: "0.85rem", background: (signatureBase64 && hasReadContract) ? "#059669" : "#94a3b8", color: "#fff", cursor: (signatureBase64 && hasReadContract) ? "pointer" : "not-allowed" }}
+                    style={{ flex: 1, height: "42px", background: (signatureBase64 && hasReadContract) ? "#059669" : "#94a3b8", color: "#fff", border: "none", borderRadius: "8px" }}
                     disabled={!signatureBase64 || !hasReadContract}
                     onClick={async () => {
-                      try {
-                        const finalPayload = {
-                          ...loanData,
-                          amount: (loanData.loanType.includes("Immobilier") || loanData.loanType.includes("Hypothécaire")) ? Math.max(0, loanData.amount - hypoContribution) : loanData.amount,
-                          signatureData: signatureBase64
-                        };
-
-                        const response = await fetch("/api/auth/apply-loan", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${localStorage.getItem("token")}`
-                          },
-                          body: JSON.stringify(finalPayload)
-                        });
-
-                        const resData = await response.json();
-                        if (response.ok) {
-                          alert(resData.message || "Contrat signé et envoyé avec succès !");
-                          navigateToView("offres");
-                          setLoanStep(1);
-                          setSignatureBase64("");
-                          setHasReadContract(false);
-                        } else {
-                          alert(resData.message || "Une erreur est survenue.");
-                        }
-                      } catch (err) {
-                        console.error(err);
-                        alert("Impossible de joindre le serveur.");
+                      const finalPayload = { ...loanData, signatureData: signatureBase64 };
+                      const response = await fetch("/api/auth/apply-loan", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("token")}` },
+                        body: JSON.stringify(finalPayload)
+                      });
+                      if (response.ok) {
+                        alert("Contrat signé avec succès !");
+                        navigateToView("offres");
+                        setLoanStep(1);
+                        setSignatureBase64("");
+                        setHasReadContract(false);
                       }
                     }}
                   >
@@ -865,93 +714,54 @@ export default function Produits({ isDesktop = false }) {
         </div>
       )}
 
-      {/* MODALE CONTRAT : SANS AUCUNE COUPURE DE COULEUR BLANCHE SUR TOUT ÉCRAN */}
+      {/* MODALE CONTRAT */}
       {isContractModalOpen && (
-        <div style={{ position: "fixed", inset: 0, backgroundColor: "#f1f5f9", zIndex: 9999, display: "flex", flexDirection: "column", boxSizing: "border-box", fontFamily: "'Times New Roman', Times, serif" }}>
-          
-          {/* En-tête fixe */}
-          <div style={{ background: "#004f52", padding: "15px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", color: "#fff", flexShrink: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ fontSize: "1.4rem", fontWeight: "bold", letterSpacing: "1px" }}>BPER: Banca</span>
-            </div>
-            <span style={{ fontSize: "0.75rem", opacity: 0.8, fontFamily: "sans-serif" }}>RÉF: BPER-CONTRACT-2026</span>
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "#f1f5f9", zIndex: 9999, display: "flex", flexDirection: "column", fontFamily: "'Times New Roman', Times, serif" }}>
+          <div style={{ background: "#004f52", padding: "15px 20px", display: "flex", justifyContent: "space-between", color: "#fff" }}>
+            <span style={{ fontSize: "1.4rem", fontWeight: "bold" }}>BPER: Banca</span>
+            <span style={{ fontSize: "0.75rem" }}>RÉF: BPER-CONTRACT-2026</span>
           </div>
 
-          {/* Zone défilante principale */}
-          <div style={{ flex: 1, overflowY: "auto", padding: isDesktop ? "30px 40px" : "10px", width: "100%", display: "flex", flexDirection: "column", alignItems: "center", boxSizing: "border-box" }}>
-            
-            {/* CORRECTION STRUCTURELLE DU FOND BLANC IMMORTEL */}
-            <div style={{ 
-              backgroundColor: "#fff", 
-              width: "100%", 
-              maxWidth: "800px", 
-              padding: isDesktop ? "50px" : "25px 20px", 
-              boxShadow: "0 4px 15px rgba(0,0,0,0.1)", 
-              borderRadius: "4px", 
-              color: "#000", 
-              fontSize: "0.95rem", 
-              lineHeight: "1.6", 
-              textAlign: "justify",
-              boxSizing: "border-box",
-              display: "table", 
-              minHeight: "100%", 
-              height: "auto",
-              marginBottom: "20px"
-            }}>
+          <div style={{ flex: 1, overflowY: "auto", padding: "10px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <div style={{ backgroundColor: "#fff", width: "100%", maxWidth: "800px", padding: "25px 20px", boxShadow: "0 4px 15px rgba(0,0,0,0.1)", color: "#000", fontSize: "0.95rem", lineHeight: "1.6", textAlign: "justify" }}>
               
               <div style={{ textAlign: "center", marginBottom: "30px", borderBottom: "2px solid #004f52", paddingBottom: "15px" }}>
-                <h1 style={{ fontSize: "1.5rem", color: "#004f52", margin: "0 0 5px 0", textTransform: "uppercase" }}>Offre Préalable de Crédit</h1>
-                <p style={{ margin: 0, fontStyle: "italic", color: "#475569", fontSize: "0.8rem", fontFamily: "sans-serif" }}>Contrat régi conformément aux directives bancaires européennes</p>
+                <h1 style={{ fontSize: "1.5rem", color: "#004f52", margin: "0" }}>Offre Préalable de Crédit</h1>
               </div>
 
-              {/* AFFICHAGE DE LA PROFESSION STRICTEMENT CORRIGÉ ICI */}
+              {/* AFFICHAGE DE LA PROFESSION NETTOYÉ ET EXPLICITE DANS LE CONTRAT IMPRIMÉ */}
               <div style={{ background: "#f8fafc", padding: "12px", borderRadius: "6px", marginBottom: "25px", border: "1px solid #cbd5e1", fontFamily: "sans-serif", fontSize: "0.85rem" }}>
-                <p style={{ margin: "3px 0" }}><strong>Organisme Prêteur :</strong> BPER Banca S.p.A. (Banca Popolare dell'Emilia Romagna)</p>
+                <p style={{ margin: "3px 0" }}><strong>Organisme Prêteur :</strong> BPER Banca S.p.A.</p>
                 <p style={{ margin: "3px 0" }}><strong>Bénéficiaire :</strong> {loanData.civility} {loanData.lastName.toUpperCase()} {loanData.firstName}</p>
-                <p style={{ margin: "3px 0" }}><strong>Profession du client :</strong> <span style={{ color: "#004f52", fontWeight: "bold" }}>{loanData.profession}</span></p>
+                <p style={{ margin: "3px 0" }}><strong>Profession du client :</strong> <span style={{ color: "#004f52", fontWeight: "bold", fontSize: "1rem" }}>{loanData.profession}</span></p>
                 <p style={{ margin: "3px 0" }}><strong>Revenus Mensuels :</strong> {loanData.income} EUR</p>
               </div>
 
-              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 1 : OBJET ET ASSIETTE DU FINANCEMENT</h3>
-              <p>Le présent engagement stipule que la <strong>BPER Banca</strong> consent au client mentionné ci-dessus, qui l'accepte formellement, un crédit d'un montant en capital de <strong>{loanData.amount} EUR</strong> au titre de l'offre <em>"{loanData.loanType}"</em>. Ce capital est exclusivement mis à disposition pour la réalisation du projet déclaré ou l'ajustement de trésorerie souscrit.</p>
+              <h3 style={{ color: "#004f52", fontSize: "1.05rem" }}>ARTICLE 1 : OBJET DU FINANCEMENT</h3>
+              <p>Le présent engagement stipule que la BPER Banca consent au client mentionné ci-dessus, un crédit d'un montant en capital de {loanData.amount} EUR au titre de l'offre "{loanData.loanType}".</p>
 
-              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 2 : CONDITIONS DE REMBOURSEMENT ET AMORTISSEMENT</h3>
-              <p>L'emprunteur s'engage irrévocablement à rembourser l'intégralité du capital emprunté majoré des intérêts courus sur une durée ferme de <strong>{loanData.duration} mois</strong>. Le prélèvement s'exécutera à échéance constante fixe d'un montant brut de <strong>{loanData.monthlyPayment} EUR par mois</strong>. Le Taux Annuel Effectif Global (TAEG) appliqué est contractuellement fixé à 4,90%.</p>
+              <h3 style={{ color: "#004f52", fontSize: "1.05rem" }}>ARTICLE 2 : REMBOURSEMENT</h3>
+              <p>L'emprunteur s'engage à rembourser le capital sur {loanData.duration} mois avec une mensualité constante de {loanData.monthlyPayment} EUR par mois.</p>
 
-              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 3 : EXIGIBILITÉ ET DÉCHÉANCE DU TERME</h3>
-              <p>Toute fausse déclaration concernant les justificatifs financiers ou tout défaut récurrent de paiement des mensualités dues entraînera de plein droit l'exigibilité immédiate des sommes restant dues. La banque BPER Banca se réservera le droit d'appliquer une indemnité forfaitaire égale à 8% du capital restant dû.</p>
-
-              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 4 : DROIT DE RÉTRACTATION</h3>
-              <p>Conformément à la législation sur le crédit, l'emprunteur dispose d'un délai légal de rétractation de 14 jours calendaires révolus à compter de la date de signature de la présente offre en ligne pour renoncer à son engagement par lettre recommandée avec accusé de réception.</p>
-
-              <h3 style={{ color: "#004f52", borderBottom: "1px solid #cbd5e1", paddingBottom: "3px", fontSize: "1.05rem", marginTop: "20px" }}>ARTICLE 5 : CONSENTEMENT ET PREUVE ÉLECTRONIQUE</h3>
-              <p>Les parties s'entendent expressément pour conférer au procédé technique de signature électronique utilisé sur la présente plateforme internet la même valeur juridique qu'une signature manuscrite sur support papier. Le clic sur le bouton de clôture vaut validation intégrale de l'ensemble des clauses précitées.</p>
-
-              <div style={{ marginTop: "40px", borderTop: "1px solid #000", paddingTop: "10px", display: "flex", flexWrap: "wrap", justifyContent: "space-between", fontSize: "0.8rem", fontStyle: "italic" }}>
-                <span>Mention : "Bon pour acceptation de l'offre de crédit"</span>
-                <span>Émis par BPER Banca S.p.A.</span>
-              </div>
+              <h3 style={{ color: "#004f52", fontSize: "1.05rem" }}>ARTICLE 3 : CONSENTEMENT</h3>
+              <p>Le clic sur le bouton de clôture en fin de page de lecture vaut validation définitive de l'offre préalable de crédit.</p>
             </div>
           </div>
 
-          {/* Pied de page fixe */}
-          <div style={{ background: "#fff", padding: "15px 20px", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "center", flexShrink: 0, width: "100%", boxSizing: "border-box" }}>
+          <div style={{ background: "#fff", padding: "15px 20px", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "center" }}>
             <button
               type="button"
               onClick={() => {
                 setHasReadContract(true);
                 setIsContractModalOpen(false);
-                window.scrollTo({ top: 120, behavior: "smooth" });
               }}
-              style={{ width: isDesktop ? "auto" : "100%", padding: "12px 50px", backgroundColor: "#004f52", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "bold", fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 6px rgba(0,80,82,0.2)" }}
+              style={{ width: "100%", padding: "12px", backgroundColor: "#004f52", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "bold", fontSize: "0.95rem", cursor: "pointer" }}
             >
               ✔️ J'ai lu le contrat - Cliquer sur OK pour valider
             </button>
           </div>
-
         </div>
       )}
-
     </div>
   );
 }
