@@ -146,14 +146,13 @@ function BperSignaturePad({ onSave, onClear, contractRead, onAttemptWithoutReadi
           onTouchEnd={stopDrawing}
         />
         
-        {/* LE STYLO BIC BLEU EN SVG VECTORIEL INDESTRUCTIBLE */}
         {showPen && (
           <div
             style={{
               position: "absolute",
               left: `${penPos.x}px`,
               top: `${penPos.y}px`,
-              transform: "translate(-4px, -36px) rotate(-15deg)", // Aligne la pointe du Bic pile sur le tracé
+              transform: "translate(-4px, -36px) rotate(-15deg)", 
               pointerEvents: "none",
               zIndex: 999
             }}
@@ -194,7 +193,6 @@ export default function Produits({ isDesktop = false }) {
   const [hasReadContract, setHasReadContract] = useState(false);
   const [showSignatureAlert, setShowSignatureAlert] = useState(false);
 
-  // Valeur par défaut claire et nette pour la profession
   const [loanData, setLoanData] = useState({
     loanType: "Prêt Personnel Multi-Projets",
     amount: 15000,
@@ -300,7 +298,7 @@ export default function Produits({ isDesktop = false }) {
     }
   }, [hypoRateType, hypoContribution]);
 
-  // CORRECTION MAJEURE : Filtrage strict pour interdire à l'API d'écraser la profession par un statut marital
+  // FILTRAGE STRICT DE L'API POUR PROTÉGER LA PROFESSION DU CLIENT
   useEffect(() => {
     const loadRealUserData = async () => {
       try {
@@ -318,7 +316,6 @@ export default function Produits({ isDesktop = false }) {
         if (response.ok) {
           const dbUser = await response.json();
           
-          // Détection et blocage des statuts civils erronés dans le champ professionnel
           const incomingProf = dbUser.situationProfessionnelle || "";
           const isInvalidProf = ["célibataire", "marié", "mariée", "divorcé", "divorcée", "veuf", "veuve"]
             .some(status => incomingProf.toLowerCase().includes(status));
@@ -329,12 +326,11 @@ export default function Produits({ isDesktop = false }) {
             firstName: dbUser.prenom || "",
             email: dbUser.email || "",        
             telephone: dbUser.telephone || "", 
-            // Si l'API renvoie une donnée invalide (comme "Célibataire"), on conserve strictement la valeur choisie dans le formulaire
             profession: (incomingProf && !isInvalidProf) ? incomingProf : prev.profession
           }));
         }
       } catch (error) {
-        console.error("Erreur de récupération Atlas :", error);
+        console.error("Erreur de récupération :", error);
       }
     };
     loadRealUserData();
@@ -399,7 +395,7 @@ export default function Produits({ isDesktop = false }) {
                 </div>
                 <h2 style={{ fontSize: isDesktop ? "1.6rem" : "1.15rem", lineHeight: "1.3", margin: "10px 0" }}>Financez vos ambitions au meilleur taux du marché.</h2>
                 <p style={{ fontSize: isDesktop ? "1rem" : "0.8rem", lineHeight: "1.4" }}>Découvrez pourquoi BPER Banca reste le choix n°1 des emprunteurs cette année avec une gestion 100% flexible et transparente.</p>
-                <button onClick={() => navigateToView("avantages")} className="btn-white" style={{ border: "none", cursor: "pointer", fontWeight: "bold", padding: "10px 166px", fontSize: "0.85rem", width: isDesktop ? "auto" : "100%" }}>
+                <button onClick={() => navigateToView("avantages")} className="btn-white" style={{ border: "none", cursor: "pointer", fontWeight: "bold", padding: "10px 16px", fontSize: "0.85rem", width: isDesktop ? "auto" : "100%" }}>
                   En savoir plus
                 </button>
               </div>
@@ -610,7 +606,6 @@ export default function Produits({ isDesktop = false }) {
                     </select>
                   </div>
                   
-                  {/* SÉLECTEUR DE PROFESSION - INTERACTION UTILISATEUR COMPLÈTE */}
                   <div>
                     <label style={{ display: "block", marginBottom: "4px", fontSize: "0.75rem", fontWeight: "bold" }}>Profession du client</label>
                     <select 
@@ -714,7 +709,7 @@ export default function Produits({ isDesktop = false }) {
         </div>
       )}
 
-      {/* MODALE CONTRAT */}
+      {/* MODALE CONTRAT (INTÉGRALITÉ DES ARTICLES ET SECTIONS) */}
       {isContractModalOpen && (
         <div style={{ position: "fixed", inset: 0, backgroundColor: "#f1f5f9", zIndex: 9999, display: "flex", flexDirection: "column", fontFamily: "'Times New Roman', Times, serif" }}>
           <div style={{ background: "#004f52", padding: "15px 20px", display: "flex", justifyContent: "space-between", color: "#fff" }}>
@@ -726,25 +721,38 @@ export default function Produits({ isDesktop = false }) {
             <div style={{ backgroundColor: "#fff", width: "100%", maxWidth: "800px", padding: "25px 20px", boxShadow: "0 4px 15px rgba(0,0,0,0.1)", color: "#000", fontSize: "0.95rem", lineHeight: "1.6", textAlign: "justify" }}>
               
               <div style={{ textAlign: "center", marginBottom: "30px", borderBottom: "2px solid #004f52", paddingBottom: "15px" }}>
-                <h1 style={{ fontSize: "1.5rem", color: "#004f52", margin: "0" }}>Offre Préalable de Crédit</h1>
+                <h1 style={{ fontSize: "1.5rem", color: "#004f52", margin: "0" }}>OFFRE PRÉALABLE DE CRÉDIT</h1>
+                <small style={{ color: "#64748b" }}>Régie par les dispositions légales relatives au crédit à la consommation et à l'immobilier</small>
               </div>
 
-              {/* AFFICHAGE DE LA PROFESSION NETTOYÉ ET EXPLICITE DANS LE CONTRAT IMPRIMÉ */}
-              <div style={{ background: "#f8fafc", padding: "12px", borderRadius: "6px", marginBottom: "25px", border: "1px solid #cbd5e1", fontFamily: "sans-serif", fontSize: "0.85rem" }}>
-                <p style={{ margin: "3px 0" }}><strong>Organisme Prêteur :</strong> BPER Banca S.p.A.</p>
-                <p style={{ margin: "3px 0" }}><strong>Bénéficiaire :</strong> {loanData.civility} {loanData.lastName.toUpperCase()} {loanData.firstName}</p>
-                <p style={{ margin: "3px 0" }}><strong>Profession du client :</strong> <span style={{ color: "#004f52", fontWeight: "bold", fontSize: "1rem" }}>{loanData.profession}</span></p>
-                <p style={{ margin: "3px 0" }}><strong>Revenus Mensuels :</strong> {loanData.income} EUR</p>
+              {/* BLOC DES DONNÉES INJECTÉES DONT LA PROFESSION DU FORMULAIRE */}
+              <div style={{ background: "#f8fafc", padding: "15px", borderRadius: "6px", marginBottom: "25px", border: "1px solid #cbd5e1", fontFamily: "sans-serif", fontSize: "0.85rem" }}>
+                <p style={{ margin: "4px 0" }}><strong>Organisme Prêteur :</strong> BPER Banca S.p.A., société anonyme au capital social régulé, immatriculée sous le numéro officiel du registre bancaire européen.</p>
+                <p style={{ margin: "4px 0" }}><strong>Emprunteur Principal :</strong> {loanData.civility} {loanData.lastName.toUpperCase()} {loanData.firstName}</p>
+                <p style={{ margin: "4px 0" }}><strong>Profession déclarée :</strong> <span style={{ color: "#004f52", fontWeight: "bold", fontSize: "0.95rem" }}>{loanData.profession}</span></p>
+                <p style={{ margin: "4px 0" }}><strong>Capacité de revenus :</strong> {loanData.income || "Non spécifié"} EUR / mois</p>
               </div>
 
-              <h3 style={{ color: "#004f52", fontSize: "1.05rem" }}>ARTICLE 1 : OBJET DU FINANCEMENT</h3>
-              <p>Le présent engagement stipule que la BPER Banca consent au client mentionné ci-dessus, un crédit d'un montant en capital de {loanData.amount} EUR au titre de l'offre "{loanData.loanType}".</p>
+              <h3 style={{ color: "#004f52", fontSize: "1.05rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "4px" }}>ARTICLE 1 : OBJET ET MONTANT DU FINANCEMENT</h3>
+              <p>Le présent contrat engage la BPER Banca à mettre à la disposition de l'Emprunteur, qui l'accepte, un montant en capital de <strong>{loanData.amount} EUR</strong> destiné exclusivement au financement de son projet de type <em>"{loanData.loanType}"</em>. Les fonds seront débloqués après expiration des délais légaux de rétractation et validation finale des pièces justificatives.</p>
 
-              <h3 style={{ color: "#004f52", fontSize: "1.05rem" }}>ARTICLE 2 : REMBOURSEMENT</h3>
-              <p>L'emprunteur s'engage à rembourser le capital sur {loanData.duration} mois avec une mensualité constante de {loanData.monthlyPayment} EUR par mois.</p>
+              <h3 style={{ color: "#004f52", fontSize: "1.05rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "4px" }}>ARTICLE 2 : MODALITÉS DE REMBOURSEMENT ET MENSUALITÉS</h3>
+              <p>L'Emprunteur s'engage fermement à rembourser le capital ainsi que les intérêts afférents sur une période définie de <strong>{loanData.duration} mois</strong>. Le montant de l'échéance mensuelle constante s'élève à <strong>{loanData.monthlyPayment} EUR / mois</strong>. Les prélèvements seront automatiquement effectués sur le compte bancaire désigné par l'emprunteur à la date convenue lors de la signature définitive.</p>
 
-              <h3 style={{ color: "#004f52", fontSize: "1.05rem" }}>ARTICLE 3 : CONSENTEMENT</h3>
-              <p>Le clic sur le bouton de clôture en fin de page de lecture vaut validation définitive de l'offre préalable de crédit.</p>
+              <h3 style={{ color: "#004f52", fontSize: "1.05rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "4px" }}>ARTICLE 3 : ADHÉSION À L'ASSURANCE EMPRUNTEUR</h3>
+              <p>Le présent financement inclut, sauf stipulation contraire validée par nos services, les garanties obligatoires liées à l'assurance collective Décès, Perte Totale et Irréversible d'Autonomie (PTIA) et Incapacité de Travail. La tarification est indexée sur le capital initial à un taux annuel standardisé de 0,60%, calculé de manière transparente dans le plan d'amortissement global fourni en annexe de la demande.</p>
+
+              <h3 style={{ color: "#004f52", fontSize: "1.05rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "4px" }}>ARTICLE 4 : DROIT DE RÉTRACTATION</h3>
+              <p>Conformément à la législation européenne en vigueur sur le crédit, l'Emprunteur dispose d'un délai légal de rétractation de 14 jours calendaires révolus à compter du jour de l'acceptation de l'offre. Pour exercer ce droit, l'emprunteur doit notifier sa décision par le biais du formulaire détachable de rétractation ou par lettre recommandée avec accusé de réception adressée au siège de la banque.</p>
+
+              <h3 style={{ color: "#004f52", fontSize: "1.05rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "4px" }}>ARTICLE 5 : CONSENTEMENT ÉLECTRONIQUE ET VALIDATION</h3>
+              <p>L'Emprunteur reconnaît expressément avoir pris connaissance de l'ensemble des conditions générales, des fiches d'informations précontractuelles européennes normalisées (FIPEN) et des clauses particulières du contrat. L'action consistant à lire le document et à apposer sa signature manuscrite numérisée sur l'interface sécurisée vaut consentement plein, entier et irrévocable aux termes de la présente offre.</p>
+              
+              <div style={{ marginTop: "40px", borderTop: "1px dashed #cbd5e1", paddingTop: "20px", display: "flex", justifyContent: "space-between", fontSize: "0.8rem", color: "#475569" }}>
+                <div>Fait électroniquement le : {new Date().toLocaleDateString('fr-FR')}</div>
+                <div>Pour BPER Banca : Validation Système Certifiée</div>
+              </div>
+
             </div>
           </div>
 
