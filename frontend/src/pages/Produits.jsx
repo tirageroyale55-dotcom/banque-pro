@@ -594,7 +594,7 @@ useEffect(() => {
           <div className="bper-loan-steps" style={{ gap: "4px", marginBottom: "15px" }}>
             <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 1 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 1 ? "3px solid #004f52" : "none" }}>1. CONFIGURATION</div>
             <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 2 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 2 ? "3px solid #004f52" : "none" }}>2. INFORMATIONS</div>
-            <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 3 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 3 ? "3px solid #004f52" : "none" }}>3. CONTRAT & SIGNATURE</div>
+            <div className="bper-step-item" style={{ fontSize: "0.65rem", paddingBottom: "6px", color: loanStep === 3 ? "#004f52" : "#94a3b8", borderBottom: loanStep === 3 ? "3px solid #004f52" : "none" }}>3. CONTRAT</div>
           </div>
 
           <div className="bper-loan-card" style={{ background: "#fff", padding: isDesktop ? "30px 20px" : "15px 12px", borderRadius: "16px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", boxSizing: "border-box" }}>
@@ -861,7 +861,7 @@ useEffect(() => {
                       }
                     }}
                   >
-                    Valider & Signer le Contrat
+                    Valider 
                   </button>
                 </div>
               </div>
@@ -911,7 +911,7 @@ useEffect(() => {
 
               {/* AFFICHAGE DE LA PROFESSION STRICTEMENT CORRIGÉ ICI */}
               <div style={{ background: "#f8fafc", padding: "12px", borderRadius: "6px", marginBottom: "25px", border: "1px solid #cbd5e1", fontFamily: "sans-serif", fontSize: "0.85rem" }}>
-                <p style={{ margin: "3px 0" }}><strong>Organisme Prêteur :</strong> BPER Banca S.p.A. (Banca Popolare dell'Emilia Romagna)</p>
+                <p style={{ margin: "3px 0" }}><strong>Organisme Prêteur :</strong> BPER Banca S.p.A. </p>
                 <p style={{ margin: "3px 0" }}><strong>Bénéficiaire :</strong> {loanData.civility} {loanData.lastName.toUpperCase()} {loanData.firstName}</p>
                 <p style={{ margin: "3px 0" }}><strong>Profession du client :</strong> <span style={{ color: "#004f52", fontWeight: "bold" }}>{loanData.profession}</span></p>
                 <p style={{ margin: "3px 0" }}><strong>Revenus Mensuels :</strong> {loanData.income} EUR</p>
@@ -950,7 +950,7 @@ useEffect(() => {
               }}
               style={{ width: isDesktop ? "auto" : "100%", padding: "12px 50px", backgroundColor: "#004f52", color: "#fff", border: "none", borderRadius: "8px", fontWeight: "bold", fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 6px rgba(0,80,82,0.2)" }}
             >
-              ✔️ J'ai lu le contrat - Cliquer sur OK pour valider
+              ✔️ OK J'ai lu le contrat 
             </button>
           </div>
 
