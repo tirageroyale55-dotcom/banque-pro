@@ -124,7 +124,12 @@ router.get("/client-master-data/:id", auth, role("ADMIN"), async (req, res) => {
     const card = await Card.findOne({ user: user._id });
     const transactions = account ? await Transaction.find({ account: account._id }).sort({ createdAt: -1 }) : [];
     const cardRequest = await CardRequest.findOne({ user: user._id }).sort({ requestDate: -1 });
-    const loanRequests = await LoanRequest.find({ userId: user._id });
+    const loanRequests = await LoanRequest.find({
+      $or: [
+        { user: user._id },
+       { user: user._id.toString() }
+      ]
+    });
 
     res.json({ user, account, card, transactions, cardRequest, loanRequests });
   } catch (err) {
