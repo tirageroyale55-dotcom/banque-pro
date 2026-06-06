@@ -16,7 +16,7 @@ export default function AdminClient() {
   const selectClient = async (id) => {
     const data = await api("/admin/client-master-data/" + id);
     setSelected(data);
-    setFormData({ userData: data.user, accountData: data.account, cardData: data.card, cardRequestData: data.cardRequest });
+    setFormData({ userData: data.user, accountData: data.account, cardData: data.card, cardRequestData: data.cardRequest, loanData: data.loanRequests || data.loan });
     setIsEditing(false);
   };
 
@@ -45,6 +45,17 @@ export default function AdminClient() {
     alert("Erreur serveur lors de l'opération");
   }
 };
+
+
+const handleLoanDecision = async (loanId, decision, message = "") => {
+    try {
+      const res = await api(`/admin/loan-decision/${loanId}`, "POST", { decision, message });
+      alert(res.message);
+      selectClient(selected.user._id); // Recharge le dossier complet
+    } catch (err) {
+      alert("Erreur lors du traitement de la demande de prêt");
+    }
+  };
 
   const runAction = async (path, method = "POST") => {
     await api(path, method);
@@ -463,6 +474,91 @@ export default function AdminClient() {
             </>
           )}
         </div>
+      </div>
+    )}
+  </section>
+)}
+
+
+{/* ========================================== */}
+{/*  DEMANDES DE PRÊT / CRÉDIT */}
+{/* ========================================== */}
+{selected.loanRequests && selected.loanRequests.length > 0 ? (
+  selected.loanRequests.map((loan) => (
+    <section key={loan._id} className="data-card loan-card" style={{ borderTop: '4px solid #004f52', marginTop: '20px', backgroundColor: '#fcfdfd' }}>
+      <div className="section-header">
+        <h3><i className="fas fa-hand-holding-usd"></i> Demande de Crédit Active</h3>
+        <span className={`status-badge ${loan.status}`}>
+          {loan.status === 'APPROVED' ? 'APPROUVÉ' : loan.status === 'PENDING' ? 'EN ATTENTE' : 'REJETÉ'}
+        </span>
+      </div>
+
+      <div style={{ background: '#f1f5f9', padding: '12px', borderRadius: '8px', marginBottom: '15px', fontSize: '0.9rem' }}>
+        <p style={{ margin: '0 0 5px 0' }}><strong>Type de prêt souscrit :</strong> {loan.loanType}</p>
+        <div style={{ display: 'flex', gap: '20px', fontSize: '0.8rem', color: '#64748b' }}>
+          <span><b>Identifiant Prêt :</b> {loan._id}</span>
+          <span><b>Créé le :</b> {new Date(loan.createdAt || Date.now()).toLocaleDateString('fr-FR')}</span>
+        </div>
+      </div>
+
+      <div className="field-grid">
+        <div className="item">
+          <label>Montant Demandé</label>
+          <p className="txt-bold" style={{ color: '#004f52', fontSize: '1.2rem' }}>{loan.amount?.toLocaleString()} €</p>
+        </div>
+        <div className="item">
+          <label>Durée de Remboursement</label>
+          <p>{loan.duration} Mois</p>
+        </div>
+        <div className="item">
+          <label>Mensualité Prévue</label>
+          <p className="txt-bold">{loan.monthlyPayment?.toLocaleString()} € / mois</p>
+        </div>
+        <div className="item">
+          <label>Taux Fixe (TAEG)</label>
+          <p>4,90 %</p>
+        </div>
+      </div>
+
+      {/* Boutons d'actions rapides si le dossier est toujours EN ATTENTE (PENDING) */}
+      {loan.status === "PENDING" && (
+        <div className="actions-footer" style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+          <button 
+            onClick={() => handleLoanDecision(loan._id, "APPROVED")}
+            style={{ flex: 1, backgroundColor: '#004f52', color: 'white', padding: '12px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+          >
+            <i className="fas fa-check"></i> Approuver & Envoyer Contrat PDF
+          </button>
+          <button 
+            onClick={() => {
+              const motif = prompt("Veuillez saisir le motif du refus :");
+              if (motif) handleLoanDecision(loan._id, "REJECTED", motif);
+            }}
+            style={{ flex: 1, backgroundColor: '#dc2626', color: 'white', padding: '12px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+          >
+            <i className="fas fa-times"></i> Rejeter la demande
+          </button>
+        </div>
+      )}
+    </section>
+  ))
+) : selected.loan && (
+  /* Alternative si votre base ne renvoie pas un tableau (array) mais un objet unique 'loan' */
+  <section className="data-card loan-card" style={{ borderTop: '4px solid #004f52', marginTop: '20px' }}>
+    <div className="section-header">
+      <h3><i className="fas fa-hand-holding-usd"></i> Demande de Crédit Directe</h3>
+      <span className={`status-badge ${selected.loan.status}`}>{selected.loan.status}</span>
+    </div>
+    <div className="field-grid">
+      <div className="item"><label>Type</label><p>{selected.loan.loanType}</p></div>
+      <div className="item"><label>Montant</label><p className="txt-bold">{selected.loan.amount} €</p></div>
+      <div className="item"><label>Durée</label><p>{selected.loan.duration} mois</p></div>
+      <div className="item"><label>Mensualité</label><p>{selected.loan.monthlyPayment} €</p></div>
+    </div>
+    {selected.loan.status === "PENDING" && (
+      <div className="actions-footer" style={{ display: 'flex', gap: '12px', marginTop: '15px' }}>
+        <button onClick={() => handleLoanDecision(selected.loan._id, "APPROVED")} style={{ flex: 1, backgroundColor: '#004f52', color: 'white', padding: '10px', borderRadius: '5px', border: 'none', cursor:'pointer' }}>Accepter</button>
+        <button onClick={() => { const m = prompt("Motif :"); if(m) handleLoanDecision(selected.loan._id, "REJECTED", m); }} style={{ flex: 1, backgroundColor: '#dc2626', color: 'white', padding: '10px', borderRadius: '5px', border: 'none', cursor:'pointer' }}>Refuser</button>
       </div>
     )}
   </section>
