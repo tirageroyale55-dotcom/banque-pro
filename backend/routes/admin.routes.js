@@ -412,7 +412,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
            .quadraticCurveTo(470, centerY, 490, centerY + 10)
            .lineWidth(1.5)
            .stroke("#1e3a8a"); // Couleur bleu d'encre de stylo officiel
-           
+        
         try {
           // Incrustation du Vrai Cachet de la Banque (Arrière plan)
           const stampBuffer = Buffer.from(VRAI_CACHET_BPER_PNG.split("base64,")[1], "base64");
