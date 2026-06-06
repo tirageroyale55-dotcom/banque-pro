@@ -11,6 +11,9 @@ const nodemailer = require("nodemailer");
 const pdfTemplate = require("html-pdf-node");
 const LoanRequest = require("../models/LoanRequest");
 
+const BPER_STAMP = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="%23004f52" stroke-width="2"/><circle cx="50" cy="50" r="38" fill="none" stroke="%23004f52" stroke-width="1"/><text x="50" y="35" font-family="Arial" font-size="6" font-weight="bold" fill="%23004f52" text-anchor="middle">BPER: BANCA S.p.A.</text><text x="50" y="52" font-family="Arial" font-size="5" font-weight="bold" fill="%23004f52" text-anchor="middle">DIRECTION DES ENGAGEMENTS</text><text x="50" y="68" font-family="Arial" font-size="6" font-weight="bold" fill="%23004f52" text-anchor="middle">CONTRAT ACCORDÉ</text></svg>`;
+const BPER_DIRECTOR_SIGNATURE = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="60" viewBox="0 0 150 60"><path d="M10,40 Q30,10 50,35 T90,20 T130,45" fill="none" stroke="%231e3a8a" stroke-width="2.5"/></svg>`;
+
 const {
   validateUser,
   getPendingUsers,
@@ -264,8 +267,7 @@ router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req
 
 
 // Images de sécurité intégrées au PDF (Cachet et Signature Direction)
-const BPER_STAMP = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="%23004f52" stroke-width="2"/><circle cx="50" cy="50" r="38" fill="none" stroke="%23004f52" stroke-width="1"/><text x="50" y="35" font-family="Arial" font-size="6" font-weight="bold" fill="%23004f52" text-anchor="middle">BPER: BANCA S.p.A.</text><text x="50" y="52" font-family="Arial" font-size="5" font-weight="bold" fill="%23004f52" text-anchor="middle">DIRECTION DES ENGAGEMENTS</text><text x="50" y="68" font-family="Arial" font-size="6" font-weight="bold" fill="%23004f52" text-anchor="middle">CONTRAT ACCORDÉ</text></svg>`;
-const BPER_DIRECTOR_SIGNATURE = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="60" viewBox="0 0 150 60"><path d="M10,40 Q30,10 50,35 T90,20 T130,45" fill="none" stroke="%231e3a8a" stroke-width="2.5"/></svg>`;
+
 
 // 🛑 VOS ROUTES D'ORIGINE (Préservées pour éviter le bug 404)
 
