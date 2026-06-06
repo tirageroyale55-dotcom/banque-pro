@@ -387,6 +387,32 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.fillColor("#000000").font("Helvetica").fontSize(9).text("Le Directeur Général des Engagements", 360, ySignatureZone + 15);
         doc.text(`Approuvé le : ${currentDate}`, 360, ySignatureZone + 28);
         
+        // 🛡️ DESSIN VECTORIEL DU VRAI CACHET BPER BANCA (Garantie zéro bug sur Vercel)
+        const centerX = 400;
+        const centerY = ySignatureZone + 75;
+        
+        // Cercle extérieur du tampon
+        doc.circle(centerX, centerY, 32).lineWidth(1.5).stroke("#004f52");
+        // Cercle intérieur du tampon
+        doc.circle(centerX, centerY, 27).lineWidth(0.5).stroke("#004f52");
+        
+        // Mentions à l'intérieur du cachet officiel
+        doc.fillColor("#004f52").font("Helvetica-Bold").fontSize(5);
+        doc.text("BPER: BANCA S.p.A.", centerX - 22, centerY - 15, { width: 44, align: "center" });
+        doc.font("Helvetica").fontSize(4);
+        doc.text("DIRECTION DES", centerX - 20, centerY - 2, { width: 40, align: "center" });
+        doc.text("ENGAGEMENTS", centerX - 20, centerY + 4, { width: 40, align: "center" });
+        doc.font("Helvetica-Bold").fontSize(5);
+        doc.text("ACCORDÉ", centerX - 20, centerY + 13, { width: 40, align: "center" });
+
+        // ✍️ DESSIN VECTORIEL DE LA VRAIE GRIFFE DU DIRECTEUR (Superposée sur le cachet)
+        doc.moveTo(380, centerY + 10)
+           .quadraticCurveTo(395, centerY - 25, 410, centerY + 5)
+           .quadraticCurveTo(430, centerY - 15, 450, centerY + 15)
+           .quadraticCurveTo(470, centerY, 490, centerY + 10)
+           .lineWidth(1.5)
+           .stroke("#1e3a8a"); // Couleur bleu d'encre de stylo officiel
+           
         try {
           // Incrustation du Vrai Cachet de la Banque (Arrière plan)
           const stampBuffer = Buffer.from(VRAI_CACHET_BPER_PNG.split("base64,")[1], "base64");
