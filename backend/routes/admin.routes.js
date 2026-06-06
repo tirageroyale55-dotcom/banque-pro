@@ -264,7 +264,6 @@ router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req
 
 
 
-
 // =========================================================================
 // 1. RÉCUPÉRATION DES DOSSIERS EN ATTENTE (Conserve vos accès d'origine)
 // =========================================================================
@@ -384,7 +383,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
           doc.fillColor("#64748b").font("Helvetica-Oblique").text("[Signature Enregistrée Électroniquement]", 40, ySignatureZone + 45);
         }
 
-        // 👉 À DROITE : Certification Bancaire — Cachet Humide et Votre Signature Exacte au Stylo Bic Bleu
+        // 👉 À DROITE : Certification Bancaire — Cachet Humide et Votre Signature Réaliste Directe au Stylo Bic
         doc.fillColor("#004f52").font("Helvetica-Bold").fontSize(10).text("Pour la banque BPER Banca :", 360, ySignatureZone);
         doc.fillColor("#000000").font("Helvetica").fontSize(9).text("Le Directeur Général des Engagements", 360, ySignatureZone + 15);
         doc.text(`Approuvé le : ${currentDate}`, 360, ySignatureZone + 28);
@@ -404,44 +403,41 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.font("Helvetica-Bold").fontSize(4.5);
         doc.text("ACCORDÉ", centerX - 20, centerY + 11, { width: 40, align: "center" });
 
-        // 🖋️ REPRODUCTION FIDÈLE DE VOTRE IMAGE (STYLE ENCRE STYLO BIC BLEU)
-        doc.strokeColor("#1d4ed8").lineWidth(1.5); // Couleur Bic Bleu Roi
+        // 🖋️ TRACÉ DIRECT ET FLUIDE AU STYLO BIC BLEU (Sans coupures)
+        doc.strokeColor("#1d4ed8").lineWidth(1.2).lineJoin("round").lineCap("round");
 
-        // 1. La grande boucle ovale à gauche
-        doc.moveTo(420, centerY - 5)
-           .bezierCurveTo(390, centerY - 15, 360, centerY + 5, 395, centerY + 15)
-           .bezierCurveTo(420, centerY + 20, 435, centerY - 2, 442, centerY - 12)
+        // TRACÉ EN UN SEUL BLOC CONTINU (L'ovale, les barres verticales et les lettres du milieu)
+        doc.moveTo(425, centerY - 5)
+           // 1. La grande boucle ovale de gauche
+           .bezierCurveTo(400, centerY - 15, 365, centerY + 5, 395, centerY + 14)
+           .bezierCurveTo(418, centerY + 20, 432, centerY - 2, 442, centerY - 12)
+           // 2. Première grande barre verticale montante puis descendante
+           .lineTo(442, centerY - 32)
+           .lineTo(442, centerY + 28)
+           // 3. Remontée fluide pour former le "dhu/ar" central sans couper le trait
+           .bezierCurveTo(442, centerY + 5, 446, centerY - 2, 450, centerY - 6)
+           .bezierCurveTo(453, centerY - 12, 456, centerY - 2, 456, centerY + 8) // Première vague
+           .bezierCurveTo(456, centerY, 461, centerY - 8, 466, centerY - 4)    // Deuxième vague
+           .lineTo(466, centerY + 8)
+           .bezierCurveTo(466, centerY + 2, 472, centerY - 6, 478, centerY - 2) // Troisième vague
+           // 4. Glissement direct vers la grande barre verticale droite
+           .lineTo(478, centerY - 42)
+           .lineTo(478, centerY + 38)
+           // 5. Sortie finale avec le grand trait horizontal médian qui s'étire vers la droite
+           .bezierCurveTo(478, centerY + 10, 476, centerY - 2, 490, centerY - 2)
+           .lineTo(585, centerY - 2)
            .stroke();
 
-        // 2. Première grande barre verticale (qui descend bas)
-        doc.moveTo(442, centerY - 35).lineTo(442, centerY + 30).stroke();
-
-        // 3. Les vagues de l'écriture centrale "dhu/ar"
-        doc.moveTo(442, centerY - 10)
-           .bezierCurveTo(448, centerY - 2, 452, centerY - 18, 455, centerY - 5)  // première boucle montante
-           .lineTo(455, centerY + 10)                                              // descente
-           .moveTo(455, centerY)
-           .bezierCurveTo(460, centerY - 10, 465, centerY - 12, 468, centerY - 2)  // pont central
-           .lineTo(468, centerY + 10)
-           .moveTo(468, centerY + 2)
-           .bezierCurveTo(474, centerY - 8, 478, centerY - 8, 483, centerY - 1)    // vague montante
-           .bezierCurveTo(488, centerY + 4, 492, centerY - 2, 498, centerY - 3)   // plat
+        // 6. La barre de soulignement inférieure indépendante
+        doc.moveTo(415, centerY + 20)
+           .lineTo(555, centerY + 20)
            .stroke();
 
-        // 4. Deuxième grande barre verticale centrale (croisant le texte)
-        doc.moveTo(480, centerY - 45).lineTo(480, centerY + 40).stroke();
-
-        // 5. La petite apostrophe / le point en haut à droite
-        doc.moveTo(515, centerY - 24).lineTo(516, centerY - 22).lineWidth(2).stroke();
-        
-        // Réinitialisation de la taille du trait pour les lignes
-        doc.lineWidth(1.5);
-
-        // 6. Le grand trait horizontal médian (qui traverse et s'étend loin à droite)
-        doc.moveTo(425, centerY - 2).lineTo(590, centerY - 2).stroke();
-
-        // 7. La barre de soulignement inférieure droite
-        doc.moveTo(415, centerY + 22).lineTo(560, centerY + 22).stroke();
+        // 7. La petite apostrophe détachée en haut à droite
+        doc.moveTo(512, centerY - 24)
+           .lineTo(514, centerY - 22)
+           .lineWidth(1.8)
+           .stroke();
 
         doc.end();
       });
