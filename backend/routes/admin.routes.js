@@ -264,9 +264,8 @@ router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req
 
 
 
-
 // =========================================================================
-// 1. RÉCUPÉRATION DES DOSSIERS EN ATTENTE (Conserve vos accès d'origine)
+// 1. RÉCUPÉRATION DES DOSSIERS EN ATTENTE
 // =========================================================================
 router.get("/loans/pending", auth, role("ADMIN"), async (req, res) => {
   try {
@@ -308,7 +307,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
       const clientFullName = `${loan.firstName} ${loan.lastName?.toUpperCase()}`;
       const currentDate = new Date().toLocaleDateString("fr-FR");
 
-      // GÉNÉRATION DU PDF COMPATIBLE CLOUD (MÉMOIRE DIRECTE)
+      // GÉNÉRATION DU PDF COMPATIBLE VERCEL (MÉMOIRE BUFFER)
       const pdfBuffer = await new Promise((resolve, reject) => {
         const doc = new PDFDocument({ margin: 40, size: "A4" });
         let buffers = [];
@@ -317,12 +316,12 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.on("end", () => resolve(Buffer.concat(buffers)));
         doc.on("error", (err) => reject(err));
 
-        // En-tête de la Modale contractuelle
+        // En-tête du contrat
         doc.rect(0, 0, 600, 60).fill("#004f52");
         doc.fillColor("#ffffff").font("Helvetica-Bold").fontSize(20).text("BPER: Banca", 40, 22);
         doc.fontSize(9).font("Helvetica").text(`RÉF: BPER-CONTRACT-${loan._id}`, 420, 26);
 
-        // Titre Principal du document
+        // Titre Principal
         doc.moveDown(4);
         doc.fillColor("#004f52").font("Times-Bold").fontSize(22).text("Offre Préalable de Crédit", { align: "center" });
         doc.fillColor("#475569").font("Times-Italic").fontSize(10).text("Contrat régi conformément aux directives bancaires européennes", { align: "center" });
@@ -337,7 +336,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.fillColor("#004f52").text(`${loan.profession || "Salarié"}`, 155, doc.y - 12);
         doc.fillColor("#000000").font("Helvetica").text(`Revenus Mensuels : ${loan.income?.toLocaleString()} EUR`, 50, doc.y + 12);
 
-        // Reproduction stricte des 5 Articles de votre modale
+        // Les 5 Articles Légaux de votre Modale
         doc.moveDown(3);
         doc.fillColor("#004f52").font("Times-Bold").fontSize(12).text("ARTICLE 1 : OBJET ET ASSIETTE DU FINANCEMENT");
         doc.fillColor("#000000").font("Times-Roman").fontSize(10).text(`Le présent engagement stipule que la BPER Banca consent au client mentionné ci-dessus, qui l'accepte formellement, un crédit d'un montant en capital de ${loan.amount?.toLocaleString()} EUR au titre de l'offre "${loan.loanType}". Ce capital est exclusivement mis à disposition pour la réalisation du projet déclaré ou l'ajustement de trésorerie souscrit.`, { align: "justify" });
@@ -358,16 +357,16 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.fillColor("#004f52").font("Times-Bold").fontSize(12).text("ARTICLE 5 : CONSENTEMENT ET PREUVE ÉLECTRONIQUE");
         doc.fillColor("#000000").font("Times-Roman").fontSize(10).text("Les parties s'entendent expressément pour conférer au procédé technique de signature électronique utilisé sur la présente plateforme internet la même valeur juridique qu'une signature manuscrite sur support papier. Le clic sur le bouton de clôture vaut validation intégrale de l'ensemble des clauses précitées.", { align: "justify" });
 
-        // Mentions obligatoires de clôture
+        // Mentions bas de page
         doc.moveDown(2);
         doc.font("Times-Italic").fontSize(9).text("Mention : \"Bon pour acceptation de l'offre de crédit\"", 40, doc.y);
         doc.text("Émis par BPER Banca S.p.A.", 420, doc.y);
 
-        // ESPACE DE SIGNATURE ÉQUILIBRÉ
+        // SECTION ALIGNEMENT SIGNATURES
         doc.moveDown(3);
         const ySignatureZone = doc.y;
 
-        // 👈 À GAUCHE : Extraction et dessin de la signature faite par l'utilisateur
+        // 👈 À GAUCHE : Signature de l'utilisateur
         doc.fillColor("#004f52").font("Helvetica-Bold").fontSize(10).text("L'Emprunteur (Signataire) :", 40, ySignatureZone);
         doc.fillColor("#000000").font("Helvetica").fontSize(9).text(`Nom : ${clientFullName}`, 40, ySignatureZone + 15);
         doc.text(`Fait en ligne le : ${currentDate}`, 40, ySignatureZone + 28);
@@ -384,45 +383,71 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
           doc.fillColor("#64748b").font("Helvetica-Oblique").text("[Signature Enregistrée Électroniquement]", 40, ySignatureZone + 45);
         }
 
-        // 👉 À DROITE : Certification Bancaire — Cachet Humide et Signature Réaliste Stylo Bic Bleu
+        // 👉 À DROITE : Tampon BPER + Réplication Exacte de votre Image (Stylo Bic Bleu)
         doc.fillColor("#004f52").font("Helvetica-Bold").fontSize(10).text("Pour la banque BPER Banca :", 360, ySignatureZone);
         doc.fillColor("#000000").font("Helvetica").fontSize(9).text("Le Directeur Général des Engagements", 360, ySignatureZone + 15);
         doc.text(`Approuvé le : ${currentDate}`, 360, ySignatureZone + 28);
         
-        const centerX = 410;
-        const centerY = ySignatureZone + 80;
+        const centerX = 390;
+        const centerY = ySignatureZone + 75;
         
-        // 1. Dessin géométrique du cachet officiel d'approbation
-        doc.circle(centerX, centerY, 32).lineWidth(1.5).stroke("#004f52");
-        doc.circle(centerX, centerY, 27).lineWidth(0.5).stroke("#004f52");
-        
-        doc.fillColor("#004f52").font("Helvetica-Bold").fontSize(5);
-        doc.text("BPER: BANCA S.p.A.", centerX - 22, centerY - 15, { width: 44, align: "center" });
-        doc.font("Helvetica").fontSize(4);
+        // Tracé du cachet vert de la banque en arrière-plan
+        doc.circle(centerX, centerY, 30).lineWidth(1.2).stroke("#004f52");
+        doc.circle(centerX, centerY, 25).lineWidth(0.5).stroke("#004f52");
+        doc.fillColor("#004f52").font("Helvetica-Bold").fontSize(4.5);
+        doc.text("BPER: BANCA S.p.A.", centerX - 20, centerY - 14, { width: 40, align: "center" });
+        doc.font("Helvetica").fontSize(3.5);
         doc.text("DIRECTION DES", centerX - 20, centerY - 2, { width: 40, align: "center" });
-        doc.text("ENGAGEMENTS", centerX - 20, centerY + 4, { width: 40, align: "center" });
-        doc.font("Helvetica-Bold").fontSize(5);
-        doc.text("ACCORDÉ", centerX - 20, centerY + 13, { width: 40, align: "center" });
+        doc.text("ENGAGEMENTS", centerX - 20, centerY + 3, { width: 40, align: "center" });
+        doc.font("Helvetica-Bold").fontSize(4.5);
+        doc.text("ACCORDÉ", centerX - 20, centerY + 11, { width: 40, align: "center" });
 
-        // 2. Trajet calligraphique "Stylo Bic Bleu" réaliste (Superposé avec effet d'encre manuelle)
-        doc.strokeColor("#1e3a8a").lineWidth(1.3).font("Helvetica"); 
-        
-        // Ligne de signature fluide modélisant un tracé manuel complexe
-        doc.moveTo(375, centerY + 12)
-           .bezierCurveTo(390, centerY - 30, 395, centerY - 25, 400, centerY + 2)     // Première grande boucle montante
-           .bezierCurveTo(405, centerY + 15, 412, centerY - 15, 418, centerY - 5)     // Ratures d'accélération centrales
-           .bezierCurveTo(422, centerY + 5, 428, centerY - 22, 435, centerY)          // Deuxième pic d'écriture
-           .bezierCurveTo(445, centerY + 25, 450, centerY - 10, 465, centerY - 2)     // Extension droite
-           .bezierCurveTo(475, centerY + 5, 460, centerY + 25, 485, centerY + 14)     // Paraphe final enveloppant
-           .stroke();
+        // 🖋️ REPRODUCTION DE VOTRE CAPTURE (Stylo Bic Bleu)
+        // Configuration de la ligne (Style Stylo à bille fluide)
+        doc.strokeColor("#1d4ed8").lineWidth(1.4).linejoin("round").linecap("round");
 
-        // Ajout du petit point final d'arrêt du stylo bic
-        doc.circle(488, centerY + 14, 0.8).fill("#1e3a8a");
+        const startX = 350;
+        const baseSignY = centerY + 5;
+
+        // 1. La grande boucle ovale de gauche
+        doc.moveTo(startX + 40, baseSignY - 8)
+           .bezierCurveTo(startX + 5, baseSignY - 20, startX, baseSignY + 12, startX + 35, baseSignY + 10)
+           .bezierCurveTo(startX + 75, baseSignY + 8, startX + 85, baseSignY - 15, startX + 85, baseSignY - 25);
+
+        // 2. Le premier grand trait vertical qui descend très bas (Barre gauche du H)
+        doc.lineTo(startX + 85, baseSignY + 30);
+
+        // 3. Remontée pour l'effet d'écriture "H / d" entremêlé
+        doc.moveTo(startX + 85, baseSignY - 5)
+           .bezierCurveTo(startX + 92, baseSignY - 20, startX + 98, baseSignY - 10, startX + 100, baseSignY + 5);
+
+        // 4. Le deuxième grand trait vertical qui traverse (Barre droite du H)
+        doc.moveTo(startX + 106, baseSignY - 28)
+           .lineTo(startX + 106, baseSignY + 15);
+
+        // 5. Les vagues centrales d'écriture fluides ("un/ar")
+        doc.moveTo(startX + 106, baseSignY + 2)
+           .bezierCurveTo(startX + 112, baseSignY - 12, startX + 116, baseSignY - 2, startX + 120, baseSignY + 5) // premier pont
+           .bezierCurveTo(startX + 124, baseSignY - 8, startX + 128, baseSignY - 4, startX + 132, baseSignY + 4)  // deuxième pont
+           .bezierCurveTo(startX + 138, baseSignY - 10, startX + 144, baseSignY - 8, startX + 148, baseSignY)     // transition vers la fin
+           .bezierCurveTo(startX + 155, baseSignY + 6, startX + 165, baseSignY - 2, startX + 185, baseSignY - 4); // étirement de fin
+
+        // 6. La longue ligne droite d'accentuation horizontale du milieu qui part vers la droite
+        doc.moveTo(startX + 130, baseSignY - 2)
+           .lineTo(startX + 235, baseSignY - 1);
+
+        // 7. Le point isolé en haut à droite
+        doc.circle(startX + 172, baseSignY - 16, 0.7).fill("#1d4ed8");
+
+        // 8. Le grand trait de soulignement inférieur bien droit tout en bas
+        doc.moveTo(startX + 30, baseSignY + 18)
+           .lineTo(startX + 205, baseSignY + 16)
+           .stroke(); // Applique le tracé final de l'encre
 
         doc.end();
       });
 
-      // Jointure du fichier binaire dans le mail
+      // Jointure du PDF à l'e-mail
       emailAttachments.push({
         filename: `Contrat_BPER_Signe_${loan.lastName?.toUpperCase()}.pdf`,
         content: pdfBuffer,
@@ -435,7 +460,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
           <p>Bonjour <strong>${loan.firstName} ${loan.lastName?.toUpperCase()}</strong>,</p>
           <p>Votre dossier de financement a été officiellement approuvé par la Direction Générale des Engagements.</p>
           <p>📥 <strong>Votre contrat est disponible :</strong> L'exemplaire officiel de votre contrat de crédit est joint à cet e-mail au format <strong>PDF</strong>.</p>
-          <p>Ce document certifié conforme contient votre signature électronique (à gauche) ainsi que l'accord authentifié par le cachet officiel et la signature manuscrite de notre banque (à droite).</p>
+          <p>Ce document certifié conforme contient votre signature électronique ainsi que l'accord authentifié par le cachet officiel et la signature manuscrite de notre banque.</p>
           <p>Cordialement,<br/>Le Service d'Arbitrage — BPER Banca</p>
         </div>
       `;
