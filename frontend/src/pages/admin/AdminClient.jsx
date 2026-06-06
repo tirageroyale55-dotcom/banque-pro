@@ -16,9 +16,8 @@ export default function AdminClient() {
   const selectClient = async (id) => {
     const data = await api("/admin/client-master-data/" + id);
     setSelected(data);
-    setFormData({ userData: data.user, accountData: data.account, cardData: data.card, cardRequestData: data.cardRequest, 
-    loanData: data.loanRequests || data.loans || data.loan || data.loanRequest || null
-     });
+    const initialLoanData = data.loanRequests || data.loans || data.loan || data.loanRequest || null;
+    setFormData({ userData: data.user, accountData: data.account, cardData: data.card, cardRequestData: data.cardRequest, loanData: initialLoanData });
     setIsEditing(false);
   };
 
