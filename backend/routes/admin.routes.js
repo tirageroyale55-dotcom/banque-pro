@@ -302,7 +302,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
 
     if (decision === "APPROVED") {
       loan.status = "APPROVED";
-      emailSubject = " CONTRAT DE CRÉDIT SIGNÉ - Exemplaire PDF - BPER Banca";
+      emailSubject = " CONTRAT DE CRÉDIT SIGNÉ - PDF - BPER Banca";
 
       const clientFullName = `${loan.firstName} ${loan.lastName?.toUpperCase()}`;
       const currentDate = new Date().toLocaleDateString("fr-FR");
