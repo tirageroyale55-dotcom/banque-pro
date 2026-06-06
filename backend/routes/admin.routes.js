@@ -263,6 +263,8 @@ router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req
 
 
 
+
+
 // =========================================================================
 // 1. RÉCUPÉRATION DES DOSSIERS EN ATTENTE (Conserve vos accès d'origine)
 // =========================================================================
@@ -306,7 +308,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
       const clientFullName = `${loan.firstName} ${loan.lastName?.toUpperCase()}`;
       const currentDate = new Date().toLocaleDateString("fr-FR");
 
-      // GÉNÉRATION INTERNE DU BUFFER PDF (SÉCURISÉE ET RAPIDE POUR LE CLOUD)
+      // GÉNÉRATION DU PDF COMPATIBLE CLOUD (MÉMOIRE DIRECTE)
       const pdfBuffer = await new Promise((resolve, reject) => {
         const doc = new PDFDocument({ margin: 40, size: "A4" });
         let buffers = [];
@@ -315,17 +317,17 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.on("end", () => resolve(Buffer.concat(buffers)));
         doc.on("error", (err) => reject(err));
 
-        // En-tête de la Modale reproduite fidèlement
+        // En-tête de la Modale contractuelle
         doc.rect(0, 0, 600, 60).fill("#004f52");
         doc.fillColor("#ffffff").font("Helvetica-Bold").fontSize(20).text("BPER: Banca", 40, 22);
         doc.fontSize(9).font("Helvetica").text(`RÉF: BPER-CONTRACT-${loan._id}`, 420, 26);
 
-        // Titre Principal du Document
+        // Titre Principal du document
         doc.moveDown(4);
         doc.fillColor("#004f52").font("Times-Bold").fontSize(22).text("Offre Préalable de Crédit", { align: "center" });
         doc.fillColor("#475569").font("Times-Italic").fontSize(10).text("Contrat régi conformément aux directives bancaires européennes", { align: "center" });
         
-        // Cadre Profil du Client
+        // Fiche d'identité Client
         doc.moveDown(2);
         doc.rect(40, doc.y, 515, 75).fill("#f8fafc").stroke("#cbd5e1");
         doc.fillColor("#000000").font("Helvetica").fontSize(10);
@@ -335,7 +337,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.fillColor("#004f52").text(`${loan.profession || "Salarié"}`, 155, doc.y - 12);
         doc.fillColor("#000000").font("Helvetica").text(`Revenus Mensuels : ${loan.income?.toLocaleString()} EUR`, 50, doc.y + 12);
 
-        // Les 5 Articles Légaux (Identiques à votre structure Produits.jsx)
+        // Reproduction stricte des 5 Articles de votre modale
         doc.moveDown(3);
         doc.fillColor("#004f52").font("Times-Bold").fontSize(12).text("ARTICLE 1 : OBJET ET ASSIETTE DU FINANCEMENT");
         doc.fillColor("#000000").font("Times-Roman").fontSize(10).text(`Le présent engagement stipule que la BPER Banca consent au client mentionné ci-dessus, qui l'accepte formellement, un crédit d'un montant en capital de ${loan.amount?.toLocaleString()} EUR au titre de l'offre "${loan.loanType}". Ce capital est exclusivement mis à disposition pour la réalisation du projet déclaré ou l'ajustement de trésorerie souscrit.`, { align: "justify" });
@@ -356,16 +358,16 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.fillColor("#004f52").font("Times-Bold").fontSize(12).text("ARTICLE 5 : CONSENTEMENT ET PREUVE ÉLECTRONIQUE");
         doc.fillColor("#000000").font("Times-Roman").fontSize(10).text("Les parties s'entendent expressément pour conférer au procédé technique de signature électronique utilisé sur la présente plateforme internet la même valeur juridique qu'une signature manuscrite sur support papier. Le clic sur le bouton de clôture vaut validation intégrale de l'ensemble des clauses précitées.", { align: "justify" });
 
-        // Mentions bas de page (Syntaxe JavaScript sécurisée avec guillemets protégés)
+        // Mentions obligatoires de clôture
         doc.moveDown(2);
         doc.font("Times-Italic").fontSize(9).text("Mention : \"Bon pour acceptation de l'offre de crédit\"", 40, doc.y);
         doc.text("Émis par BPER Banca S.p.A.", 420, doc.y);
 
-        // SECTION ALIGNEMENT DES SIGNATURES
+        // ESPACE DE SIGNATURE ÉQUILIBRÉ
         doc.moveDown(3);
         const ySignatureZone = doc.y;
 
-        // 👈 À GAUCHE : Traitement de la signature de l'utilisateur (Produits.jsx)
+        // 👈 À GAUCHE : Extraction et dessin de la signature faite par l'utilisateur
         doc.fillColor("#004f52").font("Helvetica-Bold").fontSize(10).text("L'Emprunteur (Signataire) :", 40, ySignatureZone);
         doc.fillColor("#000000").font("Helvetica").fontSize(9).text(`Nom : ${clientFullName}`, 40, ySignatureZone + 15);
         doc.text(`Fait en ligne le : ${currentDate}`, 40, ySignatureZone + 28);
@@ -373,29 +375,27 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         if (loan.signatureData && loan.signatureData.includes("base64,")) {
           try {
             const clientSigBuffer = Buffer.from(loan.signatureData.split("base64,")[1], "base64");
-            // Positionnement propre de la signature du client
             doc.image(clientSigBuffer, 40, ySignatureZone + 42, { width: 140, height: 55 });
             doc.rect(40, ySignatureZone + 42, 140, 55).lineWidth(1).dash(4, { space: 2 }).stroke("#cbd5e1");
           } catch (e) {
             doc.text("[Signature Électronique Certifiée]", 40, ySignatureZone + 45);
           }
         } else {
-          doc.fillColor("#64748b").font("Helvetica-Oblique").text("[Signature Électronique Enregistrée]", 40, ySignatureZone + 45);
+          doc.fillColor("#64748b").font("Helvetica-Oblique").text("[Signature Enregistrée Électroniquement]", 40, ySignatureZone + 45);
         }
 
-        // 👉 À DROITE : Création vectorielle du Vrai Cachet et de la Signature Direction
+        // 👉 À DROITE : Certification Bancaire — Cachet Humide et Signature Réaliste Stylo Bic Bleu
         doc.fillColor("#004f52").font("Helvetica-Bold").fontSize(10).text("Pour la banque BPER Banca :", 360, ySignatureZone);
         doc.fillColor("#000000").font("Helvetica").fontSize(9).text("Le Directeur Général des Engagements", 360, ySignatureZone + 15);
         doc.text(`Approuvé le : ${currentDate}`, 360, ySignatureZone + 28);
         
-        const centerX = 400;
-        const centerY = ySignatureZone + 75;
+        const centerX = 410;
+        const centerY = ySignatureZone + 80;
         
-        // Tracé du double cercle du tampon humide officiel
+        // 1. Dessin géométrique du cachet officiel d'approbation
         doc.circle(centerX, centerY, 32).lineWidth(1.5).stroke("#004f52");
         doc.circle(centerX, centerY, 27).lineWidth(0.5).stroke("#004f52");
         
-        // Textes internes du cachet officiel de la banque
         doc.fillColor("#004f52").font("Helvetica-Bold").fontSize(5);
         doc.text("BPER: BANCA S.p.A.", centerX - 22, centerY - 15, { width: 44, align: "center" });
         doc.font("Helvetica").fontSize(4);
@@ -404,38 +404,25 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.font("Helvetica-Bold").fontSize(5);
         doc.text("ACCORDÉ", centerX - 20, centerY + 13, { width: 40, align: "center" });
 
-        // ✍️ TRACÉ DE LA VRAIE SIGNATURE MANUSCRITE AU BIC BLEU
-        // Couleur officielle d'encre bleu Bic classique (Royal Blue)
-        const bicBlue = "#1d4ed8"; 
+        // 2. Trajet calligraphique "Stylo Bic Bleu" réaliste (Superposé avec effet d'encre manuelle)
+        doc.strokeColor("#1e3a8a").lineWidth(1.3).font("Helvetica"); 
+        
+        // Ligne de signature fluide modélisant un tracé manuel complexe
+        doc.moveTo(375, centerY + 12)
+           .bezierCurveTo(390, centerY - 30, 395, centerY - 25, 400, centerY + 2)     // Première grande boucle montante
+           .bezierCurveTo(405, centerY + 15, 412, centerY - 15, 418, centerY - 5)     // Ratures d'accélération centrales
+           .bezierCurveTo(422, centerY + 5, 428, centerY - 22, 435, centerY)          // Deuxième pic d'écriture
+           .bezierCurveTo(445, centerY + 25, 450, centerY - 10, 465, centerY - 2)     // Extension droite
+           .bezierCurveTo(475, centerY + 5, 460, centerY + 25, 485, centerY + 14)     // Paraphe final enveloppant
+           .stroke();
 
-        // Premier mouvement : L'initiale montante rapide
-        doc.moveTo(375, centerY + 15)
-           .bezierCurveTo(380, centerY - 30, 395, centerY - 25, 390, centerY + 10)
-           .lineWidth(1.8)
-           .stroke(bicBlue);
+        // Ajout du petit point final d'arrêt du stylo bic
+        doc.circle(488, centerY + 14, 0.8).fill("#1e3a8a");
 
-        // Deuxième mouvement : Les boucles centrales entrelacées
-        doc.moveTo(388, centerY + 2)
-           .bezierCurveTo(400, centerY - 15, 410, centerY - 10, 405, centerY + 12)
-           .bezierCurveTo(415, centerY - 5, 425, centerY - 15, 422, centerY + 10)
-           .lineWidth(1.3)
-           .stroke(bicBlue);
-
-        // Troisième mouvement : La grande barre de fin descendante et le paraphe
-        doc.moveTo(420, centerY + 5)
-           .lineTo(445, centerY - 20)
-           .bezierCurveTo(450, centerY - 25, 455, centerY, 430, centerY + 18)
-           .lineWidth(2.1) // Plus d'épaisseur sur l'appui du stylo
-           .stroke(bicBlue);
-
-        // Quatrième mouvement : Le trait de soulignement rapide sous la signature
-        doc.moveTo(370, centerY + 22)
-           .quadraticCurveTo(415, centerY + 12, 470, centerY + 16)
-           .lineWidth(0.9) // Trait fin de fin de geste
-           .stroke(bicBlue);
+        doc.end();
       });
 
-      // Injection sécurisée de la pièce jointe binaire dans l'e-mail
+      // Jointure du fichier binaire dans le mail
       emailAttachments.push({
         filename: `Contrat_BPER_Signe_${loan.lastName?.toUpperCase()}.pdf`,
         content: pdfBuffer,
@@ -448,7 +435,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
           <p>Bonjour <strong>${loan.firstName} ${loan.lastName?.toUpperCase()}</strong>,</p>
           <p>Votre dossier de financement a été officiellement approuvé par la Direction Générale des Engagements.</p>
           <p>📥 <strong>Votre contrat est disponible :</strong> L'exemplaire officiel de votre contrat de crédit est joint à cet e-mail au format <strong>PDF</strong>.</p>
-          <p>Ce document certifié conforme contient votre signature électronique (à gauche) ainsi que l'accord authentifié par le cachet officiel de notre banque (à droite).</p>
+          <p>Ce document certifié conforme contient votre signature électronique (à gauche) ainsi que l'accord authentifié par le cachet officiel et la signature manuscrite de notre banque (à droite).</p>
           <p>Cordialement,<br/>Le Service d'Arbitrage — BPER Banca</p>
         </div>
       `;
