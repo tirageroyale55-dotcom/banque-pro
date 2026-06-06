@@ -263,6 +263,11 @@ router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req
 
 
 
+// 🔥 signatures et tampons officiels encodés en Base64/SVG pour le Directeur BPER Banca
+const BPER_STAMP_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="%23004f52" stroke-width="2" stroke-dasharray="2,2"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23004f52" stroke-width="1.5"/><text x="50" y="33" font-family="Arial" font-size="6" font-weight="bold" fill="%23004f52" text-anchor="middle">BPER: BANCA S.p.A.</text><text x="50" y="52" font-family="Arial" font-size="5" font-weight="bold" fill="%23004f52" text-anchor="middle">DIRECTION GÉNÉRALE</text><text x="50" y="62" font-family="Arial" font-size="4.5" fill="%23004f52" text-anchor="middle">* DES ENGAGEMENTS *</text><text x="50" y="75" font-family="Arial" font-size="5" font-weight="bold" fill="%23004f52" text-anchor="middle">APPROUVÉ</text></svg>`;
+
+const BPER_DIRECTOR_SIGNATURE = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="80" viewBox="0 0 200 80"><path d="M20,50 Q40,20 60,45 T100,30 T140,55 T180,25 M50,35 L160,45 M80,20 Q100,60 110,55" fill="none" stroke="%231e3a8a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
 // 🔥 ROUTE ADMIN 1 : Récupérer toutes les demandes de prêt en attente (PENDING)
 router.get("/loans/pending", auth, role("ADMIN"), async (req, res) => {
   try {
@@ -273,7 +278,7 @@ router.get("/loans/pending", auth, role("ADMIN"), async (req, res) => {
   }
 });
 
-// 🔥 ROUTE ADMIN 2 : Décision, Génération du PDF Officiel Répliqué et Envoi du Mail
+// 🔥 ROUTE ADMIN 2 : Décision, Génération du PDF EXACT et envoi par e-mail
 router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
   try {
     const { decision, message } = req.body; 
@@ -297,65 +302,53 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
 
     if (decision === "APPROVED") {
       loan.status = "APPROVED";
-      emailSubject = `Réf BPER-${loan._id} : Votre contrat de financement approuvé et signé - BPER Banca`;
+      emailSubject = "Félicitations ! Votre contrat de financement est signé et approuvé - BPER Banca";
 
-      const clientFullName = `${loan.civility} ${loan.lastName.toUpperCase()} ${loan.firstName}`;
+      const clientFullName = `${loan.firstName} ${loan.lastName.toUpperCase()}`;
       const contractDate = new Date(loan.createdAt || Date.now()).toLocaleDateString("fr-FR");
+      const validationDate = new Date().toLocaleDateString("fr-FR");
 
-      // Signature électronique du Directeur Général modélisée en SVG propre
-      const directorSignatureSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="70" viewBox="0 0 200 70"><path d="M20,45 Q40,15 70,35 T130,20 T180,50 M50,25 Q90,55 110,15" fill="none" stroke="%23002f34" stroke-width="2.5" stroke-linecap="round"/></svg>`;
-
-      // Sceau / Tampon Officiel Circulaire de la BPER Banca modélisé en SVG propre
-      const bperStampSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="50" fill="none" stroke="%23004f52" stroke-width="2" stroke-dasharray="4 2"/><circle cx="55" cy="55" r="44" fill="none" stroke="%23004f52" stroke-width="1"/><text x="55" y="32" font-family="Arial" font-size="8" font-weight="bold" fill="%23004f52" text-anchor="middle">BPER: BANCA</text><text x="55" y="58" font-family="Arial" font-size="7" fill="%23004f52" text-anchor="middle">DIRECTION</text><text x="55" y="68" font-family="Arial" font-size="7" fill="%23004f52" text-anchor="middle">DES ENGAGEMENTS</text><text x="55" y="88" font-family="Arial" font-size="7" font-weight="bold" fill="%23004f52" text-anchor="middle">* CERTIFIÉ *</text></svg>`;
-
-      // 📜 CODE HTML EXACT DU CONTRAT DU PRODUITS.JSX ADAPTÉ POUR LE GENERATEUR PDF A4
-      const htmlContractForPDF = `
-        <!DOCTYPE html>
+      // Construction du code HTML STRICTEMENT identique à Produits.jsx converti pour le moteur PDF
+      const htmlContentForPDF = `
         <html>
         <head>
           <meta charset="utf-8">
           <style>
-            body { font-family: 'Times New Roman', Times, serif; padding: 30px; color: #000; line-height: 1.6; text-align: justify; font-size: 13px; }
-            .header-banner { background: #004f52; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: #fff; margin-bottom: 25px; }
-            .header-title { font-size: 20px; font-weight: bold; letter-spacing: 1px; margin: 0; }
-            .header-ref { font-size: 11px; font-family: Arial, sans-serif; opacity: 0.8; }
-            .title-box { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #004f52; padding-bottom: 15px; }
-            .main-title { font-size: 20px; color: #004f52; margin: 0 0 5px 0; text-transform: uppercase; font-weight: bold; }
-            .subtitle { margin: 0; font-style: italic; color: #475569; font-size: 11px; font-family: Arial, sans-serif; }
-            .info-box { background: #f8fafc; padding: 15px; border-radius: 6px; marginBottom: 25px; border: 1px solid #cbd5e1; font-family: Arial, sans-serif; font-size: 12px; line-height: 1.5; margin-bottom: 20px; }
-            h3 { color: #004f52; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px; font-size: 14px; marginTop: 20px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; }
-            p { margin: 0 0 12px 0; }
-            .mention-box { marginTop: 30px; border-top: 1px solid #000; paddingTop: 10px; display: flex; justify-content: space-between; font-size: 11px; font-style: italic; margin-bottom: 35px; }
+            body { font-family: 'Times New Roman', Times, serif; padding: 40px; color: #000; line-height: 1.6; text-align: justify; background-color: #fff; }
+            .header-box { border-bottom: 2px solid #004f52; padding-bottom: 15px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+            .logo-text { font-size: 1.8rem; font-weight: bold; color: #004f52; letter-spacing: 1px; margin: 0; }
+            .ref-text { font-size: 0.75rem; color: #475569; font-family: Arial, sans-serif; }
+            .main-title { text-align: center; font-size: 1.5rem; color: #004f52; margin: 0 0 5px 0; text-transform: uppercase; font-weight: bold; }
+            .subtitle { text-align: center; margin: 0 0 30px 0; font-style: italic; color: #475569; font-size: 0.8rem; font-family: Arial, sans-serif; }
+            .meta-block { background: #f8fafc; padding: 15px; border-radius: 6px; margin-bottom: 25px; border: 1px solid #cbd5e1; font-family: Arial, sans-serif; font-size: 0.85rem; }
+            .meta-block p { margin: 4px 0; }
+            h3 { color: #004f52; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px; font-size: 1.05rem; marginTop: 20px; font-weight: bold; }
+            p { font-size: 0.95rem; margin-bottom: 15px; }
+            .mention-line { margin-top: 40px; border-top: 1px solid #000; padding-top: 10px; display: flex; justify-content: space-between; font-size: 0.8rem; font-style: italic; }
             
-            /* Structure Bancaire Pro des blocs de Signature en bas */
-            .signatures-container { margin-top: 40px; page-break-inside: avoid; display: table; width: 100%; table-layout: fixed; }
-            .signature-column { display: table-cell; width: 50%; vertical-align: top; box-sizing: border-box; }
-            .left-column { padding-right: 20px; border-right: 1px dashed #cbd5e1; }
-            .right-column { padding-left: 20px; position: relative; }
-            .sig-title { font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; color: #004f52; margin-bottom: 5px; text-decoration: underline; }
-            .client-info { font-family: Arial, sans-serif; font-size: 11px; color: #334155; margin-top: 4px; line-height: 1.4; }
-            .img-sig-client { border: 1px dashed #004f52; width: 190px; height: 75px; object-fit: contain; background: #fafafa; display: block; margin-top: 8px; }
-            .img-sig-director { width: 180px; height: 65px; object-fit: contain; display: block; margin-top: 8px; }
-            .stamp-box { position: absolute; bottom: -10px; right: 10px; width: 100px; height: 100px; opacity: 0.95; }
+            /* ZONE DES SIGNATURES PROFESSIONNELLES EXIGÉE */
+            .signatures-container { margin-top: 50px; display: flex; justify-content: space-between; align-items: flex-start; page-break-inside: avoid; }
+            .signature-block-left { width: 45%; text-align: left; font-family: Arial, sans-serif; font-size: 0.85rem; }
+            .signature-block-right { width: 45%; text-align: right; font-family: Arial, sans-serif; font-size: 0.85rem; position: relative; }
+            .client-sig-img { border: 1px dashed #94a3b8; width: 180px; height: 80px; object-fit: contain; background: #fafafa; margin-top: 10px; display: block; }
+            .director-sig-img { width: 160px; height: 65px; object-fit: contain; margin-top: 5px; display: inline-block; }
+            .stamp-img { width: 90px; height: 90px; position: absolute; right: 110px; top: 15px; opacity: 0.85; }
           </style>
         </head>
         <body>
-
-          <div class="header-banner">
-            <div class="header-title">BPER: Banca</div>
-            <div class="header-ref">RÉF : BPER-CONTRACT-${loan._id}</div>
+          <div class="header-box">
+            <div class="logo-text">BPER: Banca</div>
+            <div class="ref-text">RÉF : BPER-CONTRACT-${loan._id}</div>
           </div>
 
-          <div class="title-box">
-            <div class="main-title">Offre Préalable de Crédit</div>
-            <div class="subtitle">Contrat régi conformément aux directives bancaires européennes</div>
-          </div>
-
-          <div class="info-box">
-            <strong>Organisme Prêteur :</strong> BPER Banca S.p.A. <br/>
-            <strong>Bénéficiaire :</strong> ${clientFullName}<br/>
-            <strong>Profession du client :</strong> <span style="color: #004f52; font-weight: bold;">${loan.profession || "Salarié"}</span><br/>
-            <strong>Revenus Mensuels :</strong> ${loan.income?.toLocaleString()} EUR
+          <div class="main-title">Offre Préalable de Crédit</div>
+          <div class="subtitle">Contrat régi conformément aux directives bancaires européennes</div>
+          
+          <div class="meta-block">
+            <p><strong>Organisme Prêteur :</strong> BPER Banca S.p.A.</p>
+            <p><strong>Bénéficiaire :</strong> ${loan.civility} ${loan.lastName.toUpperCase()} ${loan.firstName}</p>
+            <p><strong>Profession du client :</strong> <span style="color: #004f52; font-weight: bold;">${loan.profession || "Salarié"}</span></p>
+            <p><strong>Revenus Mensuels :</strong> ${loan.income?.toLocaleString()} EUR</p>
           </div>
 
           <h3>ARTICLE 1 : OBJET ET ASSIETTE DU FINANCEMENT</h3>
@@ -373,147 +366,100 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
           <h3>ARTICLE 5 : CONSENTEMENT ET PREUVE ÉLECTRONIQUE</h3>
           <p>Les parties s'entendent expressément pour conférer au procédé technique de signature électronique utilisé sur la présente plateforme internet la même valeur juridique qu'une signature manuscrite sur support papier. Le clic sur le bouton de clôture vaut validation intégrale de l'ensemble des clauses précitées.</p>
 
-          <div class="mention-box">
+          <div class="mention-line">
             <span>Mention : "Bon pour acceptation de l'offre de crédit"</span>
             <span>Émis par BPER Banca S.p.A.</span>
           </div>
 
-          <!-- ✒️ BLOCS DE SIGNATURE EXIGÉS (Gauches & Droite) -->
+          <!-- 🔥 BLOC DE SIGNATURE DOUBLE CONFORME À VOS INSTRUCTIONS -->
           <div class="signatures-container">
+            <div class="signature-block-left">
+              <strong style="color:#004f52;">L'Emprunteur (Signataire numérique) :</strong><br/>
+              <span style="font-size:11px; color:#475569;">Nom : ${clientFullName}</span><br/>
+              <span style="font-size:11px; color:#475569;">Fait le : ${contractDate}</span>
+              <img class="client-sig-img" src="${loan.signatureData}" alt="Signature Client"/>
+            </div>
             
-            <!-- À GAUCHE : L'emprunteur / Client -->
-            <div class="signature-column left-column">
-              <div class="sig-title">L'Emprunteur (Signataire unique) :</div>
-              <div class="client-info">
-                <strong>Nom & Prénom :</strong> ${loan.lastName.toUpperCase()} ${loan.firstName}<br/>
-                <strong>Date de signature :</strong> ${contractDate}<br/>
-                <span style="font-size: 9px; color: #059669; font-weight: bold;">✔ Validé par horodatage IP sécurisé</span>
-              </div>
-              <img class="img-sig-client" src="${loan.signatureData}" alt="Signature Numérique Client" />
-            </div>
-
-            <!-- À DROITE : Le Directeur Général + Sceau BPER Banca -->
-            <div class="signature-column right-column">
-              <div class="sig-title">Pour la banque BPER Banca S.p.A :</div>
-              <div class="client-info">
-                <strong>Le Directeur Général des Engagements</strong><br/>
-                <strong>Date d'approbation :</strong> ${new Date().toLocaleDateString("fr-FR")}<br/>
-                <span style="font-size: 9px; color: #0284c7; font-weight: bold;">✔ Tiers de confiance régulé</span>
-              </div>
-              <!-- Tracé signature Direction -->
-              <img class="img-sig-director" src="${directorSignatureSVG}" alt="Signature Direction" />
+            <div class="signature-block-right">
+              <strong style="color:#004f52;">Pour la banque BPER Banca :</strong><br/>
+              <span style="font-size:11px; color:#475569;">Le Directeur Général des Engagements</span><br/>
+              <span style="font-size:11px; color:#475569;">Validé le : ${validationDate}</span><br/>
               
-              <!-- Tampon Cacher BPER BANCA -->
-              <div class="stamp-box">
-                <img src="${bperStampSVG}" width="100" height="100" alt="Cachet Institutionnel" />
-              </div>
+              <!-- Tampon officiel superposé à gauche de la signature du directeur -->
+              <img class="stamp-img" src="${BPER_STAMP_SVG}" alt="Cachet BPER"/>
+              <img class="director-sig-img" src="${BPER_DIRECTOR_SIGNATURE}" alt="Signature Direction"/>
             </div>
-
           </div>
-
         </body>
         </html>
       `;
 
-      // Compilation physique du PDF A4 en mémoire
-      let pdfBuffer;
+      // 1. Compilation physique du fichier PDF joint crypté en A4
       try {
-        const options = { format: "A4", margin: { top: "15mm", right: "15mm", bottom: "15mm", left: "15mm" } };
-        pdfBuffer = await pdfTemplate.generatePdf({ content: htmlContractForPDF }, options);
+        let options = { format: "A4", margin: { top: "20px", bottom: "20px", left: "20px", right: "20px" } };
+        let file = { content: htmlContentForPDF };
+        const pdfBuffer = await pdfTemplate.generatePdf(file, options);
         
-        // Attachement du fichier PDF officiel
         emailAttachments.push({
-          filename: `Contrat_Officiel_BPER_${loan.lastName.toUpperCase()}.pdf`,
+          filename: `Contrat_Officiel_BPER_Signe_${loan.lastName.toUpperCase()}.pdf`,
           content: pdfBuffer
         });
       } catch (pdfErr) {
-        console.error("Erreur critique d'assemblage du PDF :", pdfErr);
+        console.error("Erreur critique de rendu PDFKit/html-pdf-node :", pdfErr);
       }
 
-      // Insertion visuelle dans le corps de l'e-mail pour un double affichage propre (CID)
+      // 2. Traitement du CID de la signature client pour l'injection graphique simplifiée dans l'email
       if (loan.signatureData && loan.signatureData.includes("base64,")) {
         emailAttachments.push({
-          filename: "client_signature.png",
+          filename: "signature_client.png",
           content: Buffer.from(loan.signatureData.split("base64,")[1], "base64"),
           cid: "clientSignatureCID"
         });
       }
 
-      emailAttachments.push({
-        filename: "director_sig.png",
-        content: Buffer.from(directorSignatureSVG.split("base64,")[1] || directorSignatureSVG.replace("data:image/svg+xml;utf8,", ""), "utf8"),
-        cid: "directorSignatureCID"
-      });
-
-      // ✉️ HTML DESIGN DU MAIL DE RÉCEPTION UTILISATEUR (HAUTE QUALITÉ BANCAIRE)
+      // Formatage du corps de l'e-mail
       emailHtml = `
-        <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #d8e2e2; border-radius: 8px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+        <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #cbd5e1; padding: 30px; color: #1e293b; background: #ffffff;">
+          <div style="border-bottom: 3px solid #004f52; padding-bottom: 15px; margin-bottom: 20px;">
+            <h2 style="color: #004f52; margin: 0; font-size: 24px;">BPER: <span style="font-weight: 300;">Banca</span></h2>
+          </div>
+          <p>Bonjour <strong>${loan.firstName} ${loan.lastName.toUpperCase()}</strong>,</p>
+          <p>Nous avons le plaisir de vous informer que votre demande de financement pour votre offre <strong>${loan.loanType}</strong> a reçu un avis favorable de notre comité des risques.</p>
           
-          <div style="background-color: #004f52; padding: 25px; color: #ffffff;">
-            <table style="width: 100%;">
-              <tr>
-                <td><span style="font-size: 24px; font-weight: 800; letter-spacing: 0.5px;">BPER: Banca</span></td>
-                <td style="text-align: right; font-size: 11px; opacity: 0.85;">DÉPARTEMENT DES CRÉDITS</td>
-              </tr>
-            </table>
+          <div style="background-color: #f0f7f7; padding: 15px; border-left: 5px solid #004f52; border-radius: 4px; margin: 20px 0;">
+            <p style="margin: 0 0 5px 0; font-weight: bold; color: #004f52;">Détails de l'accord de déblocage :</p>
+            <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
+              <li>Montant validé : <strong>${loan.amount?.toLocaleString()} EUR</strong></li>
+              <li>Échéancier fixe : <strong>${loan.duration} mois</strong></li>
+              <li>Mensualité : <strong>${loan.monthlyPayment?.toLocaleString()} EUR / mois</strong></li>
+            </ul>
           </div>
 
-          <div style="padding: 30px; color: #1e293b; line-height: 1.6;">
-            <p style="font-size: 15px; margin-top: 0;">Cher(e) client(e) <strong>${loan.firstName} ${loan.lastName.toUpperCase()}</strong>,</p>
-            
-            <p>Nous avons le plaisir de vous confirmer que la Direction Générale des Engagements **BPER Banca** a accordé un avis favorable à votre demande de financement en ligne.</p>
-            
-            <div style="background-color: #f0f7f7; padding: 20px; border-left: 4px solid #004f52; margin: 22px 0; border-radius: 4px;">
-              <h4 style="margin: 0 0 10px 0; color: #004f52; font-size: 14px; text-transform: uppercase;">Caractéristiques de votre offre validée :</h4>
-              <ul style="margin: 0; padding-left: 20px; font-size: 13.5px; color: #334155;">
-                <li style="margin-bottom: 5px;"><strong>Formule souscrite :</strong> ${loan.loanType}</li>
-                <li style="margin-bottom: 5px;"><strong>Capital débloqué :</strong> ${loan.amount?.toLocaleString()} EUR</li>
-                <li style="margin-bottom: 5px;"><strong>Périodicité d'amortissement :</strong> ${loan.duration} Mois</li>
-                <li style="margin-bottom: 5px;"><strong>Échéance prélevée :</strong> ${loan.monthlyPayment?.toLocaleString()} EUR / mois</li>
-                <li style="margin-bottom: 5px;"><strong>Statut professionnel retenu :</strong> ${loan.profession || "Salarié"}</li>
-              </ul>
-            </div>
-
-            <p style="font-size: 13.5px;">📋 <strong>Pièce jointe sécurisée :</strong> Conforme à vos exigences contractuelles, vous trouverez ci-joint votre **Contrat Officiel au format PDF**. Ce document fige votre accord technique et est contresigné en bas de page à gauche par vos soins, et à droite par le Directeur Général sous le cachet certifié de notre établissement bancaire.</p>
-            
-            <p style="font-size: 13.5px; margin-bottom: 30px;">Les fonds correspondants seront versés sur votre compte de dépôt à l'expiration des délais légaux de rétractation mentionnés dans l'Article 4.</p>
-
-            <p style="font-size: 13px; margin: 0; color: #475569;">Nous vous remercions de votre confiance.</p>
-            <p style="font-size: 13px; font-weight: bold; color: #004f52; margin: 4px 0 0 0;">Le Secrétariat des Crédits — BPER Banca S.p.A.</p>
-          </div>
-
-          <div style="background-color: #f8fafc; padding: 15px 30px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #64748b;">
-            Ce courriel ainsi que sa pièce jointe sont cryptés. BPER Banca S.p.A. - Siège social : Via San Carlo, 8/20 - Modène, Italie - Imm. Reg. Imp. di Modena n. 01153230360.
-          </div>
+          <p>📥 <strong>Votre contrat complet est disponible :</strong> Nous avons généré le document officiel certifié contenant votre signature électronique à gauche ainsi que le cachet de la direction à droite. Il est joint à ce courrier électronique au format <strong>PDF non modifiable</strong>.</p>
+          
+          <p style="font-size: 13px; margin-top: 25px; color: #475569;">Veuillez le conserver précieusement. Les fonds seront transférés selon vos instructions de virement bancaire.</p>
+          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;"/>
+          <p style="font-size: 11px; color: #94a3b8; text-align: center;">BPER Banca S.p.A. • Secrétariat Général des Crédits aux Particuliers • Conforme RGPD et eIDAS.</p>
         </div>
       `;
 
     } else if (decision === "REJECTED") {
       loan.status = "REJECTED";
-      emailSubject = "Mise à jour concernant votre demande de financement - BPER Banca";
+      emailSubject = "Mise à jour concernant votre dossier de crédit - BPER Banca";
       emailHtml = `
-        <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; padding: 30px; color: #1e293b;">
-          <div style="text-align: left; padding-bottom: 15px; border-bottom: 3px solid #dc2626;">
-            <span style="font-size: 24px; font-weight: 800; color: #dc2626;">BPER: <span style="font-weight: 300; color: #475569;">Banca</span></span>
+        <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #fca5a5; padding: 25px; background: #fff;">
+          <h2 style="color: #dc2626; margin-top: 0;">BPER: Banca</h2>
+          <p>Madame, Monsieur,</p>
+          <p>Après examen de vos pièces réglementaires, nous ne pouvons accorder une suite favorable à votre demande de prêt pour la raison suivante :</p>
+          <div style="background: #fef2f2; padding: 15px; border-left: 4px solid #dc2626; margin: 15px 0; font-style: italic;">
+            "${message || "Profil de risque non conforme aux exigences d'octroi de la banque."}"
           </div>
-          <p style="margin-top: 20px; font-size: 14.5px;">Cher(e) client(e),</p>
-          <p style="font-size: 14px;">Nous avons réalisé l'évaluation réglementaire des risques concernant votre demande d'octroi de crédit de <strong>${loan.amount?.toLocaleString()} EUR</strong>.</p>
-          <p style="font-size: 14px;">Après analyse minutieuse, notre commission de crédit a le regret de ne pas pouvoir formuler d'avis favorable pour le motif suivant :</p>
-          
-          <div style="background-color: #fef2f2; padding: 15px; border-left: 4px solid #dc2626; margin: 20px 0; font-style: italic; color: #991b1b; font-size: 13.5px; border-radius: 4px;">
-            "${message || "Capacité d'endettement insuffisante ou inadéquation avec les conditions de solvabilité actuelles."}"
-          </div>
-          
-          <p style="font-size: 13.5px;">Votre dossier en ligne est par conséquent classifié comme refusé et archivé de manière sécurisée.</p>
-          <p style="font-size: 13px; color: #64748b; margin-top: 25px;">Cordialement,<br/><strong>Le Service de Gestion des Risques — BPER Banca</strong></p>
+          <p>Votre dossier est archivé conformément aux protocoles réglementaires.</p>
         </div>
       `;
     }
 
-    // Mise à jour de l'état du crédit dans MongoDB Atlas
     await loan.save();
-
-    // Envoi de l'e-mail avec ses pièces jointes (PDF officiel structuré + signatures)
     await transporter.sendMail({
       from: `"BPER Banca - Service Crédits" <${process.env.MAIL_USER}>`,
       to: loan.user.email,
@@ -522,11 +468,11 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
       attachments: emailAttachments
     });
 
-    res.json({ message: `La demande a été validée (${decision}). Le client a reçu par e-mail le contrat PDF certifié conforme.` });
+    res.json({ message: `Dossier validé et scellé. E-mail avec contrat PDF et double signature transmis avec succès.` });
 
   } catch (err) {
-    console.error("Erreur lors du traitement final BPER :", err);
-    res.status(500).json({ message: "Erreur serveur lors de la validation du contrat de crédit" });
+    console.error("Erreur décision:", err);
+    res.status(500).json({ message: "Erreur lors de l'authentification ou du traitement de l'ordonnance de crédit." });
   }
 });
 
