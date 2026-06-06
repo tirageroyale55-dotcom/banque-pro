@@ -263,12 +263,9 @@ router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req
 
 
 
-const VRAI_CACHET_BPER_PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH6AYGEw0BC9j3VwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUOdB44MAAALJSURBVHja7dw9TgMxEAdgHwI6SgS6NByAE6ByAnIEToCOgA7pOAAnQId0HIAToKNE6SgR8SbySZZZ79or2/F7pKUrW971z87Y690mZVmOALB3fSgA0ANgAIABAIYAGAAYAGAIgAGA7gAGAIYAGAAYAGAAYACAAYABgAEAhgAYABgAYABA6b97WpblWNuXN/YqTf1eU7XvXfNqD8wAmAIwBWA69gN/B9B9AnG26+R9n6p7/6wHegBMAZgCMD3vgbwH9gCYAjAFYArAnvXA3gNTAKbfAfY++77Pue6/7RrvgSkA0/MeyHsg74E9AKYATAHY+x7Ye2AKwBTAFIAGwBSABsAUgAbAFIAGwBSABsAUgAbAFIAGwO96wE8A6b6M0XWf9f3X636CAdAAmALQAJgC0ACYApgC0ACYAtAAmALQAJgCmALQAJgC0ACYAtAAmAKYAtAAmALQAJgC0ACYArgrgN7r5C5m/b6u+6zvA9AAmALQAJgC0ACYArgrgP0E6D59vdYg7zXee6wBaABMAUwBaABMAUwB3BXAfgJkv98ZgAbAFMAUgAbAFMAUgAbAFIApAA2AKQANgCkADYApgCkADYApAA2AKQANgCmAuwPIvsasvS8Atu8D0ACYAtAAmALQAJgCuCuA7mvyvIexBvYBaAFMAUwBaABMAUwB3BXAfgLMvtdYg7zX9D6XAWgATAFrA9j77Nq/vOex76Prv7bX9wFoAEwBaABMAWwFmPscu8++r6v/v9f3AWgATAEYAmAIgAGAgQE0AMAQAEMADAAwBMAQwO0ArO8KID3Yp+q+v76vAWgATAEYAmAIgAEAhgAYAGAAYACAAYABgAEAhgAYAGAAYABA9z0ArO8LQLovY/Teo77HAFwOAA0AMADAwAB698D6bgDSw6+fV9/vADQAwBAAQwAMAOjuHwD6vgbYdwOYHgAs/wB2bYw13bZ9HAAAAABJRU5ErkJggg==";
-const VRAIE_SIGNATURE_DIRECTEUR_PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAA8CAYAAACxk9WvAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH6AYGEw4XBy87ywAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUOdB44MAAAGPSURBVHja7duxSgMxFIXhM06CiIuDo9vruKjPoKuj76Cvo6vP4KDoKDoKDo6OTh0UdBJEB6XnyA1XskmTJm2apv8HDgTSpOfm3pS0bVsCwD7XoQAIAQgBCIEIgBCIEIAQiBAIEIAQiBCIEIAQgBCIEIAQiBCIEAgQgBCIEIAQgBCIEIgQCBCIEIgQCBCIEIgQCBAIEIgQCBAIEIgQiBAIEIgQiBAIEIgQiBCIEAgQCBCIEIgQiBAIEAgQCBAIEAgQCBCIEIgQCBCIEIgQCBCAEIgQCBCAEIgQiBCIEAiYAtHeVfG+FwK+9iEAZmBKCBAIEAgQCBAIEAgQCBAIEAgQCBAIEAgQCBAIEAgQCBAIEAgQCBCIEAgQCBAIEAgQCBDo6ZByS3fW+p1hNshYAmAGpoQAgQCBAIEAgQCBAIEAgQCBAIEAgQCBAIEAgQCBAIEAgQCBAIEAgUiBAIEAgQCBAIEAgQCBAIFuBWTscuK9f7v+N8gGGAshQCBAIEAgQCBAIEAgQODvAmTsh9Xf0bEXAjMwJQToB3wBC+wI06G7vBYAAAAASUVORK5CYII=";
-
-
-
-// 1. Récupération des prêts
+// =========================================================================
+// 1. RÉCUPÉRATION DES DOSSIERS EN ATTENTE (Conserve vos accès d'origine)
+// =========================================================================
 router.get("/loans/pending", auth, role("ADMIN"), async (req, res) => {
   try {
     const pendingLoans = await LoanRequest.find({ status: "PENDING" }).populate("user");
@@ -278,7 +275,9 @@ router.get("/loans/pending", auth, role("ADMIN"), async (req, res) => {
   }
 });
 
-// 2. Acceptation, Création du PDF avec les vraies images et envoi par mail
+// =========================================================================
+// 2. DÉCISION DE L'ADMINISTRATEUR & GÉNÉRATION/ENVOI DU PDF OFFICIEL
+// =========================================================================
 router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
   try {
     const { decision, message } = req.body;
@@ -307,7 +306,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
       const clientFullName = `${loan.firstName} ${loan.lastName?.toUpperCase()}`;
       const currentDate = new Date().toLocaleDateString("fr-FR");
 
-      // GÉNÉRATION COMPATIBLE VERCEL VIA PDFKIT
+      // GÉNÉRATION INTERNE DU BUFFER PDF (SÉCURISÉE ET RAPIDE POUR LE CLOUD)
       const pdfBuffer = await new Promise((resolve, reject) => {
         const doc = new PDFDocument({ margin: 40, size: "A4" });
         let buffers = [];
@@ -316,12 +315,12 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.on("end", () => resolve(Buffer.concat(buffers)));
         doc.on("error", (err) => reject(err));
 
-        // En-tête de la Modale reproduite en PDF
+        // En-tête de la Modale reproduite fidèlement
         doc.rect(0, 0, 600, 60).fill("#004f52");
         doc.fillColor("#ffffff").font("Helvetica-Bold").fontSize(20).text("BPER: Banca", 40, 22);
         doc.fontSize(9).font("Helvetica").text(`RÉF: BPER-CONTRACT-${loan._id}`, 420, 26);
 
-        // Titre Principal
+        // Titre Principal du Document
         doc.moveDown(4);
         doc.fillColor("#004f52").font("Times-Bold").fontSize(22).text("Offre Préalable de Crédit", { align: "center" });
         doc.fillColor("#475569").font("Times-Italic").fontSize(10).text("Contrat régi conformément aux directives bancaires européennes", { align: "center" });
@@ -336,7 +335,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.fillColor("#004f52").text(`${loan.profession || "Salarié"}`, 155, doc.y - 12);
         doc.fillColor("#000000").font("Helvetica").text(`Revenus Mensuels : ${loan.income?.toLocaleString()} EUR`, 50, doc.y + 12);
 
-        // Les Articles Légaux (Articles 1 à 5)
+        // Les 5 Articles Légaux (Identiques à votre structure Produits.jsx)
         doc.moveDown(3);
         doc.fillColor("#004f52").font("Times-Bold").fontSize(12).text("ARTICLE 1 : OBJET ET ASSIETTE DU FINANCEMENT");
         doc.fillColor("#000000").font("Times-Roman").fontSize(10).text(`Le présent engagement stipule que la BPER Banca consent au client mentionné ci-dessus, qui l'accepte formellement, un crédit d'un montant en capital de ${loan.amount?.toLocaleString()} EUR au titre de l'offre "${loan.loanType}". Ce capital est exclusivement mis à disposition pour la réalisation du projet déclaré ou l'ajustement de trésorerie souscrit.`, { align: "justify" });
@@ -357,16 +356,16 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.fillColor("#004f52").font("Times-Bold").fontSize(12).text("ARTICLE 5 : CONSENTEMENT ET PREUVE ÉLECTRONIQUE");
         doc.fillColor("#000000").font("Times-Roman").fontSize(10).text("Les parties s'entendent expressément pour conférer au procédé technique de signature électronique utilisé sur la présente plateforme internet la même valeur juridique qu'une signature manuscrite sur support papier. Le clic sur le bouton de clôture vaut validation intégrale de l'ensemble des clauses précitées.", { align: "justify" });
 
-        // Mentions bas de page (Corrigées sans erreur de syntaxe rouge)
+        // Mentions bas de page (Syntaxe JavaScript sécurisée avec guillemets protégés)
         doc.moveDown(2);
         doc.font("Times-Italic").fontSize(9).text("Mention : \"Bon pour acceptation de l'offre de crédit\"", 40, doc.y);
         doc.text("Émis par BPER Banca S.p.A.", 420, doc.y);
 
-        // SECTION SIGNATURE GEOMÉTRIQUE FIXE
+        // SECTION ALIGNEMENT DES SIGNATURES
         doc.moveDown(3);
         const ySignatureZone = doc.y;
 
-        // 👈 À GAUCHE : Bloc et Signature de l'utilisateur récupérée depuis Produits.jsx
+        // 👈 À GAUCHE : Traitement de la signature de l'utilisateur (Produits.jsx)
         doc.fillColor("#004f52").font("Helvetica-Bold").fontSize(10).text("L'Emprunteur (Signataire) :", 40, ySignatureZone);
         doc.fillColor("#000000").font("Helvetica").fontSize(9).text(`Nom : ${clientFullName}`, 40, ySignatureZone + 15);
         doc.text(`Fait en ligne le : ${currentDate}`, 40, ySignatureZone + 28);
@@ -374,29 +373,29 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         if (loan.signatureData && loan.signatureData.includes("base64,")) {
           try {
             const clientSigBuffer = Buffer.from(loan.signatureData.split("base64,")[1], "base64");
-            // Pose de la signature automatique du client à gauche
+            // Positionnement propre de la signature du client
             doc.image(clientSigBuffer, 40, ySignatureZone + 42, { width: 140, height: 55 });
             doc.rect(40, ySignatureZone + 42, 140, 55).lineWidth(1).dash(4, { space: 2 }).stroke("#cbd5e1");
           } catch (e) {
-            doc.text("[Signature Numérique Certifiée]", 40, ySignatureZone + 45);
+            doc.text("[Signature Électronique Certifiée]", 40, ySignatureZone + 45);
           }
+        } else {
+          doc.fillColor("#64748b").font("Helvetica-Oblique").text("[Signature Électronique Enregistrée]", 40, ySignatureZone + 45);
         }
 
-        // 👉 À DROITE : Vrai Cachet Officiel et Vraie Griffe du Directeur Général
+        // 👉 À DROITE : Création vectorielle du Vrai Cachet et de la Signature Direction
         doc.fillColor("#004f52").font("Helvetica-Bold").fontSize(10).text("Pour la banque BPER Banca :", 360, ySignatureZone);
         doc.fillColor("#000000").font("Helvetica").fontSize(9).text("Le Directeur Général des Engagements", 360, ySignatureZone + 15);
         doc.text(`Approuvé le : ${currentDate}`, 360, ySignatureZone + 28);
         
-        // 🛡️ DESSIN VECTORIEL DU VRAI CACHET BPER BANCA (Garantie zéro bug sur Vercel)
         const centerX = 400;
         const centerY = ySignatureZone + 75;
         
-        // Cercle extérieur du tampon
+        // Tracé du double cercle du tampon humide officiel
         doc.circle(centerX, centerY, 32).lineWidth(1.5).stroke("#004f52");
-        // Cercle intérieur du tampon
         doc.circle(centerX, centerY, 27).lineWidth(0.5).stroke("#004f52");
         
-        // Mentions à l'intérieur du cachet officiel
+        // Textes internes du cachet officiel de la banque
         doc.fillColor("#004f52").font("Helvetica-Bold").fontSize(5);
         doc.text("BPER: BANCA S.p.A.", centerX - 22, centerY - 15, { width: 44, align: "center" });
         doc.font("Helvetica").fontSize(4);
@@ -405,30 +404,18 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.font("Helvetica-Bold").fontSize(5);
         doc.text("ACCORDÉ", centerX - 20, centerY + 13, { width: 40, align: "center" });
 
-        // ✍️ DESSIN VECTORIEL DE LA VRAIE GRIFFE DU DIRECTEUR (Superposée sur le cachet)
+        // Tracé calligraphique à l'encre bleue pour la signature manuscrite du directeur
         doc.moveTo(380, centerY + 10)
            .quadraticCurveTo(395, centerY - 25, 410, centerY + 5)
            .quadraticCurveTo(430, centerY - 15, 450, centerY + 15)
            .quadraticCurveTo(470, centerY, 490, centerY + 10)
            .lineWidth(1.5)
-           .stroke("#1e3a8a"); // Couleur bleu d'encre de stylo officiel
-        
-        try {
-          // Incrustation du Vrai Cachet de la Banque (Arrière plan)
-          const stampBuffer = Buffer.from(VRAI_CACHET_BPER_PNG.split("base64,")[1], "base64");
-          doc.image(stampBuffer, 350, ySignatureZone + 42, { width: 75, height: 75 });
-          
-          // Incrustation de la Vraie Griffe de Signature du Directeur (Superposée par dessus)
-          const directorSigBuffer = Buffer.from(VRAIE_SIGNATURE_DIRECTEUR_PNG.split("base64,")[1], "base64");
-          doc.image(directorSigBuffer, 410, ySignatureZone + 50, { width: 110, height: 50 });
-        } catch (imgErr) {
-          doc.fillColor("#dc2626").text("[Erreur graphique : Cachet Certifié Actif]", 360, ySignatureZone + 45);
-        }
+           .stroke("#1e3a8a"); 
 
         doc.end();
       });
 
-      // Liaison finale de la pièce jointe
+      // Injection sécurisée de la pièce jointe binaire dans l'e-mail
       emailAttachments.push({
         filename: `Contrat_BPER_Signe_${loan.lastName?.toUpperCase()}.pdf`,
         content: pdfBuffer,
@@ -439,15 +426,24 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #cbd5e1; padding: 25px; background: #fff;">
           <h2 style="color: #004f52; border-bottom: 2px solid #004f52; padding-bottom: 10px; margin-top: 0;">BPER: Banca</h2>
           <p>Bonjour <strong>${loan.firstName} ${loan.lastName?.toUpperCase()}</strong>,</p>
-          <p>Nous avons le plaisir de vous annoncer que votre crédit a été validé.</p>
-          <p>📥 Votre <strong>Contrat d'Offre Préalable au format PDF</strong> est joint à cet e-mail. Ce document comporte vos informations officielles, votre signature, ainsi que le cachet de notre direction.</p>
+          <p>Votre dossier de financement a été officiellement approuvé par la Direction Générale des Engagements.</p>
+          <p>📥 <strong>Votre contrat est disponible :</strong> L'exemplaire officiel de votre contrat de crédit est joint à cet e-mail au format <strong>PDF</strong>.</p>
+          <p>Ce document certifié conforme contient votre signature électronique (à gauche) ainsi que l'accord authentifié par le cachet officiel de notre banque (à droite).</p>
           <p>Cordialement,<br/>Le Service d'Arbitrage — BPER Banca</p>
         </div>
       `;
     } else {
       loan.status = "REJECTED";
       emailSubject = "Mise à jour de votre dossier — BPER Banca";
-      emailHtml = `<p>Bonjour, votre demande a été refusée pour le motif suivant : ${message}</p>`;
+      emailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #cbd5e1; padding: 25px;">
+          <h2 style="color: #dc2626; border-bottom: 2px solid #dc2626; padding-bottom: 10px; margin-top: 0;">BPER: Banca</h2>
+          <p>Bonjour <strong>${loan.firstName} ${loan.lastName?.toUpperCase()}</strong>,</p>
+          <p>Après étude de vos pièces justificatives, nous regrettons de vous informer que votre demande n'a pas pu être acceptée pour le motif suivant :</p>
+          <p style="background: #fef2f2; border-left: 4px solid #dc2626; padding: 10px; color: #991b1b; font-weight: bold;">${message}</p>
+          <p>Cordialement,<br/>Le Service des Engagements</p>
+        </div>
+      `;
     }
 
     await loan.save();
@@ -462,10 +458,10 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
       });
     }
 
-    res.json({ message: "Le dossier a été approuvé. Le PDF officiel avec le vrai cachet et la vraie signature du directeur a été envoyé." });
+    res.json({ message: "Le dossier a été traité avec succès. L'e-mail contenant l'offre PDF officielle a été envoyé au client." });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Erreur lors du traitement de la décision." });
+    console.error("Erreur critique d'administration :", err);
+    res.status(500).json({ message: "Erreur lors du traitement ou de l'envoi du courrier." });
   }
 });
 
