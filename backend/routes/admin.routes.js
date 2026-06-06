@@ -323,7 +323,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
 
         // Titre Principal du document
         doc.moveDown(4);
-        doc.fillColor("#004f52").font("Times-Bold").fontSize(14).text("Offre Préalable de Crédit", { align: "center" });
+        doc.fillColor("#004f52").font("Times-Bold").fontSize(10).text("Offre Préalable de Crédit", { align: "center" });
         doc.fillColor("#475569").font("Times-Italic").fontSize(10).text("Contrat régi conformément aux directives bancaires européennes", { align: "center" });
         
         // Fiche d'identité Client
