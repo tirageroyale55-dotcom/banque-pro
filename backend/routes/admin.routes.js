@@ -404,15 +404,35 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
         doc.font("Helvetica-Bold").fontSize(5);
         doc.text("ACCORDÉ", centerX - 20, centerY + 13, { width: 40, align: "center" });
 
-        // Tracé calligraphique à l'encre bleue pour la signature manuscrite du directeur
-        doc.moveTo(380, centerY + 10)
-           .quadraticCurveTo(395, centerY - 25, 410, centerY + 5)
-           .quadraticCurveTo(430, centerY - 15, 450, centerY + 15)
-           .quadraticCurveTo(470, centerY, 490, centerY + 10)
-           .lineWidth(1.5)
-           .stroke("#1e3a8a"); 
+        // ✍️ TRACÉ DE LA VRAIE SIGNATURE MANUSCRITE AU BIC BLEU
+        // Couleur officielle d'encre bleu Bic classique (Royal Blue)
+        const bicBlue = "#1d4ed8"; 
 
-        doc.end();
+        // Premier mouvement : L'initiale montante rapide
+        doc.moveTo(375, centerY + 15)
+           .bezierCurveTo(380, centerY - 30, 395, centerY - 25, 390, centerY + 10)
+           .lineWidth(1.8)
+           .stroke(bicBlue);
+
+        // Deuxième mouvement : Les boucles centrales entrelacées
+        doc.moveTo(388, centerY + 2)
+           .bezierCurveTo(400, centerY - 15, 410, centerY - 10, 405, centerY + 12)
+           .bezierCurveTo(415, centerY - 5, 425, centerY - 15, 422, centerY + 10)
+           .lineWidth(1.3)
+           .stroke(bicBlue);
+
+        // Troisième mouvement : La grande barre de fin descendante et le paraphe
+        doc.moveTo(420, centerY + 5)
+           .lineTo(445, centerY - 20)
+           .bezierCurveTo(450, centerY - 25, 455, centerY, 430, centerY + 18)
+           .lineWidth(2.1) // Plus d'épaisseur sur l'appui du stylo
+           .stroke(bicBlue);
+
+        // Quatrième mouvement : Le trait de soulignement rapide sous la signature
+        doc.moveTo(370, centerY + 22)
+           .quadraticCurveTo(415, centerY + 12, 470, centerY + 16)
+           .lineWidth(0.9) // Trait fin de fin de geste
+           .stroke(bicBlue);
       });
 
       // Injection sécurisée de la pièce jointe binaire dans l'e-mail
