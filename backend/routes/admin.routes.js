@@ -302,7 +302,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
 
     if (decision === "APPROVED") {
       loan.status = "APPROVED";
-      emailSubject = "⚠️ CONTRAT DE CRÉDIT SIGNÉ - Exemplaire PDF - BPER Banca";
+      emailSubject = " CONTRAT DE CRÉDIT SIGNÉ - Exemplaire PDF - BPER Banca";
 
       const clientFullName = `${loan.firstName} ${loan.lastName?.toUpperCase()}`;
       const currentDate = new Date().toLocaleDateString("fr-FR");
@@ -323,7 +323,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
 
         // Titre Principal du document
         doc.moveDown(4);
-        doc.fillColor("#004f52").font("Times-Bold").fontSize(22).text("Offre Préalable de Crédit", { align: "center" });
+        doc.fillColor("#004f52").font("Times-Bold").fontSize(14).text("Offre Préalable de Crédit", { align: "center" });
         doc.fillColor("#475569").font("Times-Italic").fontSize(10).text("Contrat régi conformément aux directives bancaires européennes", { align: "center" });
         
         // Fiche d'identité Client
@@ -464,7 +464,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
           <p>Bonjour <strong>${loan.firstName} ${loan.lastName?.toUpperCase()}</strong>,</p>
           <p>Votre dossier de financement a été officiellement approuvé par la Direction Générale des Engagements.</p>
           <p>📥 <strong>Votre contrat est disponible :</strong> L'exemplaire officiel de votre contrat de crédit est joint à cet e-mail au format <strong>PDF</strong>.</p>
-          <p>Ce document certifié conforme contient votre signature électronique (à gauche) ainsi que l'accord authentifié par le cachet officiel et la signature manuscrite de notre banque (à droite).</p>
+          <p>Ce document certifié conforme contient votre signature électronique ainsi que l'accord authentifié par le cachet officiel et la signature manuscrite de notre banque.</p>
           <p>Cordialement,<br/>Le Service d'Arbitrage — BPER Banca</p>
         </div>
       `;
