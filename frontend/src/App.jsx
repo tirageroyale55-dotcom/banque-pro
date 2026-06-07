@@ -53,38 +53,48 @@ function SecuritySessionGuard() {
   const location = useLocation();
 
   useEffect(() => {
-    // 1. Liste des pages publiques
+    // 1. Liste des pages publiques qui n'ont pas besoin de sécurité
     const publicRoutes = [
       "/", "/apply-intro", "/apply", "/apply/form", 
       "/pending", "/activation", "/login", "/welcome", 
       "/blocked", "/forgot-id", "/forgot-pin", "/reset-password"
     ];
 
-    // 2. Si l'utilisateur est sur une page publique (comme login), on prépare le témoin
-    if (publicRoutes.includes(location.pathname)) {
-      // On marque qu'on vient d'une page publique (donc pas de F5 suspect)
-      sessionStorage.setItem("was_on_public_route", "true");
-      return; 
-    }
+    // 2. Fonction de sécurité qui s'exécute UNIQUEMENT au moment exact où la page s'actualise (F5/Mobile)
+    const handleRefreshSecurity = () => {
+      // Si l'utilisateur est sur une page privée ou admin au moment de l'actualisation
+      if (!publicRoutes.includes(window.location.pathname)) {
+        // On détruit immédiatement ses accès avant que la page ne recharge
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
+    };
 
-    // 3. S'il arrive sur une page PRIVÉE :
-    // On vérifie si le témoin existe. Si le témoin n'existe PAS, c'est que la page a été actualisée de force !
-    const wasOnPublic = sessionStorage.getItem("was_on_public_route");
+    // 3. On branche l'écouteur d'actualisation du navigateur
+    window.addEventListener("beforeunload", handleRefreshSecurity);
 
-    if (!wasOnPublic) {
-      // C'est une actualisation (F5 ou retour arrière mobile) -> Sécurité maximale
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("token");
-      localStorage.removeItem("user");
-      
+    // Nettoyage de l'écouteur si le composant est démonté
+    return () => {
+      window.removeEventListener("beforeunload", handleRefreshSecurity);
+    };
+  }, []); // [] = S'installe une seule fois au démarrage global de l'app
+
+  // 4. Sécurité passive : Si un utilisateur rafraîchit, le token est détruit (étape 2), 
+  // donc s'il essaie d'accéder à une page privée sans token, on le redirige proprement.
+  useEffect(() => {
+    const publicRoutes = [
+      "/", "/apply-intro", "/apply", "/apply/form", 
+      "/pending", "/activation", "/login", "/welcome", 
+      "/blocked", "/forgot-id", "/forgot-pin", "/reset-password"
+    ];
+
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+    if (!token && !publicRoutes.includes(location.pathname)) {
       navigate("/login", { replace: true });
-    } else {
-      // C'est une navigation normale après connexion ! On consomme le témoin pour la prochaine fois
-      // Si l'utilisateur fait F5 maintenant, le témoin n'existera plus et il sera déconnecté.
-      sessionStorage.removeItem("was_on_public_route");
     }
-
-  }, [location.pathname]); // S'active intelligemment à chaque changement de page
+  }, [location.pathname, navigate]);
 
   return null;
 }
