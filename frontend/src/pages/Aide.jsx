@@ -24,7 +24,7 @@ export default function Aide({ isDesktop = false }) {
 
     try {
       // Envoi de la demande d'assistance
-      await api("/support/ticket", "POST", formData);
+      await api("/auth/support/ticket", "POST", formData);
       setSuccess(true);
       setFormData({ category: "TECHNICAL_SUPPORT", subject: "", message: "" });
     } catch (err) {
