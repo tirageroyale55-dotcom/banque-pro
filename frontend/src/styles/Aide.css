@@ -1,25 +1,15 @@
-
 /* Aide.css */
 
-/* Forcer l'affichage sous l'entête globale de votre application */
-#bper-aide-page-fix {
-  display: block !important;
-  width: 100% !important;
-  min-height: 100vh !important;
-  box-sizing: border-box !important;
-  clear: both !important;
+.aide-page-wrapper {
+  padding: 10px 20px 20px 20px; /* Réduit le padding du haut à seulement 10px */
+  margin-top: 10px;            /* Espace minimal de sécurité avec le bloc du dessus */
+  box-sizing: border-box;
 }
 
-/* Version Mobile / Par défaut : On pousse fortement vers le bas pour dégager l'entête */
-#bper-aide-page-fix.mobile-layout {
-  padding: 100px 20px 40px 20px !important; /* Rehaussé à 100px pour éviter toute coupure haute */
-  margin: 0 !important;
-}
-
-/* Version Bureau (si une sidebar ou une barre supérieure différente existe) */
-#bper-aide-page-fix.desktop-layout {
-  padding: 40px 30px !important;
-  margin-top: 80px !important; /* Crée l'espace nécessaire sous l'entête de bureau */
+/* En mode desktop, on enlève tout surplus de marge */
+.aide-page-wrapper.desktop {
+  margin-top: 0;
+  padding-top: 15px;
 }
 
 .aide-container {
@@ -30,21 +20,26 @@
 
 .aide-title {
   color: #004f52;
-  font-size: 1.8rem;
-  margin-top: 0 !important; /* Bloque le décalage invisible du titre */
-  margin-bottom: 8px;
+  font-size: 1.6rem;
+  margin-top: 0;               /* Colle le titre au plus près du haut du composant */
+  margin-bottom: 6px;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .aide-subtitle {
   color: #64748b;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   margin-top: 0;
-  margin-bottom: 25px;
-  line-height: 1.5;
+  margin-bottom: 20px;
+  line-height: 1.4;
 }
 
-/* --- LE RESTE DES STYLES SÉCURISÉS (Inchangé mais conservé pour référence) --- */
+
+
+
+
+
 .support-grid {
   display: flex;
   flex-direction: column;
@@ -162,6 +157,7 @@
   font-family: inherit;
   background-color: #ffffff;
   color: #1e293b;
+  transition: border-color 0.15s ease-in-out;
 }
 
 .form-group select:focus,
@@ -185,6 +181,12 @@
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+  margin-top: 5px;
+}
+
+.btn-submit-secure:hover:not(:disabled) {
+  background-color: #003638;
 }
 
 .btn-submit-secure:disabled {
