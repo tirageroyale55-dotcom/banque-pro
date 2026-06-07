@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { api } from "../services/api"; 
-import "../../styles/Aide.css"; // Ajustez le chemin vers votre fichier CSS
+import "../styles/Aide.css"; // Ajustez le chemin vers votre fichier CSS
 
 export default function Aide({ isDesktop = false }) {
   const [formData, setFormData] = useState({
