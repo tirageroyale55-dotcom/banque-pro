@@ -1,7 +1,7 @@
 
 .aide-page-wrapper {
   padding: 20px;
-  margin-top: 60px; /* SÉCURITÉ : Ajustez cette valeur (ex: 60px, 70px ou 80px) selon la hauteur de votre barre du haut */
+  margin-top: 0px; /* SÉCURITÉ : Ajustez cette valeur (ex: 60px, 70px ou 80px) selon la hauteur de votre barre du haut */
   box-sizing: border-box;
   min-height: calc(100vh - 60px);
 }
