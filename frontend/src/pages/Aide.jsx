@@ -23,19 +23,18 @@ export default function Aide({ isDesktop = false }) {
     setSuccess(false);
 
     try {
-      // Envoi de la demande d'assistance
       await api("/support/ticket", "POST", formData);
       setSuccess(true);
       setFormData({ category: "TECHNICAL_SUPPORT", subject: "", message: "" });
     } catch (err) {
-      setError("Une erreur est survenue lors de la transmission. Veuillez réessuyer.");
+      setError("Une erreur est survenue lors de la transmission. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className={isDesktop ? "aide-page-wrapper desktop" : "page-content aide-page-wrapper"}>
+    <main id="bper-aide-page-fix" className={isDesktop ? "desktop-layout" : "mobile-layout"}>
       <div className="aide-container">
         <h2 className="aide-title">Centre de Support & Assistance</h2>
         <p className="aide-subtitle">
@@ -43,7 +42,6 @@ export default function Aide({ isDesktop = false }) {
         </p>
 
         <div className="support-grid">
-          
           
           {/* CANAUX DIRECTS */}
           <div className="info-card-channels">
@@ -125,6 +123,6 @@ export default function Aide({ isDesktop = false }) {
 
         </div>
       </div>
-    </div>
+    </main>
   );
 }
