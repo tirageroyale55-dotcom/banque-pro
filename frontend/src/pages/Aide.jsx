@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api } from "../../services/api";
+import { api } from "../services/api"; 
 import "../../styles/Aide.css"; // Ajustez le chemin vers votre fichier CSS
 
 export default function Aide({ isDesktop = false }) {
