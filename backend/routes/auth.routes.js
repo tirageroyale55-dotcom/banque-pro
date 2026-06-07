@@ -10,7 +10,7 @@ const { resetPassword } = require("../controllers/auth.controller");
 
 const auth = require("../middleware/auth.middleware");
 const LoanRequest = require("../models/LoanRequest");
-
+const SupportTicket = require("../models/SupportTicket");
 
 router.post("/login", login);
 
@@ -194,6 +194,36 @@ router.get("/my-loans", auth, async (req, res) => {
     res.json(myLoans);
   } catch (err) {
     res.status(500).json({ message: "Erreur lors du chargement de votre historique" });
+  }
+});
+
+// POST : Enregistrer une demande d'assistance depuis la page Aide
+router.post("/support/ticket", auth, async (req, res) => {
+  try {
+    const { category, subject, message } = req.body;
+
+    // Validation rapide des champs obligatoires
+    if (!subject || !message) {
+      return res.status(400).json({ message: "Veuillez remplir tous les champs obligatoires." });
+    }
+
+    const newTicket = new SupportTicket({
+      user: req.user._id, // Récupère l'ID de l'utilisateur connecté via votre middleware 'auth'
+      category,
+      subject,
+      message
+    });
+
+    await newTicket.save();
+    
+    // Message de succès professionnel (terme de suivi bancaire)
+    res.status(201).json({ 
+      success: true, 
+      message: "Votre demande a été cryptée et transmise avec succès au service conformité et support." 
+    });
+  } catch (err) {
+    console.error("Erreur Support Ticket:", err);
+    res.status(500).json({ message: "Échec technique lors de la transmission du ticket sécurisé." });
   }
 });
 
