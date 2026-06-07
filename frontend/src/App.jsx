@@ -47,10 +47,45 @@ import AdminReset from "./pages/admin/AdminReset";
 import AdminClient from "./pages/admin/AdminClient";
 import AdminPrets from "./pages/admin/AdminPrets";
 
+function SecuritySessionGuard() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Liste exhaustive de vos routes publiques 
+    const publicRoutes = [
+      "/",
+      "/apply-intro",
+      "/apply",
+      "/apply/form",
+      "/pending",
+      "/activation",
+      "/login",
+      "/welcome",
+      "/blocked",
+      "/forgot-id",
+      "/forgot-pin",
+      "/reset-password"
+    ];
+
+    
+    if (!publicRoutes.includes(location.pathname)) {
+      
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+      localStorage.removeItem("user");
+      
+      navigate("/login", { replace: true });
+    }
+  }, []); 
+
+  return null; 
+}
 
 export default function App() {
   return (
     <BrowserRouter>
+     <SecuritySessionGuard />
       <Routes>
 
         {/* PUBLIC ROUTES */}
