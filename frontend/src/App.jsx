@@ -53,36 +53,40 @@ function SecuritySessionGuard() {
   const location = useLocation();
 
   useEffect(() => {
-    // Liste exhaustive de vos routes publiques 
+    // 1. Liste des pages publiques
     const publicRoutes = [
-      "/",
-      "/apply-intro",
-      "/apply",
-      "/apply/form",
-      "/pending",
-      "/activation",
-      "/login",
-      "/welcome",
-      "/blocked",
-      "/forgot-id",
-      "/forgot-pin",
-      "/reset-password"
+      "/", "/apply-intro", "/apply", "/apply/form", 
+      "/pending", "/activation", "/login", "/welcome", 
+      "/blocked", "/forgot-id", "/forgot-pin", "/reset-password"
     ];
 
-    const isPageRefresh = window.performance && 
-      window.performance.getEntriesByType("navigation")[0]?.type === "reload";
+    // 2. Si l'utilisateur est sur une page publique (comme login), on prépare le témoin
+    if (publicRoutes.includes(location.pathname)) {
+      // On marque qu'on vient d'une page publique (donc pas de F5 suspect)
+      sessionStorage.setItem("was_on_public_route", "true");
+      return; 
+    }
 
-    if (isPageRefresh && !publicRoutes.includes(location.pathname)) {
-      
+    // 3. S'il arrive sur une page PRIVÉE :
+    // On vérifie si le témoin existe. Si le témoin n'existe PAS, c'est que la page a été actualisée de force !
+    const wasOnPublic = sessionStorage.getItem("was_on_public_route");
+
+    if (!wasOnPublic) {
+      // C'est une actualisation (F5 ou retour arrière mobile) -> Sécurité maximale
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
       localStorage.removeItem("user");
       
       navigate("/login", { replace: true });
+    } else {
+      // C'est une navigation normale après connexion ! On consomme le témoin pour la prochaine fois
+      // Si l'utilisateur fait F5 maintenant, le témoin n'existera plus et il sera déconnecté.
+      sessionStorage.removeItem("was_on_public_route");
     }
-  }, [location.pathname]);
 
-  return null; 
+  }, [location.pathname]); // S'active intelligemment à chaque changement de page
+
+  return null;
 }
 
 export default function App() {
