@@ -60,28 +60,27 @@ function SecuritySessionGuard() {
       "/blocked", "/forgot-id", "/forgot-pin", "/reset-password"
     ];
 
-    // 2. Fonction de sécurité qui s'exécute UNIQUEMENT au moment exact où la page s'actualise (F5/Mobile)
+    
     const handleRefreshSecurity = () => {
-      // Si l'utilisateur est sur une page privée ou admin au moment de l'actualisation
+      
       if (!publicRoutes.includes(window.location.pathname)) {
-        // On détruit immédiatement ses accès avant que la page ne recharge
+        
         localStorage.removeItem("token");
         sessionStorage.removeItem("token");
         localStorage.removeItem("user");
       }
     };
 
-    // 3. On branche l'écouteur d'actualisation du navigateur
+    
     window.addEventListener("beforeunload", handleRefreshSecurity);
 
-    // Nettoyage de l'écouteur si le composant est démonté
+    
     return () => {
       window.removeEventListener("beforeunload", handleRefreshSecurity);
     };
-  }, []); // [] = S'installe une seule fois au démarrage global de l'app
+  }, []); 
 
-  // 4. Sécurité passive : Si un utilisateur rafraîchit, le token est détruit (étape 2), 
-  // donc s'il essaie d'accéder à une page privée sans token, on le redirige proprement.
+  
   useEffect(() => {
     const publicRoutes = [
       "/", "/apply-intro", "/apply", "/apply/form", 

@@ -12,7 +12,7 @@ export default function Apply() {
 
   const [step, setStep] = useState(1);
   const [submittedStep, setSubmittedStep] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
   const [signatureError, setSignatureError] = useState(false);
   const [contractError, setContractError] = useState(false);
@@ -156,10 +156,12 @@ export default function Apply() {
 
   const submit = async (e) => {
   e.preventDefault();
+  setLoading(true);
 
   try {
     if (!signatureData) {
   alert("Signature manquante");
+  setLoading(false);
   return;
 }
     const data = new FormData();
@@ -185,10 +187,12 @@ export default function Apply() {
         setEmailExists(true);
         setPhoneExists(true);
         alert(result.message);
+        setLoading(false);
         return;
       }
 
       alert(result.message || "Erreur serveur");
+      setLoading(false);
       return;
     }
 
@@ -200,6 +204,7 @@ export default function Apply() {
 
   } catch (err) {
     alert("Erreur réseau");
+    setLoading(false);
   }
 };
 
@@ -269,6 +274,14 @@ export default function Apply() {
 
   return (
     <div className="apply-bg">
+
+      {loading && (
+      <div className="apply-loading-overlay">
+        <div className="apply-spinner"></div>
+        <p className="apply-loading-text">Demande en cours d'envoi sécurisé...</p>
+      </div>
+    )}
+
       <form
         className={`apply-card ${submittedStep ? "submitted" : ""}`}
         onSubmit={step === 6 ? submit : next}
@@ -414,6 +427,7 @@ export default function Apply() {
                   ctx.clearRect(0, 0, canvas.width, canvas.height);
                   setHasSignature(false);
                   setSignatureError(true);
+                  setSignatureData(null);
                 }}
               >
                 Effacer la signature
@@ -454,16 +468,16 @@ export default function Apply() {
         )}
 
         <div className="apply-actions">
-          {step > 1 && (
-            <button type="button" className="btn-outline" onClick={() => setStep((s) => s - 1)}>
-              Retour
-            </button>
-          )}
+             {step > 1 && (
+           <button type="button" className="btn-outline" onClick={() => setStep((s) => s - 1)} disabled={loading}>
+             Retour
+           </button>
+        )}
 
-          <button className="btn-solid" disabled={step === 2 && (emailExists || phoneExists)}>
+           <button className="btn-solid" disabled={(step === 2 && (emailExists || phoneExists)) || loading}>
             {step === 6 ? "Envoyer ma demande" : "Continuer"}
-          </button>
-        </div>
+           </button>
+         </div>
       </form>
     </div>
   );
