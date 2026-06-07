@@ -1,3 +1,44 @@
+
+.aide-page-wrapper {
+  padding: 20px;
+  margin-top: 60px; /* SÉCURITÉ : Ajustez cette valeur (ex: 60px, 70px ou 80px) selon la hauteur de votre barre du haut */
+  box-sizing: border-box;
+  min-height: calc(100vh - 60px);
+}
+
+/* Si l'application est en mode Desktop (souvent avec une sidebar), on ajuste les marges */
+.aide-page-wrapper.desktop {
+  margin-top: 0;
+  padding: 30px;
+}
+
+.aide-container {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.aide-title {
+  color: #004f52;
+  font-size: 1.8rem;
+  margin-top: 0; /* CORRECTION : Empêche le titre de pousser vers le haut de manière invisible */
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.aide-subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-top: 0;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+/* ... Le reste de votre CSS existant pour les cards et formulaires ne change pas ... */
+
+
+
+
 /* Aide.css */
 .aide-container {
   max-width: 800px;

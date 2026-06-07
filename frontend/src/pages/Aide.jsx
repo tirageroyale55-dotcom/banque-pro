@@ -35,7 +35,7 @@ export default function Aide({ isDesktop = false }) {
   };
 
   return (
-    <div className={isDesktop ? "" : "page-content"}>
+    <div className={isDesktop ? "aide-page-wrapper desktop" : "page-content aide-page-wrapper"}>
       <div className="aide-container">
         <h2 className="aide-title">Centre de Support & Assistance</h2>
         <p className="aide-subtitle">
@@ -43,6 +43,7 @@ export default function Aide({ isDesktop = false }) {
         </p>
 
         <div className="support-grid">
+          
           
           {/* CANAUX DIRECTS */}
           <div className="info-card-channels">
