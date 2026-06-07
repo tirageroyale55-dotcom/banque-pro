@@ -1,27 +1,28 @@
 /* Aide.css */
 
+/* 1. Écrasement global pour la page Aide, mobile ET desktop */
+.page-content.aide-page-wrapper, 
 .aide-page-wrapper {
-  padding: 10px 20px 20px 20px; /* Réduit le padding du haut à seulement 10px */
-  margin-top: 10px;            /* Espace minimal de sécurité avec le bloc du dessus */
+  padding-top: 15px !important;  /* Force la réduction de l'espace en haut sur mobile */
+  margin-top: 0 !important;      /* Supprime toute marge parasite */
   box-sizing: border-box;
+  background-color: #f8fafc;     /* Fond gris très clair/blanc cassé propre pour le contenu */
+  min-height: 100vh;
 }
 
-/* En mode desktop, on enlève tout surplus de marge */
-.aide-page-wrapper.desktop {
-  margin-top: 0;
-  padding-top: 15px;
-}
-
+/* 2. Ajustement spécifique pour le conteneur */
 .aide-container {
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
+  padding: 0 10px; /* Évite que les cartes collent aux bords de l'écran sur mobile */
 }
 
+/* 3. Ajustement du titre pour qu'il colle bien au haut */
 .aide-title {
-  color: #004f52;
-  font-size: 1.6rem;
-  margin-top: 0;               /* Colle le titre au plus près du haut du composant */
+  color: #004f52; /* Le vert institutionnel BPER BANCA pour le texte */
+  font-size: 1.5rem; /* Un peu plus petit sur mobile pour que ça passe sur une ligne */
+  margin-top: 0 !important;
   margin-bottom: 6px;
   font-weight: 700;
   line-height: 1.2;
@@ -29,10 +30,21 @@
 
 .aide-subtitle {
   color: #64748b;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   margin-top: 0;
   margin-bottom: 20px;
   line-height: 1.4;
+}
+
+/* En mode desktop, on peut se permettre de respirer un peu plus si besoin */
+@media (min-width: 769px) {
+  .aide-page-wrapper.desktop {
+    padding-top: 30px !important;
+    background: transparent; /* Laisse le fond du dashboard desktop s'appliquer */
+  }
+  .aide-title {
+    font-size: 1.8rem;
+  }
 }
 
 
