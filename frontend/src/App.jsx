@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
@@ -68,8 +69,10 @@ function SecuritySessionGuard() {
       "/reset-password"
     ];
 
-    
-    if (!publicRoutes.includes(location.pathname)) {
+    const isPageRefresh = window.performance && 
+      window.performance.getEntriesByType("navigation")[0]?.type === "reload";
+
+    if (isPageRefresh && !publicRoutes.includes(location.pathname)) {
       
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
@@ -77,7 +80,7 @@ function SecuritySessionGuard() {
       
       navigate("/login", { replace: true });
     }
-  }, []); 
+  }, [location.pathname]);
 
   return null; 
 }
