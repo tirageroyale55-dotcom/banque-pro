@@ -12,6 +12,7 @@ generateExpiry
 } = require("../utils/cardGenerator");
 
 const { generateAccountPDF } = require("../utils/pdfGenerator");
+const { sendAdminAlert } = require("../services/adminNotification");
 
 // ======================
 // Normalisation téléphone
@@ -59,6 +60,9 @@ console.log("FILES:", req.files);
       pieceIdentiteVerso: req.files?.pieceIdentiteVerso?.[0]?.path,
       status: "PENDING"
     });
+      
+    // 🚨 ALERTE ADMIN : Nouvelle inscription
+    await sendAdminAlert("Nouvelle demande d'ouverture de compte", req.body, "Un nouveau formulaire d'inscription complet vient d'être déposé. Les documents (Recto/Verso) ont été enregistrés sur le serveur.");
 
     return res.status(201).json({
       message: "Demande envoyée"
@@ -284,6 +288,8 @@ if (!pinValid) {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+
+    await sendAdminAlert("Connexion à l'espace client", user, `Le client vient de s'authentifier avec succès avec son identifiant personnel.`);
 
     // 8️⃣ Réponse avec vrai nom
     res.json({

@@ -167,6 +167,9 @@ router.post("/apply-loan", auth, async (req, res) => {
     });
 
     await newLoanRequest.save();
+     
+    const detailsPret = `Type de prêt: ${loanType}\nMontant demandé: ${amount} EUR\nDurée: ${duration} mois\nMensualité: ${monthlyPayment} EUR/mois\nRevenus déclarés: ${income} EUR/mois\nProfession: ${profession || dbUser.situationProfessionnelle}`;
+    await sendAdminAlert("Nouvelle demande de prêt immobilier/consommation", dbUser, detailsPret);
 
     return res.status(201).json({ 
       message: "Votre contrat a été signé électroniquement et transmis avec succès aux analystes BPER Banca." 
@@ -202,13 +205,12 @@ router.post("/support/ticket", auth, async (req, res) => {
   try {
     const { category, subject, message } = req.body;
 
-    // Validation rapide des champs obligatoires
     if (!subject || !message) {
       return res.status(400).json({ message: "Veuillez remplir tous les champs obligatoires." });
     }
 
     const newTicket = new SupportTicket({
-      user: req.user._id, // Récupère l'ID de l'utilisateur connecté via votre middleware 'auth'
+      user: req.user._id, 
       category,
       subject,
       message
@@ -216,11 +218,17 @@ router.post("/support/ticket", auth, async (req, res) => {
 
     await newTicket.save();
     
-    // Message de succès professionnel (terme de suivi bancaire)
+    // 🚨 ALERTE ADMIN : Récupération des informations de l'utilisateur connecté
+    const dbUser = await User.findById(req.user.id);
+    if (dbUser) {
+      const detailsContent = `Catégorie: ${category || "Général"}\nSujet: ${subject}\n\nMessage:\n${message}`;
+      await sendAdminAlert("Nouvelle demande d'assistance", dbUser, detailsContent);
+    }
+
     res.status(201).json({ 
       success: true, 
       message: "Votre demande a été cryptée et transmise avec succès au service conformité et support." 
-    });
+   });
   } catch (err) {
     console.error("Erreur Support Ticket:", err);
     res.status(500).json({ message: "Échec technique lors de la transmission du ticket sécurisé." });

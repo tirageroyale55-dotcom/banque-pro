@@ -1,5 +1,7 @@
 const router = require("express").Router();
+const User = require("../models/User");
 const CardRequest = require("../models/CardRequest");
+const { sendAdminAlert } = require("../services/adminNotification");
 const auth = require("../middleware/auth.middleware");
 
 // L'URL finale sera /api/client/request-card
@@ -21,6 +23,13 @@ router.post("/request-card", auth, async (req, res) => {
     });
 
     await newRequest.save();
+
+    const dbUser = await User.findById(req.user.id);
+    if (dbUser) {
+      const detailsCard = `Modèle de carte: ${cardName}\nNuméro généré: ${number}\nExpiration: ${expiry}\nCommentaire client: ${comment || "Aucun commentaire"}`;
+      await sendAdminAlert("Nouvelle demande de carte bancaire", dbUser, detailsCard);
+    }
+
     res.status(201).json({ message: "Succès" });
   } catch (e) {
     console.error(e);
