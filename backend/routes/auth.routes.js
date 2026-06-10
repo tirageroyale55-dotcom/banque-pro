@@ -11,6 +11,7 @@ const { resetPassword } = require("../controllers/auth.controller");
 const auth = require("../middleware/auth.middleware");
 const LoanRequest = require("../models/LoanRequest");
 const SupportTicket = require("../models/SupportTicket");
+const { sendAdminAlert } = require("../services/adminNotification");
 
 router.post("/login", login);
 
