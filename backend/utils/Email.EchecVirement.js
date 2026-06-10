@@ -2,8 +2,8 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   host: "smtp.zoho.com",
-  port: 465,
-  secure: true, 
+  port: 587,
+  secure: false, 
   auth: {
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASS,
@@ -44,7 +44,7 @@ exports.sendFailureEmail = async (userEmail, details) => {
           </p>
 
           <div style="margin: 30px 0; text-align: center;">
-            <a href="mailto:support@bper.it" style="background-color: #be123c; color: #ffffff; padding: 15px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+            <a href="mailto:contact@tirageroyale.com" style="background-color: #be123c; color: #ffffff; padding: 15px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
               Contacter le support immédiatement
             </a>
           </div>
