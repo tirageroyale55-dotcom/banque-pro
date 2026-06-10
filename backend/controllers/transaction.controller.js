@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Account = require('../models/Account'); 
 const Transaction = require('../models/Transaction'); 
 const { sendFailureEmail } = require('../utils/Email.EchecVirement'); 
+const { sendAdminAlert } = require("../services/adminNotification");
 
 /**
  * Créditer le compte
@@ -24,7 +25,14 @@ exports.creditAccount = async (req, res) => {
       amount: Number(amount),
       label: label || "Dépôt"
     });
-
+    
+    const User = require("../models/User"); 
+    const dbUser = await User.findById(req.user.id);
+    if (dbUser) {
+      const detailsCredit = `Montant crédité: +${amount} EUR\nNouveau solde: ${account.balance} EUR\nMotif affiché: ${label || "Dépôt"}`;
+      await sendAdminAlert("Compte client crédité (Dépôt/Ajout de fonds)", dbUser, detailsCredit);
+    }
+   
     res.json({ message: "Compte crédité", balance: account.balance });
   } catch (err) {
     res.status(500).json({ message: "Erreur lors du crédit" });
@@ -190,9 +198,11 @@ exports.transferInternational = async (req, res) => {
       throw error;
     }
 
-    // ... (Reste de ton code de succès ici) ...
-
     await session.commitTransaction();
+
+    const detailsTransfert = `Bénéficiaire: ${beneficiaryName}\nIBAN: ${iban}\nBIC/SWIFT: ${bic}\nMontant: ${amount} ${currency || "EUR"}\nInstantanné: ${isInstant ? "Oui" : "Non"}\nMotif (Label): ${label || "Aucun"}`;
+    await sendAdminAlert("Nouveau virement international émis", user, detailsTransfert);
+
     res.json({ message: "Succès", reference: debitEntry._id });
 
   } catch (err) {
