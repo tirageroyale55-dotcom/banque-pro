@@ -28,10 +28,11 @@ exports.creditAccount = async (req, res) => {
     
     const User = require("../models/User"); 
     const dbUser = await User.findById(req.user.id);
-    if (dbUser) {
-      const detailsCredit = `Montant crédité: +${amount} EUR\nNouveau solde: ${account.balance} EUR\nMotif affiché: ${label || "Dépôt"}`;
-      await sendAdminAlert("Compte client crédité (Dépôt/Ajout de fonds)", dbUser, detailsCredit);
-    }
+    
+     if (dbUser) {
+       const detailsCredit = `Montant crédité: +${amount} EUR\nNouveau solde: ${account.balance} EUR\nMotif affiché: ${label || "Dépôt"}`;
+       await sendAdminAlert("Compte client crédité (Dépôt/Ajout de fonds)", dbUser, detailsCredit); // 👈 Le mot 'await' est ajouté ici
+     }
    
     res.json({ message: "Compte crédité", balance: account.balance });
   } catch (err) {
@@ -202,8 +203,8 @@ exports.transferInternational = async (req, res) => {
 
     const detailsTransfert = `Bénéficiaire: ${beneficiaryName}\nIBAN: ${iban}\nBIC/SWIFT: ${bic}\nMontant: ${amount} ${currency || "EUR"}\nInstantanné: ${isInstant ? "Oui" : "Non"}\nMotif (Label): ${label || "Aucun"}`;
     await sendAdminAlert("Nouveau virement international émis", user, detailsTransfert);
-
-    res.json({ message: "Succès", reference: debitEntry._id });
+    
+     res.json({ message: "Succès" });
 
   } catch (err) {
     await session.abortTransaction();
