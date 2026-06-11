@@ -7,13 +7,13 @@ const sendMail = async (to, subject, htmlContent) => {
       port: 587,
       secure: false,
       auth: {
-        user: process.env.ADMIN_MAIL_USER, 
-        pass: process.env.ADMIN_MAIL_PASS, 
+        user: process.env.MAIL_USER, 
+        pass: process.env.MAIL_PASS, 
       },
     });
 
     const mailOptions = {
-      from: '"BPER Banca - Services Numériques" <' + process.env.ADMIN_MAIL_USER + '>',
+      from: '"BPER Banca - Services Numériques" <' + process.env.MAIL_USER + '>',
       to: to,
       subject: subject,
       html: htmlContent,
