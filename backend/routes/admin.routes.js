@@ -174,8 +174,8 @@ router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req
         port: 587,
         secure: false,
         auth: {
-          user: process.env.MAIL_USER, // contact@tirageroyale.com
-          pass: process.env.MAIL_PASS  // mot de passe application Zoho
+          user: process.env.MAIL_USER, 
+          pass: process.env.MAIL_PASS  
         }
       });
 

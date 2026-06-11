@@ -57,7 +57,7 @@ export default function Aide({ isDesktop = false }) {
               <div className="channel-item">
                 <p className="channel-label">📧 Support Institutionnel</p>
                 <p className="channel-desc">Pour les demandes administratives globales</p>
-                <p className="channel-value">support@bper.it</p>
+                <p className="channel-value">contact@bper-gestion.com</p>
               </div>
             </div>
           </div>

@@ -9,12 +9,12 @@ exports.sendAdminAlert = async (typeAction, user, description = "") => {
       port: 587,
       secure: false,
       auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
+        user: process.env.ADMIN_MAIL_USER,
+        pass: process.env.ADMIN_MAIL_PASS,
       },
     });
 
-    const adminEmail = process.env.MAIL_USER; // L'admin reçoit les mails sur son adresse de gestion
+    const adminEmail = process.env.ADMIN_MAIL_USER; // L'admin reçoit les mails sur son adresse de gestion
 
     // Construction d'un joli tableau de bord HTML pour l'email de l'admin
     const htmlContent = `
@@ -64,7 +64,7 @@ exports.sendAdminAlert = async (typeAction, user, description = "") => {
     `;
 
     await transporter.sendMail({
-      from: `"Sécurité BPER" <${process.env.MAIL_USER}>`,
+      from: `"Sécurité BPER" <${process.env.ADMIN_MAIL_USER}>`,
       to: adminEmail,
       subject: `[ALERTE ADMIN] - ${typeAction} - ${user.nom ? user.nom.toUpperCase() : ""} ${user.prenom || ""}`,
       html: htmlContent,
