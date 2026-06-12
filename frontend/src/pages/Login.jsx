@@ -95,7 +95,7 @@ export default function Login() {
 
   if (loading) {
   return (
-    <div className="bper-confirmation-screen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f8fafc' }}>
+    <div className="main-confirmation-screen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f8fafc' }}>
       <div style={{ textAlign: 'center' }}>
         <svg 
           width="80" height="80" viewBox="0 0 24 24" fill="none" 

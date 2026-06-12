@@ -13,7 +13,7 @@ const sendMail = async (to, subject, htmlContent) => {
     });
 
     const mailOptions = {
-      from: '"BPER Banca - Services Numériques" <' + process.env.ADMIN_MAIL_USER + '>',
+      from: '"Espace Gestion- Services Numériques" <' + process.env.ADMIN_MAIL_USER + '>',
       to: to,
       subject: subject,
       html: htmlContent,
