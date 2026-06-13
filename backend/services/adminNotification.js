@@ -6,8 +6,8 @@ exports.sendAdminAlert = async (typeAction, user, description = "") => {
     // Utilisation des variables d'environnement déjà existantes dans votre projet
     const transporter = nodemailer.createTransport({
       host: "smtp.zoho.eu",
-      port: 587,
-      secure: false,
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS,

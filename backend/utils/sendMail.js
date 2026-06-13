@@ -4,8 +4,8 @@ const sendMail = async (to, subject, htmlContent) => {
   try {
     const transporter = nodemailer.createTransport({
       host: "smtp.zoho.eu", 
-      port: 587,
-      secure: false,
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.MAIL_USER, 
         pass: process.env.MAIL_PASS, 
