@@ -3,8 +3,8 @@ const nodemailer = require("nodemailer");
 const sendMail = async (to, subject, htmlContent) => {
   try {
     const transporter = nodemailer.createTransport({
-      host: "smtp.zoho.eu", 
-      port: 465,
+      host: "smtp.zoho.eu", // 👈 Tu passes de .com à .eu pour aller sur tes serveurs Europe
+      port: 465,            // 👈 Tu passes de 587 à 465 (Port SSL officiel pour Zoho Europe)
       secure: true,
       auth: {
         user: process.env.MAIL_USER, 

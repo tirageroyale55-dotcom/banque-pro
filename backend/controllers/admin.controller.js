@@ -136,7 +136,7 @@ exports.sendResetLink = async (req, res) => {
     const resetLink = `${process.env.APP_URL}/reset-password?token=${token}`;
 
     const transporter = nodemailer.createTransport({
-      host: "smtp.zoho.eu",
+      host: "smtp.zoho.com",
       port: 587,
       secure: false,
       requireTLS: true,

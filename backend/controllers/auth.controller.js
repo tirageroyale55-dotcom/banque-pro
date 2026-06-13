@@ -161,7 +161,7 @@ exports.activateAccount = async (req, res) => {
 
       // Configurer le transporteur Mail (Zoho/Gmail/etc)
       const transporter = nodemailer.createTransport({
-        host: "smtp.zoho.eu", 
+        host: "smtp.zoho.com", // ou ton host habituel
         port: 587,
         secure: false,
         auth: {
@@ -334,7 +334,7 @@ exports.sendPersonalId = async (req, res) => {
     }
 
     const transporter = nodemailer.createTransport({
-      host: "smtp.zoho.eu",
+      host: "smtp.zoho.com",
       port: 587,
       secure: false,
       auth: {
