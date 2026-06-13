@@ -170,7 +170,7 @@ router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req
     // --- CAS : REJETER ET SUPPRIMER AVEC ENVOI DE MAIL ---
     
       const transporter = nodemailer.createTransport({
-        host: "smtp.zoho.com",
+        host: "smtp.zoho.eu",
         port: 587,
         secure: false,
         auth: {
@@ -293,7 +293,7 @@ router.post("/loan-decision/:loanId", auth, role("ADMIN"), async (req, res) => {
     if (!loan) return res.status(404).json({ message: "Dossier introuvable" });
 
     const transporter = nodemailer.createTransport({
-      host: "smtp.zoho.com",
+      host: "smtp.zoho.eu",
       port: 587,
       secure: false,
       auth: {
