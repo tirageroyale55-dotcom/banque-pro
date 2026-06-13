@@ -371,7 +371,7 @@ export default function VirementInternational() {
       </p>
 
       <div className="error-actions">
-        <button className="btn-contact-support" onClick={() => window.location.href='mailto:contact@bper-gestion.com'}>
+        <button className="btn-contact-support" onClick={() => window.location.href='mailto:support@bper-gestion.com'}>
           <PhoneCall size={18} /> Contacter le support
         </button>
         <button className="btn-home-primary" onClick={() => navigate("/dashboard")}>

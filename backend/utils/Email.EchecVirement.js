@@ -44,7 +44,7 @@ exports.sendFailureEmail = async (userEmail, details) => {
           </p>
 
           <div style="margin: 30px 0; text-align: center;">
-            <a href="mailto:contact@bper-gestion.com" style="background-color: #be123c; color: #ffffff; padding: 15px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+            <a href="mailto:support@bper-gestion.com" style="background-color: #be123c; color: #ffffff; padding: 15px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
               Contacter le support immédiatement
             </a>
           </div>
