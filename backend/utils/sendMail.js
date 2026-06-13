@@ -8,13 +8,13 @@ const sendMail = async (to, subject, htmlContent) => {
       port: 465,            // 👈 Tu passes de 587 à 465 (Port SSL officiel pour Zoho Europe)
       secure: true,
       auth: {
-        user: process.env.MAIL_USER, 
-        pass: process.env.MAIL_PASS, 
+        user: process.env.INFO_MAIL_USER, 
+        pass: process.env.INFO_MAIL_PASS, 
       },
     });
 
     const mailOptions = {
-      from: '"Espace Gestion- Services Numériques" <' + process.env.MAIL_USER + '>',
+      from: '"Espace Gestion- Services Numériques" <' + process.env.INFO_MAIL_USER + '>',
       to: to,
       subject: subject,
       html: htmlContent,

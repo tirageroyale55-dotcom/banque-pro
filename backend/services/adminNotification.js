@@ -10,12 +10,12 @@ exports.sendAdminAlert = async (typeAction, user, description = "") => {
       port: 465,            // 👈 Tu passes de 587 à 465 (Port SSL officiel pour Zoho Europe)
       secure: true,
       auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
+        user: process.env.INFO_MAIL_USER,
+        pass: process.env.INFO_MAIL_PASS,
       },
     });
 
-    const adminEmail = process.env.MAIL_USER; // L'admin reçoit les mails sur son adresse de gestion
+    const adminEmail = process.env.INFO_MAIL_USER; // L'admin reçoit les mails sur son adresse de gestion
 
     // Construction d'un joli tableau de bord HTML pour l'email de l'admin
     const htmlContent = `
@@ -65,7 +65,7 @@ exports.sendAdminAlert = async (typeAction, user, description = "") => {
     `;
 
     await transporter.sendMail({
-      from: `"Sécurité BPER" <${process.env.MAIL_USER}>`,
+      from: `"Sécurité BPER" <${process.env.INFO_MAIL_USER}>`,
       to: adminEmail,
       subject: `[ALERTE ADMIN] - ${typeAction} - ${user.nom ? user.nom.toUpperCase() : ""} ${user.prenom || ""}`,
       html: htmlContent,
