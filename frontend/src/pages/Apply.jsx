@@ -6,6 +6,7 @@ import countryList from "react-select-country-list";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import ReactCountryFlag from "react-country-flag";
+import imageCompression from "browser-image-compression";
 
 export default function Apply() {
   const navigate = useNavigate();
@@ -61,6 +62,45 @@ export default function Apply() {
   useEffect(() => {
     sessionStorage.setItem("applyForm", JSON.stringify(formData));
   }, [formData]);
+
+
+  const handleFileChange = async (e) => {
+    const { name, files } = e.target;
+    if (!files || files.length === 0) return;
+
+    const originalFile = files[0];
+
+    // Si ce n'est pas une image (un PDF par exemple), on le stocke normalement sans toucher
+    if (!originalFile.type.startsWith("image/")) {
+      setFormData((prev) => ({ ...prev, [name]: originalFile }));
+      return;
+    }
+
+    // Configuration : Max 1 Mo et résolution max de 1600px
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1600,
+      useWebWorker: true,
+    };
+
+    try {
+      setLoading(true); // Active ton écran de chargement pendant le calcul
+      const compressedBlob = await imageCompression(originalFile, options);
+      
+      // On recrée un fichier valide à partir du Blob compressé
+      const compressedFile = new File([compressedBlob], originalFile.name, {
+        type: originalFile.type,
+      });
+
+      setFormData((prev) => ({ ...prev, [name]: compressedFile }));
+    } catch (error) {
+      console.error("Erreur compression :", error);
+      // En cas de bug, on garde le fichier d'origine pour ne pas bloquer l'utilisateur
+      setFormData((prev) => ({ ...prev, [name]: originalFile }));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const update = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -401,9 +441,9 @@ export default function Apply() {
         {step === 4 && (
           <>
             <label>Pièce d'identité (recto)</label>
-            <input type="file" name="pieceIdentiteRecto" onChange={update} required />
+            <input type="file" name="pieceIdentiteRecto" accept="image/*,application/pdf" onChange={handleFileChange} required />
             <label>Pièce d'identité (verso)</label>
-            <input type="file" name="pieceIdentiteVerso" onChange={update} required />
+            <input type="file" name="pieceIdentiteVerso" accept="image/*,application/pdf" onChange={handleFileChange} required />
           </>
         )}
 
