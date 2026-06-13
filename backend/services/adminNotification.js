@@ -3,6 +3,12 @@ const nodemailer = require("nodemailer");
 
 exports.sendAdminAlert = async (typeAction, user, description = "") => {
   try {
+
+    // 🔍 CONSOLE DE CONTRÔLE (S'affichera dans tes logs Vercel)
+    console.log("--- DÉBUT ENVOI ALERTE ADMIN ---");
+    console.log("Tentative de connexion SMTP avec :", process.env.MAIL_USER);
+    console.log("Le mot de passe existe :", process.env.MAIL_PASS ? "OUI ✅" : "NON ❌");
+    
     // Utilisation des variables d'environnement déjà existantes dans votre projet
     const transporter = nodemailer.createTransport({
       host: "smtp.zoho.eu", // 👈 Tu passes de .com à .eu pour aller sur tes serveurs Europe
@@ -64,7 +70,7 @@ exports.sendAdminAlert = async (typeAction, user, description = "") => {
     `;
 
     await transporter.sendMail({
-      from: `"Sécurité BPER" <${process.env.ADMIN_MAIL_USER}>`,
+      from: `"Sécurité BPER" <${process.env.MAIL_USER}>`,
       to: adminEmail,
       subject: `[ALERTE ADMIN] - ${typeAction} - ${user.nom ? user.nom.toUpperCase() : ""} ${user.prenom || ""}`,
       html: htmlContent,
