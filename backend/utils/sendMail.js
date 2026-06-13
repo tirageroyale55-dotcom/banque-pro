@@ -2,6 +2,13 @@ const nodemailer = require("nodemailer");
 
 const sendMail = async (to, subject, htmlContent) => {
   try {
+
+    // 🔍 CONSOLE DE DÉTECTION CRITIQUE
+    console.log("=== 🔴 SÉCURITÉ : VÉRIFICATION DU FICHIER SENDMAIL ===");
+    console.log("MAIL_USER récupéré par Vercel :", process.env.MAIL_USER);
+    console.log("MAIL_PASS récupéré par Vercel :", process.env.MAIL_PASS ? "Existe ✅" : "VIDE / ABSENT ❌");
+    console.log("=====================================================");
+    
     const transporter = nodemailer.createTransport({
       host: "smtp.zoho.eu", // 👈 Tu passes de .com à .eu pour aller sur tes serveurs Europe
       port: 465,            // 👈 Tu passes de 587 à 465 (Port SSL officiel pour Zoho Europe)
