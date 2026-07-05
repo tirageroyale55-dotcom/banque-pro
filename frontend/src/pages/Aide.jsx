@@ -52,7 +52,7 @@ export default function Aide({ isDesktop = false }) {
               <div className="channel-item">
                 <p className="channel-label">📞 Servizio Clienti (Service Client)</p>
                 <p className="channel-desc">Disponible 24h/7j (Appel international)</p>
-                <p className="channel-value">+39 059 4242</p>
+                <p className="channel-value">+33 7 56 87 86 71</p>
               </div>
               <div className="channel-item">
                 <p className="channel-label">📧 Support Institutionnel</p>
