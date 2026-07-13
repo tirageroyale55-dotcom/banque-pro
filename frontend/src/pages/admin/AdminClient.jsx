@@ -22,21 +22,28 @@ export default function AdminClient() {
   };
 
   const handleGlobalSave = async () => {
-  try {
-    // 1. Sauvegarde classique (User, Account, Ancienne Card)
-    await api("/admin/client-master-update/" + selected.user._id, "PUT", formData);
-    
-    // 2. Sauvegarde spécifique à la NOUVELLE CARTE (CardRequest)
-    if (formData.cardRequestData) {
-       // On utilise une route PUT existante ou on l'ajoute pour CardRequest
-       await api(`/admin/card-request-update/${selected.cardRequest._id}`, "PUT", formData.cardRequestData);
+    try {
+      // 🛡️ CORRECTION : On envoie uniquement userData, accountData et cardData 
+      // sous la forme attendue par ton backend (sans les données parasites de prêts)
+      const dataToSend = {
+        userData: formData.userData,
+        accountData: formData.accountData,
+        cardData: formData.cardData,
+        cardRequestData: formData.cardRequestData // Géré proprement par ta route master-update
+      };
+
+      // 1. Sauvegarde globale et unique via ta route master-update
+      await api("/admin/client-master-update/" + selected.user._id, "PUT", dataToSend);
+
+      alert("Modifications enregistrées avec succès !");
+      setIsEditing(false); // On quitte le mode édition de façon propre
+      selectClient(selected.user._id); // On rafraîchit la vue
+    } catch (e) { 
+      console.error("Détail de l'erreur frontend :", e);
+      alert("Erreur de sauvegarde"); 
     }
-
-    alert("Modifications enregistrées");
-    selectClient(selected.user._id);
-  } catch (e) { alert("Erreur de sauvegarde"); }
-};
-
+  };
+  
   const handleCardDecision = async (requestId, decision, message = "") => {
   try {
     const res = await api(`/admin/card-request-decision/${requestId}`, "POST", { decision, message });

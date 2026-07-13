@@ -140,42 +140,23 @@ router.get("/client-master-data/:id", auth, role("ADMIN"), async (req, res) => {
 
 router.put("/client-master-update/:id", auth, role("ADMIN"), async (req, res) => {
   try {
-    const { userData, accountData, cardData, cardRequestData } = req.body;
+    const { userData, accountData, cardData, cardRequestData } = req.body; // Ajout de cardRequestData
     
-    // 🛡️ ÉTAPE 1 : Nettoyage sécurisé pour empêcher Mongoose de planter sur les ID invariables
-    if (userData) {
-      delete userData._id;
-      delete userData.__v;
-      await User.findByIdAndUpdate(req.params.id, { $set: userData }, { new: true });
-    }
+    if (userData) await User.findByIdAndUpdate(req.params.id, userData);
+    if (accountData) await Account.findOneAndUpdate({ user: req.params.id }, accountData);
+    if (cardData) await Card.findOneAndUpdate({ user: req.params.id }, cardData);
     
-    if (accountData) {
-      delete accountData._id;
-      delete accountData.__v;
-      delete accountData.user; // On ne modifie pas la liaison utilisateur
-      await Account.findOneAndUpdate({ user: req.params.id }, { $set: accountData }, { new: true });
-    }
-    
-    if (cardData) {
-      delete cardData._id;
-      delete cardData.__v;
-      delete cardData.user;
-      await Card.findOneAndUpdate({ user: req.params.id }, { $set: cardData }, { new: true });
-    }
-    
+    // 🔥 AJOUT : Met à jour la demande de carte si elle est envoyée
     if (cardRequestData) {
-      delete cardRequestData._id;
-      delete cardRequestData.__v;
-      delete cardRequestData.user;
-      await CardRequest.findOneAndUpdate({ user: req.params.id }, { $set: cardRequestData }, { new: true });
+      await CardRequest.findOneAndUpdate({ user: req.params.id }, cardRequestData);
     }
     
     res.json({ message: "Mise à jour globale réussie" });
   } catch (err) {
-    console.error("Erreur mise à jour admin :", err); // 🔥 Permet de voir le vrai coupable dans tes logs Vercel
-    res.status(500).json({ message: "Erreur lors de la mise à jour", error: err.message });
+    res.status(500).json({ message: "Erreur lors de la mise à jour" });
   }
 });
+
 
 
 router.post("/card-request-decision/:requestId", auth, role("ADMIN"), async (req, res) => {
